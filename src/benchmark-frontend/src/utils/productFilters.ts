@@ -1,0 +1,19 @@
+import type { Product, Category } from '../types/product';
+
+export type FilterState = {
+  search: string;
+  category: 'All' | Category;
+  inStockOnly: boolean;
+  sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
+};
+
+export function filterProducts(products: Product[], filters: FilterState): Product[] {
+  let result = [...products];
+
+  // TODO: implement search filter
+  // TODO: implement category filter
+  // TODO: implement in-stock filter
+  // TODO: implement sorting
+
+  return result;
+}
