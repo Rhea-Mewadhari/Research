@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { products } from '../../benchmark-frontend/src/data/products';
-import App from '../../benchmark-frontend/src/App';
+import { products } from '../../../benchmark-frontend/src/data/products';
+import App from '../../../benchmark-frontend/src/App';
 
 describe('Hidden: sorting integrity', () => {
   it('default sort preserves original dataset order', () => {

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import App from '../../benchmark-frontend/src/App';
+import App from '../../../benchmark-frontend/src/App';
 
 describe('Hidden: console cleanliness', () => {
   it('does not produce console errors during render and interaction', async () => {

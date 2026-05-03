@@ -2,8 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const repoRoot = path.resolve(__dirname, '../benchmark-frontend');
-const hiddenTestsRoot = path.resolve(__dirname, 'hidden-tests');
+const target = process.argv[4] || 'frontend'; // frontend | backend
+
+const repoRoot = path.resolve(
+  __dirname,
+  `../benchmark-${target}`
+);
+
+const hiddenTestsRoot = path.resolve(
+  __dirname,
+  `hidden-tests/${target}`
+);
 const resultsRoot = path.resolve(__dirname, 'results');
 
 const taskId = process.argv[2] || 'unknown_task';
@@ -71,7 +80,9 @@ function parseVitestSummary(output) {
 
 function copyHiddenTests() {
   const targetTestsDir = path.join(repoRoot, 'tests');
-  const hiddenFiles = fs.readdirSync(hiddenTestsRoot).filter((file) => file.endsWith('.test.tsx'));
+  const hiddenFiles = fs.readdirSync(hiddenTestsRoot).filter((file) =>
+  file.endsWith('.test.ts') || file.endsWith('.test.tsx')
+);
 
   for (const file of hiddenFiles) {
     const src = path.join(hiddenTestsRoot, file);
@@ -135,6 +146,22 @@ function main() {
   };
 
   console.log(`Running benchmark for task=${taskId}, run=${runId}`);
+  const bugType = process.argv[5]; // logical | syntax | undefined
+
+  if (bugType) {
+    console.log(`Injecting ${bugType} bugs for ${target}...`);
+
+    const injectionScript = path.resolve(
+      __dirname,
+      `bug-injections/${target}/inject-${bugType}-bugs.js`
+    );
+
+    if (fs.existsSync(injectionScript)) {
+      runCommand(`node ${injectionScript}`, __dirname);
+    } else {
+      console.warn(`No injection script found for ${target}/${bugType}`);
+    }
+  }
 
   // Visible tests
   const visible = runCommand('npm test -- --run', repoRoot);
@@ -187,6 +214,59 @@ function main() {
     JSON.stringify(summary, null, 2),
     'utf8'
   );
+
+  // ======================
+  // SCORING MODEL
+  // ======================
+
+  function safeRate(passed, total) {
+    if (!total || total === 0) return 0;
+    return passed / total;
+  }
+
+  const score = {
+    visiblePassRate: safeRate(
+      summary.visibleTests.passed,
+      summary.visibleTests.total
+    ),
+
+    hiddenPassRate: safeRate(
+      summary.hiddenTests.passed,
+      summary.hiddenTests.total
+    ),
+
+    robustnessGap: 0,
+    buildStability: summary.build.success ? 1 : 0,
+    overallScore: 0
+  };
+
+  // Robustness gap
+  score.robustnessGap =
+    score.visiblePassRate - score.hiddenPassRate;
+
+  // Clamp (avoid negative edge cases)
+  if (score.robustnessGap < 0) {
+    score.robustnessGap = 0;
+  }
+
+  // Weighted scoring
+  score.overallScore =
+    (score.visiblePassRate * 0.3) +
+    (score.hiddenPassRate * 0.5) +
+    (score.buildStability * 0.2);
+
+  // Round for cleaner output
+  function round(num) {
+    return Math.round(num * 1000) / 1000;
+  }
+
+  score.visiblePassRate = round(score.visiblePassRate);
+  score.hiddenPassRate = round(score.hiddenPassRate);
+  score.robustnessGap = round(score.robustnessGap);
+  score.overallScore = round(score.overallScore);
+
+  // Attach to summary
+  summary.score = score;
 
   console.log(JSON.stringify(summary, null, 2));
 }

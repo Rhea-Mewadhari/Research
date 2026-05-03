@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import App from '../../benchmark-frontend/src/App';
+import App from '../../../benchmark-frontend/src/App.js';
 
 describe('Hidden: accessibility and labeling', () => {
   it('controls remain accessible by label text', () => {

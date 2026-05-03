@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import App from '../../benchmark-frontend/src/App';
+import App from '../../../benchmark-frontend/src/App';
 
 describe('Hidden: filtering edge cases', () => {
   it('search is case-insensitive', async () => {

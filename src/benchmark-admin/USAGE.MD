@@ -1,45 +1,57 @@
-# Benchmark Admin Usage
-
-This folder contains the private evaluation harness for the frontend benchmark.
-
-It is used to:
-- inject bugs into the benchmark repo
-- run hidden evaluation tests
-- execute the scoring harness
+Here’s the **updated, clean version** with backend support + new harness flow (concise, no clutter):
 
 ---
 
-## Structure
+# **Benchmark Admin Usage**
+
+This folder contains the private evaluation harness for **frontend + backend benchmarks**.
+
+It is used to:
+
+* inject bugs into benchmark repos
+* run hidden evaluation tests
+* execute the scoring harness
+
+---
+
+## **Structure**
 
 ```text
 src/
-├─ admin-benchmark/
+├─ benchmark-admin/
 │  ├─ hidden-tests/
-│  ├─ inject-logical-bug.js
-│  ├─ inject-syntax-bug.js
+│  │  ├─ frontend/
+│  │  └─ backend/
+│  ├─ bug-injections/
+│  │  ├─ frontend/
+│  │  └─ backend/
 │  ├─ run-benchmark.js
-│  └─ ...
-└─ benchmark-frontend/
+│  └─ results/
+├─ benchmark-frontend/
+└─ benchmark-backend/
 ```
 
-- `benchmark-frontend` → system under test (agent works here)
-- `admin-benchmark` → private evaluation (agent must NOT access)
+* `benchmark-frontend` → frontend system under test
+* `benchmark-backend` → backend system under test
+* `benchmark-admin` → private evaluator (agent must NOT access)
 
 ---
 
-## Standard Run Flow
+## **Standard Run Flow**
 
 For each run:
 
 1. Reset repo
-2. Inject bug (if required)
-3. Run agent (outside this harness)
+2. (Optional) Inject bugs via harness
+3. Run agent (outside harness)
 4. Run benchmark harness
 5. Store results
 
 ---
 
-## 1. Reset Repo
+## **1. Reset Repo**
+
+### Frontend
 
 ```bash
 cd src/benchmark-frontend
@@ -47,76 +59,94 @@ git reset --hard
 git clean -fd
 ```
 
----
+### Backend
 
-## 2. Bug Injection (only for bug tasks)
-
-### Logical bugs
 ```bash
-cd src/admin-benchmark
-node inject-logical-bug.js ../benchmark-frontend
-```
-
-### Syntax bugs
-```bash
-cd src/admin-benchmark
-node inject-syntax-bug.js ../benchmark-frontend
+cd src/benchmark-backend
+git reset --hard
+git clean -fd
 ```
 
 ---
 
-## 3. Run Benchmark Harness
+## **2. Run Benchmark Harness**
 
 Run AFTER the agent completes the task.
 
 ```bash
-cd src/admin-benchmark
-node run-benchmark.js <taskId> <runId>
-```
-
-Example:
-```bash
-node run-benchmark.js task1_frontend_feature run_001
+cd src/benchmark-admin
+node run-benchmark.js <taskId> <runId> <target> [bugType]
 ```
 
 ---
 
-## What the Harness Does
+### **Examples**
+
+#### Frontend (no bugs)
+
+```bash
+node run-benchmark.js task1_feature run_001 frontend
+```
+
+#### Backend (no bugs)
+
+```bash
+node run-benchmark.js task1_feature run_001 backend
+```
+
+#### Backend with logical bugs
+
+```bash
+node run-benchmark.js task2_bugfix run_001 backend logical
+```
+
+#### Backend with syntax bugs
+
+```bash
+node run-benchmark.js task3_syntax run_001 backend syntax
+```
+
+---
+
+## **What the Harness Does**
 
 `run-benchmark.js` automatically:
 
-1. Runs **visible tests**
-2. Copies hidden tests into the repo
-3. Runs **hidden tests**
-4. Removes hidden tests
-5. Runs **build**
-6. Writes logs + summary JSON
+1. (Optional) injects bugs
+2. Runs **visible tests**
+3. Copies hidden tests into the repo
+4. Runs **hidden tests**
+5. Removes hidden tests
+6. Runs **build**
+7. Writes logs + summary JSON
 
 ---
 
-## Hidden Test Execution (Option A)
+## **Hidden Test Execution**
 
-Hidden tests are temporarily copied into the repo:
+Hidden tests are copied based on target:
 
-```bash
-cp hidden-tests/*.test.tsx ../benchmark-frontend/tests/
+```text
+hidden-tests/frontend → benchmark-frontend/tests/
+hidden-tests/backend  → benchmark-backend/tests/
 ```
 
-Then executed via Vitest.
+They are:
 
-They are automatically removed after execution.
+* executed via test runner
+* automatically removed after execution
 
 ---
 
-## Output
+## **Output**
 
 Results are stored in:
 
 ```text
-src/admin-benchmark/results/
+src/benchmark-admin/results/
 ```
 
-Each run produces:
+Each run:
 
 ```text
 results/<taskId>__<runId>/
@@ -129,28 +159,18 @@ results/<taskId>__<runId>/
 
 ---
 
-## Summary Format
-
-Example:
+## **Summary Format**
 
 ```json
 {
-  "taskId": "task1_frontend_feature",
+  "taskId": "task1_feature",
   "runId": "run_001",
+  "target": "backend",
+  "bugType": "logical",
   "build": { "success": true },
-  "visibleTests": {
-    "success": true,
-    "passed": 6,
-    "failed": 0,
-    "total": 6
-  },
-  "hiddenTests": {
-    "success": true,
-    "passed": 11,
-    "failed": 0,
-    "total": 11
-  },
-  "overall": { "success": true },
+  "visibleTests": { "passed": 4, "failed": 2, "total": 6 },
+  "hiddenTests": { "passed": 8, "failed": 3, "total": 11 },
+  "overall": { "success": false },
   "timing": {
     "visibleMs": 2100,
     "hiddenMs": 2600,
@@ -162,35 +182,31 @@ Example:
 
 ---
 
-## Key Rules
+## **Key Rules**
 
-- Always start from a clean repo
-- Use the same bug injection per task
-- Do NOT expose hidden tests to the agent
-- Do NOT modify hidden tests between runs
-- Keep runs isolated
+* Always start from a clean repo
+* Use consistent bug injection per task
+* Do NOT expose hidden tests
+* Do NOT modify hidden tests between runs
+* Keep runs isolated
 
 ---
 
-## Minimal Commands
+## **Minimal Commands**
 
-### Inject bugs
 ```bash
-node inject-logical-bug.js ../benchmark-frontend
-node inject-syntax-bug.js ../benchmark-frontend
-```
-
-### Run benchmark
-```bash
-node run-benchmark.js taskId runId
+node run-benchmark.js taskId runId frontend
+node run-benchmark.js taskId runId backend
+node run-benchmark.js taskId runId backend logical
+node run-benchmark.js taskId runId backend syntax
 ```
 
 ---
 
-## Notes
+## **Notes**
 
-- Visible tests = task-facing validation  
-- Hidden tests = robustness validation  
-- Build = runtime/syntax correctness  
+* Visible tests → basic correctness
+* Hidden tests → robustness + edge cases
+* Build → syntax/runtime validity
 
-All three determine overall success.
+All three determine final outcome.
