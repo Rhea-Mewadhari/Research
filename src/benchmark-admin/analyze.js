@@ -69,12 +69,19 @@ function makeEslintConfig(ruleSet) {
     ? BACKEND_DEAD_FILES.map(f => `**/${f}`)
     : [];
 
+  // In ESLint v9, files that don't match any config block's `files` key are excluded.
+  // cwd must be srcDir so relative globs resolve within the target project.
+  const files = target === 'frontend'
+    ? ['**/*.ts', '**/*.tsx']
+    : ['**/*.ts'];
+
   return new ESLint({
-    cwd: adminDir,
+    cwd: srcDir,
     overrideConfigFile: true,
     overrideConfig: [
-      { ignores },
+      ...(ignores.length ? [{ ignores }] : []),
       {
+        files,
         plugins: {
           sonarjs,
           '@typescript-eslint': tseslint.plugin,
@@ -89,10 +96,9 @@ function makeEslintConfig(ruleSet) {
 }
 
 function srcGlobs() {
-  const base = srcDir.replace(/\\/g, '/');
   return target === 'frontend'
-    ? [`${base}/**/*.ts`, `${base}/**/*.tsx`]
-    : [`${base}/**/*.ts`];
+    ? ['**/*.ts', '**/*.tsx']
+    : ['**/*.ts'];
 }
 
 // ---------------------------------------------------------------------------
@@ -273,12 +279,20 @@ function runDuplication() {
 
   try {
     const jscpdBin  = adminBin('jscpd');
+
+    // jscpd must run from srcDir with "." — absolute Windows paths are not resolved correctly
+    // .tsx files are not in the built-in typescript format; register them via --formats-exts
+    const formatArg = target === 'frontend'
+      ? '--format typescript --formats-exts "typescript:tsx"'
+      : '--format typescript';
+
     const ignoreArg = target === 'backend'
-      ? BACKEND_DEAD_FILES.map(f => `--ignore "**/${f}"`).join(' ')
+      ? BACKEND_DEAD_FILES.map(f => `--ignore "${f}"`).join(' ')
       : '';
 
     tryRun(
-      `"${jscpdBin}" "${srcDir}" --min-tokens 30 --reporters json --output "${tmpDir}" ${ignoreArg}`,
+      `"${jscpdBin}" . --min-tokens 30 --reporters json --output "${tmpDir}" ${formatArg} ${ignoreArg} --no-gitignore`,
+      srcDir,
     );
 
     const reportPath = join(tmpDir, 'jscpd-report.json');
@@ -327,14 +341,19 @@ function runSecurity() {
       `"${semgrepBin}" scan ${configs} --json --no-rewrite-rule-ids "${srcDir}"`,
     );
 
-    // semgrep exits 0 (no findings) or 1 (findings found) — both are valid runs.
-    // Only treat it as unavailable if stdout is entirely non-JSON.
+    // semgrep exits 0 (no findings) or 1 (findings found) — both produce valid JSON on stdout.
+    // If stdout is empty the binary wasn't found or crashed before producing output.
+    if (!result.stdout) {
+      const hint = result.stderr.slice(0, 200) || 'binary not found or produced no output';
+      return nullDimension(keys, `semgrep unavailable: ${hint}`);
+    }
+
     let parsed;
     try {
-      parsed = JSON.parse(result.stdout || '{}');
+      parsed = JSON.parse(result.stdout);
     } catch {
-      const hint = result.stderr.slice(0, 200) || result.stdout.slice(0, 200) || 'no output';
-      return nullDimension(keys, `semgrep unavailable or failed: ${hint}`);
+      const hint = result.stderr.slice(0, 200) || result.stdout.slice(0, 200);
+      return nullDimension(keys, `semgrep JSON parse failed: ${hint}`);
     }
 
     const rawFindings = parsed.results || [];
