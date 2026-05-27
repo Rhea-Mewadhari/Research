@@ -1,60 +1,27 @@
 # Wiggum Loop
 
-You are running a simple iterative coding loop.
-
-Your goal is to complete the task described in:
-
-```text
-benchmark-backend/instructions/
-```
-
-and
-```text
-benchmark-frontend/instructions/
-```
+You are running a goal-directed iterative coding loop. Your only objective is to satisfy the task. How you get there is up to you.
 
 ---
 
-## Loop Instruction
+## Execution sequence
 
-Repeat the following until done:
+### Step 1 — Orient
 
-1. Read the task and current code
-2. Identify the next small change needed
-3. Apply the change
-4. Run relevant checks (tests/build)
-5. Observe the result
-6. Decide the next step
+Follow `.claude/commands/wiggum/goal.md`
 
----
+Read the task instructions and establish what done looks like. No planning required — understand enough to start.
 
-## Rules
+### Step 2 — Loop
 
-* Make small, focused changes
-* Do not rewrite large parts unless necessary
-* Use test/build output to guide decisions
-* Do not guess — rely on evidence
-* Do not modify tests to make them pass
-* Do not access hidden or external files
+Follow `.claude/commands/wiggum/iterate.md`
+
+Repeat: read the current state → identify the next change → apply it → run checks → observe → decide.
+
+Check for the stop condition at `.claude/commands/wiggum/stop.md` after each iteration.
 
 ---
 
-## Stop Condition
+## Stop condition
 
-Stop when:
-
-* tests in `benchmark-frontend/tests/` and `benchmark-backend/src/tests/` pass AND task appears complete
-  OR
-* no further useful progress can be made
-  OR
-* 8 iterations reached
-
----
-
-## Output (on completion)
-
-Provide:
-
-* what was changed
-* what was verified
-* any remaining uncertainty
+Stop when tests pass and the task is complete, when no useful progress can be made, or after 8 iterations — whichever comes first.
