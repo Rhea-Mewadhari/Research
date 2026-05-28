@@ -3,6 +3,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const venvScripts = process.platform === 'win32' ? 'Scripts' : 'bin';
+export const semgrepBin = resolve(__dirname, `../../../.venv/${venvScripts}/semgrep`);
+
 export const BACKEND_DEAD_FILES = ['counter.ts', 'main.ts'];
 
 export function buildPaths(target) {

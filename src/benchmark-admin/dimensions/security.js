@@ -1,10 +1,10 @@
-import { nullDimension, adminBin, tryRun } from '../helpers/utils.js';
+import { nullDimension, tryRun } from '../helpers/utils.js';
+import { semgrepBin } from '../helpers/paths.js';
 
-export function runSecurity({ srcDir, adminDir, adminBins }) {
+export function runSecurity({ srcDir, adminDir }) {
   const keys = ['totalFindingCount', 'bySeverity', 'findings'];
 
   try {
-    const semgrepBin = adminBin(adminBins, 'semgrep');
     const configs    = ['p/typescript', 'p/javascript', 'p/react', 'p/express']
       .map(c => `--config ${c}`)
       .join(' ');
