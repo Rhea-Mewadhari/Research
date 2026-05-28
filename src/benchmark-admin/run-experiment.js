@@ -6,12 +6,13 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '../..');
 
-const [taskId, runId, target, framework] = process.argv.slice(2);
+const [taskId, runId, target, framework, bugType] = process.argv.slice(2);
 
 if (!taskId || !runId || !target || !framework) {
-  console.error('Usage: node run-experiment.js <taskId> <runId> <target> <framework>');
+  console.error('Usage: node run-experiment.js <taskId> <runId> <target> <framework> [bugType]');
   console.error('  target:    frontend | backend');
   console.error('  framework: gsd | wiggum');
+  console.error('  bugType:   logical | syntax  (optional, for bug-fix tasks)');
   process.exit(1);
 }
 
@@ -22,6 +23,11 @@ if (!['frontend', 'backend'].includes(target)) {
 
 if (!['gsd', 'wiggum'].includes(framework)) {
   console.error(`Unknown framework: ${framework}. Use gsd or wiggum.`);
+  process.exit(1);
+}
+
+if (bugType && !['logical', 'syntax'].includes(bugType)) {
+  console.error(`Unknown bugType: ${bugType}. Use logical or syntax.`);
   process.exit(1);
 }
 
@@ -43,6 +49,16 @@ function capture(cmd, args, cwd) {
   const result = spawnSync(cmd, args, { cwd, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
   if (result.error) throw result.error;
   return result;
+}
+
+// ── 0. Bug injection (must happen before baseline so agent starts on broken code) ──
+if (bugType) {
+  const injectionScript = path.resolve(__dirname, `bug-injections/${target}/inject-${bugType}-bugs.js`);
+  if (!fs.existsSync(injectionScript)) {
+    console.error(`Bug injection script not found: ${injectionScript}`);
+    process.exit(1);
+  }
+  run('0/5 inject bugs', 'node', [injectionScript], __dirname);
 }
 
 // ── 1. Baseline quality ──────────────────────────────────────────────────────
