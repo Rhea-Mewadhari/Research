@@ -1,18 +1,18 @@
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
-function nowIso() {
+export function nowIso() {
   return new Date().toISOString();
 }
 
-function ensureDir(dir) {
+export function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 }
 
-function runCommand(command, cwd) {
+export function runCommand(command, cwd) {
   const start = Date.now();
   try {
     const stdout = execSync(command, { cwd, encoding: 'utf8', stdio: 'pipe' });
@@ -27,7 +27,7 @@ function runCommand(command, cwd) {
   }
 }
 
-function parseVitestSummary(output) {
+export function parseVitestSummary(output) {
   const text = output || '';
   const passedMatch = text.match(/(\d+)\s+passed/i);
   const failedMatch = text.match(/(\d+)\s+failed/i);
@@ -36,8 +36,6 @@ function parseVitestSummary(output) {
   return { passed, failed, total: passed + failed };
 }
 
-function writeLog(dir, name, content) {
+export function writeLog(dir, name, content) {
   fs.writeFileSync(path.join(dir, name), content, 'utf8');
 }
-
-module.exports = { nowIso, ensureDir, runCommand, parseVitestSummary, writeLog };

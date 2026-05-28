@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-function copyHiddenTests(hiddenTestsRoot, repoRoot) {
+export function copyHiddenTests(hiddenTestsRoot, repoRoot) {
   const targetTestsDir = path.join(repoRoot, 'tests');
   const hiddenFiles = fs.readdirSync(hiddenTestsRoot).filter(
     f => f.endsWith('.test.ts') || f.endsWith('.test.tsx')
@@ -14,7 +14,7 @@ function copyHiddenTests(hiddenTestsRoot, repoRoot) {
   return hiddenFiles;
 }
 
-function removeHiddenTests(files, repoRoot) {
+export function removeHiddenTests(files, repoRoot) {
   const targetTestsDir = path.join(repoRoot, 'tests');
 
   for (const file of files) {
@@ -22,5 +22,3 @@ function removeHiddenTests(files, repoRoot) {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 }
-
-module.exports = { copyHiddenTests, removeHiddenTests };

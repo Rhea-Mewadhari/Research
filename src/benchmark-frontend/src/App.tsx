@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import './styles.css';
+import './styles/style.css';
 import { products } from './data/products';
 import FilterPanel from './components/FilterPanel';
 import ProductList from './components/ProductList';

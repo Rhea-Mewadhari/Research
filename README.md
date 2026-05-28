@@ -10,14 +10,14 @@ Each experiment is a two-part process: manual setup (git isolation) followed by 
 
 ### 1. Manual setup
 
-```bash
-git reset --hard && git clean -fd
+```powershell
+git reset --hard; git clean -fd
 git checkout -b run/<framework>/<taskId>/<runId>
 ```
 
 ### 2. Run the experiment
 
-```bash
+```powershell
 node src/benchmark-admin/run-experiment.js <taskId> <runId> <target> <framework> [bugType]
 ```
 
@@ -26,7 +26,7 @@ The script runs automatically:
 
 ### 3. Commit the outputs
 
-```bash
+```powershell
 git add src/benchmark-<target> src/benchmark-admin/results/<taskId>__<runId>
 git commit -m "run: <framework> <taskId> <runId> (<target>)"
 ```
@@ -41,18 +41,18 @@ git commit -m "run: <framework> <taskId> <runId> (<target>)"
 
 #### Task 1 — Feature Implementation
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task1/gsd-run1
 node src/benchmark-admin/run-experiment.js task1 gsd-run1 frontend gsd
 git add src/benchmark-frontend src/benchmark-admin/results/task1__gsd-run1
 git commit -m "run: gsd task1 gsd-run1 (frontend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task1/wiggum-run1
 node src/benchmark-admin/run-experiment.js task1 wiggum-run1 frontend wiggum
 git add src/benchmark-frontend src/benchmark-admin/results/task1__wiggum-run1
@@ -63,18 +63,18 @@ git commit -m "run: wiggum task1 wiggum-run1 (frontend)"
 
 #### Task 2 — Logical Bug Fix
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task2/gsd-run1
 node src/benchmark-admin/run-experiment.js task2 gsd-run1 frontend gsd logical
 git add src/benchmark-frontend src/benchmark-admin/results/task2__gsd-run1
 git commit -m "run: gsd task2 gsd-run1 (frontend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task2/wiggum-run1
 node src/benchmark-admin/run-experiment.js task2 wiggum-run1 frontend wiggum logical
 git add src/benchmark-frontend src/benchmark-admin/results/task2__wiggum-run1
@@ -85,18 +85,18 @@ git commit -m "run: wiggum task2 wiggum-run1 (frontend)"
 
 #### Task 3 — Syntax Bug Fix
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task3/gsd-run1
 node src/benchmark-admin/run-experiment.js task3 gsd-run1 frontend gsd syntax
 git add src/benchmark-frontend src/benchmark-admin/results/task3__gsd-run1
 git commit -m "run: gsd task3 gsd-run1 (frontend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task3/wiggum-run1
 node src/benchmark-admin/run-experiment.js task3 wiggum-run1 frontend wiggum syntax
 git add src/benchmark-frontend src/benchmark-admin/results/task3__wiggum-run1
@@ -107,18 +107,18 @@ git commit -m "run: wiggum task3 wiggum-run1 (frontend)"
 
 #### Task 4 — Refactoring
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task4/gsd-run1
 node src/benchmark-admin/run-experiment.js task4 gsd-run1 frontend gsd
 git add src/benchmark-frontend src/benchmark-admin/results/task4__gsd-run1
 git commit -m "run: gsd task4 gsd-run1 (frontend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task4/wiggum-run1
 node src/benchmark-admin/run-experiment.js task4 wiggum-run1 frontend wiggum
 git add src/benchmark-frontend src/benchmark-admin/results/task4__wiggum-run1
@@ -129,18 +129,18 @@ git commit -m "run: wiggum task4 wiggum-run1 (frontend)"
 
 #### Task 5 — Test Generation
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task5/gsd-run1
 node src/benchmark-admin/run-experiment.js task5 gsd-run1 frontend gsd
 git add src/benchmark-frontend src/benchmark-admin/results/task5__gsd-run1
 git commit -m "run: gsd task5 gsd-run1 (frontend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task5/wiggum-run1
 node src/benchmark-admin/run-experiment.js task5 wiggum-run1 frontend wiggum
 git add src/benchmark-frontend src/benchmark-admin/results/task5__wiggum-run1
@@ -151,18 +151,18 @@ git commit -m "run: wiggum task5 wiggum-run1 (frontend)"
 
 #### Task 6 — Integration (Async Data)
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task6/gsd-run1
 node src/benchmark-admin/run-experiment.js task6 gsd-run1 frontend gsd
 git add src/benchmark-frontend src/benchmark-admin/results/task6__gsd-run1
 git commit -m "run: gsd task6 gsd-run1 (frontend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task6/wiggum-run1
 node src/benchmark-admin/run-experiment.js task6 wiggum-run1 frontend wiggum
 git add src/benchmark-frontend src/benchmark-admin/results/task6__wiggum-run1
@@ -177,18 +177,18 @@ git commit -m "run: wiggum task6 wiggum-run1 (frontend)"
 
 #### Task 1 — Feature Implementation
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task1/gsd-run1-be
 node src/benchmark-admin/run-experiment.js task1 gsd-run1-be backend gsd
 git add src/benchmark-backend src/benchmark-admin/results/task1__gsd-run1-be
 git commit -m "run: gsd task1 gsd-run1-be (backend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task1/wiggum-run1-be
 node src/benchmark-admin/run-experiment.js task1 wiggum-run1-be backend wiggum
 git add src/benchmark-backend src/benchmark-admin/results/task1__wiggum-run1-be
@@ -199,18 +199,18 @@ git commit -m "run: wiggum task1 wiggum-run1-be (backend)"
 
 #### Task 2 — Logical Bug Fix
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task2/gsd-run1-be
 node src/benchmark-admin/run-experiment.js task2 gsd-run1-be backend gsd logical
 git add src/benchmark-backend src/benchmark-admin/results/task2__gsd-run1-be
 git commit -m "run: gsd task2 gsd-run1-be (backend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task2/wiggum-run1-be
 node src/benchmark-admin/run-experiment.js task2 wiggum-run1-be backend wiggum logical
 git add src/benchmark-backend src/benchmark-admin/results/task2__wiggum-run1-be
@@ -221,18 +221,18 @@ git commit -m "run: wiggum task2 wiggum-run1-be (backend)"
 
 #### Task 3 — Syntax Bug Fix
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task3/gsd-run1-be
 node src/benchmark-admin/run-experiment.js task3 gsd-run1-be backend gsd syntax
 git add src/benchmark-backend src/benchmark-admin/results/task3__gsd-run1-be
 git commit -m "run: gsd task3 gsd-run1-be (backend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task3/wiggum-run1-be
 node src/benchmark-admin/run-experiment.js task3 wiggum-run1-be backend wiggum syntax
 git add src/benchmark-backend src/benchmark-admin/results/task3__wiggum-run1-be
@@ -243,18 +243,18 @@ git commit -m "run: wiggum task3 wiggum-run1-be (backend)"
 
 #### Task 4 — Refactoring
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task4/gsd-run1-be
 node src/benchmark-admin/run-experiment.js task4 gsd-run1-be backend gsd
 git add src/benchmark-backend src/benchmark-admin/results/task4__gsd-run1-be
 git commit -m "run: gsd task4 gsd-run1-be (backend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task4/wiggum-run1-be
 node src/benchmark-admin/run-experiment.js task4 wiggum-run1-be backend wiggum
 git add src/benchmark-backend src/benchmark-admin/results/task4__wiggum-run1-be
@@ -265,18 +265,18 @@ git commit -m "run: wiggum task4 wiggum-run1-be (backend)"
 
 #### Task 5 — Test Generation
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task5/gsd-run1-be
 node src/benchmark-admin/run-experiment.js task5 gsd-run1-be backend gsd
 git add src/benchmark-backend src/benchmark-admin/results/task5__gsd-run1-be
 git commit -m "run: gsd task5 gsd-run1-be (backend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task5/wiggum-run1-be
 node src/benchmark-admin/run-experiment.js task5 wiggum-run1-be backend wiggum
 git add src/benchmark-backend src/benchmark-admin/results/task5__wiggum-run1-be
@@ -287,18 +287,18 @@ git commit -m "run: wiggum task5 wiggum-run1-be (backend)"
 
 #### Task 6 — Integration (Async Data)
 
-```bash
+```powershell
 # GSD
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/gsd/task6/gsd-run1-be
 node src/benchmark-admin/run-experiment.js task6 gsd-run1-be backend gsd
 git add src/benchmark-backend src/benchmark-admin/results/task6__gsd-run1-be
 git commit -m "run: gsd task6 gsd-run1-be (backend)"
 ```
 
-```bash
+```powershell
 # Wiggum
-git reset --hard && git clean -fd
+git reset --hard; git clean -fd
 git checkout -b run/wiggum/task6/wiggum-run1-be
 node src/benchmark-admin/run-experiment.js task6 wiggum-run1-be backend wiggum
 git add src/benchmark-backend src/benchmark-admin/results/task6__wiggum-run1-be
@@ -342,8 +342,15 @@ Use the Wiggum loop to complete the frontend task 1.
 
 ## Prerequisites
 
-```bash
-cd src/benchmark-admin && pnpm install
+```powershell
+# Node dependencies
+cd src/benchmark-admin; pnpm install
+
+# Python dependencies (semgrep for security analysis)
+# Run from the repo root
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
 The `claude` CLI must be available in `PATH` (`claude --version` to verify).

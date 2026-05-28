@@ -39,7 +39,7 @@ export function runAgent({ repoRoot, resultDir, framework, target, taskId }) {
 
   try {
     const parsed = JSON.parse((claudeResult.stdout || '').trim());
-    agentMeta.cost_usd   = parsed.cost_usd   ?? null;
+    agentMeta.cost_usd   = parsed.total_cost_usd ?? null;
     agentMeta.num_turns  = parsed.num_turns  ?? null;
     agentMeta.session_id = parsed.session_id ?? null;
     agentMeta.is_error   = parsed.is_error   ?? false;

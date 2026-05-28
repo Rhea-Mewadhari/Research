@@ -1,8 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const { nowIso, ensureDir, runCommand, parseVitestSummary, writeLog } = require('./helpers/benchmark-utils');
-const { copyHiddenTests, removeHiddenTests } = require('./helpers/hidden-tests');
-const { computeScore } = require('./helpers/scorer');
+import fs from 'fs';
+import path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { nowIso, ensureDir, runCommand, parseVitestSummary, writeLog } from './helpers/benchmark-utils.js';
+import { copyHiddenTests, removeHiddenTests } from './helpers/hidden-tests.js';
+import { computeScore } from './helpers/scorer.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const taskId  = process.argv[2] || 'unknown_task';
 const runId   = process.argv[3] || `run_${Date.now()}`;

@@ -7,7 +7,7 @@ function round(num) {
   return Math.round(num * 1000) / 1000;
 }
 
-function computeScore(summary) {
+export function computeScore(summary) {
   const visiblePassRate = safeRate(summary.visibleTests.passed, summary.visibleTests.total);
   const hiddenPassRate  = safeRate(summary.hiddenTests.passed,  summary.hiddenTests.total);
   const buildStability  = summary.build.success ? 1 : 0;
@@ -27,5 +27,3 @@ function computeScore(summary) {
     overallScore:    round(overallScore),
   };
 }
-
-module.exports = { computeScore };
