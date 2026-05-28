@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "experiment": "node run-experiment.js",
     "analyze": "node analyze.js",
     "delta": "node delta.js"
   },
