@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, resolve } from 'path';
+import { diffDimension, numericDelta } from './helpers/delta-helpers.js';
 
 const [baselineFile, postAgentFile, outputFile] = process.argv.slice(2);
 
@@ -19,45 +20,6 @@ function loadReport(filePath) {
 
 const baseline  = loadReport(baselineFile);
 const postAgent = loadReport(postAgentFile);
-
-// ---------------------------------------------------------------------------
-// Delta helpers
-// ---------------------------------------------------------------------------
-
-function dimStatus(b, p) {
-  const bNull = b === null || b === undefined || b.error != null;
-  const pNull = p === null || p === undefined || p.error != null;
-  if (bNull && pNull)  return 'null_both';
-  if (bNull)           return 'null_baseline';
-  if (pNull)           return 'null_postAgent';
-  return 'compared';
-}
-
-function numericDelta(bVal, pVal) {
-  if (bVal == null || pVal == null) return { baseline: bVal ?? null, postAgent: pVal ?? null, delta: null };
-  return { baseline: bVal, postAgent: pVal, delta: pVal - bVal };
-}
-
-function diffDimension(bDim, pDim, numericKeys) {
-  const status = dimStatus(bDim, pDim);
-  if (status !== 'compared') {
-    return {
-      status,
-      baselineError:  bDim?.error ?? null,
-      postAgentError: pDim?.error ?? null,
-    };
-  }
-
-  const out = { status };
-  for (const key of numericKeys) {
-    out[key] = numericDelta(bDim[key], pDim[key]);
-  }
-  return out;
-}
-
-// ---------------------------------------------------------------------------
-// Per-dimension deltas
-// ---------------------------------------------------------------------------
 
 const complexity = diffDimension(
   baseline.complexity, postAgent.complexity,
@@ -84,7 +46,6 @@ const security = diffDimension(
   ['totalFindingCount'],
 );
 
-// For security, also diff bySeverity if both available
 if (security.status === 'compared') {
   const bSev = baseline.security.bySeverity  ?? {};
   const pSev = postAgent.security.bySeverity ?? {};
@@ -95,15 +56,11 @@ if (security.status === 'compared') {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Assemble and write
-// ---------------------------------------------------------------------------
-
 const delta = {
   meta: {
-    baselineFile:  resolve(baselineFile),
-    postAgentFile: resolve(postAgentFile),
-    generatedAt:   new Date().toISOString(),
+    baselineFile:    resolve(baselineFile),
+    postAgentFile:   resolve(postAgentFile),
+    generatedAt:     new Date().toISOString(),
     baselineTarget:  baseline.meta?.target,
     postAgentTarget: postAgent.meta?.target,
   },
@@ -114,8 +71,9 @@ const delta = {
   security,
 };
 
-const outDir = dirname(resolve(outputFile));
+const outPath = resolve(outputFile);
+const outDir  = dirname(outPath);
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
 
-writeFileSync(resolve(outputFile), JSON.stringify(delta, null, 2), 'utf8');
-console.log(`[delta] written to ${resolve(outputFile)}`);
+writeFileSync(outPath, JSON.stringify(delta, null, 2), 'utf8');
+console.log(`[delta] written to ${outPath}`);
