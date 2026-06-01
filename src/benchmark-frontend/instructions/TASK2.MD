@@ -10,13 +10,13 @@ Your task is to identify and fix incorrect behavior in filtering and sorting so 
 
 ## Context
 
-The application allows users to:
-- search products
-- filter by category
-- filter by in-stock status
-- sort results
+The product filtering feature is implemented, but has logical bugs. Observable incorrect behaviors include:
 
-However, some combinations of filters and sorting produce incorrect results.
+- Searching for a lowercase term (e.g. `wireless`) returns no results, even when a matching product exists
+- A search term with surrounding spaces returns no results
+- Selecting a category and then enabling in-stock filtering shows incorrect results — one filter overrides the other
+- Sorted results are not in the expected order
+- Clicking "Clear filters" does not fully reset all filter state
 
 ---
 
@@ -25,17 +25,17 @@ However, some combinations of filters and sorting produce incorrect results.
 Fix the implementation so that:
 
 ### 1. Filters combine correctly
-- Search, category, and in-stock filters must work together
+- Search, category, and in-stock filters must all apply together
 - Applying one filter must not override or reset others
 
 ### 2. Search behavior
 - Must be case-insensitive
-- Must ignore leading/trailing whitespace
+- Must ignore leading/trailing whitespace in the input value
 - Must only match against product name
 
 ### 3. Category filter
-- Selecting `All` must not filter anything
-- Selecting a category must strictly match that category
+- Selecting `All` must show all products
+- Selecting a specific category must strictly match that category
 
 ### 4. In-stock filter
 - Must exclude all `inStock === false` items when enabled

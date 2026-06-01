@@ -13,12 +13,9 @@ Your task is to fix these issues so that:
 
 ## Context
 
-The codebase includes:
-- React components
-- TypeScript types
-- filtering utilities
+The codebase has errors introduced across multiple files. These prevent the app from building or behaving correctly. Find and fix all of them.
 
-Some files contain:
+Errors may include:
 - invalid JSX
 - incorrect TypeScript usage
 - broken event handlers
@@ -60,7 +57,7 @@ Fix all syntax and runtime errors, including:
 
 ## Expected Files to Modify
 
-Any file with syntax or runtime errors
+Any file under `src/` that contains errors — check all components, utilities, and types
 
 ---
 

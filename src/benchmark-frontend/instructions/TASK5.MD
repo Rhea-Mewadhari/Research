@@ -8,12 +8,7 @@ Write comprehensive tests for the product filtering and sorting functionality.
 
 ## Context
 
-The application includes:
-- filtering logic
-- sorting logic
-- UI interactions
-
-Existing tests are incomplete or missing.
+The application includes filtering logic, sorting logic, and UI interactions. Existing test coverage is incomplete — expand it to cover the cases below.
 
 ---
 
@@ -59,12 +54,13 @@ Write tests that cover:
 
 ## Expected Files
 
-- Add/update files in `/tests`
+- Add or update test files in `src/tests/`
 
 ---
 
 ## Success Criteria
 
-- Tests accurately validate behavior
-- Good coverage of edge cases
-- Tests are readable and maintainable
+- Tests run successfully with `vitest`
+- Each test asserts on specific rendered output (product names, count, order) — not just that nothing crashed
+- All cases listed above are covered
+- Tests are self-contained and deterministic

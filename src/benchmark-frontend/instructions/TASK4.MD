@@ -8,31 +8,27 @@ Improve the structure and maintainability of the product filtering implementatio
 
 ## Context
 
-The current implementation works but may contain:
-- duplicated logic
-- tightly coupled components
-- poor separation of concerns
+The current implementation works and tests pass, but the code has structural issues that make it harder to maintain.
 
 ---
 
 ## Requirements
 
-Refactor the code to improve:
-
 ### 1. Separation of concerns
-- Move logic out of components where appropriate
-- Keep UI components focused on rendering
+- Filter and sort logic belongs in `src/utils/productFilters.ts`, not inside components
+- Components should call utility functions — not re-implement filtering inline
+- `App.tsx` should own filter state; components should receive values and callbacks as props
 
 ### 2. Reusability
-- Extract reusable logic into utilities or hooks
+- Extract any repeated logic into named utility functions
+- If logic is duplicated between `FilterPanel.tsx` and `productFilters.ts`, consolidate it
 
 ### 3. Readability
-- Improve naming
-- simplify complex logic
+- Rename variables or functions whose names don't describe what they do
+- Break up any functions that do too many things
 
-### 4. Maintainability
-- Reduce duplication
-- improve structure
+### 4. Dead code
+- Remove unused imports, variables, or functions
 
 ---
 
@@ -46,14 +42,16 @@ Refactor the code to improve:
 
 ## Expected Refactoring Areas
 
-- `productFilters.ts`
-- component logic in FilterPanel / SortSelect
-- state handling in App
+- `src/utils/productFilters.ts`
+- `src/components/FilterPanel.tsx`
+- `src/components/SortSelect.tsx`
+- `src/App.tsx`
 
 ---
 
 ## Success Criteria
 
 - All tests still pass
-- Code is cleaner and easier to follow
-- No regression in behavior
+- Filter and sort logic lives in `productFilters.ts`, not in component bodies
+- No unused imports or dead code
+- No behavior regression

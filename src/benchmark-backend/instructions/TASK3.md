@@ -1,16 +1,27 @@
 # Task 3: Fix Syntax and Runtime Errors
 
 ## Objective
-Fix all compile-time and runtime issues in the backend.
+Fix all compile-time and runtime errors in the backend so the application starts and all endpoints respond correctly.
 
-## Issues May Include
-- Broken imports
+## What to Look For
+
+The codebase contains errors that prevent it from compiling or running. Find and fix all of them:
+
+- Broken or missing imports/exports
 - TypeScript type errors
-- Incorrect async usage
-- Undefined variables
-- Crashing endpoints
+- Incorrect async/await usage
+- Undefined variables or properties
+- Crashing route handlers
 
-## Requirements
-- Application must start successfully
-- All endpoints must respond without crashing
-- Tests should run without runtime errors
+## Expected Files to Check
+All files under `src/` may contain errors — check `server.ts`, `app.ts`, `routes/`, `controllers/`, `services/`, `data/`, and `types/`.
+
+## Constraints
+- Do not change functionality beyond fixing errors
+- Do not restructure files unnecessarily
+
+## Success Criteria
+- The server starts without errors
+- `GET /products` responds with a JSON array
+- All visible tests pass
+- No uncaught runtime errors in the server log
