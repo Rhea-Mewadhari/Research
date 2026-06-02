@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { getAllProducts } from "../services/productService";
 
 export const getProducts = (req: Request, res: Response) => {
