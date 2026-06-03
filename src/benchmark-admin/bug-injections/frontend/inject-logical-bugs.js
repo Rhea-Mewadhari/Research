@@ -1,12 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const repoRoot = process.argv[2];
-
-if (!repoRoot) {
-  console.error('Usage: node inject-logical-bug.js <repoRoot>');
-  process.exit(1);
-}
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(__dirname, '../../../benchmark-frontend');
 
 function write(filePath, content) {
   fs.writeFileSync(filePath, content, 'utf8');
