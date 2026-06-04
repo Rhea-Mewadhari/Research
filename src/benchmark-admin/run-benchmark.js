@@ -59,7 +59,7 @@ function main() {
   // Hidden tests
   let hiddenFiles = [];
   try {
-    hiddenFiles = copyHiddenTests(hiddenTestsRoot, repoRoot);
+    hiddenFiles = copyHiddenTests(hiddenTestsRoot, repoRoot, taskId);
 
     const hidden = runCommand('npm test -- --run', repoRoot);
     summary.timing.hiddenMs = hidden.durationMs;

@@ -9,12 +9,23 @@ function round(num) {
 
 export function computeScore(summary) {
   const visiblePassRate = safeRate(summary.visibleTests.passed, summary.visibleTests.total);
-  const hiddenPassRate  = safeRate(summary.hiddenTests.passed,  summary.hiddenTests.total);
   const buildStability  = summary.build.success ? 1 : 0;
+  const hasHiddenTests  = summary.hiddenTests.total > 0;
 
-  const robustnessGap = Math.max(0, visiblePassRate - hiddenPassRate);
+  if (!hasHiddenTests) {
+    return {
+      visiblePassRate:  round(visiblePassRate),
+      hiddenPassRate:   null,
+      robustnessGap:    null,
+      buildStability,
+      overallScore:     round((visiblePassRate * 0.8) + (buildStability * 0.2)),
+      hiddenTestsNote:  'No hidden tests for this task; visible weight 80%, build weight 20%.',
+    };
+  }
 
-  const overallScore =
+  const hiddenPassRate = safeRate(summary.hiddenTests.passed, summary.hiddenTests.total);
+  const robustnessGap  = Math.max(0, visiblePassRate - hiddenPassRate);
+  const overallScore   =
     (visiblePassRate * 0.3) +
     (hiddenPassRate  * 0.5) +
     (buildStability  * 0.2);
