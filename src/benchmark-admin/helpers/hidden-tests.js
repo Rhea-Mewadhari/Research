@@ -5,7 +5,8 @@ import path from 'path';
 // their source-relative imports need to be rewritten to be valid from the new location.
 // e.g. '../../../benchmark-frontend/src/' → '../src/'
 const IMPORT_REWRITES = [
-  [/['"]\.\.\/\.\.\/\.\.\/benchmark-frontend\/src\//g, "'../src/"],
+  [/(['"])\.\.\/\.\.\/\.\.\/benchmark-frontend\/src\//g, '$1../src/'],
+  [/(['"])\.\.\/\.\.\/\.\.\/benchmark-backend\/src\//g,  '$1../src/'],
 ];
 
 function rewriteImports(content) {
@@ -29,6 +30,8 @@ export function copyHiddenTests(hiddenTestsRoot, repoRoot, taskId) {
       f => f.endsWith('.test.ts') || f.endsWith('.test.tsx')
     );
   }
+
+  fs.mkdirSync(targetTestsDir, { recursive: true });
 
   for (const file of hiddenFiles) {
     const src     = path.join(hiddenTestsRoot, file);

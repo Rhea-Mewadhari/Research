@@ -1,0 +1,33 @@
+{
+  "task1": [
+    "hidden.search.test.ts",
+    "hidden.combined.test.ts",
+    "hidden.integrity.test.ts",
+    "hidden.sorting.test.ts"
+  ],
+  "task2": [
+    "hidden.search.test.ts",
+    "hidden.combined.test.ts",
+    "hidden.integrity.test.ts",
+    "hidden.sorting.test.ts"
+  ],
+  "task3": [
+    "hidden.search.test.ts",
+    "hidden.combined.test.ts",
+    "hidden.integrity.test.ts",
+    "hidden.sorting.test.ts"
+  ],
+  "task4": [
+    "hidden.search.test.ts",
+    "hidden.combined.test.ts",
+    "hidden.integrity.test.ts",
+    "hidden.sorting.test.ts"
+  ],
+  "task5": [],
+  "task6": [
+    "hidden.search.test.ts",
+    "hidden.combined.test.ts",
+    "hidden.integrity.test.ts",
+    "hidden.sorting.test.ts"
+  ]
+}

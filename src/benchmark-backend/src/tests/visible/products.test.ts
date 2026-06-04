@@ -23,4 +23,17 @@ describe("GET /products", () => {
     const prices = res.body.map((p: any) => p.price);
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
   });
+
+  it("sorts by price descending", async () => {
+    const res = await request(app).get("/products?sort=price_desc");
+    const prices = res.body.map((p: any) => p.price);
+    expect(prices).toEqual([...prices].sort((a, b) => b - a));
+  });
+
+  it("filters by search term", async () => {
+    const res = await request(app).get("/products?search=laptop");
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body.every((p: any) => p.name.toLowerCase().includes("laptop"))).toBe(true);
+  });
 });
