@@ -18,23 +18,23 @@ export function computeScore(summary) {
       hiddenPassRate:   null,
       robustnessGap:    null,
       buildStability,
-      overallScore:     round((visiblePassRate * 0.8) + (buildStability * 0.2)),
+      correctnessScore: round((visiblePassRate * 0.8) + (buildStability * 0.2)),
       hiddenTestsNote:  'No hidden tests for this task; visible weight 80%, build weight 20%.',
     };
   }
 
-  const hiddenPassRate = safeRate(summary.hiddenTests.passed, summary.hiddenTests.total);
-  const robustnessGap  = Math.max(0, visiblePassRate - hiddenPassRate);
-  const overallScore   =
+  const hiddenPassRate   = safeRate(summary.hiddenTests.passed, summary.hiddenTests.total);
+  const robustnessGap    = Math.max(0, visiblePassRate - hiddenPassRate);
+  const correctnessScore =
     (visiblePassRate * 0.3) +
     (hiddenPassRate  * 0.5) +
     (buildStability  * 0.2);
 
   return {
-    visiblePassRate: round(visiblePassRate),
-    hiddenPassRate:  round(hiddenPassRate),
-    robustnessGap:   round(robustnessGap),
+    visiblePassRate:  round(visiblePassRate),
+    hiddenPassRate:   round(hiddenPassRate),
+    robustnessGap:    round(robustnessGap),
     buildStability,
-    overallScore:    round(overallScore),
+    correctnessScore: round(correctnessScore),
   };
 }

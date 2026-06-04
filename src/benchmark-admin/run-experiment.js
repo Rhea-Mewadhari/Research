@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { run } from './helpers/spawn-utils.js';
 import { runAgent } from './helpers/agent-runner.js';
+import { computeQualityScore } from './helpers/quality-scorer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot  = path.resolve(__dirname, '../..');
@@ -71,11 +72,22 @@ run('5/5 delta', 'node', [
   path.join(resultDir, 'quality-delta.json'),
 ], __dirname);
 
-// Merge agent metadata into summary.json 
+// Merge agent metadata and quality score into summary.json
 const summaryPath = path.join(resultDir, 'summary.json');
+const deltaPath   = path.join(resultDir, 'quality-delta.json');
+
 if (fs.existsSync(summaryPath)) {
   const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
   summary.agent = agentMeta;
+
+  if (fs.existsSync(deltaPath) && summary.score) {
+    const delta          = JSON.parse(fs.readFileSync(deltaPath, 'utf8'));
+    const qualityScore   = computeQualityScore(delta);
+    const correctness    = summary.score.correctnessScore;
+    summary.score.qualityScore  = qualityScore;
+    summary.score.overallScore  = Math.round((correctness * 0.6 + qualityScore * 0.4) * 1000) / 1000;
+  }
+
   fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2), 'utf8');
 }
 
