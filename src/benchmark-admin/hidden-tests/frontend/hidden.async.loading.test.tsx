@@ -16,7 +16,7 @@ describe('Hidden: async data loading', () => {
       { timeout: 2000 }
     );
 
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 6 products');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 15 products');
   });
 
   it('filtering works correctly after data loads', async () => {

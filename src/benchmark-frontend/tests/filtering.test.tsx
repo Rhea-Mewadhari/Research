@@ -22,8 +22,9 @@ describe('Filtering behavior', () => {
 
     expect(screen.getByText(/yoga mat/i)).toBeInTheDocument();
     expect(screen.getByText(/resistance bands/i)).toBeInTheDocument();
+    expect(screen.getByText(/foam roller/i)).toBeInTheDocument();
     expect(screen.queryByText(/wireless mouse/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 2 products');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 5 products');
   });
 
   it('filters products by in-stock only', async () => {
@@ -33,7 +34,9 @@ describe('Filtering behavior', () => {
     await user.click(screen.getByLabelText(/in-stock only/i));
 
     expect(screen.queryByText(/usb-c hub/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/noise-cancelling headphones/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/dumbbell set/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/desk lamp/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 4 products');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 11 products');
   });
 });

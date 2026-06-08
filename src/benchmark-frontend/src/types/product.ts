@@ -7,4 +7,8 @@ export type Product = {
   price: number;
   inStock: boolean;
   rating: number;
+  reviewCount: number;
+  description: string;
+  tags: string[];
+  discountPct?: number;
 };

@@ -32,11 +32,20 @@ describe('Hidden: combined filter behavior', () => {
 
     expect(names).toEqual([
       'Wireless Mouse',
-      'Yoga Mat',
       'USB-C Hub',
+      'Mechanical Keyboard',
+      'Webcam HD',
+      'Noise-Cancelling Headphones',
+      'Yoga Mat',
       'Resistance Bands',
+      'Foam Roller',
+      'Dumbbell Set',
+      'Jump Rope',
       'Laptop Stand',
       'Desk Lamp',
+      'Cable Organiser',
+      'Monitor Riser',
+      'Ergonomic Wrist Rest',
     ]);
   });
 });

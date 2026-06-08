@@ -1,20 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import './styles/style.css';
 import { products } from './data/products';
 import FilterPanel from './components/FilterPanel';
 import ProductList from './components/ProductList';
 import SortSelect from './components/SortSelect';
-import { filterProducts, type FilterState } from './utils/productFilters';
-
-const initialFilters: FilterState = {
-  search: '',
-  category: 'All',
-  inStockOnly: false,
-  sortBy: 'default',
-};
+import { filterProducts } from './utils/productFilters';
+import { useProductFilters } from './hooks/useProductFilters';
 
 export default function App() {
-  const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const { filters, setFilters } = useProductFilters();
 
   const visibleProducts = useMemo(() => {
     return filterProducts(products, filters);

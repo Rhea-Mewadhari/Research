@@ -7,7 +7,7 @@ export type FilterState = {
   sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
 };
 
-export function filterProducts(products: Product[], filters: FilterState): Product[] {
+export function filterProducts(products: Product[], _filters: FilterState): Product[] {
   let result = [...products];
 
   // TODO: implement search filter

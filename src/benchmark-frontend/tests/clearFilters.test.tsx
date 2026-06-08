@@ -16,6 +16,6 @@ describe('Clear filters', () => {
     expect(screen.getByLabelText(/category/i)).toHaveValue('All');
     expect(screen.getByLabelText(/in-stock only/i)).not.toBeChecked();
     expect(screen.getByLabelText(/sort by/i)).toHaveValue('default');
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 6 products');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 15 products');
   });
 });

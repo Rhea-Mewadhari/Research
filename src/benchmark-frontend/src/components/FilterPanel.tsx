@@ -8,7 +8,7 @@ type Props = {
 
 const categories: Array<'All' | Category> = ['All', 'Electronics', 'Fitness', 'Accessories'];
 
-export default function FilterPanel({ filters, onChange }: Props) {
+export default function FilterPanel({ filters, onChange: _onChange }: Props) {
   return (
     <section aria-label="Filters" className="panel">
       <h2>Filters</h2>

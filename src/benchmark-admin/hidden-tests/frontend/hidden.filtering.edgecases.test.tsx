@@ -17,9 +17,9 @@ describe('Hidden: filtering edge cases', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.type(screen.getByLabelText(/search/i), '   lamp   ');
+    await user.type(screen.getByLabelText(/search/i), '   foam   ');
 
-    expect(screen.getByText(/desk lamp/i)).toBeInTheDocument();
+    expect(screen.getByText(/foam roller/i)).toBeInTheDocument();
     expect(screen.queryByText(/wireless mouse/i)).not.toBeInTheDocument();
   });
 
@@ -29,7 +29,7 @@ describe('Hidden: filtering edge cases', () => {
 
     await user.selectOptions(screen.getByLabelText(/category/i), 'All');
 
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 6 products');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 15 products');
   });
 
   it('search only matches product name, not category text', async () => {
