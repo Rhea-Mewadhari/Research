@@ -50,7 +50,7 @@ function main() {
   }
 
   // Visible tests
-  const visible = runCommand('npm test -- --run', repoRoot);
+  const visible = runCommand('pnpm test -- --run', repoRoot);
   summary.timing.visibleMs = visible.durationMs;
   writeLog(resultDir, 'visible-tests.stdout.txt', visible.stdout);
   writeLog(resultDir, 'visible-tests.stderr.txt', visible.stderr);
@@ -61,7 +61,7 @@ function main() {
   try {
     hiddenFiles = copyHiddenTests(hiddenTestsRoot, repoRoot, taskId);
 
-    const hidden = runCommand('npm test -- --run', repoRoot);
+    const hidden = runCommand('pnpm test -- --run', repoRoot);
     summary.timing.hiddenMs = hidden.durationMs;
     writeLog(resultDir, 'hidden-tests.stdout.txt', hidden.stdout);
     writeLog(resultDir, 'hidden-tests.stderr.txt', hidden.stderr);
@@ -71,7 +71,7 @@ function main() {
   }
 
   // Build
-  const build = runCommand('npm run build', repoRoot);
+  const build = runCommand('pnpm run build', repoRoot);
   summary.timing.buildMs  = build.durationMs;
   writeLog(resultDir, 'build.stdout.txt', build.stdout);
   writeLog(resultDir, 'build.stderr.txt', build.stderr);
