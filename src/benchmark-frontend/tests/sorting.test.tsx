@@ -6,6 +6,7 @@ describe('Sorting behavior', () => {
   it('sorts by price ascending', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByTestId('results-count');
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
 
@@ -35,6 +36,7 @@ describe('Sorting behavior', () => {
   it('sorts by price descending', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByTestId('results-count');
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-desc');
 
@@ -50,6 +52,7 @@ describe('Sorting behavior', () => {
   it('sorts by rating descending', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByTestId('results-count');
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'rating-desc');
 

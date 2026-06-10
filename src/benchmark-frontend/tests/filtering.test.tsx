@@ -6,6 +6,7 @@ describe('Filtering behavior', () => {
   it('filters products by search term', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByTestId('results-count');
 
     await user.type(screen.getByLabelText(/search/i), 'mouse');
 
@@ -17,6 +18,7 @@ describe('Filtering behavior', () => {
   it('filters products by category', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByTestId('results-count');
 
     await user.selectOptions(screen.getByLabelText(/category/i), 'Fitness');
 
@@ -30,6 +32,7 @@ describe('Filtering behavior', () => {
   it('filters products by in-stock only', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByTestId('results-count');
 
     await user.click(screen.getByLabelText(/in-stock only/i));
 

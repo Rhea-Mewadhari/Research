@@ -12,14 +12,15 @@ function write(filePath, content) {
 
 const productFiltersPath = path.join(repoRoot, 'src', 'utils', 'productFilters.ts');
 const filterPanelPath = path.join(repoRoot, 'src', 'components', 'FilterPanel.tsx');
+const sortSelectPath = path.join(repoRoot, 'src', 'components', 'SortSelect.tsx');
 
 write(
   productFiltersPath,
-  `import type { Product, Category } from '../types/product';
+  `import type { Product } from '../types/product';
 
 export type FilterState = {
   search: string;
-  category: 'All' | Category;
+  category: string;
   inStockOnly: boolean;
   sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
 };
@@ -56,17 +57,15 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
 
 write(
   filterPanelPath,
-  `import type { Category } from '../types/product';
-import type { FilterState } from '../utils/productFilters';
+  `import type { FilterState } from '../utils/productFilters';
 
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  categories: string[];
 };
 
-const categories: Array<'All' | Category> = ['All', 'Electronics', 'Fitness', 'Accessories'];
-
-export default function FilterPanel({ filters, onChange }: Props) {
+export default function FilterPanel({ filters, onChange, categories }: Props) {
   return (
     <section aria-label="Filters" className="panel">
       <h2>Filters</h2>
@@ -92,7 +91,7 @@ export default function FilterPanel({ filters, onChange }: Props) {
           onChange={(e) =>
             onChange({
               ...filters,
-              category: e.target.value as FilterState['category'],
+              category: e.target.value,
             })
           }
         >
@@ -137,6 +136,38 @@ export default function FilterPanel({ filters, onChange }: Props) {
         Clear filters
       </button>
     </section>
+  );
+}
+`
+);
+
+// Provide a working SortSelect so the agent only needs to fix the logical bugs
+// rather than also implement the sort handler from scratch.
+write(
+  sortSelectPath,
+  `import type { FilterState } from '../utils/productFilters';
+
+type Props = {
+  value: FilterState['sortBy'];
+  onChange: (sortBy: FilterState['sortBy']) => void;
+};
+
+export default function SortSelect({ value, onChange }: Props) {
+  return (
+    <div className="panel">
+      <label htmlFor="sortBy">Sort by</label>
+      <select
+        id="sortBy"
+        name="sortBy"
+        value={value}
+        onChange={(e) => onChange(e.target.value as FilterState['sortBy'])}
+      >
+        <option value="default">Default</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="rating-desc">Rating</option>
+      </select>
+    </div>
   );
 }
 `

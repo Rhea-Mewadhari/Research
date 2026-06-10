@@ -3,19 +3,30 @@
 ## Objective
 Write comprehensive tests for the `GET /products` endpoint using the existing Vitest + Supertest setup.
 
+## Context
+
+All requests to `/products` require an `Authorization: Bearer <token>` header. The benchmark token is `benchmark-token-2024`. The response is a paginated envelope:
+
+```json
+{ "data": [...], "total": 15, "page": 1, "limit": 10, "totalPages": 2 }
+```
+
+Use `res.body.data` to access the product array.
+
 ## Test Coverage Required
 
 ### Basic
-- Returns all products when no query parameters are provided
+- Returns products in a paginated envelope when no query parameters are provided
+- Returns 401 when no auth header is sent
 
 ### Search
 - Case-insensitive partial match on product name
 - Search with leading/trailing whitespace still matches correctly
-- Search that matches nothing returns an empty array
+- Search that matches nothing returns an empty `data` array
 
 ### Category filter
 - Filters to only products in the specified category
-- Unknown category returns an empty array
+- Unknown category returns an empty `data` array
 
 ### In-stock filter
 - `inStock=true` returns only products with `inStock === true`

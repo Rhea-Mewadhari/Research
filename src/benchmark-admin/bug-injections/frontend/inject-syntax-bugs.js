@@ -14,11 +14,11 @@ function write(filePath, content) {
 // once the agent fixes the syntax bugs (productFilters itself has no bugs here).
 write(
   path.join(repoRoot, 'src', 'utils', 'productFilters.ts'),
-  `import type { Product, Category } from '../types/product';
+  `import type { Product } from '../types/product';
 
 export type FilterState = {
   search: string;
-  category: 'All' | Category;
+  category: string;
   inStockOnly: boolean;
   sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
 };
@@ -52,20 +52,19 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
 `
 );
 
-// Provide a correct FilterPanel so interactions work once syntax bugs are fixed.
+// Provide a correct FilterPanel (Phase 2: accepts categories prop, working handlers)
+// so interactions work once syntax bugs in other files are fixed.
 write(
   path.join(repoRoot, 'src', 'components', 'FilterPanel.tsx'),
-  `import type { Category } from '../types/product';
-import type { FilterState } from '../utils/productFilters';
+  `import type { FilterState } from '../utils/productFilters';
 
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  categories: string[];
 };
 
-const categories: Array<'All' | Category> = ['All', 'Electronics', 'Fitness', 'Accessories'];
-
-export default function FilterPanel({ filters, onChange }: Props) {
+export default function FilterPanel({ filters, onChange, categories }: Props) {
   return (
     <section aria-label="Filters" className="panel">
       <h2>Filters</h2>
@@ -91,7 +90,7 @@ export default function FilterPanel({ filters, onChange }: Props) {
           onChange={(e) =>
             onChange({
               ...filters,
-              category: e.target.value as FilterState['category'],
+              category: e.target.value,
             })
           }
         >
@@ -143,23 +142,30 @@ export default function FilterPanel({ filters, onChange }: Props) {
 // BUG 1 + BUG 2 in App.tsx:
 //   Bug 1 — wrong CSS import path ('./styles.css' should be './styles/style.css')
 //   Bug 2 — <ProductList> missing closing '/>' (JSX syntax error)
+//   Phase 2 version: keeps async loading, Spinner, pagination, and categories prop.
 write(
   path.join(repoRoot, 'src', 'App.tsx'),
   `import { useMemo } from 'react';
 import './styles.css';
-import { products } from './data/products';
 import FilterPanel from './components/FilterPanel';
 import ProductList from './components/ProductList';
+import Spinner from './components/Spinner';
 import SortSelect from './components/SortSelect';
 import { filterProducts } from './utils/productFilters';
 import { useProductFilters } from './hooks/useProductFilters';
 
 export default function App() {
-  const { filters, setFilters } = useProductFilters();
+  const { filters, setFilters, products, isLoading, error, page, totalPages, setPage } =
+    useProductFilters();
+
+  const categories = useMemo(
+    () => ['All', ...new Set(products.map((p) => p.category))],
+    [products]
+  );
 
   const visibleProducts = useMemo(() => {
     return filterProducts(products, filters);
-  }, [filters]);
+  }, [products, filters]);
 
   return (
     <main className="container">
@@ -169,14 +175,41 @@ export default function App() {
       </header>
 
       <div className="toolbar">
-        <FilterPanel filters={filters} onChange={setFilters} />
+        <FilterPanel filters={filters} onChange={setFilters} categories={categories} />
         <SortSelect
           value={filters.sortBy}
           onChange={(sortBy) => setFilters((prev) => ({ ...prev, sortBy }))}
         />
       </div>
 
-      <ProductList products={visibleProducts}
+      {isLoading ? (
+        <Spinner />
+      ) : error ? (
+        <p role="alert">{error}</p>
+      ) : (
+        <>
+          <p data-testid="results-count">
+            Showing {visibleProducts.length} products (page {page} of {totalPages})
+          </p>
+          <ProductList products={visibleProducts}
+          <div className="pagination">
+            <button
+              type="button"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={page <= 1}
+            >
+              Prev
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </main>
   );
 }

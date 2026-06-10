@@ -1,14 +1,12 @@
-import type { Category } from '../types/product';
 import type { FilterState } from '../utils/productFilters';
 
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  categories: string[];
 };
 
-const categories: Array<'All' | Category> = ['All', 'Electronics', 'Fitness', 'Accessories'];
-
-export default function FilterPanel({ filters, onChange: _onChange }: Props) {
+export default function FilterPanel({ filters, onChange: _onChange, categories }: Props) {
   return (
     <section aria-label="Filters" className="panel">
       <h2>Filters</h2>

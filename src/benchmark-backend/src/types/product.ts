@@ -18,4 +18,14 @@ export interface ProductQuery {
   category?: string;
   inStock?: boolean;
   sort?: SortOption;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }

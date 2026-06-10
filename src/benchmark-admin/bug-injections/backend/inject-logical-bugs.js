@@ -11,19 +11,23 @@ function write(filePath, content) {
 }
 
 // Inject a complete but logically broken productService.ts.
+// Uses the Phase 2 async + PaginatedResponse shape so the response format stays correct
+// and hidden tests (which check .body.data) can work once bugs are fixed.
+//
 // Bugs:
-//   1. let result = products  — no spread copy, mutation risk across requests
+//   1. result = products — no spread copy, mutation risk across requests
 //   2. Case-sensitive search with no whitespace trim
 //   3. category filter resets `result` to the full dataset, discarding prior filters
 //   4. Sorting applied before filtering
-//   5. name_desc sort is incorrect (uses localeCompare but in wrong direction)
+//   5. name_desc sort is incorrect (same comparator as name_asc)
 write(
   path.join(repoRoot, 'src', 'services', 'productService.ts'),
-  `import { products } from '../data/products';
-import type { Product, ProductQuery } from '../types/product';
+  `import { fetchAllProducts } from './dataFetcher';
+import type { Product, ProductQuery, PaginatedResponse } from '../types/product';
 
-export function getAllProducts(query: ProductQuery): Product[] {
-  let result = products; // BUG 1: no copy — mutates the shared array
+export async function getAllProducts(query: ProductQuery): Promise<PaginatedResponse<Product>> {
+  const products = await fetchAllProducts();
+  let result = products; // BUG 1: no copy — mutates the shared cached array
 
   // BUG 4: sorting before filtering
   if (query.sort === 'price_asc') {
@@ -50,7 +54,13 @@ export function getAllProducts(query: ProductQuery): Product[] {
     result = result.filter((p) => p.inStock === query.inStock);
   }
 
-  return result;
+  const total = result.length;
+  const page = query.page ?? 1;
+  const limit = query.limit ?? 10;
+  const totalPages = Math.ceil(total / limit);
+  const data = result.slice((page - 1) * limit, page * limit);
+
+  return { data, total, page, limit, totalPages };
 }
 `
 );

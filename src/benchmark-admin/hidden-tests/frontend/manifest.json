@@ -4,30 +4,36 @@
     "hidden.combined.behavior.test.tsx",
     "hidden.console.test.tsx",
     "hidden.filtering.edgecases.test.tsx",
-    "hidden.sorting.integrity.test.tsx"
+    "hidden.sorting.integrity.test.tsx",
+    "hidden.async.loading.test.tsx"
   ],
   "task2": [
     "hidden.accessibility.test.tsx",
     "hidden.combined.behavior.test.tsx",
     "hidden.console.test.tsx",
     "hidden.filtering.edgecases.test.tsx",
-    "hidden.sorting.integrity.test.tsx"
+    "hidden.sorting.integrity.test.tsx",
+    "hidden.async.loading.test.tsx"
   ],
   "task3": [
     "hidden.accessibility.test.tsx",
     "hidden.combined.behavior.test.tsx",
     "hidden.console.test.tsx",
     "hidden.filtering.edgecases.test.tsx",
-    "hidden.sorting.integrity.test.tsx"
+    "hidden.sorting.integrity.test.tsx",
+    "hidden.async.loading.test.tsx"
   ],
   "task4": [
     "hidden.accessibility.test.tsx",
     "hidden.combined.behavior.test.tsx",
     "hidden.console.test.tsx",
     "hidden.filtering.edgecases.test.tsx",
-    "hidden.sorting.integrity.test.tsx"
+    "hidden.sorting.integrity.test.tsx",
+    "hidden.async.loading.test.tsx"
   ],
-  "task5": [],
+  "task5": [
+    "hidden.async.loading.test.tsx"
+  ],
   "task6": [
     "hidden.accessibility.test.tsx",
     "hidden.combined.behavior.test.tsx",

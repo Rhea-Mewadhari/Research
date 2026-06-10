@@ -1,4 +1,12 @@
-export type Category = 'Electronics' | 'Fitness' | 'Accessories';
+export type Category = string;
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 export type Product = {
   id: number;

@@ -12,7 +12,6 @@ export default function ProductList({ products }: Props) {
 
   return (
     <section aria-label="Product results">
-      <p data-testid="results-count">Showing {products.length} products</p>
       <div className="grid">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />

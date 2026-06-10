@@ -4,7 +4,7 @@
 
 Implement the missing frontend feature for the product catalog application.
 
-The application already renders a catalog of products. Your job is to complete the filtering and sorting feature so that users can:
+The application already renders a catalog of products loaded from a backend API. Your job is to complete the filtering and sorting feature so that users can:
 
 - search products by name
 - filter by category
@@ -29,13 +29,10 @@ Examples:
 - `  lamp ` should match `Desk Lamp`
 
 ### 2. Category filter
-- The category dropdown must support:
-  - `All`
-  - `Electronics`
-  - `Fitness`
-  - `Accessories`
+- The category dropdown must support `All` plus any categories present in the loaded product data
 - Selecting `All` should show products from every category
 - Selecting a specific category should only show matching products
+- The `categories` array is already derived from the loaded products in `App.tsx` and passed to `FilterPanel` as a prop
 
 ### 3. In-stock filter
 - When the in-stock checkbox is checked, only products with `inStock === true` should be shown
@@ -63,10 +60,9 @@ If no products match the current filters, the UI must display:
 ## Technical Constraints
 
 - Do not add new dependencies
-- Do not change the product dataset
+- Do not modify the data-fetching logic (`src/api/productsApi.ts`, `src/hooks/useProductFilters.ts`)
+- Do not modify `src/data/products.ts`
 - Do not remove existing components
-- Keep the current TypeScript types intact unless a small change is absolutely necessary
-- Prefer implementing the feature inside the existing files rather than restructuring the app
 - The app must build and the tests must pass
 
 ---
@@ -77,9 +73,6 @@ You will most likely need to modify:
 - `src/utils/productFilters.ts`
 - `src/components/FilterPanel.tsx`
 - `src/components/SortSelect.tsx`
-
-You may also make small changes in:
-- `src/App.tsx`
 
 ---
 

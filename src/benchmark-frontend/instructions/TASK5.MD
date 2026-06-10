@@ -8,7 +8,9 @@ Write comprehensive tests for the product filtering and sorting functionality.
 
 ## Context
 
-The application includes filtering logic, sorting logic, and UI interactions. Existing test coverage is incomplete — expand it to cover the cases below.
+The application fetches products asynchronously from a backend API and renders a filterable, sortable product catalog. Filtering and sorting logic lives in `src/utils/productFilters.ts`; UI state is managed in `src/hooks/useProductFilters.ts`. Existing test coverage is incomplete — expand it to cover the cases below.
+
+Because products load asynchronously, tests that interact with the UI must wait for the initial data load before asserting on product counts or running filter interactions. Use `await screen.findByTestId('results-count')` or `await screen.findAllByRole('heading', { level: 3 })` to wait for the loaded state before interacting.
 
 ---
 
@@ -17,8 +19,8 @@ The application includes filtering logic, sorting logic, and UI interactions. Ex
 Write tests that cover:
 
 ### 1. Rendering
-- initial product list
-- empty state
+- initial product list (all products visible after load)
+- empty state (no products match the filter)
 
 ### 2. Search
 - case-insensitive matching
@@ -47,14 +49,14 @@ Write tests that cover:
 ## Constraints
 
 - Use existing test setup (Vitest + Testing Library)
-- Follow current testing patterns
+- Follow current testing patterns in `tests/`
 - Do not modify application logic unless necessary
 
 ---
 
 ## Expected Files
 
-- Add or update test files in `src/tests/`
+- Add or update test files in `tests/`
 
 ---
 

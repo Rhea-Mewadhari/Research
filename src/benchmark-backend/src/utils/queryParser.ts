@@ -23,5 +23,15 @@ export function parseProductQuery(raw: Record<string, unknown>): ProductQuery {
     query.sort = raw.sort as SortOption;
   }
 
+  const pageVal = parseInt(String(raw.page), 10);
+  if (!isNaN(pageVal) && pageVal > 0) {
+    query.page = pageVal;
+  }
+
+  const limitVal = parseInt(String(raw.limit), 10);
+  if (!isNaN(limitVal) && limitVal > 0) {
+    query.limit = Math.min(limitVal, 50);
+  }
+
   return query;
 }

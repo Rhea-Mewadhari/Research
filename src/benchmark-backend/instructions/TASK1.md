@@ -3,9 +3,19 @@
 ## Objective
 Complete the `GET /products` endpoint by implementing filtering, searching, and sorting logic in the service layer.
 
+## Context
+
+The endpoint is already wired up end-to-end: the auth middleware validates Bearer tokens, the controller calls the service, and the service fetches product data asynchronously from `dataFetcher`. Products are returned in a paginated envelope:
+
+```json
+{ "data": [...], "total": 100, "page": 1, "limit": 10, "totalPages": 10 }
+```
+
+The `getAllProducts` function currently fetches all products but does not apply any filters or sorting. Implement the missing logic.
+
 ## Requirements
 
-All query parameters are optional and combinable. When no parameters are provided, return the full product list unmodified.
+All query parameters are optional and combinable. When no parameters are provided, return the full product list (paginated).
 
 ### Search
 - `search=<string>` → filter by product name
@@ -25,15 +35,18 @@ All query parameters are optional and combinable. When no parameters are provide
 
 ## Technical Constraints
 - Apply filters and search before sorting
-- Do not mutate the original product array
+- Do not mutate the product array returned by `fetchAllProducts()`
 - Filtering logic belongs in `src/services/productService.ts`
+- Do not change the response envelope shape (`PaginatedResponse<Product>`)
+- All requests to `/products` must include `Authorization: Bearer <token>` — this is already enforced by the auth middleware
 
 ## Expected Files to Modify
 - `src/services/productService.ts`
 
 ## Example
 ```
-GET /products?category=electronics&inStock=true&sort=price_asc
+GET /products?category=electronics&inStock=true&sort=price_asc&limit=50
+Authorization: Bearer benchmark-token-2024
 ```
 
 ## Success Criteria

@@ -3,9 +3,11 @@
 ## Objective
 Fix incorrect behavior in the `GET /products` endpoint so that filtering, searching, and sorting work as intended.
 
-## Known Issues
+## Context
 
-The endpoint is implemented but has logical bugs:
+The service layer (`productService.ts`) is implemented but contains logical bugs. The response format is a paginated envelope `{ data, total, page, limit, totalPages }` — do not change this. All requests require `Authorization: Bearer <token>` — this is already enforced by the auth middleware.
+
+## Known Issues
 
 - Searching for a lowercase term (e.g. `search=wireless`) returns no results, even when a matching product exists
 - A search term with surrounding whitespace (e.g. `search=%20mouse%20`) returns no results
@@ -18,11 +20,12 @@ Fix the implementation so that:
 
 - Search is case-insensitive and trims leading/trailing whitespace from the query value
 - `category`, `inStock`, and `search` filters all apply together — none overrides another
-- The pipeline order is: filter → search → sort
+- The pipeline order is: filter → search → sort → paginate
 - Sorting produces correctly ordered results for all four sort values (`price_asc`, `price_desc`, `name_asc`, `name_desc`)
 
 ## Constraints
-- Do not change the API structure (route path, response format, query parameter names)
+- Do not change the response envelope (`PaginatedResponse<Product>`)
+- Do not change the auth middleware or route structure
 - Do not remove any features
 
 ## Expected Files to Modify

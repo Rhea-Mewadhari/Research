@@ -4,12 +4,12 @@ import { products } from '../../../benchmark-frontend/src/data/products';
 import App from '../../../benchmark-frontend/src/App';
 
 describe('Hidden: sorting integrity', () => {
-  it('default sort preserves original dataset order', () => {
+  it('default sort preserves original dataset order', async () => {
     render(<App />);
 
-    const renderedNames = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
+    const renderedNames = (await screen.findAllByRole('heading', { level: 3 })).map(
+      (node) => node.textContent
+    );
 
     const originalNames = products.map((p) => p.name);
 
@@ -21,6 +21,7 @@ describe('Hidden: sorting integrity', () => {
     const snapshot = products.map((p) => ({ ...p }));
 
     render(<App />);
+    await screen.findAllByRole('heading', { level: 3 });
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'rating-desc');

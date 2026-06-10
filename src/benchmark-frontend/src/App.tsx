@@ -1,18 +1,24 @@
 import { useMemo } from 'react';
 import './styles/style.css';
-import { products } from './data/products';
 import FilterPanel from './components/FilterPanel';
 import ProductList from './components/ProductList';
+import Spinner from './components/Spinner';
 import SortSelect from './components/SortSelect';
 import { filterProducts } from './utils/productFilters';
 import { useProductFilters } from './hooks/useProductFilters';
 
 export default function App() {
-  const { filters, setFilters } = useProductFilters();
+  const { filters, setFilters, products, isLoading, error, page, totalPages, setPage } =
+    useProductFilters();
+
+  const categories = useMemo(
+    () => ['All', ...new Set(products.map((p) => p.category))],
+    [products]
+  );
 
   const visibleProducts = useMemo(() => {
     return filterProducts(products, filters);
-  }, [filters]);
+  }, [products, filters]);
 
   return (
     <main className="container">
@@ -22,14 +28,41 @@ export default function App() {
       </header>
 
       <div className="toolbar">
-        <FilterPanel filters={filters} onChange={setFilters} />
+        <FilterPanel filters={filters} onChange={setFilters} categories={categories} />
         <SortSelect
           value={filters.sortBy}
           onChange={(sortBy) => setFilters((prev) => ({ ...prev, sortBy }))}
         />
       </div>
 
-      <ProductList products={visibleProducts} />
+      {isLoading ? (
+        <Spinner />
+      ) : error ? (
+        <p role="alert">{error}</p>
+      ) : (
+        <>
+          <p data-testid="results-count">
+            Showing {visibleProducts.length} products (page {page} of {totalPages})
+          </p>
+          <ProductList products={visibleProducts} />
+          <div className="pagination">
+            <button
+              type="button"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={page <= 1}
+            >
+              Prev
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </main>
   );
 }

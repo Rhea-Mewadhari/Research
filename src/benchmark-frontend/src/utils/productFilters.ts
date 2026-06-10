@@ -1,8 +1,8 @@
-import type { Product, Category } from '../types/product';
+import type { Product } from '../types/product';
 
 export type FilterState = {
   search: string;
-  category: 'All' | Category;
+  category: string;
   inStockOnly: boolean;
   sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
 };

@@ -6,6 +6,7 @@ describe('Clear filters', () => {
   it('resets filters back to default values', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByTestId('results-count');
 
     await user.type(screen.getByLabelText(/search/i), 'lamp');
     await user.selectOptions(screen.getByLabelText(/category/i), 'Accessories');

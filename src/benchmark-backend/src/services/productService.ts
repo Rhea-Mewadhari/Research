@@ -1,7 +1,8 @@
-import { products } from '../data/products';
-import type { Product, ProductQuery } from '../types/product';
+import { fetchAllProducts } from './dataFetcher';
+import type { Product, ProductQuery, PaginatedResponse } from '../types/product';
 
-export function getAllProducts(_query: ProductQuery): Product[] {
+export async function getAllProducts(query: ProductQuery): Promise<PaginatedResponse<Product>> {
+  const products = await fetchAllProducts();
   let result = [...products];
 
   // TODO (agent must implement):
@@ -10,5 +11,11 @@ export function getAllProducts(_query: ProductQuery): Product[] {
   // - apply inStock filter
   // - apply sorting (price_asc, price_desc, name_asc, name_desc)
 
-  return result;
+  const total = result.length;
+  const page = query.page ?? 1;
+  const limit = query.limit ?? 10;
+  const totalPages = Math.ceil(total / limit);
+  const data = result.slice((page - 1) * limit, page * limit);
+
+  return { data, total, page, limit, totalPages };
 }

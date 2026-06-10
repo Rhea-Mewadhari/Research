@@ -13,8 +13,18 @@ The codebase contains errors that prevent it from compiling or running. Find and
 - Undefined variables or properties
 - Crashing route handlers
 
+## Expected Architecture
+
+When working correctly, the backend has:
+- `GET /health` — responds without auth
+- `GET /products` — requires a valid Bearer token (digit-sum rule), returns `PaginatedResponse<Product>`
+- Auth middleware at `src/middleware/auth.ts` applied to the `/products` route
+- An async service at `src/services/productService.ts` that fetches data via `src/services/dataFetcher.ts`
+
+If any of the above is missing or broken by the injected errors, restore it.
+
 ## Expected Files to Check
-All files under `src/` may contain errors — check `server.ts`, `app.ts`, `routes/`, `controllers/`, `services/`, `data/`, and `types/`.
+All files under `src/` may contain errors — check `app.ts`, `server.ts`, `routes/`, `controllers/`, `services/`, `utils/`, and `types/`.
 
 ## Constraints
 - Do not change functionality beyond fixing errors
@@ -22,6 +32,7 @@ All files under `src/` may contain errors — check `server.ts`, `app.ts`, `rout
 
 ## Success Criteria
 - The server starts without errors
-- `GET /products` responds with a JSON array
+- `GET /products` with a valid Bearer token returns a `PaginatedResponse<Product>` JSON object
+- `GET /health` responds with `{ "status": "ok" }`
 - All visible tests pass
 - No uncaught runtime errors in the server log
