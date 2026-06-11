@@ -7,6 +7,8 @@ describe('Hidden: combined filter behavior', () => {
     const user = userEvent.setup();
     render(<App />);
 
+    // Wait for async data load before categories are available in the dropdown
+    await screen.findByRole('option', { name: 'Accessories' });
     await user.selectOptions(screen.getByLabelText(/category/i), 'Accessories');
     await user.click(screen.getByLabelText(/in-stock only/i));
     await user.type(screen.getByLabelText(/search/i), 'laptop');
