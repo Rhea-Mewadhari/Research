@@ -288,7 +288,7 @@ export default function ProductCard({ product }: Props) {
 
         <div className="card-price">
           {hasDiscount && (
-            <span className="price-original">${product.price}</span>
+            <span className="price-original">\${product.price}</span>
           )}
           <span className="price-current">{formatPrice(product.price, product.discountPercent)}</span>
         </div>
