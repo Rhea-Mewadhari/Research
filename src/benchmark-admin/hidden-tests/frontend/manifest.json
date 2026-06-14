@@ -29,7 +29,8 @@
     "hidden.console.test.tsx",
     "hidden.filtering.edgecases.test.tsx",
     "hidden.sorting.integrity.test.tsx",
-    "hidden.async.loading.test.tsx"
+    "hidden.async.loading.test.tsx",
+    "hidden.structure.test.tsx"
   ],
   "task5": [
     "hidden.async.loading.test.tsx"
