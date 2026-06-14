@@ -40,6 +40,8 @@ The category dropdown must be populated from the categories present in the loade
 ### 4. Pagination reset on filter change
 When any filter is changed, reset the page back to 1. Otherwise, the user might be on page 3 and see an empty result because the filtered list is shorter.
 
+In `App.tsx`, replace the direct `setFilters` prop with a wrapped handler that calls both `setFilters` and `setPage(1)` together. Pass this wrapper to `FilterPanel` and `SortSelect` instead of `setFilters` directly.
+
 ---
 
 ## Technical Constraints
@@ -56,6 +58,7 @@ When any filter is changed, reset the page back to 1. Otherwise, the user might 
 - `src/utils/productFilters.ts` — implement filterProducts
 - `src/components/FilterPanel.tsx` — wire up onChange handlers
 - `src/components/SortSelect.tsx` — wire up onChange handler
+- `src/App.tsx` — wrap setFilters to also reset the page to 1 on filter change
 
 ---
 
