@@ -133,7 +133,7 @@ git commit -m "run: wiggum task4 wiggum-run1 (frontend)"
 # GSD
 git reset --hard; git clean -fd
 git checkout -b run/gsd/task5/gsd-run1
-node src/benchmark-admin/run-experiment.js task5 gsd-run1 frontend gsd
+node src/benchmark-admin/run-experiment.js task5 gsd-run1 frontend gsd testgen
 git add src/benchmark-frontend src/benchmark-admin/results/task5__gsd-run1
 git commit -m "run: gsd task5 gsd-run1 (frontend)"
 ```
@@ -142,7 +142,7 @@ git commit -m "run: gsd task5 gsd-run1 (frontend)"
 # Wiggum
 git reset --hard; git clean -fd
 git checkout -b run/wiggum/task5/wiggum-run1
-node src/benchmark-admin/run-experiment.js task5 wiggum-run1 frontend wiggum
+node src/benchmark-admin/run-experiment.js task5 wiggum-run1 frontend wiggum testgen
 git add src/benchmark-frontend src/benchmark-admin/results/task5__wiggum-run1
 git commit -m "run: wiggum task5 wiggum-run1 (frontend)"
 ```

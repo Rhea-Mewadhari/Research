@@ -28,8 +28,8 @@ if (!['gsd', 'wiggum'].includes(framework)) {
   process.exit(1);
 }
 
-if (bugType && !['logical', 'syntax', 'refactor'].includes(bugType)) {
-  console.error(`Unknown bugType: ${bugType}. Use logical, syntax, or refactor.`);
+if (bugType && !['logical', 'syntax', 'refactor', 'testgen'].includes(bugType)) {
+  console.error(`Unknown bugType: ${bugType}. Use logical, syntax, refactor, or testgen.`);
   process.exit(1);
 }
 
