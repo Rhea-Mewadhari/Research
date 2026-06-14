@@ -1,9 +1,6 @@
 {
   "task1": [
-    "hidden.search.test.ts",
-    "hidden.combined.test.ts",
-    "hidden.integrity.test.ts",
-    "hidden.sorting.test.ts",
+    "hidden.contract.test.ts",
     "hidden.auth.test.ts"
   ],
   "task2": [
@@ -11,7 +8,8 @@
     "hidden.combined.test.ts",
     "hidden.integrity.test.ts",
     "hidden.sorting.test.ts",
-    "hidden.auth.test.ts"
+    "hidden.auth.test.ts",
+    "hidden.structure.test.ts"
   ],
   "task3": [
     "hidden.search.test.ts",
@@ -28,6 +26,7 @@
     "hidden.auth.test.ts"
   ],
   "task5": [
+    "hidden.featured.test.ts",
     "hidden.search.test.ts",
     "hidden.combined.test.ts",
     "hidden.integrity.test.ts",
@@ -35,6 +34,7 @@
     "hidden.auth.test.ts"
   ],
   "task6": [
+    "hidden.security.test.ts",
     "hidden.search.test.ts",
     "hidden.combined.test.ts",
     "hidden.integrity.test.ts",

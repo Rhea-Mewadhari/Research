@@ -1,55 +1,52 @@
-# Task 6: Backend Integration Task
+# Task 6: Security & Validation Fix
 
 ## Objective
-Complete the `GET /products` endpoint by implementing filtering, searching, and sorting logic inside an async service layer that is already wired up and fetching real product data.
+
+The auth middleware and product controller were recently modified and now contain security vulnerabilities. Identify and fix all issues. The failing visible test is your first signal — trace it to the root cause and look for related problems in the same file and its neighbours.
+
+---
 
 ## Context
 
-The backend already has the following infrastructure in place — **do not change it**:
+The application serves a product catalogue API protected by Bearer token authentication. A recent change introduced three security issues:
 
-- `src/services/dataFetcher.ts` — fetches products from the DummyJSON API and caches the result
-- `src/middleware/auth.ts` — validates Bearer tokens via a digit-sum rule; already applied to `/products`
-- `src/controllers/productController.ts` — async controller that calls the service and returns the result
-- `src/utils/queryParser.ts` — parses and validates all query parameters including `page` and `limit`
-- Response format is `PaginatedResponse<Product>`: `{ data, total, page, limit, totalPages }`
+1. **Auth bypass** — the Bearer prefix is no longer enforced, so any Authorization header value passes the format check
+2. **Code injection via `eval()`** — token validation was rewritten to use `eval()` with the raw token string embedded in a template literal; a token containing `"` or `)` crashes the server with a 500
+3. **Command injection** — the product controller logs search queries by passing `req.query.search` directly to a shell command via `child_process.exec()`
 
-The `getAllProducts` function in `src/services/productService.ts` currently fetches all products but does **not** apply any filters or sorting — that is what you must implement.
+---
 
 ## Requirements
 
-All query parameters are optional and combinable. When no parameters are provided, return the full product list (paginated).
+### 1. Fix auth middleware (`src/middleware/auth.ts`)
 
-### Search
-- `search=<string>` → filter by product name
-- Case-insensitive, partial match
-- Trim leading/trailing whitespace from the search value
+- Restore the Bearer prefix requirement: only `Authorization: Bearer <token>` headers are accepted; any other format (including a raw token with no prefix) must return 401
+- Remove `eval()` entirely — rewrite `isValidToken` using pure string/array operations
+- The digit-sum logic itself is correct; only the implementation needs to change
 
-### Category filter
-- `category=<string>` → filter by category (case-insensitive exact match)
+### 2. Remove command injection (`src/controllers/productController.ts`)
 
-### In-stock filter
-- `inStock=true` → only products where `inStock === true`
+- Remove the `child_process.exec()` call and its import
+- The controller should only parse the query, call the service, and return the response
 
-### Sorting
-- `sort=price_asc` → lowest price first
-- `sort=price_desc` → highest price first
-- `sort=name_asc` → alphabetical
-- `sort=name_desc` → reverse alphabetical
+### 3. Add token length validation (`src/middleware/auth.ts`)
 
-### Pipeline order
-Apply in this sequence: **filter → search → sort → paginate**
+- Reject tokens longer than 200 characters with a 401 before any validation runs
+- This prevents ReDoS and unusually long inputs from reaching the digit-sum logic
 
-## Technical Constraints
-- Work only inside `src/services/productService.ts`
-- Do not mutate the product array returned by `fetchAllProducts()`
-- Do not change the response envelope shape
-- All visible tests must pass
+---
 
 ## Expected Files to Modify
-- `src/services/productService.ts`
+
+- `src/middleware/auth.ts`
+- `src/controllers/productController.ts`
+
+---
 
 ## Success Criteria
-- All visible tests pass
-- All four sort orders return correctly ordered results
-- Filters and search combine correctly — none overrides another
-- Auth and pagination continue to work (they are already implemented)
+
+- All visible tests pass, including `rejects a request with no Bearer prefix`
+- A token with special characters like `"` or `)` returns 401 — not 500
+- `child_process` is not imported anywhere in the codebase
+- No use of `eval()` anywhere in the codebase
+- Token longer than 200 characters returns 401

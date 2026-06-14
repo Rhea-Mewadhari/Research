@@ -1,59 +1,67 @@
-# Task 5: Write API Tests
+# Task 5: Data & Model Update — Featured Products + Rating Sort
 
 ## Objective
-Write comprehensive tests for the `GET /products` endpoint using the existing Vitest + Supertest setup.
+
+Extend the product API with two new capabilities: a `featured` filter and a `rating_desc` sort option. The type definitions have already been updated — your job is to backfill the data, wire through the query parser, implement the service logic, and make the tests pass.
+
+---
 
 ## Context
 
-All requests to `/products` require an `Authorization: Bearer <token>` header. The benchmark token is `benchmark-token-2024`. The response is a paginated envelope:
+The `Product` interface now includes an optional `featured` boolean field. Four products should be marked as featured. The `SortOption` type already includes `'rating_desc'`.
 
-```json
-{ "data": [...], "total": 15, "page": 1, "limit": 10, "totalPages": 2 }
-```
+The frontend will use these two new query parameters:
 
-Use `res.body.data` to access the product array.
+| Parameter | Values | Behaviour |
+|---|---|---|
+| `featured` | `true` / `false` | Filter to featured (or non-featured) products |
+| `sort=rating_desc` | — | Sort by `rating` field, highest first |
 
-## Test Coverage Required
+---
 
-### Basic
-- Returns products in a paginated envelope when no query parameters are provided
-- Returns 401 when no auth header is sent
+## Requirements
 
-### Search
-- Case-insensitive partial match on product name
-- Search with leading/trailing whitespace still matches correctly
-- Search that matches nothing returns an empty `data` array
+### 1. Data — mark featured products
 
-### Category filter
-- Filters to only products in the specified category
-- Unknown category returns an empty `data` array
+In `src/data/products.ts`, set `featured: true` on **four** products:
 
-### In-stock filter
-- `inStock=true` returns only products with `inStock === true`
+- Laptop (id 1)
+- Ergonomic Chair (id 8)
+- Yoga Mat (id 11)
+- Clean Code (id 14)
 
-### Sorting
-- `sort=price_asc` — lowest price first
-- `sort=price_desc` — highest price first
-- `sort=name_asc` — alphabetical
-- `sort=name_desc` — reverse alphabetical
+All other products default to not featured (omit the field or set `featured: false`).
 
-### Combined filters
-- `category` + `inStock` together return the correct intersection
-- `search` + `sort` together return correctly filtered and ordered results
+### 2. Query parser — parse new parameters
 
-## Test Framework
-- Use **Vitest** as the test runner
-- Use **Supertest** to make HTTP requests against the Express app
-- Follow the pattern used in `src/tests/visible/products.test.ts`
+In `src/utils/queryParser.ts`:
 
-## Expected Files
-- Add new test files to `src/tests/`
+- Parse `featured=true` / `featured=false` from the query string and set `query.featured` accordingly
+- Add `'rating_desc'` to the list of valid sort options so it is not silently dropped
 
-## Constraints
-- Tests must be deterministic — do not depend on external state
-- Do not modify application code unless a clear bug is found
+### 3. Service — apply new filter and sort
+
+In `src/services/productService.ts`:
+
+- When `query.featured` is set, filter results to products where `(p.featured ?? false) === query.featured`
+- When `query.sort === 'rating_desc'`, sort results by `rating` descending
+
+---
+
+## Expected Files to Modify
+
+- `src/data/products.ts`
+- `src/utils/queryParser.ts`
+- `src/services/productService.ts`
+
+Do **not** modify `src/types/product.ts` — the type definitions are already correct.
+
+---
 
 ## Success Criteria
-- Tests run successfully with `vitest`
-- Each test asserts on specific response data, not just status codes
-- All edge cases listed above are covered
+
+- `pnpm test` passes, including the new `Featured filter` and `Rating sort` test suites
+- `featured=true` returns exactly 4 products, all with `featured === true`
+- `featured=false` returns the remaining 11 products
+- `sort=rating_desc` returns all products sorted highest-rating-first
+- Existing filter, sort, pagination, and auth tests continue to pass

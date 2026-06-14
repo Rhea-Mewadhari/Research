@@ -181,7 +181,7 @@ git commit -m "run: wiggum task6 wiggum-run1 (frontend)"
 # GSD
 git reset --hard; git clean -fd
 git checkout -b run/gsd/task1/gsd-run1-be
-node src/benchmark-admin/run-experiment.js task1 gsd-run1-be backend gsd
+node src/benchmark-admin/run-experiment.js task1 gsd-run1-be backend gsd integration
 git add src/benchmark-backend src/benchmark-admin/results/task1__gsd-run1-be
 git commit -m "run: gsd task1 gsd-run1-be (backend)"
 ```
@@ -190,7 +190,7 @@ git commit -m "run: gsd task1 gsd-run1-be (backend)"
 # Wiggum
 git reset --hard; git clean -fd
 git checkout -b run/wiggum/task1/wiggum-run1-be
-node src/benchmark-admin/run-experiment.js task1 wiggum-run1-be backend wiggum
+node src/benchmark-admin/run-experiment.js task1 wiggum-run1-be backend wiggum integration
 git add src/benchmark-backend src/benchmark-admin/results/task1__wiggum-run1-be
 git commit -m "run: wiggum task1 wiggum-run1-be (backend)"
 ```
@@ -203,7 +203,7 @@ git commit -m "run: wiggum task1 wiggum-run1-be (backend)"
 # GSD
 git reset --hard; git clean -fd
 git checkout -b run/gsd/task2/gsd-run1-be
-node src/benchmark-admin/run-experiment.js task2 gsd-run1-be backend gsd logical
+node src/benchmark-admin/run-experiment.js task2 gsd-run1-be backend gsd refactor
 git add src/benchmark-backend src/benchmark-admin/results/task2__gsd-run1-be
 git commit -m "run: gsd task2 gsd-run1-be (backend)"
 ```
@@ -212,7 +212,7 @@ git commit -m "run: gsd task2 gsd-run1-be (backend)"
 # Wiggum
 git reset --hard; git clean -fd
 git checkout -b run/wiggum/task2/wiggum-run1-be
-node src/benchmark-admin/run-experiment.js task2 wiggum-run1-be backend wiggum logical
+node src/benchmark-admin/run-experiment.js task2 wiggum-run1-be backend wiggum refactor
 git add src/benchmark-backend src/benchmark-admin/results/task2__wiggum-run1-be
 git commit -m "run: wiggum task2 wiggum-run1-be (backend)"
 ```
@@ -225,7 +225,7 @@ git commit -m "run: wiggum task2 wiggum-run1-be (backend)"
 # GSD
 git reset --hard; git clean -fd
 git checkout -b run/gsd/task3/gsd-run1-be
-node src/benchmark-admin/run-experiment.js task3 gsd-run1-be backend gsd syntax
+node src/benchmark-admin/run-experiment.js task3 gsd-run1-be backend gsd testgen
 git add src/benchmark-backend src/benchmark-admin/results/task3__gsd-run1-be
 git commit -m "run: gsd task3 gsd-run1-be (backend)"
 ```
@@ -234,20 +234,20 @@ git commit -m "run: gsd task3 gsd-run1-be (backend)"
 # Wiggum
 git reset --hard; git clean -fd
 git checkout -b run/wiggum/task3/wiggum-run1-be
-node src/benchmark-admin/run-experiment.js task3 wiggum-run1-be backend wiggum syntax
+node src/benchmark-admin/run-experiment.js task3 wiggum-run1-be backend wiggum testgen
 git add src/benchmark-backend src/benchmark-admin/results/task3__wiggum-run1-be
 git commit -m "run: wiggum task3 wiggum-run1-be (backend)"
 ```
 
 ---
 
-#### Task 4 — Refactoring
+#### Task 4 — Configuration & Build Fix
 
 ```powershell
 # GSD
 git reset --hard; git clean -fd
 git checkout -b run/gsd/task4/gsd-run1-be
-node src/benchmark-admin/run-experiment.js task4 gsd-run1-be backend gsd
+node src/benchmark-admin/run-experiment.js task4 gsd-run1-be backend gsd config
 git add src/benchmark-backend src/benchmark-admin/results/task4__gsd-run1-be
 git commit -m "run: gsd task4 gsd-run1-be (backend)"
 ```
@@ -256,20 +256,20 @@ git commit -m "run: gsd task4 gsd-run1-be (backend)"
 # Wiggum
 git reset --hard; git clean -fd
 git checkout -b run/wiggum/task4/wiggum-run1-be
-node src/benchmark-admin/run-experiment.js task4 wiggum-run1-be backend wiggum
+node src/benchmark-admin/run-experiment.js task4 wiggum-run1-be backend wiggum config
 git add src/benchmark-backend src/benchmark-admin/results/task4__wiggum-run1-be
 git commit -m "run: wiggum task4 wiggum-run1-be (backend)"
 ```
 
 ---
 
-#### Task 5 — Test Generation
+#### Task 5 — Data & Model Update
 
 ```powershell
 # GSD
 git reset --hard; git clean -fd
 git checkout -b run/gsd/task5/gsd-run1-be
-node src/benchmark-admin/run-experiment.js task5 gsd-run1-be backend gsd
+node src/benchmark-admin/run-experiment.js task5 gsd-run1-be backend gsd data
 git add src/benchmark-backend src/benchmark-admin/results/task5__gsd-run1-be
 git commit -m "run: gsd task5 gsd-run1-be (backend)"
 ```
@@ -278,20 +278,20 @@ git commit -m "run: gsd task5 gsd-run1-be (backend)"
 # Wiggum
 git reset --hard; git clean -fd
 git checkout -b run/wiggum/task5/wiggum-run1-be
-node src/benchmark-admin/run-experiment.js task5 wiggum-run1-be backend wiggum
+node src/benchmark-admin/run-experiment.js task5 wiggum-run1-be backend wiggum data
 git add src/benchmark-backend src/benchmark-admin/results/task5__wiggum-run1-be
 git commit -m "run: wiggum task5 wiggum-run1-be (backend)"
 ```
 
 ---
 
-#### Task 6 — Integration (Async Data)
+#### Task 6 — Security & Validation Fix
 
 ```powershell
 # GSD
 git reset --hard; git clean -fd
 git checkout -b run/gsd/task6/gsd-run1-be
-node src/benchmark-admin/run-experiment.js task6 gsd-run1-be backend gsd
+node src/benchmark-admin/run-experiment.js task6 gsd-run1-be backend gsd security
 git add src/benchmark-backend src/benchmark-admin/results/task6__gsd-run1-be
 git commit -m "run: gsd task6 gsd-run1-be (backend)"
 ```
@@ -300,7 +300,7 @@ git commit -m "run: gsd task6 gsd-run1-be (backend)"
 # Wiggum
 git reset --hard; git clean -fd
 git checkout -b run/wiggum/task6/wiggum-run1-be
-node src/benchmark-admin/run-experiment.js task6 wiggum-run1-be backend wiggum
+node src/benchmark-admin/run-experiment.js task6 wiggum-run1-be backend wiggum security
 git add src/benchmark-backend src/benchmark-admin/results/task6__wiggum-run1-be
 git commit -m "run: wiggum task6 wiggum-run1-be (backend)"
 ```

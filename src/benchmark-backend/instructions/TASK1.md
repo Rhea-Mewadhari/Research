@@ -1,55 +1,80 @@
-# Task 1: Implement Product Filtering API
+# Task 1: Integration — Align Backend API Contract with Frontend
 
 ## Objective
-Complete the `GET /products` endpoint by implementing filtering, searching, and sorting logic in the service layer.
+
+Resolve the contract mismatches between the frontend product catalog and the backend `GET /products` endpoint so that the two systems work together correctly.
+
+---
 
 ## Context
 
-The endpoint is already wired up end-to-end: the auth middleware validates Bearer tokens, the controller calls the service, and the service fetches product data asynchronously from `dataFetcher`. Products are returned in a paginated envelope:
+The frontend and backend were developed by separate teams. The frontend has recently been updated, and its API client now sends sort values in a different format and expects different field names in the response envelope. The backend has not been updated to match.
 
-```json
-{ "data": [...], "total": 100, "page": 1, "limit": 10, "totalPages": 10 }
+The frontend API client (`src/api/productsApi.ts` in the frontend repo) sends requests in this shape:
+
 ```
-
-The `getAllProducts` function currently fetches all products but does not apply any filters or sorting. Implement the missing logic.
-
-## Requirements
-
-All query parameters are optional and combinable. When no parameters are provided, return the full product list (paginated).
-
-### Search
-- `search=<string>` → filter by product name
-- Matching must be case-insensitive and support partial matches
-- Leading and trailing whitespace in the search value should not affect matching
-
-### Filtering
-- `category=<string>` → filter by category (case-insensitive exact match)
-- `inStock=<true|false>` → filter to products where `inStock === true` when the value is `"true"`
-  - Note: query parameters arrive as strings — `"true"` is truthy, `"false"` is not
-
-### Sorting
-- `sort=price_asc` → lowest price first
-- `sort=price_desc` → highest price first
-- `sort=name_asc` → alphabetical by name
-- `sort=name_desc` → reverse alphabetical by name
-
-## Technical Constraints
-- Apply filters and search before sorting
-- Do not mutate the product array returned by `fetchAllProducts()`
-- Filtering logic belongs in `src/services/productService.ts`
-- Do not change the response envelope shape (`PaginatedResponse<Product>`)
-- All requests to `/products` must include `Authorization: Bearer <token>` — this is already enforced by the auth middleware
-
-## Expected Files to Modify
-- `src/services/productService.ts`
-
-## Example
-```
-GET /products?category=electronics&inStock=true&sort=price_asc&limit=50
+GET /products?sort=price-asc&page=1
 Authorization: Bearer benchmark-token-2024
 ```
 
+And expects responses in this shape:
+
+```json
+{
+  "data": [...],
+  "total": 15,
+  "page": 1,
+  "limit": 10,
+  "totalPages": 2
+}
+```
+
+---
+
+## Mismatches to Fix
+
+### 1. Sort parameter format
+
+The frontend sends hyphenated sort values:
+
+| Frontend sends | Meaning |
+|---|---|
+| `price-asc` | lowest price first |
+| `price-desc` | highest price first |
+| `rating-desc` | highest rating first |
+
+The backend currently only recognises camelCase sort values (`priceAsc`, `priceDesc`, `ratingDesc`) and silently ignores anything else. Sort requests from the frontend are dropped.
+
+**Fix:** update `src/utils/queryParser.ts` to accept the frontend's hyphenated format, and ensure `src/services/productService.ts` handles `rating-desc` sorting correctly.
+
+### 2. Response envelope field names
+
+The backend currently returns `count` and `pages` in the response envelope. The frontend expects `total` and `totalPages`.
+
+**Fix:** update `src/services/productService.ts` to return the correct field names.
+
+---
+
+## Technical Constraints
+
+- Do not modify `src/middleware/auth.ts` or the auth logic
+- Do not change the `Product` data shape
+- All existing filters (search, category, inStock) must continue to work
+- The fix must be backward-compatible: other valid sort values should still work
+
+---
+
+## Expected Files to Modify
+
+- `src/utils/queryParser.ts` — accept frontend sort format
+- `src/services/productService.ts` — fix response envelope field names, ensure rating-desc sort is handled
+
+---
+
 ## Success Criteria
+
+- `GET /products?sort=price-asc` returns products sorted by price ascending
+- `GET /products?sort=price-desc` returns products sorted by price descending
+- `GET /products?sort=rating-desc` returns products sorted by rating descending
+- Response envelope contains `total` and `totalPages` (not `count` and `pages`)
 - All visible tests pass
-- All four sort orders return correctly ordered results
-- Filters and search can be combined without any one overriding another

@@ -1,37 +1,48 @@
-# Task 2: Fix Logical Bugs in Product API
+# Task 2: Refactoring — Backend Service Layer
 
 ## Objective
-Fix incorrect behavior in the `GET /products` endpoint so that filtering, searching, and sorting work as intended.
+
+Improve the structure and maintainability of the product service layer without changing its behaviour.
+
+---
 
 ## Context
 
-The service layer (`productService.ts`) is implemented but contains logical bugs. The response format is a paginated envelope `{ data, total, page, limit, totalPages }` — do not change this. All requests require `Authorization: Bearer <token>` — this is already enforced by the auth middleware.
+The current implementation works and all tests pass, but the code has structural issues that make it harder to maintain and extend.
 
-## Known Issues
-
-- Searching for a lowercase term (e.g. `search=wireless`) returns no results, even when a matching product exists
-- A search term with surrounding whitespace (e.g. `search=%20mouse%20`) returns no results
-- Results are not correctly sorted when a `sort` parameter is provided
-- Combining `category` and `inStock` returns incorrect results — one filter silently overrides the other
+---
 
 ## Requirements
 
-Fix the implementation so that:
+### 1. Separation of concerns
+- Filtering logic (search, category, inStock) belongs in a dedicated helper — not inlined inside `getAllProducts`
+- Sorting logic belongs in a dedicated helper — not inlined inside `getAllProducts`
+- `getAllProducts` should be a thin orchestrator: fetch → filter → sort → paginate → return
 
-- Search is case-insensitive and trims leading/trailing whitespace from the query value
-- `category`, `inStock`, and `search` filters all apply together — none overrides another
-- The pipeline order is: filter → search → sort → paginate
-- Sorting produces correctly ordered results for all four sort values (`price_asc`, `price_desc`, `name_asc`, `name_desc`)
+### 2. Dead code removal
+- Remove unused exports and variables
+- Remove any constants defined but never referenced
 
-## Constraints
-- Do not change the response envelope (`PaginatedResponse<Product>`)
-- Do not change the auth middleware or route structure
-- Do not remove any features
+### 3. Readability
+- Replace redundant boolean checks (`=== true`, `!== undefined`) with idiomatic equivalents
+- Ensure sort logic uses a consistent, readable structure
 
-## Expected Files to Modify
-- `src/services/productService.ts`
+### 4. No regressions
+- All existing tests must continue to pass
+- The response envelope shape must not change
+- Do not modify `queryParser.ts`, `auth.ts`, or route/controller files
+
+---
+
+## Expected Refactoring Areas
+
+- `src/services/productService.ts` — extract filter and sort helpers, remove dead code
+
+---
 
 ## Success Criteria
-- All visible tests pass
-- Combined filters return the correct subset of products
-- Sort order is stable and correct for all four sort values
+
+- All tests still pass
+- Filtering and sorting logic each live in their own named helper function, not inline in `getAllProducts`
+- No unused exports or dead variables remain
+- No behaviour regression

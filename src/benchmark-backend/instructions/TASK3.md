@@ -1,38 +1,79 @@
-# Task 3: Fix Syntax and Runtime Errors
+# Task 3: Test Generation — Product API
 
 ## Objective
-Fix all compile-time and runtime errors in the backend so the application starts and all endpoints respond correctly.
 
-## What to Look For
+Write comprehensive tests for the `GET /products` endpoint.
 
-The codebase contains errors that prevent it from compiling or running. Find and fix all of them:
+---
 
-- Broken or missing imports/exports
-- TypeScript type errors
-- Incorrect async/await usage
-- Undefined variables or properties
-- Crashing route handlers
+## Context
 
-## Expected Architecture
+The backend is fully implemented and working. The product API supports filtering, sorting, pagination, and Bearer token authentication. Your job is to write tests that thoroughly cover the endpoint's behaviour.
 
-When working correctly, the backend has:
-- `GET /health` — responds without auth
-- `GET /products` — requires a valid Bearer token (digit-sum rule), returns `PaginatedResponse<Product>`
-- Auth middleware at `src/middleware/auth.ts` applied to the `/products` route
-- An async service at `src/services/productService.ts` that fetches data via `src/services/dataFetcher.ts`
+The endpoint is at `GET /products` and requires `Authorization: Bearer <token>` where the token's digits must sum to an even number (e.g. `Bearer benchmark-token-2024`).
 
-If any of the above is missing or broken by the injected errors, restore it.
+Products are returned in a paginated envelope:
 
-## Expected Files to Check
-All files under `src/` may contain errors — check `app.ts`, `server.ts`, `routes/`, `controllers/`, `services/`, `utils/`, and `types/`.
+```json
+{ "data": [...], "total": 15, "page": 1, "limit": 10, "totalPages": 2 }
+```
+
+---
+
+## Requirements
+
+Write tests that cover:
+
+### 1. Filtering
+- Filter by `category` (exact match, case-insensitive)
+- Filter by `inStock=true` and `inStock=false`
+- Unknown category returns empty data array
+
+### 2. Search
+- Case-insensitive name matching
+- Partial matches
+- Whitespace trimming
+
+### 3. Sorting
+- `sort=price_asc` — lowest price first
+- `sort=price_desc` — highest price first
+- `sort=name_asc` — alphabetical
+- `sort=name_desc` — reverse alphabetical
+
+### 4. Pagination
+- Correct envelope shape (`data`, `total`, `page`, `limit`, `totalPages`)
+- Different pages return different products
+- `limit` is clamped to a maximum of 50
+
+### 5. Combined filters
+- Multiple query params applied together
+
+### 6. Authentication
+- Missing auth header → 401
+- Invalid token (odd digit sum) → 401
+- Valid token (even digit sum) → 200
+- `/health` does not require auth
+
+---
 
 ## Constraints
-- Do not change functionality beyond fixing errors
-- Do not restructure files unnecessarily
+
+- Use the existing test setup: Vitest + Supertest
+- Mock `fetchAllProducts` using `vi.mock` — do not call the real external API
+- Follow the patterns already present in `src/tests/visible/products.test.ts`
+- Do not modify any application source files
+
+---
+
+## Expected Files to Modify
+
+- `src/tests/visible/products.test.ts` — write your tests here
+
+---
 
 ## Success Criteria
-- The server starts without errors
-- `GET /products` with a valid Bearer token returns a `PaginatedResponse<Product>` JSON object
-- `GET /health` responds with `{ "status": "ok" }`
-- All visible tests pass
-- No uncaught runtime errors in the server log
+
+- All tests pass with `vitest`
+- Each test asserts on specific response values — not just that the status is 200
+- All areas listed above are covered
+- Tests are self-contained and deterministic
