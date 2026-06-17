@@ -4,5 +4,11 @@ export default defineConfig({
   test: {
     globals: true,
     setupFiles: ['./tests/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['json'],
+      include: ['src/services/productService.ts'],
+      reportsDirectory: 'coverage',
+    },
   },
 });

@@ -7,5 +7,11 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './tests/setup.ts',
     globals: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['json'],
+      include: ['src/utils/productFilters.ts'],
+      reportsDirectory: 'coverage',
+    },
   },
 });

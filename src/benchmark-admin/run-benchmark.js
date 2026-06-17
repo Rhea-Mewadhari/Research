@@ -6,6 +6,45 @@ import { nowIso, ensureDir, runCommand, parseVitestSummary, writeLog } from './h
 import { copyHiddenTests, removeHiddenTests } from './helpers/hidden-tests.js';
 import { computeScore } from './helpers/scorer.js';
 
+const COVERAGE_TARGETS = {
+  frontend: 'src/utils/productFilters.ts',
+  backend:  'src/services/productService.ts',
+};
+
+function parseCoverage(coveragePath, targetFile) {
+  if (!fs.existsSync(coveragePath)) return null;
+  let data;
+  try { data = JSON.parse(fs.readFileSync(coveragePath, 'utf8')); } catch { return null; }
+
+  const normalised = targetFile.split('/').join(path.sep);
+  const key = Object.keys(data).find(k => k.endsWith(normalised));
+  if (!key) return null;
+
+  const { s, b, f } = data[key];
+
+  function stmtPct(hits) {
+    const vals = Object.values(hits);
+    if (!vals.length) return 1;
+    return vals.filter(v => v > 0).length / vals.length;
+  }
+
+  function branchPct(hits) {
+    let total = 0, covered = 0;
+    for (const counts of Object.values(hits)) {
+      for (const n of counts) { total++; if (n > 0) covered++; }
+    }
+    return total ? covered / total : 1;
+  }
+
+  const round = n => Math.round(n * 1000) / 1000;
+  return {
+    file:         targetFile,
+    branchPct:    round(branchPct(b)),
+    statementPct: round(stmtPct(s)),
+    functionPct:  round(stmtPct(f)),
+  };
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const taskId  = process.argv[2] || 'unknown_task';
@@ -55,6 +94,15 @@ function main() {
   writeLog(resultDir, 'visible-tests.stdout.txt', visible.stdout);
   writeLog(resultDir, 'visible-tests.stderr.txt', visible.stderr);
   summary.visibleTests = { success: visible.success, ...parseVitestSummary(`${visible.stdout}\n${visible.stderr}`) };
+
+  // Coverage (testgen tasks only — runs on agent's visible tests before hidden tests are added)
+  if (bugType === 'testgen' && COVERAGE_TARGETS[target]) {
+    const cov = runCommand('pnpm test:coverage', repoRoot);
+    writeLog(resultDir, 'coverage.stdout.txt', cov.stdout);
+    const coveragePath = path.join(repoRoot, 'coverage', 'coverage-final.json');
+    summary.coverage = parseCoverage(coveragePath, COVERAGE_TARGETS[target]);
+    fs.rmSync(path.join(repoRoot, 'coverage'), { recursive: true, force: true });
+  }
 
   // Hidden tests
   let hiddenFiles = [];

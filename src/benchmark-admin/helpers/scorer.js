@@ -23,12 +23,22 @@ export function computeScore(summary) {
     };
   }
 
-  const hiddenPassRate   = safeRate(summary.hiddenTests.passed, summary.hiddenTests.total);
-  const robustnessGap    = Math.max(0, visiblePassRate - hiddenPassRate);
-  const correctnessScore =
-    (visiblePassRate * 0.3) +
-    (hiddenPassRate  * 0.5) +
-    (buildStability  * 0.2);
+  const hiddenPassRate = safeRate(summary.hiddenTests.passed, summary.hiddenTests.total);
+  const robustnessGap  = Math.max(0, visiblePassRate - hiddenPassRate);
+
+  // Testgen tasks include branch coverage in correctnessScore:
+  //   hidden 40% + coverage 30% + visible 20% + build 10%
+  // All other tasks use the standard formula:
+  //   hidden 50% + visible 30% + build 20%
+  const branchPct = summary.coverage?.branchPct ?? null;
+  const correctnessScore = branchPct != null
+    ? (hiddenPassRate  * 0.4) +
+      (branchPct       * 0.3) +
+      (visiblePassRate * 0.2) +
+      (buildStability  * 0.1)
+    : (visiblePassRate * 0.3) +
+      (hiddenPassRate  * 0.5) +
+      (buildStability  * 0.2);
 
   return {
     visiblePassRate:  round(visiblePassRate),
