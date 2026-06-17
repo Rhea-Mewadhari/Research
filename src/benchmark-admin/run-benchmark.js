@@ -78,16 +78,6 @@ function main() {
 
   console.log(`Running benchmark for task=${taskId}, run=${runId}`);
 
-  if (bugType) {
-    console.log(`Injecting ${bugType} bugs for ${target}...`);
-    const injectionScript = path.resolve(__dirname, `bug-injections/${target}/inject-${bugType}-bugs.js`);
-    if (fs.existsSync(injectionScript)) {
-      runCommand(`node ${injectionScript}`, __dirname);
-    } else {
-      console.warn(`No injection script found for ${target}/${bugType}`);
-    }
-  }
-
   // Visible tests
   const visible = runCommand('pnpm test -- --run', repoRoot);
   summary.timing.visibleMs = visible.durationMs;
