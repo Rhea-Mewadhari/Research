@@ -57,7 +57,7 @@ const agentMeta = runAgent({ repoRoot, resultDir, framework, target, taskId });
 fs.writeFileSync(path.join(resultDir, 'agent-metadata.json'), JSON.stringify(agentMeta, null, 2), 'utf8');
 
 //  3. Benchmark evaluation 
-run('3/5 benchmark', 'node', ['run-benchmark.js', taskId, runId, target], __dirname);
+run('3/5 benchmark', 'node', ['run-benchmark.js', taskId, runId, target, ...(bugType ? [bugType] : [])], __dirname);
 
 //  4. Post-agent quality 
 run('4/5 post quality', 'node', [
