@@ -19,9 +19,13 @@ export function runDuplication({ target, srcDir, adminBins }) {
       ? '--format typescript --formats-exts "typescript:tsx"'
       : '--format typescript';
 
-    const ignoreArg = target === 'backend'
-      ? BACKEND_DEAD_FILES.map(f => `--ignore "${f}"`).join(' ')
-      : '';
+    const testIgnores = ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx']
+      .map(g => `--ignore "${g}"`).join(' ');
+
+    const ignoreArg = [
+      ...(target === 'backend' ? BACKEND_DEAD_FILES.map(f => `--ignore "${f}"`) : []),
+      testIgnores,
+    ].join(' ');
 
     tryRun(
       `"${jscpdBin}" . --min-tokens 30 --reporters json --output "${tmpDir}" ${formatArg} ${ignoreArg} --no-gitignore`,

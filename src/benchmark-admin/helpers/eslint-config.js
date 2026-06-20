@@ -10,9 +10,13 @@ export function srcGlobs(target) {
 }
 
 export function makeEslintConfig(target, srcDir, ruleSet) {
-  const ignores = target === 'backend'
-    ? BACKEND_DEAD_FILES.map(f => `**/${f}`)
-    : [];
+  const ignores = [
+    ...( target === 'backend' ? BACKEND_DEAD_FILES.map(f => `**/${f}`) : [] ),
+    '**/*.test.ts',
+    '**/*.test.tsx',
+    '**/*.spec.ts',
+    '**/*.spec.tsx',
+  ];
 
   // In ESLint v9, files that don't match any config block's `files` key are excluded.
   // cwd must be srcDir so relative globs resolve within the target project.
