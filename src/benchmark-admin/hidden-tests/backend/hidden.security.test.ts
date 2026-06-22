@@ -15,18 +15,19 @@ describe('Hidden: auth security hardening', () => {
 
   it('token containing double-quote does not crash the server', async () => {
     // eval-based validation would throw SyntaxError on tokens containing "
-    // The server must return 401, not 500
+    // Token has digit sum 1 (odd) so it is also invalid by the business rule → must return 401, not 500
     const res = await request(app)
       .get('/products?limit=50')
-      .set('Authorization', 'Bearer token-")-inject"-here');
+      .set('Authorization', 'Bearer tok1en-")-inject"-here');
     expect(res.status).not.toBe(500);
     expect(res.status).toBe(401);
   });
 
   it('token containing closing paren does not crash the server', async () => {
+    // Token has digit sum 1 (odd) → invalid by business rule → must return 401, not 500
     const res = await request(app)
       .get('/products?limit=50')
-      .set('Authorization', 'Bearer token-)break(eval');
+      .set('Authorization', 'Bearer tok1en-)break(eval');
     expect(res.status).not.toBe(500);
     expect(res.status).toBe(401);
   });
