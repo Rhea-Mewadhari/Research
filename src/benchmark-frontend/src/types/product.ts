@@ -1,5 +1,23 @@
 export type Category = string;
 
+export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
+
+export interface SavedFilter {
+  id: string;
+  name: string;
+  createdAt: number;
+  snapshot: {
+    search: string;
+    category: string;
+    inStockOnly: boolean;
+    sortBy: SortOption;
+  };
+}
+
+export interface ComparisonState {
+  comparedIds: string[];
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   total: number;
@@ -19,4 +37,7 @@ export type Product = {
   description: string;
   tags: string[];
   discountPct?: number;
+  featured?: boolean;
+  images?: string[];
+  stock?: number;
 };

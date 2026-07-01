@@ -1,12 +1,14 @@
 import type { FilterState } from '../utils/productFilters';
+import SavedFiltersPanel from './SavedFiltersPanel';
 
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  onClear?: () => void;
   categories: string[];
 };
 
-export default function FilterPanel({ filters, onChange: _onChange, categories }: Props) {
+export default function FilterPanel({ filters, onChange: _onChange, onClear, categories }: Props) {
   return (
     <section aria-label="Filters" className="panel">
       <h2>Filters</h2>
@@ -52,9 +54,11 @@ export default function FilterPanel({ filters, onChange: _onChange, categories }
         </label>
       </div>
 
-      <button type="button" onClick={() => {}}>
+      <button type="button" onClick={() => onClear?.()}>
         Clear filters
       </button>
+
+      <SavedFiltersPanel />
     </section>
   );
 }

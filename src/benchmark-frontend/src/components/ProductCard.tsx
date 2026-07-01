@@ -1,15 +1,26 @@
 import type { Product } from '../types/product';
 import { formatPrice, formatRating, truncate } from '../utils/formatters';
+import FavouriteButton from './FavouriteButton';
+import { useComparisonContext } from '../context/ComparisonContext';
 
 type Props = {
   product: Product;
+  onSelect?: (id: string) => void;
 };
 
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({ product, onSelect }: Props) {
+  const { isCompared, addToComparison, removeFromComparison } = useComparisonContext();
+  const productId = String(product.id);
   const hasDiscount = product.discountPct != null;
+  const compared = isCompared(productId);
 
   return (
-    <article className="card" data-testid={`product-${product.id}`}>
+    <article
+      className="card"
+      data-testid={`product-${product.id}`}
+      onClick={() => onSelect?.(productId)}
+      style={{ cursor: onSelect ? 'pointer' : undefined }}
+    >
       <div className="card-image">
         <img
           src={`/images/${product.name.toLowerCase().replace(/\s+/g, '-')}.jpg`}
@@ -24,6 +35,7 @@ export default function ProductCard({ product }: Props) {
           {hasDiscount && (
             <span className="badge badge-discount">-{product.discountPct}%</span>
           )}
+          <FavouriteButton productId={productId} />
         </div>
 
         <p className="card-category">{product.category}</p>
@@ -48,6 +60,19 @@ export default function ProductCard({ product }: Props) {
         <p className={`card-stock ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
           {product.inStock ? 'In Stock' : 'Out of Stock'}
         </p>
+
+        <button
+          type="button"
+          aria-pressed={compared}
+          aria-label={compared ? `Remove ${product.name} from comparison` : `Add ${product.name} to comparison`}
+          className={`compare-btn${compared ? ' is-compared' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            compared ? removeFromComparison(productId) : addToComparison(productId);
+          }}
+        >
+          {compared ? 'Remove from compare' : 'Compare'}
+        </button>
       </div>
     </article>
   );

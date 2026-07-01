@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import productRoutes from './routes/productRoutes';
+import apiProductRoutes from './routes/apiProductRoutes';
+import favouriteRoutes from './routes/favouriteRoutes';
 import { requireAuth } from './middleware/auth';
 
 const app = express();
@@ -13,6 +15,8 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/products', requireAuth, productRoutes);
+app.use('/api/products', apiProductRoutes);
+app.use('/api/favourites', favouriteRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });

@@ -1,68 +1,45 @@
-import { useMemo } from 'react';
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom';
 import './styles/style.css';
-import FilterPanel from './components/FilterPanel';
-import ProductList from './components/ProductList';
-import Spinner from './components/Spinner';
-import SortSelect from './components/SortSelect';
-import { filterProducts } from './utils/productFilters';
-import { useProductFilters } from './hooks/useProductFilters';
+import ComparisonBar from './components/ComparisonBar';
+import NavBar from './components/NavBar';
+import { ComparisonProvider } from './context/ComparisonContext';
+import { FavouritesProvider } from './context/FavouritesContext';
+import { FilterProvider } from './context/FilterContext';
+import { ProductProvider } from './context/ProductContext';
+import ComparePage from './pages/ComparePage';
+import FavouritesPage from './pages/FavouritesPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import ProductListPage from './pages/ProductListPage';
+
+function AppLayout() {
+  return (
+    <>
+      <NavBar />
+      <Outlet />
+      <ComparisonBar />
+    </>
+  );
+}
 
 export default function App() {
-  const { filters, setFilters, products, isLoading, error, page, totalPages, setPage } =
-    useProductFilters();
-
-  const categories = useMemo(
-    () => ['All', ...new Set(products.map((p) => p.category))],
-    [products]
-  );
-
-  const visibleProducts = useMemo(() => {
-    return filterProducts(products, filters);
-  }, [products, filters]);
-
   return (
-    <main className="container">
-      <header>
-        <h1>Product Catalog</h1>
-        <p>Browse and filter available products.</p>
-      </header>
-
-      <div className="toolbar">
-        <FilterPanel filters={filters} onChange={setFilters} categories={categories} />
-        <SortSelect
-          value={filters.sortBy}
-          onChange={(sortBy) => setFilters((prev) => ({ ...prev, sortBy }))}
-        />
-      </div>
-
-      {isLoading ? (
-        <Spinner />
-      ) : error ? (
-        <p role="alert">{error}</p>
-      ) : (
-        <>
-          <p data-testid="results-count">
-            Showing {visibleProducts.length} products (page {page} of {totalPages})
-          </p>
-          <ProductList products={visibleProducts} />
-          <div className="pagination">
-            <button
-              type="button"
-              onClick={() => setPage((p) => p - 1)}
-              disabled={page <= 1}
-            >
-              Prev
-            </button>
-            <button
-              type="button"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={page >= totalPages}
-            >
-              Next
-            </button>
-          </div>
-        </>
-      )}
-    </main>
+    <ProductProvider>
+      <FilterProvider>
+        <FavouritesProvider>
+          <ComparisonProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route element={<AppLayout />}>
+                  <Route index element={<ProductListPage />} />
+                  <Route path="product/:id" element={<ProductDetailPage />} />
+                  <Route path="favourites" element={<FavouritesPage />} />
+                  <Route path="compare" element={<ComparePage />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </ComparisonProvider>
+        </FavouritesProvider>
+      </FilterProvider>
+    </ProductProvider>
   );
 }

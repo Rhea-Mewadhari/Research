@@ -1,6 +1,18 @@
 import { fetchAllProducts } from './dataFetcher';
 import type { Product, ProductQuery, PaginatedResponse } from '../types/product';
 
+export async function getProductById(id: number): Promise<Product | undefined> {
+  const products = await fetchAllProducts();
+  return products.find((p) => p.id === id);
+}
+
+export async function getProductsByIds(ids: number[]): Promise<Product[]> {
+  const products = await fetchAllProducts();
+  return ids
+    .map((id) => products.find((p) => p.id === id))
+    .filter((p): p is Product => p !== undefined);
+}
+
 export async function getAllProducts(query: ProductQuery): Promise<PaginatedResponse<Product>> {
   const products = await fetchAllProducts();
   let result = [...products];

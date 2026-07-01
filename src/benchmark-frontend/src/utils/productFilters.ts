@@ -1,19 +1,33 @@
-import type { Product } from '../types/product';
+import type { Product, SortOption } from '../types/product';
 
 export type FilterState = {
   search: string;
   category: string;
   inStockOnly: boolean;
-  sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
+  sortBy: SortOption;
 };
 
-export function filterProducts(products: Product[], _filters: FilterState): Product[] {
-  let result = [...products];
+export function filterProducts(products: Product[], filters: FilterState): Product[] {
+  const term = filters.search.trim().toLowerCase();
 
-  // TODO: implement search filter
-  // TODO: implement category filter
-  // TODO: implement in-stock filter
-  // TODO: implement sorting
+  let result = products.filter((p) => {
+    if (term && !p.name.toLowerCase().includes(term)) return false;
+    if (filters.category !== 'All' && p.category !== filters.category) return false;
+    if (filters.inStockOnly && !p.inStock) return false;
+    return true;
+  });
+
+  switch (filters.sortBy) {
+    case 'price-asc':
+      result = [...result].sort((a, b) => a.price - b.price);
+      break;
+    case 'price-desc':
+      result = [...result].sort((a, b) => b.price - a.price);
+      break;
+    case 'rating-desc':
+      result = [...result].sort((a, b) => b.rating - a.rating);
+      break;
+  }
 
   return result;
 }
