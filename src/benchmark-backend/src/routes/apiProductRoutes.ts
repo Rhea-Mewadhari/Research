@@ -1,10 +1,14 @@
 import { Router } from 'express';
-import { getCompareProducts, getProductDetail } from '../controllers/productController';
+import { getById } from '../controllers/productController';
+import { compare } from '../controllers/compareController';
+import { validate } from '../middleware/validate';
+import { productIdSchema, compareQuerySchema } from '../schemas/productSchema';
 
 const router = Router();
 
-// /compare must come before /:id so the literal string isn't caught as an id param
-router.get('/compare', getCompareProducts);
-router.get('/:id', getProductDetail);
+// /compare must be registered before /:id — otherwise Express treats
+// the literal string 'compare' as a value for the :id param.
+router.get('/compare', validate(compareQuerySchema), compare);
+router.get('/:id', validate(productIdSchema), getById);
 
 export default router;

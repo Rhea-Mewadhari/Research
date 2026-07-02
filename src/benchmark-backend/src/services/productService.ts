@@ -1,33 +1,106 @@
-import { fetchAllProducts } from './dataFetcher';
-import type { Product, ProductQuery, PaginatedResponse } from '../types/product';
+import { db } from '../db/client';
+import type { Product, ProductQuery, PaginatedResult } from '../types/product';
 
-export async function getProductById(id: number): Promise<Product | undefined> {
-  const products = await fetchAllProducts();
-  return products.find((p) => p.id === id);
+function rowToProduct(row: Record<string, unknown>): Product {
+  return {
+    id: String(row['id']),
+    name: row['name'] as string,
+    category: row['category'] as string,
+    price: row['price'] as number,
+    inStock: row['in_stock'] === 1,
+    stock: row['stock'] as number,
+    rating: row['rating'] as number,
+    reviewCount: Math.round((row['rating'] as number) * 20),
+    description: row['description'] as string,
+    featured: row['featured'] === 1,
+    images: JSON.parse(row['images'] as string) as string[],
+    tags: JSON.parse(row['tags'] as string) as string[],
+    createdAt: row['created_at'] as string,
+  };
 }
 
-export async function getProductsByIds(ids: number[]): Promise<Product[]> {
-  const products = await fetchAllProducts();
-  return ids
-    .map((id) => products.find((p) => p.id === id))
-    .filter((p): p is Product => p !== undefined);
-}
+const SORT_MAP: Record<string, string> = {
+  price_asc: 'price ASC',
+  price_desc: 'price DESC',
+  name_asc: 'LOWER(name) ASC',
+  name_desc: 'LOWER(name) DESC',
+  rating_desc: 'rating DESC',
+};
 
-export async function getAllProducts(query: ProductQuery): Promise<PaginatedResponse<Product>> {
-  const products = await fetchAllProducts();
-  let result = [...products];
+export function getProducts(query: ProductQuery): PaginatedResult<Product> {
+  const conditions: string[] = [];
+  const params: Array<string | number> = [];
 
-  // TODO (agent must implement):
-  // - apply search filter (case-insensitive partial match, trim whitespace)
-  // - apply category filter (case-insensitive exact match)
-  // - apply inStock filter
-  // - apply sorting (price_asc, price_desc, name_asc, name_desc)
+  if (query.search) {
+    conditions.push('LOWER(name) LIKE ?');
+    params.push(`%${query.search.trim().toLowerCase()}%`);
+  }
+  if (query.category) {
+    conditions.push('LOWER(category) = LOWER(?)');
+    params.push(query.category);
+  }
+  if (query.inStock !== undefined) {
+    conditions.push('in_stock = ?');
+    params.push(query.inStock ? 1 : 0);
+  }
+  if (query.featured !== undefined) {
+    conditions.push('featured = ?');
+    params.push(query.featured ? 1 : 0);
+  }
 
-  const total = result.length;
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const orderBy = (query.sort && SORT_MAP[query.sort]) ?? 'CAST(id AS INTEGER) ASC';
+
   const page = query.page ?? 1;
   const limit = query.limit ?? 10;
-  const totalPages = Math.ceil(total / limit);
-  const data = result.slice((page - 1) * limit, page * limit);
+  const offset = (page - 1) * limit;
 
-  return { data, total, page, limit, totalPages };
+  const { count: total } = db
+    .prepare(`SELECT COUNT(*) AS count FROM products ${where}`)
+    .get(params) as { count: number };
+
+  const rows = db
+    .prepare(`SELECT * FROM products ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`)
+    .all([...params, limit, offset]) as Record<string, unknown>[];
+
+  return {
+    data: rows.map(rowToProduct),
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+}
+
+export function getProductById(id: string): Product | null {
+  const row = db
+    .prepare('SELECT * FROM products WHERE id = ?')
+    .get(id) as Record<string, unknown> | undefined;
+  return row ? rowToProduct(row) : null;
+}
+
+export function getProductsByIds(ids: string[]): Product[] {
+  if (ids.length === 0) return [];
+  const placeholders = ids.map(() => '?').join(', ');
+  const rows = db
+    .prepare(`SELECT * FROM products WHERE id IN (${placeholders})`)
+    .all(ids) as Record<string, unknown>[];
+  const rowMap = new Map(rows.map((r) => [String(r['id']), r]));
+  return ids
+    .map((id) => rowMap.get(id))
+    .filter((r): r is Record<string, unknown> => r !== undefined)
+    .map(rowToProduct);
+}
+
+export function getFeaturedProducts(): Product[] {
+  const rows = db
+    .prepare(`
+      SELECT p.*
+      FROM products p
+      LEFT JOIN featured_overrides fo ON fo.product_id = p.id
+      WHERE COALESCE(fo.is_featured, p.featured) = 1
+      ORDER BY CAST(p.id AS INTEGER)
+    `)
+    .all() as Record<string, unknown>[];
+  return rows.map(rowToProduct);
 }

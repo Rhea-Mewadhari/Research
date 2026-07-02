@@ -1,28 +1,13 @@
-import { vi, beforeEach, afterEach } from 'vitest';
-import { products } from '../src/data/products';
+import { vi, beforeAll, afterEach } from 'vitest';
+import { runMigrations } from '../src/db/migrate';
+import { seed } from '../src/db/seed';
 
-// Stub the global fetch so hidden tests never make real DummyJSON calls.
-// dataFetcher.ts calls fetch() directly; stubbing the global intercepts it.
-beforeEach(() => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        products: products.map((p) => ({
-          id: p.id,
-          title: p.name,
-          price: p.price,
-          stock: p.inStock ? 10 : 0,
-          category: p.category,
-          rating: p.rating,
-          description: p.description,
-          tags: p.tags,
-          discountPercentage: p.discountPct ?? 0,
-        })),
-      }),
-    })
-  );
+// Initialize the in-memory test database once before this suite's tests run.
+// The DB is a module-level singleton (client.ts), so this runs once per
+// worker process — subsequent test files in the same worker reuse the seeded data.
+beforeAll(async () => {
+  runMigrations();
+  await seed();
 });
 
 afterEach(() => {
