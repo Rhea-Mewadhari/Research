@@ -42,5 +42,27 @@
     "hidden.sorting.integrity.test.tsx",
     "hidden.async.loading.test.tsx",
     "hidden.pagination.reset.test.tsx"
+  ],
+  "task7": [
+    "hidden.context.migration.test.tsx",
+    "hidden.combined.behavior.test.tsx",
+    "hidden.sorting.integrity.test.tsx",
+    "hidden.filtering.edgecases.test.tsx"
+  ],
+  "task8": [
+    "hidden.debounce.search.test.tsx",
+    "hidden.combined.behavior.test.tsx",
+    "hidden.filtering.edgecases.test.tsx"
+  ],
+  "task9": [
+    "hidden.favourite.revert.test.tsx"
+  ],
+  "task10": [
+    "hidden.detail.focus.test.tsx"
+  ],
+  "task11": [
+    "hidden.derived.state.test.tsx",
+    "hidden.sorting.integrity.test.tsx",
+    "hidden.combined.behavior.test.tsx"
   ]
 }

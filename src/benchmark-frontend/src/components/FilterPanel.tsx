@@ -8,7 +8,7 @@ type Props = {
   categories: string[];
 };
 
-export default function FilterPanel({ filters, onChange: _onChange, onClear, categories }: Props) {
+export default function FilterPanel({ filters, onChange, onClear, categories }: Props) {
   return (
     <section aria-label="Filters" className="panel">
       <h2>Filters</h2>
@@ -20,7 +20,7 @@ export default function FilterPanel({ filters, onChange: _onChange, onClear, cat
           name="search"
           type="text"
           value={filters.search}
-          onChange={() => {}}
+          onChange={(e) => onChange({ ...filters, search: e.target.value })}
           placeholder="Search by product name"
         />
       </div>
@@ -31,7 +31,7 @@ export default function FilterPanel({ filters, onChange: _onChange, onClear, cat
           id="category"
           name="category"
           value={filters.category}
-          onChange={() => {}}
+          onChange={(e) => onChange({ ...filters, category: e.target.value })}
         >
           {categories.map((category) => (
             <option key={category} value={category}>
@@ -48,7 +48,7 @@ export default function FilterPanel({ filters, onChange: _onChange, onClear, cat
             name="inStockOnly"
             type="checkbox"
             checked={filters.inStockOnly}
-            onChange={() => {}}
+            onChange={(e) => onChange({ ...filters, inStockOnly: e.target.checked })}
           />
           In-stock only
         </label>
