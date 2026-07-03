@@ -417,6 +417,116 @@ git commit -m "run: wiggum task6 wiggum-run1-be (backend)"
 
 ---
 
+#### BE-T2-1 — Route Registration Order
+
+```powershell
+# GSD
+git reset --hard; git clean -fd
+git checkout -b run/gsd/BE-T2-1/gsd-run1
+node src/benchmark-admin/run-experiment.js BE-T2-1 gsd-run1 backend gsd route-order
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-1__gsd-run1
+git commit -m "run: gsd BE-T2-1 gsd-run1 (backend)"
+```
+
+```powershell
+# Wiggum
+git reset --hard; git clean -fd
+git checkout -b run/wiggum/BE-T2-1/wiggum-run1
+node src/benchmark-admin/run-experiment.js BE-T2-1 wiggum-run1 backend wiggum route-order
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-1__wiggum-run1
+git commit -m "run: wiggum BE-T2-1 wiggum-run1 (backend)"
+```
+
+---
+
+#### BE-T2-2 — Middleware Composition — Error Propagation
+
+```powershell
+# GSD
+git reset --hard; git clean -fd
+git checkout -b run/gsd/BE-T2-2/gsd-run1
+node src/benchmark-admin/run-experiment.js BE-T2-2 gsd-run1 backend gsd middleware
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-2__gsd-run1
+git commit -m "run: gsd BE-T2-2 gsd-run1 (backend)"
+```
+
+```powershell
+# Wiggum
+git reset --hard; git clean -fd
+git checkout -b run/wiggum/BE-T2-2/wiggum-run1
+node src/benchmark-admin/run-experiment.js BE-T2-2 wiggum-run1 backend wiggum middleware
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-2__wiggum-run1
+git commit -m "run: wiggum BE-T2-2 wiggum-run1 (backend)"
+```
+
+---
+
+#### BE-T2-3 — Database Integrity — Favourites Atomicity
+
+```powershell
+# GSD
+git reset --hard; git clean -fd
+git checkout -b run/gsd/BE-T2-3/gsd-run1
+node src/benchmark-admin/run-experiment.js BE-T2-3 gsd-run1 backend gsd db-integrity
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-3__gsd-run1
+git commit -m "run: gsd BE-T2-3 gsd-run1 (backend)"
+```
+
+```powershell
+# Wiggum
+git reset --hard; git clean -fd
+git checkout -b run/wiggum/BE-T2-3/wiggum-run1
+node src/benchmark-admin/run-experiment.js BE-T2-3 wiggum-run1 backend wiggum db-integrity
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-3__wiggum-run1
+git commit -m "run: wiggum BE-T2-3 wiggum-run1 (backend)"
+```
+
+---
+
+#### BE-T2-4 — Pagination Correctness — Filter-Aware Total Count
+
+```powershell
+# GSD
+git reset --hard; git clean -fd
+git checkout -b run/gsd/BE-T2-4/gsd-run1
+node src/benchmark-admin/run-experiment.js BE-T2-4 gsd-run1 backend gsd pagination
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-4__gsd-run1
+git commit -m "run: gsd BE-T2-4 gsd-run1 (backend)"
+```
+
+```powershell
+# Wiggum
+git reset --hard; git clean -fd
+git checkout -b run/wiggum/BE-T2-4/wiggum-run1
+node src/benchmark-admin/run-experiment.js BE-T2-4 wiggum-run1 backend wiggum pagination
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-4__wiggum-run1
+git commit -m "run: wiggum BE-T2-4 wiggum-run1 (backend)"
+```
+
+---
+
+#### BE-T2-5 — Rate Limiter — Memory Leak and Retry-After Correctness
+
+```powershell
+# GSD
+git reset --hard; git clean -fd
+git checkout -b run/gsd/BE-T2-5/gsd-run1
+node src/benchmark-admin/run-experiment.js BE-T2-5 gsd-run1 backend gsd rate-limiter
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-5__gsd-run1
+git commit -m "run: gsd BE-T2-5 gsd-run1 (backend)"
+```
+
+```powershell
+# Wiggum
+git reset --hard; git clean -fd
+git checkout -b run/wiggum/BE-T2-5/wiggum-run1
+node src/benchmark-admin/run-experiment.js BE-T2-5 wiggum-run1 backend wiggum rate-limiter
+git add src/benchmark-backend src/benchmark-admin/results/BE-T2-5__wiggum-run1
+git commit -m "run: wiggum BE-T2-5 wiggum-run1 (backend)"
+```
+
+---
+
 ## Results
 
 All outputs land in `src/benchmark-admin/results/<taskId>__<runId>/`:
