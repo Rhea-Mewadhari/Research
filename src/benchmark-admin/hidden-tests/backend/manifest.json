@@ -41,19 +41,19 @@
     "hidden.sorting.test.ts",
     "hidden.auth.test.ts"
   ],
-  "BE-T2-1": [
+  "task7": [
     "hidden.route-order.test.ts"
   ],
-  "BE-T2-2": [
+  "task8": [
     "hidden.middleware.test.ts"
   ],
-  "BE-T2-3": [
+  "task9": [
     "hidden.db-integrity.test.ts"
   ],
-  "BE-T2-4": [
+  "task10": [
     "hidden.pagination.test.ts"
   ],
-  "BE-T2-5": [
+  "task11": [
     "hidden.rate-limiter.test.ts"
   ]
 }
