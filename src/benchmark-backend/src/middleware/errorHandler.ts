@@ -12,7 +12,7 @@ export function errorHandler(
 
   if (err instanceof RateLimitError) {
     res.setHeader('Retry-After', String(err.retryAfterSeconds));
-    res.status(err.statusCode).json({ error: err.message, code: err.code });
+    res.status(err.statusCode).json({ error: err.message, code: err.code, requestId });
     return;
   }
 
@@ -22,7 +22,7 @@ export function errorHandler(
       isServerError && process.env.NODE_ENV === 'production'
         ? 'Internal server error'
         : err.message;
-    res.status(err.statusCode).json({ error: message, code: err.code });
+    res.status(err.statusCode).json({ error: message, code: err.code, requestId });
     return;
   }
 
@@ -32,5 +32,5 @@ export function errorHandler(
       : err instanceof Error
         ? err.message
         : 'Unknown error';
-  res.status(500).json({ error: message });
+  res.status(500).json({ error: message, requestId });
 }

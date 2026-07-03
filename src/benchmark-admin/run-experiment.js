@@ -28,8 +28,8 @@ if (!['gsd', 'wiggum'].includes(framework)) {
   process.exit(1);
 }
 
-if (bugType && !['logical', 'syntax', 'refactor', 'testgen', 'integration', 'config', 'data', 'security', 'context-migration', 'debounce', 'optimistic', 'focus', 'derived-state'].includes(bugType)) {
-  console.error(`Unknown bugType: ${bugType}. Use logical, syntax, refactor, testgen, integration, config, data, security, context-migration, debounce, optimistic, focus, or derived-state.`);
+if (bugType && !['logical', 'syntax', 'refactor', 'testgen', 'integration', 'config', 'data', 'security', 'route-order', 'middleware', 'db-integrity', 'pagination', 'rate-limiter', 'context-migration', 'debounce', 'optimistic', 'focus', 'derived-state'].includes(bugType)) {
+  console.error(`Unknown bugType: ${bugType}. Use logical, syntax, refactor, testgen, integration, config, data, security, route-order, middleware, db-integrity, pagination, rate-limiter, context-migration, debounce, optimistic, focus, or derived-state.`);
   process.exit(1);
 }
 
