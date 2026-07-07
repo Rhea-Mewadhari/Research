@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
@@ -11,11 +11,12 @@ describe('Context migration — SortSelect', () => {
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
 
-    const headings = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const headings = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((el) => el.textContent ?? '');
 
-    // Jump Rope is the cheapest product ($19); it must appear first after price-asc sort
+    // Jump Rope is the cheapest product; it must appear first after price-asc sort
     expect(headings[0]).toMatch(/jump rope/i);
   });
 
@@ -27,12 +28,13 @@ describe('Context migration — SortSelect', () => {
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-desc');
 
-    const headings = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const headings = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((el) => el.textContent ?? '');
 
-    // Ergonomic Chair is the most expensive ($549)
-    expect(headings[0]).toMatch(/ergonomic chair/i);
+    // Noise-Cancelling Headphones is the most expensive product
+    expect(headings[0]).toMatch(/noise-cancelling headphones/i);
   });
 });
 

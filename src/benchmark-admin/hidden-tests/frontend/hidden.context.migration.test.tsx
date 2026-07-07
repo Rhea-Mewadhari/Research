@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../../../benchmark-frontend/src/App';
 
@@ -14,7 +14,8 @@ describe('Hidden: context migration — sort wired to FilterContext', () => {
     // If SortSelect is wired to local state instead of context, the select will
     // show the selected value visually but filterProducts will receive sortBy='default'
     // and the cheapest product will not appear first.
-    const headings = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const headings = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((el) => el.textContent ?? '');
 
@@ -30,12 +31,13 @@ describe('Hidden: context migration — sort wired to FilterContext', () => {
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'rating-desc');
 
-    const headings = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const headings = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((el) => el.textContent ?? '');
 
-    // Clean Code has rating 4.9 — highest rated product
-    expect(headings[0]).toMatch(/clean code/i);
+    // Yoga Mat has the highest rating — appears first after rating-desc sort
+    expect(headings[0]).toMatch(/yoga mat/i);
   });
 });
 
@@ -81,8 +83,9 @@ describe('Hidden: context migration — category click writes to FilterContext',
     await user.click(btn);
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
 
-    // Jump Rope ($19) is the cheapest Fitness product
-    const headings = screen
+    // Jump Rope is the cheapest Fitness product
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const headings = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((el) => el.textContent ?? '');
     expect(headings[0]).toMatch(/jump rope/i);

@@ -81,8 +81,8 @@ describe('ProductDetailPanel — open and close', () => {
     await screen.findByTestId('results-count');
     await user.click(screen.getByTestId('product-1'));
 
-    // Product detail fetch resolves — panel renders product content
-    await screen.findByRole('heading', { name: /wireless mouse/i });
+    // Product detail fetch resolves — panel renders product content (h2 in dialog)
+    await screen.findByRole('heading', { name: /wireless mouse/i, level: 2 });
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });

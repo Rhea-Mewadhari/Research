@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { products } from '../../../benchmark-frontend/src/data/products';
 import App from '../../../benchmark-frontend/src/App';
@@ -7,9 +7,10 @@ describe('Hidden: sorting integrity', () => {
   it('default sort preserves original dataset order', async () => {
     render(<App />);
 
-    const renderedNames = (await screen.findAllByRole('heading', { level: 3 })).map(
-      (node) => node.textContent
-    );
+    const productSection = await screen.findByRole('region', { name: /product results/i });
+    const renderedNames = within(productSection)
+      .getAllByRole('heading', { level: 3 })
+      .map((node) => node.textContent);
 
     const originalNames = products.map((p) => p.name);
 

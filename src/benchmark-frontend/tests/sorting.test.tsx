@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
@@ -10,7 +10,8 @@ describe('Sorting behavior', () => {
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
 
-    const names = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const names = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((node) => node.textContent);
 
@@ -40,7 +41,8 @@ describe('Sorting behavior', () => {
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-desc');
 
-    const names = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const names = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((node) => node.textContent);
 
@@ -56,7 +58,8 @@ describe('Sorting behavior', () => {
 
     await user.selectOptions(screen.getByLabelText(/sort by/i), 'rating-desc');
 
-    const names = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const names = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((node) => node.textContent);
 

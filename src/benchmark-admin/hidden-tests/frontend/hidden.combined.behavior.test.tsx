@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../../../benchmark-frontend/src/App';
 
@@ -28,7 +28,8 @@ describe('Hidden: combined filter behavior', () => {
 
     expect(screen.getByLabelText(/sort by/i)).toHaveValue('default');
 
-    const names = screen
+    const productSection = screen.getByRole('region', { name: /product results/i });
+    const names = within(productSection)
       .getAllByRole('heading', { level: 3 })
       .map((node) => node.textContent);
 

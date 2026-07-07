@@ -29,10 +29,13 @@ export function runCommand(command, cwd) {
 
 export function parseVitestSummary(output) {
   const text = output || '';
-  const passedMatch = text.match(/(\d+)\s+passed/i);
-  const failedMatch = text.match(/(\d+)\s+failed/i);
-  const passed = passedMatch ? Number(passedMatch[1]) : 0;
-  const failed = failedMatch ? Number(failedMatch[1]) : 0;
+  // Use the last occurrences so we capture the "Tests" summary line totals
+  // (individual test counts) rather than per-file inline counts or the
+  // "Test Files" line that appears earlier in vitest output.
+  const passedMatches = [...text.matchAll(/(\d+)\s+passed/gi)];
+  const failedMatches = [...text.matchAll(/(\d+)\s+failed/gi)];
+  const passed = passedMatches.length ? Number(passedMatches.at(-1)[1]) : 0;
+  const failed = failedMatches.length ? Number(failedMatches.at(-1)[1]) : 0;
   return { passed, failed, total: passed + failed };
 }
 

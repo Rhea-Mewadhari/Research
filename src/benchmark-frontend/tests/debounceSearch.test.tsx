@@ -41,7 +41,7 @@ describe('Debounce — search filtering', () => {
 
     await user.type(screen.getByLabelText(/search/i), 'KEYBOARD');
 
-    await screen.findByText(/mechanical keyboard/i);
+    await screen.findByRole('heading', { name: /mechanical keyboard/i });
     expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
   });
 
@@ -54,7 +54,7 @@ describe('Debounce — search filtering', () => {
     await user.selectOptions(screen.getByLabelText(/category/i), 'Electronics');
     await user.type(screen.getByLabelText(/search/i), 'hub');
 
-    await screen.findByText(/usb-c hub/i);
+    await screen.findByRole('heading', { name: /usb-c hub/i });
     expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
   });
 
