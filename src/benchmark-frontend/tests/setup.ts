@@ -3,6 +3,7 @@ import { vi, beforeEach, afterEach } from 'vitest';
 import { products } from '../src/data/products';
 
 beforeEach(() => {
+  localStorage.clear();
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
