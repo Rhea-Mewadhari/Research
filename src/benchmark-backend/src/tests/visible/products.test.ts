@@ -6,6 +6,12 @@ vi.mock('../../services/dataFetcher', () => ({
   fetchAllProducts: mockFetchAllProducts,
 }));
 
+// Products tests are not testing rate limiting — bypass it so that the in-memory
+// store (MAX_REQUESTS=10 during task11 injection) doesn't exhaust within this file.
+vi.mock('../../middleware/rateLimiter', () => ({
+  rateLimiter: (_req: any, _res: any, next: any) => next(),
+}));
+
 import request from 'supertest';
 import app from '../../app';
 import { products as MOCK_PRODUCTS } from '../../data/products';
