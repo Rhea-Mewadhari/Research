@@ -4597,5 +4597,26 @@
         "cost_usd":  0.2566076,
         "num_turns":  15,
         "is_error":  false
+    },
+    {
+        "framework":  "wiggum",
+        "task_id":  "task8",
+        "run_id":  "wiggum-run5-be",
+        "run_num":  5,
+        "target":  "backend",
+        "bug_type":  "middleware",
+        "build_success":  false,
+        "visible_passed":  33,
+        "visible_total":  33,
+        "hidden_passed":  38,
+        "hidden_total":  38,
+        "coverage_branch_pct":  null,
+        "correctness":  0.8,
+        "quality":  1,
+        "overall":  0.88,
+        "wall_duration_ms":  506651,
+        "cost_usd":  1.0457729,
+        "num_turns":  40,
+        "is_error":  false
     }
 ]

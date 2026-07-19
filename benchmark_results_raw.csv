@@ -218,3 +218,4 @@
 "wiggum","task11","wiggum-run4-be","4","backend","rate-limiter","False","33","33","39","39",,"0,8","0,99","0,876","108889","0,3719708","21","False"
 "wiggum","task11","wiggum-run5","5","frontend","derived-state","True","32","39","39","47",,"0,861","1","0,917","76982","0,2457806","15","False"
 "wiggum","task11","wiggum-run5-be","5","backend","rate-limiter","False","33","33","39","39",,"0,8","0,99","0,876","63231","0,2566076","15","False"
+"wiggum","task8","wiggum-run5-be","5","backend","middleware","False","33","33","38","38",,"0,8","1","0,88","506651","1,0457729","40","False"
