@@ -42,3 +42,46 @@ export function parseVitestSummary(output) {
 export function writeLog(dir, name, content) {
   fs.writeFileSync(path.join(dir, name), content, 'utf8');
 }
+
+// Files the agent actually touched since the last clean reset, relative to `cwd`.
+// Used to scope build failures to the agent's own changes so pre-existing,
+// unrelated scaffold errors elsewhere in the project don't fail the run.
+export function getGitChangedFiles(cwd) {
+  const normalise = (p) => p.trim().replace(/\\/g, '/');
+  const runGit = (command) => {
+    try {
+      return execSync(command, { cwd, encoding: 'utf8', stdio: 'pipe' });
+    } catch {
+      return '';
+    }
+  };
+
+  const modified = runGit('git diff --name-only --relative HEAD');
+  const untracked = runGit('git ls-files --others --exclude-standard');
+
+  return new Set(
+    `${modified}\n${untracked}`
+      .split('\n')
+      .map(normalise)
+      .filter(Boolean)
+  );
+}
+
+// Parses `tsc` diagnostic lines of the form:
+//   src/services/dataFetcher.ts(6,5): error TS2322: Type 'number' is not assignable to type 'string'.
+export function parseTscErrors(output) {
+  const text = output || '';
+  const regex = /^(.+?)\((\d+),(\d+)\): error (TS\d+): (.+)$/gm;
+  const errors = [];
+  let match;
+  while ((match = regex.exec(text))) {
+    errors.push({
+      file: match[1].trim().replace(/\\/g, '/'),
+      line: Number(match[2]),
+      column: Number(match[3]),
+      code: match[4],
+      message: match[5].trim(),
+    });
+  }
+  return errors;
+}

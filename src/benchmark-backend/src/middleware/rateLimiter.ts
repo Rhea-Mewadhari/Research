@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { RateLimitError } from '../errors';
 
 const WINDOW_MS = 60_000;
-const MAX_REQUESTS = 100;
+const MAX_REQUESTS = 10;
 
 const store = new Map<string, number[]>();
 

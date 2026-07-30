@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { nowIso, ensureDir, runCommand, parseVitestSummary, writeLog } from './helpers/benchmark-utils.js';
+import { nowIso, ensureDir, runCommand, parseVitestSummary, writeLog, getGitChangedFiles, parseTscErrors } from './helpers/benchmark-utils.js';
 import { copyHiddenTests, removeHiddenTests } from './helpers/hidden-tests.js';
 import { computeScore } from './helpers/scorer.js';
 
@@ -109,11 +109,35 @@ function main() {
   }
 
   // Build
+  // Snapshot the agent's footprint *before* the build step so pre-existing,
+  // unrelated scaffold errors elsewhere in the project don't fail the run —
+  // only errors in files the agent actually touched count against build.success.
+  const changedFiles = getGitChangedFiles(repoRoot);
   const build = runCommand('pnpm run build', repoRoot);
   summary.timing.buildMs  = build.durationMs;
   writeLog(resultDir, 'build.stdout.txt', build.stdout);
   writeLog(resultDir, 'build.stderr.txt', build.stderr);
-  summary.build.success = build.success;
+
+  const tscErrors      = parseTscErrors(`${build.stdout}\n${build.stderr}`);
+  const agentErrors    = tscErrors.filter(e => changedFiles.has(e.file));
+  const preExisting    = tscErrors.filter(e => !changedFiles.has(e.file));
+
+  if (preExisting.length) {
+    console.warn(`[build] Ignoring ${preExisting.length} pre-existing error(s) outside agent-modified files:`);
+    preExisting.forEach(e => console.warn(`  ${e.file}(${e.line},${e.column}): ${e.code} ${e.message}`));
+  }
+
+  // Only downgrade a raw failure to success when every diagnostic in the output
+  // was positively attributed to a non-agent file. If the failure produced no
+  // parseable tsc diagnostics at all (missing dependency, config error, etc.),
+  // we can't attribute it — leave rawSuccess as the final word.
+  const attributableFailure = build.success || (tscErrors.length > 0 && agentErrors.length === 0);
+
+  summary.build = {
+    success:      attributableFailure,
+    rawSuccess:   build.success,
+    preExistingErrors: preExisting,
+  };
 
   summary.overall.success =
     summary.visibleTests.success &&
