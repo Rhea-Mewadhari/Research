@@ -95,15 +95,51 @@ function main() {
   }
 
   // Hidden tests
+  // Scoped to only the hidden test files themselves (not the whole tests/ dir) —
+  // otherwise every visible test file re-runs alongside them, so a single
+  // pre-existing visible failure gets counted a second time here, double-weighted
+  // in computeScore (visible 30% + hidden 50%).
   let hiddenFiles = [];
   try {
     hiddenFiles = copyHiddenTests(hiddenTestsRoot, repoRoot, taskId);
 
-    const hidden = runCommand('pnpm test -- --run', repoRoot);
+    let hidden;
+    if (hiddenFiles.length > 0) {
+      // No `--` separator here: in this pnpm setup, args forwarded across
+      // `--` to the `vitest run` script silently fail to reach vitest at all
+      // (verified — even a bogus filter runs the full suite unfiltered
+      // through `pnpm test -- <filter>`); passed directly, they work.
+      const hiddenPaths = hiddenFiles.map(f => `"tests/${f}"`).join(' ');
+      hidden = runCommand(`pnpm test ${hiddenPaths}`, repoRoot);
+    } else {
+      hidden = { success: true, stdout: '', stderr: '', durationMs: 0 };
+    }
     summary.timing.hiddenMs = hidden.durationMs;
     writeLog(resultDir, 'hidden-tests.stdout.txt', hidden.stdout);
     writeLog(resultDir, 'hidden-tests.stderr.txt', hidden.stderr);
-    summary.hiddenTests = { success: hidden.success, ...parseVitestSummary(`${hidden.stdout}\n${hidden.stderr}`) };
+
+    const hiddenOutput = `${hidden.stdout}\n${hidden.stderr}`;
+    const hiddenParsed  = parseVitestSummary(hiddenOutput);
+    // A crash during collection (e.g. a broken import) can still leave the
+    // per-file "Test Files X failed (X)" line intact even though vitest's own
+    // "Tests  no tests" line shows zero tests actually ran — parseVitestSummary
+    // then falls back to that file-level count, so `total` isn't reliably 0.
+    // Check vitest's literal marker too. Distinguish this from "this task
+    // genuinely has no hidden tests" using the manifest-declared file count,
+    // not the parsed total — otherwise scorer.js would silently drop hidden-test
+    // weighting for what is actually a catastrophic failure.
+    const crashed = !hidden.success && hiddenFiles.length > 0 &&
+      (hiddenParsed.total === 0 || /no tests/i.test(hiddenOutput));
+    if (crashed) {
+      console.warn(`[hidden tests] Crashed before producing a parseable summary (expected ${hiddenFiles.length} file(s)) — not treating as "no hidden tests".`);
+    }
+
+    summary.hiddenTests = {
+      success: hidden.success,
+      ...hiddenParsed,
+      expectedFiles: hiddenFiles.length,
+      crashed,
+    };
   } finally {
     removeHiddenTests(hiddenFiles, repoRoot);
   }
