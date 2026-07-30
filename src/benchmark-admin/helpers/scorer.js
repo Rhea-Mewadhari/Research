@@ -10,7 +10,11 @@ function round(num) {
 export function computeScore(summary) {
   const visiblePassRate = safeRate(summary.visibleTests.passed, summary.visibleTests.total);
   const buildStability  = summary.build.success ? 1 : 0;
-  const hasHiddenTests  = summary.hiddenTests.total > 0;
+  // Whether hidden tests exist for this task is a fact about the task
+  // (how many files the manifest declared), not about whether the run
+  // produced a parseable count — a crashed run must still be scored as a
+  // hidden-test failure, not silently treated as "no hidden tests".
+  const hasHiddenTests  = (summary.hiddenTests.expectedFiles ?? summary.hiddenTests.total) > 0;
 
   if (!hasHiddenTests) {
     return {
