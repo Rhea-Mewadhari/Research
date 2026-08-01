@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
@@ -10,9 +10,14 @@ describe('Filtering behavior', () => {
 
     await user.type(screen.getByLabelText(/search/i), 'mouse');
 
+    // "wireless mouse" is present in the unfiltered list too, so waiting on it
+    // alone would resolve before the 300ms debounce settles — wait on the
+    // count instead, which only reaches this value once filtering applies.
+    await waitFor(() => {
+      expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
+    });
     expect(screen.getByText(/wireless mouse/i)).toBeInTheDocument();
     expect(screen.queryByText(/yoga mat/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
   });
 
   it('filters products by category', async () => {

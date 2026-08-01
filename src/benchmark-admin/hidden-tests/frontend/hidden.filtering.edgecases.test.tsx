@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../../../benchmark-frontend/src/App';
 
@@ -9,8 +9,13 @@ describe('Hidden: filtering edge cases', () => {
 
     await user.type(screen.getByLabelText(/search/i), 'MOUSE');
 
-    expect(screen.getByText(/wireless mouse/i)).toBeInTheDocument();
-    expect(screen.queryByText(/yoga mat/i)).not.toBeInTheDocument();
+    // Search is debounced (300ms) — "wireless mouse" is present unfiltered
+    // too, so both conditions must be checked together under waitFor rather
+    // than asserted immediately after typing.
+    await waitFor(() => {
+      expect(screen.getByText(/wireless mouse/i)).toBeInTheDocument();
+      expect(screen.queryByText(/yoga mat/i)).not.toBeInTheDocument();
+    });
   });
 
   it('search trims leading and trailing whitespace', async () => {
@@ -19,8 +24,10 @@ describe('Hidden: filtering edge cases', () => {
 
     await user.type(screen.getByLabelText(/search/i), '   foam   ');
 
-    expect(screen.getByText(/foam roller/i)).toBeInTheDocument();
-    expect(screen.queryByText(/wireless mouse/i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/foam roller/i)).toBeInTheDocument();
+      expect(screen.queryByText(/wireless mouse/i)).not.toBeInTheDocument();
+    });
   });
 
   it('category "All" does not filter anything', async () => {
@@ -38,7 +45,9 @@ describe('Hidden: filtering edge cases', () => {
 
     await user.type(screen.getByLabelText(/search/i), 'electronics');
 
-    expect(screen.getByRole('status')).toHaveTextContent('No products found.');
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('No products found.');
+    });
     expect(screen.queryByText(/wireless mouse/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/usb-c hub/i)).not.toBeInTheDocument();
   });
@@ -49,6 +58,8 @@ describe('Hidden: filtering edge cases', () => {
 
     await user.type(screen.getByLabelText(/search/i), 'zzzzzz');
 
-    expect(screen.getByRole('status')).toHaveTextContent('No products found.');
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('No products found.');
+    });
   });
 });

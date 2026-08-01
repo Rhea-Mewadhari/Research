@@ -5,7 +5,9 @@ import App from '../../../benchmark-frontend/src/App';
 describe('Hidden: async data loading', () => {
   it('shows a loading indicator before products appear', async () => {
     render(<App />);
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    // The spinner exposes "Loading" via aria-label, not visible text content,
+    // so getByText never matches it — query by role instead.
+    expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('renders all products once loading completes', async () => {
@@ -30,9 +32,13 @@ describe('Hidden: async data loading', () => {
 
     await user.type(screen.getByLabelText(/search/i), 'yoga');
 
+    // Search is debounced (300ms) — wait on the count settling before
+    // checking the other conditions, which resolve on the same render.
+    await waitFor(() => {
+      expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
+    });
     expect(screen.getByText(/yoga mat/i)).toBeInTheDocument();
     expect(screen.queryByText(/wireless mouse/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
   });
 
   it('does not produce console errors during async load and interaction', async () => {

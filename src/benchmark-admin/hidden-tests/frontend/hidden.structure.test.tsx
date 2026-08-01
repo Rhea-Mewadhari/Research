@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import App from '../../../benchmark-frontend/src/App';
@@ -19,7 +19,11 @@ describe('Hidden: separation of concerns', () => {
 
     await user.type(screen.getByLabelText(/search/i), 'mouse');
 
-    expect(filterProducts).toHaveBeenCalled();
+    // Search is debounced (300ms) — filterProducts only re-runs once
+    // debouncedSearch updates, not immediately after typing.
+    await waitFor(() => {
+      expect(filterProducts).toHaveBeenCalled();
+    });
   });
 
   it('delegates sorting to filterProducts utility when sort changes', async () => {

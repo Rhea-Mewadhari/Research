@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../../../benchmark-frontend/src/App';
 
@@ -13,9 +13,13 @@ describe('Hidden: combined filter behavior', () => {
     await user.click(screen.getByLabelText(/in-stock only/i));
     await user.type(screen.getByLabelText(/search/i), 'laptop');
 
+    // Search is debounced (300ms) — wait on the count settling before
+    // checking the other conditions, which resolve on the same render.
+    await waitFor(() => {
+      expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
+    });
     expect(screen.getByText(/laptop stand/i)).toBeInTheDocument();
     expect(screen.queryByText(/desk lamp/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
   });
 
   it('clear filters also resets sorting', async () => {
