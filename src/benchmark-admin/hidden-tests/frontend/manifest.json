@@ -64,5 +64,11 @@
     "hidden.derived.state.test.tsx",
     "hidden.sorting.integrity.test.tsx",
     "hidden.combined.behavior.test.tsx"
+  ],
+  "task12": [
+    "hidden.auth-foundation.test.tsx"
+  ],
+  "task13": [
+    "hidden.profile-management.test.tsx"
   ]
 }

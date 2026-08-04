@@ -55,5 +55,11 @@
   ],
   "task11": [
     "hidden.rate-limiter.test.ts"
+  ],
+  "task12": [
+    "hidden.auth-foundation.test.ts"
+  ],
+  "task13": [
+    "hidden.profile-management.test.ts"
   ]
 }

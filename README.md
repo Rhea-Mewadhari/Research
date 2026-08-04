@@ -527,6 +527,82 @@ git commit -m "run: wiggum task11 wiggum-run1 (backend)"
 
 ---
 
+---
+
+### Full-Stack
+
+---
+
+#### Task 12 — Feature: Authentication Foundation (Full-Stack)
+
+Full spec at `src/benchmark-backend/instructions/task12.md`. Unlike Tasks 1–11
+(independent per-target tasks that happen to share a number), this is one task
+graded across both repos. A single command runs the agent against
+`benchmark-frontend` and then `benchmark-backend` in turn, via
+`run-fullstack-experiment.js` — a thin wrapper that calls `run-experiment.js`
+once per target (backend gets a `-be`-suffixed `runId` so its results
+directory never collides with the frontend run's), then writes both scores
+side by side. Frontend and backend are still graded independently — there is
+no blended single score.
+
+```powershell
+# GSD
+git checkout feat/complexity; git reset --hard; git clean -fd
+git checkout -b run/gsd/task12/gsd-run1
+node src/benchmark-admin/run-fullstack-experiment.js task12 gsd-run1 gsd
+git add src/benchmark-frontend src/benchmark-backend src/benchmark-admin/results/task12__gsd-run1 src/benchmark-admin/results/task12__gsd-run1-be
+git commit -m "run: gsd task12 gsd-run1 (fullstack)"
+```
+
+```powershell
+# Wiggum
+git checkout feat/complexity; git reset --hard; git clean -fd
+git checkout -b run/wiggum/task12/wiggum-run1
+node src/benchmark-admin/run-fullstack-experiment.js task12 wiggum-run1 wiggum
+git add src/benchmark-frontend src/benchmark-backend src/benchmark-admin/results/task12__wiggum-run1 src/benchmark-admin/results/task12__wiggum-run1-be
+git commit -m "run: wiggum task12 wiggum-run1 (fullstack)"
+```
+
+Results land in:
+- `results/task12__<runId>/summary.json` — frontend score
+- `results/task12__<runId>-be/summary.json` — backend score
+- `results/task12__<runId>/fullstack-summary.json` — both, side by side
+
+---
+
+#### Task 13 — Feature: User Profile Management (Full-Stack)
+
+Full spec at `src/benchmark-backend/instructions/task13.md`. Builds directly on
+Task 12 — the users table, JWT issuance, and `requireJwt` middleware must
+already exist. **This task branches from a completed Task 12 run, not from
+`feat/complexity`** — check out the Task 12 branch for the same framework
+first, then branch from there.
+
+```powershell
+# GSD — branches from the Task 12 GSD run
+git checkout run/gsd/task12/gsd-run1; git reset --hard; git clean -fd
+git checkout -b run/gsd/task13/gsd-run1
+node src/benchmark-admin/run-fullstack-experiment.js task13 gsd-run1 gsd
+git add src/benchmark-frontend src/benchmark-backend src/benchmark-admin/results/task13__gsd-run1 src/benchmark-admin/results/task13__gsd-run1-be
+git commit -m "run: gsd task13 gsd-run1 (fullstack)"
+```
+
+```powershell
+# Wiggum — branches from the Task 12 Wiggum run
+git checkout run/wiggum/task12/wiggum-run1; git reset --hard; git clean -fd
+git checkout -b run/wiggum/task13/wiggum-run1
+node src/benchmark-admin/run-fullstack-experiment.js task13 wiggum-run1 wiggum
+git add src/benchmark-frontend src/benchmark-backend src/benchmark-admin/results/task13__wiggum-run1 src/benchmark-admin/results/task13__wiggum-run1-be
+git commit -m "run: wiggum task13 wiggum-run1 (fullstack)"
+```
+
+Results land in:
+- `results/task13__<runId>/summary.json` — frontend score
+- `results/task13__<runId>-be/summary.json` — backend score
+- `results/task13__<runId>/fullstack-summary.json` — both, side by side
+
+---
+
 ## Results
 
 All outputs land in `src/benchmark-admin/results/<taskId>__<runId>/`:
