@@ -1,0 +1,16 @@
+{
+  "task12": [
+    "tests/authSignup.test.tsx",
+    "tests/authLogin.test.tsx",
+    "tests/authNavBar.test.tsx",
+    "tests/authProductsApiToken.test.ts"
+  ],
+  "task13": [
+    "tests/authSignup.test.tsx",
+    "tests/authLogin.test.tsx",
+    "tests/authNavBar.test.tsx",
+    "tests/authProductsApiToken.test.ts",
+    "tests/protectedRoute.test.tsx",
+    "tests/profilePage.test.tsx"
+  ]
+}

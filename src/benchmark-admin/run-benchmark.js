@@ -52,11 +52,23 @@ const runId   = process.argv[3] || `run_${Date.now()}`;
 const target  = process.argv[4] || 'frontend'; // frontend | backend
 const bugType = process.argv[5];               // logical | syntax | undefined
 
-const repoRoot        = path.resolve(__dirname, `../benchmark-${target}`);
-const hiddenTestsRoot = path.resolve(__dirname, `hidden-tests/${target}`);
-const resultsRoot     = path.resolve(__dirname, 'results');
+const repoRoot         = path.resolve(__dirname, `../benchmark-${target}`);
+const hiddenTestsRoot  = path.resolve(__dirname, `hidden-tests/${target}`);
+const visibleManifest  = path.resolve(__dirname, `visible-tests-manifest/${target}.json`);
+const resultsRoot      = path.resolve(__dirname, 'results');
 
 ensureDir(resultsRoot);
+
+// Tasks whose visible tests don't stand alone in the tests/ directory — e.g.
+// task13's PATCH /api/users/me tests sit alongside task12's, since task13
+// builds on a completed task12 run rather than the clean baseline — get an
+// entry here scoping run-benchmark.js to just their own files. Tasks without
+// an entry (1-11) fall back to running the whole directory, unchanged.
+function getScopedVisibleFiles(taskId) {
+  if (!fs.existsSync(visibleManifest)) return null;
+  const manifest = JSON.parse(fs.readFileSync(visibleManifest, 'utf8'));
+  return manifest[taskId] ?? null;
+}
 
 function main() {
   const startedAt = nowIso();
@@ -79,7 +91,16 @@ function main() {
   console.log(`Running benchmark for task=${taskId}, run=${runId}`);
 
   // Visible tests
-  const visible = runCommand('pnpm test -- --run', repoRoot);
+  const scopedVisibleFiles = getScopedVisibleFiles(taskId);
+  let visible;
+  if (scopedVisibleFiles && scopedVisibleFiles.length > 0) {
+    // No `--` separator — see the identical note on the hidden-tests run
+    // below; passed directly, args reach vitest correctly in this pnpm setup.
+    const visiblePaths = scopedVisibleFiles.map(f => `"${f}"`).join(' ');
+    visible = runCommand(`pnpm test ${visiblePaths}`, repoRoot);
+  } else {
+    visible = runCommand('pnpm test -- --run', repoRoot);
+  }
   summary.timing.visibleMs = visible.durationMs;
   writeLog(resultDir, 'visible-tests.stdout.txt', visible.stdout);
   writeLog(resultDir, 'visible-tests.stderr.txt', visible.stderr);

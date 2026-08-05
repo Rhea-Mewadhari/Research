@@ -1,0 +1,9 @@
+{
+  "task12": [
+    "src/tests/visible/auth.test.ts"
+  ],
+  "task13": [
+    "src/tests/visible/auth.test.ts",
+    "src/tests/visible/userProfile.test.ts"
+  ]
+}
