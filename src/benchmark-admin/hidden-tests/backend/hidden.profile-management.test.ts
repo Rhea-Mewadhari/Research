@@ -40,9 +40,12 @@ describe('Hidden: profile management — structure', () => {
       path.resolve(__dirname, '../src/controllers/authController.ts'),
       'utf8'
     );
-    // The Bug 1 pattern from the spec: reading the target user id off req.params
+    // The Bug 1 pattern from the spec: reading the target user id off req.params.
+    // Deliberately not asserting which property replaces it (req.user,
+    // req.jwtUser, etc. are all valid choices) — the actual security property
+    // is already covered behaviorally by the ownership check in
+    // userProfile.test.ts (spoofed id in the URL must not leak another user's data).
     expect(content).not.toMatch(/req\.params(\.|\[)['"]?id/);
-    expect(content).toMatch(/req\.user/);
   });
 });
 
