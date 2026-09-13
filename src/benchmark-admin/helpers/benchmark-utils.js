@@ -31,7 +31,8 @@ export function parseVitestSummary(output) {
   const text = output || '';
   // Use the last occurrences so we capture the "Tests" summary line totals
   // (individual test counts) rather than per-file inline counts or the
-  // "Test Files" line that appears earlier in vitest output.
+  // "Test Files" line that appears earlier in vitest output — the "Tests"
+  // line is test-level, "Test Files" is file-level, and they usually differ.
   const passedMatches = [...text.matchAll(/(\d+)\s+passed/gi)];
   const failedMatches = [...text.matchAll(/(\d+)\s+failed/gi)];
   const passed = passedMatches.length ? Number(passedMatches.at(-1)[1]) : 0;

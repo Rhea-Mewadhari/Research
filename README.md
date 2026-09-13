@@ -613,26 +613,78 @@ All outputs land in `src/benchmark-admin/results/<taskId>__<runId>/`:
 | `baseline-quality.json` | Static analysis snapshot before the agent ran |
 | `post-quality.json` | Static analysis snapshot after |
 | `quality-delta.json` | Per-metric delta — positive = regression |
-| `agent-metadata.json` | Raw agent invocation metadata |
-| `agent-stdout.txt` | Full agent output |
+| `agent-metadata.json` | Raw agent invocation metadata — per-phase (GSD) or per-iteration (Wiggum) breakdown plus totals |
+| `agent-stdout.txt` / `agent-stderr.txt` | Concatenated output across all invocations in the run |
+| `agent-stdout-<label>.txt` | Output from one invocation only (e.g. `agent-stdout-verify-work.txt`, `agent-stdout-iter2.txt`) |
 
 ---
 
 ## Manual Sessions (development / debugging)
 
-**GSD** — specification-first, standards-anchored:
-```
-/gsd-loop
+Both frameworks now run as a sequence of independent, context-free `claude` sessions —
+the harness (`helpers/gsd-driver.js` / `helpers/wiggum-driver.js`) drives this
+automatically. To reproduce a single step by hand, run each command below in its own
+session (not continued from the previous one) so state only carries over via
+`.planning/` / `.wiggum/plan.json` and git commits, matching what the harness does.
 
-Use GSD to complete the frontend task 1.
+**GSD** — six phases, one fresh session each, in order:
 ```
+/gsd:new-project
 
-**Wiggum** — goal-directed loop, minimal constraints:
+Target: frontend
+Task: task1
 ```
-/wiggum-loop
+```
+/gsd:discuss-phase
 
-Use the Wiggum loop to complete the frontend task 1.
+Target: frontend
+Task: task1
 ```
+```
+/gsd:plan-phase
+
+Target: frontend
+Task: task1
+```
+```
+/gsd:execute-phase
+
+Target: frontend
+Task: task1
+```
+```
+/gsd:verify-work
+
+Target: frontend
+Task: task1
+```
+```
+/gsd:complete-milestone
+
+Target: frontend
+Task: task1
+```
+(only run `complete-milestone` if `.planning/verify-result.json` says `"passed": true` —
+otherwise go back to `/gsd:execute-phase` with the failed criteria)
+
+**Wiggum** — a plan-generation session, then one fresh session per phase:
+```
+/wiggum:plan
+
+Target: frontend
+Task: task1
+```
+```
+/wiggum:phase
+
+Target: frontend
+Task: task1
+Plan: .wiggum/plan.json
+
+Execute exactly one open phase.
+```
+(repeat the `/wiggum:phase` session, each one fresh, until every phase in
+`.wiggum/plan.json` is `"done"`)
 
 ---
 
