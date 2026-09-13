@@ -3,11 +3,13 @@ import path from 'path';
 import { capture } from './spawn-utils.js';
 import { runGsd } from './gsd-driver.js';
 import { runWiggum } from './wiggum-driver.js';
+import { createSandbox, syncBack, destroySandbox } from './sandbox.js';
 
 // One fresh, context-free `claude` process. Every phase/iteration of both
 // frameworks goes through this — neither driver ever reuses a session, since
 // external context reset between steps is the entire point of both designs.
-export function invokeClaude(prompt, { repoRoot, maxTurns = 50, label, resultDir }) {
+// `workDir` is the sandbox directory, never the real repo — see sandbox.js.
+export function invokeClaude(prompt, { workDir, maxTurns = 50, label, resultDir }) {
   const start = Date.now();
   const claudeResult = capture('claude', [
     '--print',
@@ -15,7 +17,7 @@ export function invokeClaude(prompt, { repoRoot, maxTurns = 50, label, resultDir
     '--max-turns', String(maxTurns),
     '--dangerously-skip-permissions',
     '-p', prompt,
-  ], repoRoot);
+  ], workDir);
   const wallDurationMs = Date.now() - start;
 
   if (resultDir && label) {
@@ -72,9 +74,23 @@ export function runAgent({ repoRoot, resultDir, framework, target, taskId }) {
   console.log(`\n[2/5 agent] Running ${framework.toUpperCase()} on ${target} ${taskId}...`);
 
   const agentStart = Date.now();
-  const driverResult = framework === 'gsd'
-    ? runGsd({ repoRoot, resultDir, target, taskId })
-    : runWiggum({ repoRoot, resultDir, target, taskId });
+
+  // Every phase/iteration runs inside an isolated, history-free copy of the
+  // (post-bug-injection) working tree — not the real repo — so the agent
+  // can't shortcut the task via `git log`/`git branch -a`/`git diff <ref>`/
+  // `git stash` to recover the pre-bug code or a previous run's solved code.
+  // See sandbox.js for what "isolated" means here and its known limits.
+  const sandbox = createSandbox(repoRoot);
+  let driverResult;
+  try {
+    driverResult = framework === 'gsd'
+      ? runGsd({ workDir: sandbox.sandboxDir, resultDir, target, taskId })
+      : runWiggum({ workDir: sandbox.sandboxDir, resultDir, target, taskId });
+    syncBack(sandbox.sandboxDir, repoRoot);
+  } finally {
+    destroySandbox(sandbox.sandboxDir);
+  }
+
   const wallDurationMs = Date.now() - agentStart;
 
   concatLogs(resultDir, driverResult.invocationLabels, 'stdout');

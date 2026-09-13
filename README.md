@@ -24,6 +24,18 @@ node src/benchmark-admin/run-experiment.js <taskId> <runId> <target> <framework>
 The script runs automatically:
 - Bug injection (if `bugType` provided) → pre-agent static analysis → agent execution → benchmark scoring → post-agent static analysis → quality delta
 
+**Agent execution runs in an isolated sandbox, not the checked-out branch directly.**
+Every phase/iteration invocation gets a fresh copy of the working tree in a throwaway
+directory outside the repo (`helpers/sandbox.js`), with its own single-commit git
+history and no other branches or remotes — so an agent can't shortcut a bug-fix task
+via `git log`/`git branch -a`/`git diff <ref>`/`git stash` to recover the pre-bug code
+or a previous run's solved code from this repo's real history (both are otherwise
+reachable, since every run branch shares one `.git`). The sandbox is synced back into
+the real working tree and discarded once the agent finishes; the real repo's history is
+untouched throughout. This does not protect against an agent that deliberately
+navigates to a *known* absolute path elsewhere on disk — only against recovering the
+answer from this repo's own git history, which is the failure mode this was built for.
+
 ### 3. Commit the outputs
 
 ```powershell
