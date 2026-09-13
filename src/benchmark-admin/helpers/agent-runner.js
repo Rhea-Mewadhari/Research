@@ -1,34 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 import { capture } from './spawn-utils.js';
+import { runGsd } from './gsd-driver.js';
+import { runWiggum } from './wiggum-driver.js';
 
-const PROMPTS = {
-  gsd:    (target, taskId) => `/gsd-loop\n\nUse GSD to complete the ${target} task ${taskId}.`,
-  wiggum: (target, taskId) => `/wiggum-loop\n\nUse the Wiggum loop to complete the ${target} task ${taskId}.`,
-};
-
-export function runAgent({ repoRoot, resultDir, framework, target, taskId }) {
-  console.log(`\n[2/5 agent] Running ${framework.toUpperCase()} on ${target} ${taskId}...`);
-
-  const agentStart = Date.now();
+// One fresh, context-free `claude` process. Every phase/iteration of both
+// frameworks goes through this — neither driver ever reuses a session, since
+// external context reset between steps is the entire point of both designs.
+export function invokeClaude(prompt, { repoRoot, maxTurns = 50, label, resultDir }) {
+  const start = Date.now();
   const claudeResult = capture('claude', [
     '--print',
     '--output-format', 'json',
-    '--max-turns', '50',
+    '--max-turns', String(maxTurns),
     '--dangerously-skip-permissions',
-    '-p', PROMPTS[framework](target, taskId),
+    '-p', prompt,
   ], repoRoot);
-  const wallDurationMs = Date.now() - agentStart;
+  const wallDurationMs = Date.now() - start;
 
-  fs.writeFileSync(path.join(resultDir, 'agent-stdout.txt'), claudeResult.stdout || '', 'utf8');
-  if (claudeResult.stderr) {
-    fs.writeFileSync(path.join(resultDir, 'agent-stderr.txt'), claudeResult.stderr, 'utf8');
+  if (resultDir && label) {
+    fs.writeFileSync(path.join(resultDir, `agent-stdout-${label}.txt`), claudeResult.stdout || '', 'utf8');
+    if (claudeResult.stderr) {
+      fs.writeFileSync(path.join(resultDir, `agent-stderr-${label}.txt`), claudeResult.stderr, 'utf8');
+    }
   }
 
-  const agentMeta = {
-    framework,
-    target,
-    taskId,
+  const record = {
+    label,
     exit_code:        claudeResult.status,
     wall_duration_ms: wallDurationMs,
     cost_usd:         null,
@@ -39,15 +37,63 @@ export function runAgent({ repoRoot, resultDir, framework, target, taskId }) {
 
   try {
     const parsed = JSON.parse((claudeResult.stdout || '').trim());
-    agentMeta.cost_usd   = parsed.total_cost_usd ?? null;
-    agentMeta.num_turns  = parsed.num_turns  ?? null;
-    agentMeta.session_id = parsed.session_id ?? null;
-    agentMeta.is_error   = parsed.is_error   ?? false;
+    record.cost_usd   = parsed.total_cost_usd ?? null;
+    record.num_turns  = parsed.num_turns  ?? null;
+    record.session_id = parsed.session_id ?? null;
+    record.is_error    = parsed.is_error   ?? false;
   } catch {
-    agentMeta.parse_error = 'Could not parse claude JSON output — check agent-stdout.txt';
+    record.parse_error = 'Could not parse claude JSON output — check agent-stdout file for this invocation';
   }
 
-  console.log(`Agent done — cost: $${agentMeta.cost_usd ?? 'unknown'}, turns: ${agentMeta.num_turns ?? 'unknown'}`);
+  console.log(`  [${label ?? 'invoke'}] cost: $${record.cost_usd ?? 'unknown'}, turns: ${record.num_turns ?? 'unknown'}`);
+
+  return record;
+}
+
+// Concatenates every invocation's captured stdout/stderr into the single
+// agent-stdout.txt / agent-stderr.txt file names run-experiment.js's closing
+// log message promises, on top of the per-invocation agent-stdout-<label>.txt
+// files each invokeClaude() call already wrote.
+function concatLogs(resultDir, labels, ext) {
+  const chunks = labels.map(label => {
+    const file = path.join(resultDir, `agent-${ext}-${label}.txt`);
+    if (!fs.existsSync(file)) return null;
+    const content = fs.readFileSync(file, 'utf8');
+    if (!content) return null;
+    return `----- ${label} -----\n${content}`;
+  }).filter(Boolean);
+
+  if (chunks.length) {
+    fs.writeFileSync(path.join(resultDir, `agent-${ext}.txt`), chunks.join('\n\n'), 'utf8');
+  }
+}
+
+export function runAgent({ repoRoot, resultDir, framework, target, taskId }) {
+  console.log(`\n[2/5 agent] Running ${framework.toUpperCase()} on ${target} ${taskId}...`);
+
+  const agentStart = Date.now();
+  const driverResult = framework === 'gsd'
+    ? runGsd({ repoRoot, resultDir, target, taskId })
+    : runWiggum({ repoRoot, resultDir, target, taskId });
+  const wallDurationMs = Date.now() - agentStart;
+
+  concatLogs(resultDir, driverResult.invocationLabels, 'stdout');
+  concatLogs(resultDir, driverResult.invocationLabels, 'stderr');
+
+  const agentMeta = {
+    framework,
+    target,
+    taskId,
+    wall_duration_ms: wallDurationMs,
+    cost_usd:   driverResult.totalCostUsd,
+    num_turns:  driverResult.totalTurns,
+    exit_code:  driverResult.exitCode,
+    is_error:   driverResult.isError,
+    session_id: driverResult.lastSessionId,
+    [framework]: driverResult.detail,
+  };
+
+  console.log(`Agent done — total cost: $${agentMeta.cost_usd ?? 'unknown'}, total turns: ${agentMeta.num_turns ?? 'unknown'}`);
 
   return agentMeta;
 }
