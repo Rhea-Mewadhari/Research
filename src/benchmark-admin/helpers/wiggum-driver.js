@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import { invokeClaude } from './agent-runner.js';
-import { getHead, commitAll } from './git-utils.js';
+import { checkpoint } from './sandbox.js';
 
 const PLAN_PATH = '.wiggum/plan.json';
 
-function readPlan(repoRoot) {
-  const file = path.join(repoRoot, PLAN_PATH);
+function readPlan(workDir) {
+  const file = path.join(workDir, PLAN_PATH);
   if (!fs.existsSync(file)) return null;
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -39,10 +39,13 @@ function summarizeTotals(invocations) {
 }
 
 // External restart loop: the plan-generation call and every phase call below
-// are independent `claude` processes started via invokeClaude — none of them
-// share a session, so only .wiggum/plan.json and the git history persist
-// across iterations, matching the Ralph Wiggum Loop's own restart mechanism.
-export function runWiggum({ repoRoot, resultDir, target, taskId }) {
+// are independent `claude` processes started via invokeClaude, each run
+// inside the sandbox (workDir) — none of them share a session, and the
+// sandbox's own history is collapsed to one commit before and after each of
+// them (see sandbox.js), so only .wiggum/plan.json and the files on disk
+// persist across iterations, matching the Ralph Wiggum Loop's own restart
+// mechanism.
+export function runWiggum({ workDir, resultDir, target, taskId }) {
   const invocations = [];
   const invocationLabels = [];
 
@@ -51,13 +54,13 @@ export function runWiggum({ repoRoot, resultDir, target, taskId }) {
     `Read the task instructions and produce ${PLAN_PATH}: a plan broken into ` +
     `discrete phases, each with an id, a title, and status "open". Do not ` +
     `write any implementation code in this step.`,
-    { repoRoot, label: 'plan', resultDir }
+    { workDir, label: 'plan', resultDir }
   );
-  commitAll(repoRoot, `wiggum: plan (${taskId})`);
+  let lastTreeHash = checkpoint(workDir, 'plan').treeHash;
   invocations.push(planResult);
   invocationLabels.push('plan');
 
-  let plan = readPlan(repoRoot);
+  let plan = readPlan(workDir);
   const iterations = [];
   let terminationReason = 'plan-complete';
   let failedPhaseId = null;
@@ -73,7 +76,6 @@ export function runWiggum({ repoRoot, resultDir, target, taskId }) {
         break;
       }
 
-      const headBefore = getHead(repoRoot);
       const planBefore = plan;
       const label = `iter${iterations.length + 1}`;
 
@@ -82,16 +84,16 @@ export function runWiggum({ repoRoot, resultDir, target, taskId }) {
         `Execute exactly one open phase from the plan. Do not assume any prior ` +
         `conversation context — the spec, the plan, and the current repo state ` +
         `are all you have. Update that phase's status in ${PLAN_PATH} before you stop.`,
-        { repoRoot, label, resultDir }
+        { workDir, label, resultDir }
       );
-      commitAll(repoRoot, `wiggum: ${label} (${taskId})`);
+      const { treeHash } = checkpoint(workDir, label);
       invocations.push(result);
       invocationLabels.push(label);
       iterations.push({ index: iterations.length + 1, ...result });
 
-      plan = readPlan(repoRoot);
-      const headAfter = getHead(repoRoot);
-      const progressed = headAfter !== headBefore || JSON.stringify(planBefore) !== JSON.stringify(plan);
+      plan = readPlan(workDir);
+      const progressed = treeHash !== lastTreeHash || JSON.stringify(planBefore) !== JSON.stringify(plan);
+      lastTreeHash = treeHash;
 
       if (!progressed) {
         terminationReason = 'no-progress';

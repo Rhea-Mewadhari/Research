@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import { invokeClaude } from './agent-runner.js';
-import { commitAll } from './git-utils.js';
+import { checkpoint } from './sandbox.js';
 
 const VERIFY_RESULT_PATH = '.planning/verify-result.json';
 const MAX_REWORK = 2;
 
-function readVerifyResult(repoRoot) {
-  const file = path.join(repoRoot, VERIFY_RESULT_PATH);
+function readVerifyResult(workDir) {
+  const file = path.join(workDir, VERIFY_RESULT_PATH);
   if (!fs.existsSync(file)) {
     return { passed: false, criteria: [], notes: 'verify-result.json not found — treating as failed' };
   }
@@ -39,12 +39,14 @@ function summarizeTotals(invocations) {
   };
 }
 
-// Six fresh `claude` invocations, one per GSD phase — state carried only via
-// .planning/ files and the commit the driver makes after each phase, never
-// via a shared session. verify-work is a real gate: complete-milestone only
-// runs if verify-result.json says passed:true, with a bounded rework loop
-// back through execute-phase in between.
-export function runGsd({ repoRoot, resultDir, target, taskId }) {
+// Six fresh `claude` invocations, one per GSD phase, all inside the sandbox
+// (workDir) — state carried only via .planning/ files and the file contents
+// on disk, never via a shared session or reachable git history (the
+// sandbox's history is collapsed to one commit after every phase; see
+// sandbox.js). verify-work is a real gate: complete-milestone only runs if
+// verify-result.json says passed:true, with a bounded rework loop back
+// through execute-phase in between.
+export function runGsd({ workDir, resultDir, target, taskId }) {
   const invocations = [];
   const invocationLabels = [];
   const phases = [];
@@ -52,12 +54,12 @@ export function runGsd({ repoRoot, resultDir, target, taskId }) {
   const runPhase = (name, extra = '') => {
     const result = invokeClaude(
       `/gsd:${name}\n\nTarget: ${target}\nTask: ${taskId}${extra}`,
-      { repoRoot, label: name, resultDir }
+      { workDir, label: name, resultDir }
     );
-    const commitSha = commitAll(repoRoot, `gsd: ${name} (${taskId})`);
+    const { treeHash } = checkpoint(workDir, name);
     invocations.push(result);
     invocationLabels.push(name);
-    phases.push({ name, commitSha, ...result });
+    phases.push({ name, treeHash, ...result });
     return result;
   };
 
@@ -67,7 +69,7 @@ export function runGsd({ repoRoot, resultDir, target, taskId }) {
   runPhase('execute-phase');
 
   runPhase('verify-work');
-  let verify = readVerifyResult(repoRoot);
+  let verify = readVerifyResult(workDir);
   const passedFirstAttempt = verify.passed;
 
   let reworkAttempts = 0;
@@ -79,7 +81,7 @@ export function runGsd({ repoRoot, resultDir, target, taskId }) {
       `Address these failed criteria:\n${formatCriteria(verify.criteria)}`
     );
     runPhase('verify-work');
-    verify = readVerifyResult(repoRoot);
+    verify = readVerifyResult(workDir);
   }
 
   const completed = verify.passed;
