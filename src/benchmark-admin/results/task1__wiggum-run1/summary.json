@@ -1,0 +1,126 @@
+{
+  "taskId": "task1",
+  "runId": "wiggum-run1",
+  "timestamp": "2026-09-14T18:05:55.959Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 15,
+    "failed": 0,
+    "total": 15,
+    "expectedFiles": 6,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1571,
+    "hiddenMs": 1261,
+    "buildMs": 1103,
+    "totalMs": 3995
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.75,
+    "overallScore": 0.9
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task1",
+    "wall_duration_ms": 284566,
+    "cost_usd": 1.1074092,
+    "num_turns": 55,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "cfefa64d-6634-4719-80bb-0330befb2401",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Implement filterProducts logic (search, category, inStock, sort) in src/utils/productFilters.ts",
+          "status": "done",
+          "notes": "Implemented all four filters (search case-insensitive trim, category All passthrough, inStockOnly boolean, price-asc/price-desc/rating-desc sort). Remaining test failures are UI integration tests that require phases 2 and 3 (FilterPanel and SortSelect wiring)."
+        },
+        {
+          "id": "phase-2",
+          "title": "Wire up FilterPanel.tsx: connect onChange for search, category, inStock controls and Clear filters button",
+          "status": "done",
+          "notes": "Wired search input, category select, inStockOnly checkbox, and Clear filters button to call onChange with updated FilterState. clearFilters, filtering, and app render tests all pass. Sorting tests still fail pending SortSelect wiring (phase 3)."
+        },
+        {
+          "id": "phase-3",
+          "title": "Wire up SortSelect.tsx: connect onChange to the sort dropdown",
+          "status": "done",
+          "notes": "Wired onChange prop to the select element's onChange handler. All 17 tests pass including all 3 sorting tests."
+        },
+        {
+          "id": "phase-4",
+          "title": "Run tests and verify build passes",
+          "status": "done",
+          "notes": "All 17 tests pass (6 test files). Production build succeeds: tsc -b and vite build both clean, output in dist/."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 70318,
+          "cost_usd": 0.24624090000000004,
+          "num_turns": 13,
+          "session_id": "c39d5d2b-861e-4581-b9ff-16645cafff29",
+          "is_error": false
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 50708,
+          "cost_usd": 0.23334090000000002,
+          "num_turns": 12,
+          "session_id": "bd2a250e-d191-49c8-b0ba-6d5d32201407",
+          "is_error": false
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 43535,
+          "cost_usd": 0.2352819,
+          "num_turns": 10,
+          "session_id": "5b3be549-d431-4ce2-8ab9-82bd3d0f2650",
+          "is_error": false
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 55512,
+          "cost_usd": 0.16755299999999998,
+          "num_turns": 9,
+          "session_id": "cfefa64d-6634-4719-80bb-0330befb2401",
+          "is_error": false
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
