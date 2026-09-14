@@ -1,0 +1,79 @@
+{
+  "investigations": {
+    "techStack": [
+      "Build tool: Vite ^6.2.0 with @vitejs/plugin-react",
+      "Test runner: Vitest ^3.2.4 with jsdom, @testing-library/react, @testing-library/user-event",
+      "React 19, TypeScript ~5.7.2 (strict: noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch)",
+      "Module resolution: 'bundler' (Vite-native); verbatimModuleSyntax enabled",
+      "Package manager: pnpm",
+      "ESLint flat config with typescript-eslint, react-hooks, react-refresh plugins",
+      "noUnusedParameters means _onChange alias pattern must be removed when wiring real handlers"
+    ],
+    "features": [
+      "useProductFilters hook manages FilterState { search, category, inStockOnly, sortBy } and product fetch/pagination",
+      "App.tsx computes visibleProducts via useMemo(() => filterProducts(products, filters), [products, filters])",
+      "FilterPanel.tsx: UI exists for search input, category select, inStockOnly checkbox, Clear button — all handlers are no-ops",
+      "SortSelect.tsx: UI exists for sort dropdown — handler is a no-op",
+      "ProductList.tsx: already renders <p role='status'>No products found.</p> when products array is empty — no change needed",
+      "ProductCard.tsx, formatters.ts, productsApi.ts: fully implemented — must not regress",
+      "filterProducts in productFilters.ts: stub returns unmodified input array — all filtering/sorting unimplemented"
+    ],
+    "architecture": [
+      "State lives in useProductFilters hook; App.tsx destructures and passes down via props",
+      "FilterPanel.onChange prop receives full FilterState object (App passes setFilters directly)",
+      "SortSelect.onChange prop receives just the sortBy value (App wraps: sortBy => setFilters(prev => ({...prev, sortBy})))",
+      "New filterProducts logic belongs entirely in src/utils/productFilters.ts",
+      "FilterPanel handler wiring belongs entirely in src/components/FilterPanel.tsx (rename _onChange -> onChange)",
+      "SortSelect handler wiring belongs entirely in src/components/SortSelect.tsx (rename _onChange -> onChange)",
+      "Empty-state rendering is already in ProductList.tsx — no architecture change needed",
+      "Type imports use 'import type' convention; FilterState is exported from productFilters.ts"
+    ],
+    "edgeCases": [
+      "Search: trim whitespace before matching; case-insensitive substring match on product.name",
+      "Search: empty string must pass all products through (no filtering)",
+      "Category: 'All' must pass every product through; non-'All' is exact string match",
+      "inStockOnly: false includes all products; true excludes products where inStock === false",
+      "Combined filters: all three apply cumulatively (AND logic) before sorting",
+      "sortBy 'default': must preserve original input array order — do not sort",
+      "sortBy 'price-asc'/'price-desc'/'rating-desc': must copy array before sorting to avoid mutation",
+      "filterProducts must not mutate its input array — use [...products] before .sort()",
+      "Clear button must reset sortBy to 'default' in addition to resetting filter controls",
+      "SortSelect onChange value must be cast to FilterState['sortBy'] to satisfy TypeScript strict mode",
+      "FilterPanel spread pattern: each handler spreads previous filters and overrides one field"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3, 4, 5 — filterProducts must implement search (case-insensitive trim), category (exact/'All'), inStockOnly, sorting (price-asc/price-desc/rating-desc/default), and must not mutate input",
+      "description": "Implement filterProducts in productFilters.ts: (1) if search is non-empty, trim and lowercase-match against product.name; (2) if category !== 'All', filter by exact category match; (3) if inStockOnly, filter to inStock === true; (4) sort by spreading into a new array — price ascending, price descending, rating descending, or preserve order for 'default'. Apply filters first, then sort.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 6, 7, 8 — FilterPanel search input, category select, and inStockOnly checkbox must call onChange with updated FilterState on every change",
+      "description": "Wire FilterPanel.tsx onChange handlers: rename _onChange parameter to onChange; search input onChange calls onChange({ ...filters, search: e.target.value }); category select onChange calls onChange({ ...filters, category: e.target.value }); inStockOnly checkbox onChange calls onChange({ ...filters, inStockOnly: e.target.checked }).",
+      "files": [
+        "src/benchmark-frontend/src/components/FilterPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 9 — FilterPanel 'Clear filters' button must reset all state to { search: '', category: 'All', inStockOnly: false, sortBy: 'default' }",
+      "description": "Wire the Clear filters button in FilterPanel.tsx: its onClick calls onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' }). This task modifies the same file as task-2 and should be done in the same edit.",
+      "files": [
+        "src/benchmark-frontend/src/components/FilterPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 10 — SortSelect <select> must call onChange with the selected sortBy value typed as FilterState['sortBy']",
+      "description": "Wire SortSelect.tsx onChange handler: rename _onChange parameter to onChange; select onChange calls onChange(e.target.value as FilterState['sortBy']). Import FilterState type from productFilters.ts if not already imported.",
+      "files": [
+        "src/benchmark-frontend/src/components/SortSelect.tsx"
+      ]
+    }
+  ]
+}

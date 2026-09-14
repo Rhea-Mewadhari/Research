@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "filterProducts filters by search term: given a non-empty search string, only products whose name contains the trimmed search value (case-insensitive, partial match) are returned.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > 'filters products by search term' PASSED. Implementation confirmed in productFilters.ts:13-16: trims and lowercases search, filters via p.name.toLowerCase().includes(trimmedSearch)."
+    },
+    {
+      "id": "2",
+      "description": "filterProducts filters by category: when category is not 'All', only products whose category field exactly matches are returned; when 'All', all products pass through.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > 'filters products by category' PASSED. Implementation confirmed in productFilters.ts:18-20: filters p.category === filters.category only when filters.category !== 'All'."
+    },
+    {
+      "id": "3",
+      "description": "filterProducts filters by in-stock status: when inStockOnly is true, only products with inStock === true are returned.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > 'filters products by in-stock only' PASSED. Implementation confirmed in productFilters.ts:22-24: filters p.inStock === true when filters.inStockOnly is true."
+    },
+    {
+      "id": "4",
+      "description": "filterProducts sorts results: 'price-asc' produces ascending price order, 'price-desc' descending price, 'rating-desc' descending rating, 'default' preserves original input order. Sorting applied after filtering.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > 'sorts by price ascending' PASSED, 'sorts by price descending' PASSED, 'sorts by rating descending' PASSED. Implementation in productFilters.ts:26-32 handles all four cases; 'default' branch has no sort applied."
+    },
+    {
+      "id": "5",
+      "description": "filterProducts does not mutate its input array: the original products array passed in is unchanged after the function returns.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx all 3 sort tests PASSED. Implementation uses let result = [...products] (line 11) and sort uses [...result].sort(...) (lines 27,29,31) — no in-place mutation. Build completed successfully with exit code 0."
+    },
+    {
+      "id": "6",
+      "description": "FilterPanel search input calls onChange with an updated FilterState (spreading previous filters, setting search to current input value) on every keystroke.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > 'filters products by search term' PASSED (search input drives filter update). tests/clearFilters.test.tsx > 'resets filters back to default values' PASSED (search input has non-empty value after typing, resets to '' after Clear)."
+    },
+    {
+      "id": "7",
+      "description": "FilterPanel category <select> calls onChange with updated FilterState (spreading previous filters, setting category to selected option value) when the selection changes.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > 'filters products by category' PASSED (getByLabelText(/category/i) resolves, selecting 'Fitness' updates results). tests/clearFilters.test.tsx > 'resets filters back to default values' PASSED (category resets to 'All' after Clear)."
+    },
+    {
+      "id": "8",
+      "description": "FilterPanel in-stock checkbox calls onChange with updated FilterState (spreading previous filters, setting inStockOnly to checkbox's checked state) when toggled.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > 'filters products by in-stock only' PASSED (getByLabelText(/in-stock only/i) resolves, clicking reduces product count to 11). tests/clearFilters.test.tsx > 'resets filters back to default values' PASSED (checkbox is not checked after Clear)."
+    },
+    {
+      "id": "9",
+      "description": "FilterPanel 'Clear filters' button resets all filter state to { search: '', category: 'All', inStockOnly: false, sortBy: 'default' } when clicked.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > 'resets filters back to default values' PASSED: after setting search/category/in-stock, clicking getByRole('button', { name: /clear filters/i }) results in search='', category='All', checkbox unchecked, sort='default', results-count 'Showing 15 products'."
+    },
+    {
+      "id": "10",
+      "description": "SortSelect <select> calls onChange with the selected sortBy value (typed as FilterState['sortBy']) when the selection changes.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > all three sort tests PASSED using getByLabelText(/sort by/i) to change the select and observing reordered product headings."
+    },
+    {
+      "id": "11",
+      "description": "When filterProducts returns an empty array, ProductList renders a <p> with text 'No products found.' and role 'status'.",
+      "passed": true,
+      "evidence": "ProductList.tsx:9-11 contains: if (products.length === 0) { return <p role=\"status\">No products found.</p>; }. All 17 tests passed (test suite ran without error). Build completed successfully with exit code 0."
+    },
+    {
+      "id": "12",
+      "description": "The app builds without TypeScript errors after all changes.",
+      "passed": true,
+      "evidence": "pnpm run build (tsc -b && vite build) exited with code 0. Output: 'vite v6.4.2 building for production... ✓ 38 modules transformed. ✓ built in 287ms'. No TypeScript diagnostic errors emitted."
+    }
+  ]
+}
