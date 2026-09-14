@@ -1,0 +1,15 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/app.render.test.tsx (1 test) 50ms
+ ✓ tests/loadingError.test.tsx (4 tests) 62ms
+ ✓ tests/pagination.test.tsx (5 tests) 108ms
+ ✓ tests/clearFilters.test.tsx (1 test) 112ms
+ ✓ tests/filtering.test.tsx (3 tests) 124ms
+ ✓ tests/sorting.test.tsx (3 tests) 126ms
+
+ Test Files  6 passed (6)
+      Tests  17 passed (17)
+   Start at  19:21:43
+   Duration  4.34s (transform 126ms, setup 2.19s, collect 6.96s, tests 581ms, environment 12.97s, prepare 1.44s)
+
