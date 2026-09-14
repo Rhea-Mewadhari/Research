@@ -1,0 +1,57 @@
+{
+  "investigations": {
+    "techStack": [
+      "Vite 6.2.0 build tool; TypeScript ~5.7.2 with strict mode — noUnusedLocals and noUnusedParameters enforced; do not introduce unused variables",
+      "Vitest 3.2.4 + @testing-library/react 16.3.2 + jsdom; tests run via `npm run test` from src/benchmark-frontend",
+      "React 19 with react-jsx transform — no React import needed in JSX files",
+      "No UI utility libraries; pure React + TypeScript only",
+      "FilterState type is exported from productFilters.ts and is the shared contract across hook, App, and components"
+    ],
+    "features": [
+      "App.tsx: fully implemented — calls filterProducts() inside useMemo, derives categories list, passes correct props to FilterPanel, SortSelect, and ProductList",
+      "ProductList.tsx: fully implemented — renders cards and already shows 'No products found.' (role=status) when products.length === 0; no changes needed",
+      "useProductFilters.ts: fully implemented — manages filter state, fetches products, exposes updateFilter() and clearFilters(); must not be modified",
+      "FilterPanel.tsx: props are correctly received but ALL four handlers are empty stubs (onChange={() => {}) — search, category, inStockOnly, and Clear filters",
+      "SortSelect.tsx: props are correctly received but the onChange handler is an empty stub — sort dropdown is entirely unwired",
+      "productFilters.ts: filterProducts() is a stub that returns a shallow copy of products with no filter or sort logic applied"
+    ],
+    "architecture": [
+      "filterProducts() is called in App.tsx inside useMemo — not in the hook or in any component directly",
+      "Hook (useProductFilters) owns all primary state: filters, products, loading, pagination; App derives visibleProducts and categories via useMemo",
+      "FilterPanel and SortSelect are pure UI — they call their onChange prop upward to App, which updates hook state; they never filter directly",
+      "New filter/sort algorithm belongs entirely in src/utils/productFilters.ts filterProducts()",
+      "New UI event bindings belong in src/components/FilterPanel.tsx and src/components/SortSelect.tsx only"
+    ],
+    "edgeCases": [
+      "Whitespace-only search ('   ') must be treated as no-filter — trim before checking if search string is non-empty",
+      "Search is case-insensitive partial substring — lowercase both the trimmed input and product.name before comparing",
+      "Category 'All' is a sentinel meaning no category filter; never compare product.category === 'All'",
+      "Exactly 4 products are out of stock (USB-C Hub, Noise-Cancelling Headphones, Dumbbell Set, Desk Lamp) — inStockOnly must remove exactly these, leaving 11",
+      "filterProducts must not mutate the input array — spread before sorting: [...filtered].sort(...)",
+      "sortBy 'default' must preserve the original input order exactly — return the filtered slice without calling sort()",
+      "No two products share an identical price or rating in test data — tie-breaking is untested but V8's stable sort preserves original order for ties",
+      "All active filters combine with AND semantics — filter chain runs first, then sort is applied to the filtered result",
+      "Empty result ('No products found.') is already handled by ProductList.tsx — no additional code required for that element"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1–9, 16: filterProducts must implement case-insensitive trimmed name search, exact category filter, inStockOnly filter, price-asc / price-desc / rating-desc / default sort, combined AND logic, no input mutation, and the TypeScript build must pass",
+      "description": "Implement filterProducts() in productFilters.ts: (1) start with [...products] to avoid mutation, (2) if trimmed search is non-empty, keep only products whose lowercased name includes the lowercased trimmed search, (3) if category !== 'All', keep only products whose category exactly equals filterState.category, (4) if inStockOnly is true, keep only products where product.inStock === true, (5) for price-asc sort by price ascending; for price-desc sort by price descending; for rating-desc sort by rating descending; for 'default' return as-is",
+      "files": ["src/benchmark-frontend/src/utils/productFilters.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 10–13: FilterPanel search input, category select, inStockOnly checkbox, and Clear filters button must each call the onChange prop with the correct updated FilterState",
+      "description": "Wire handlers in FilterPanel.tsx: (a) search <input> onChange: call onChange({ ...filters, search: e.target.value }), (b) category <select> onChange: call onChange({ ...filters, category: e.target.value }), (c) inStockOnly <input type=checkbox> onChange: call onChange({ ...filters, inStockOnly: e.target.checked }), (d) Clear filters <button> onClick: call onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' })",
+      "files": ["src/benchmark-frontend/src/components/FilterPanel.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 14: SortSelect dropdown onChange must propagate the selected value upward via its onChange prop",
+      "description": "Wire the handler in SortSelect.tsx: replace the empty onChange stub on the <select> with e => onChange(e.target.value as FilterState['sortBy'])",
+      "files": ["src/benchmark-frontend/src/components/SortSelect.tsx"]
+    }
+  ]
+}
