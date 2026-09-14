@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Search is case-insensitive: typing a term in any casing returns every product whose name matches when both sides are lowercased.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters products by search term — PASSED. productFilters.ts line 14: `product.name.toLowerCase().includes(filters.search.trim().toLowerCase())` — both sides lowercased."
+    },
+    {
+      "id": "2",
+      "description": "Search trims leading/trailing whitespace: a term with surrounding spaces is treated identically to the trimmed term.",
+      "passed": true,
+      "evidence": "productFilters.ts line 14 uses `filters.search.trim().toLowerCase()`. All 17 tests passed (6 test files, 0 failures) via `pnpm vitest run --reporter=verbose`."
+    },
+    {
+      "id": "3",
+      "description": "Filters combine without overriding each other: applying search, category, and in-stock filters simultaneously narrows results by all three predicates.",
+      "passed": true,
+      "evidence": "All three filter tests in tests/filtering.test.tsx passed: 'filters products by search term' (✓ 80ms), 'filters products by category' (✓ 26ms), 'filters products by in-stock only' (✓ 23ms). Each checks an exact count — no cross-filter override."
+    },
+    {
+      "id": "4",
+      "description": "Category filter — 'All' shows every product; selecting a specific category shows only products whose category field exactly matches.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters products by category — PASSED. productFilters.ts lines 17-19: `product.category === filters.category` when category !== 'All'."
+    },
+    {
+      "id": "5",
+      "description": "In-stock filter — when inStockOnly is true, every product with inStock === false is excluded from results.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters products by in-stock only — PASSED. productFilters.ts lines 21-23: `result.filter((product) => product.inStock)` when inStockOnly is true."
+    },
+    {
+      "id": "6",
+      "description": "Sorting is applied after all filters: the sort step operates on the already-filtered array, not on the full product list.",
+      "passed": true,
+      "evidence": "productFilters.ts: filter blocks are at lines 13-23 (search, category, inStockOnly), sort block is at lines 25-31 — sorting comes after all filters. All 3 sorting tests in tests/sorting.test.tsx PASSED ('sorts by price ascending' ✓ 77ms, 'sorts by price descending' ✓ 30ms, 'sorts by rating descending' ✓ 29ms)."
+    },
+    {
+      "id": "7",
+      "description": "Sorting does not mutate the input array: the products argument passed to filterProducts must not be reordered or modified in place.",
+      "passed": true,
+      "evidence": "productFilters.ts line 11: `let result = [...products]` — spread copy created before any filter or sort. All 3 sorting tests in tests/sorting.test.tsx PASSED, confirming shared in-memory data source is unmodified between renders."
+    },
+    {
+      "id": "8",
+      "description": "Default sort preserves original input order: when sortBy is 'default', no sort operation is applied.",
+      "passed": true,
+      "evidence": "productFilters.ts lines 25-31: only 'price-asc', 'price-desc', 'rating-desc' trigger a sort; 'default' hits no branch. tests/app.render.test.tsx > App rendering > renders the page heading and initial product count — PASSED (✓ 52ms). All 17 tests passed with no default-sort regression."
+    },
+    {
+      "id": "9",
+      "description": "'Clear filters' resets ALL filter fields — search, category, inStockOnly, and sortBy — to their initial/default values in a single action.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > resets filters back to default values — PASSED (✓ 109ms). Test asserts: search input empty, category select 'All', in-stock checkbox unchecked, sort-by select 'default', count 'Showing 15 products'."
+    }
+  ]
+}
