@@ -48,6 +48,13 @@ function reinitGit(dir, message) {
 export function createSandbox(repoRoot) {
   const sandboxDir = fs.mkdtempSync(path.join(os.tmpdir(), 'benchmark-sandbox-'));
   copyTree(repoRoot, sandboxDir);
+  // .venv (semgrep's virtualenv) is unrelated to the agent's task and gets
+  // discarded before the agent ever sees it — not just excluded on the way
+  // back in syncBack(). It's riddled with symlinks (some absolute, some
+  // relative) that a plain recursive copy can silently rewrite to point at
+  // this very sandbox, so the safest thing is to never let it round-trip at
+  // all.
+  fs.rmSync(path.join(sandboxDir, '.venv'), { recursive: true, force: true });
   const treeHash = reinitGit(sandboxDir, 'sandbox: initial state (post bug-injection)');
   return { sandboxDir, treeHash };
 }
@@ -64,10 +71,12 @@ export function checkpoint(sandboxDir, label) {
 }
 
 // Copies the sandbox's final file state back onto the real repo root (which
-// still has its own real git history) — excluding .git and node_modules,
-// which never changed and don't belong in the real checkout's tracked
-// output — so the existing benchmark/static-analysis steps, which operate on
-// the real repoRoot, see the agent's actual changes.
+// still has its own real git history) — excluding .git, node_modules, and
+// .venv, none of which ever changed and none of which belong in the real
+// checkout's tracked output — so the existing benchmark/static-analysis
+// steps, which operate on the real repoRoot, see the agent's actual changes.
+// (.venv shouldn't exist in the sandbox at all — createSandbox strips it —
+// this exclusion is just defense in depth against that invariant changing.)
 export function syncBack(sandboxDir, repoRoot) {
   fs.cpSync(sandboxDir, repoRoot, {
     recursive: true,
@@ -75,7 +84,7 @@ export function syncBack(sandboxDir, repoRoot) {
     filter: (src) => {
       const rel = path.relative(sandboxDir, src);
       const parts = rel.split(path.sep);
-      return !parts.includes('.git') && !parts.includes('node_modules');
+      return !parts.includes('.git') && !parts.includes('node_modules') && !parts.includes('.venv');
     },
   });
 }
