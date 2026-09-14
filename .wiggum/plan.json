@@ -1,0 +1,30 @@
+{
+  "taskId": "task1",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Implement filterProducts logic in src/utils/productFilters.ts (search, category, inStock, sort)",
+      "status": "done",
+      "notes": "Implemented search (case-insensitive, trimmed), category, inStockOnly filters, and price-asc/price-desc/rating-desc sorting. Build passes. Remaining test failures are due to unconnected UI handlers (phases 2 and 3)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Wire up FilterPanel.tsx onChange handlers for search, category, inStock, and clear button",
+      "status": "done",
+      "notes": "Wired onChange for search input, category select, inStockOnly checkbox, and clear button. Filtering and clearFilters tests pass. Build passes. Sorting tests still fail (SortSelect not yet wired — phase 3)."
+    },
+    {
+      "id": "phase-3",
+      "title": "Wire up SortSelect.tsx onChange handler",
+      "status": "done",
+      "notes": "Renamed _onChange prop to onChange and wired the select's onChange to call it with the cast value. All 17 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify build succeeds and all tests pass",
+      "status": "done",
+      "notes": "All 17 tests pass across 6 test files. Build succeeds with tsc + vite. No errors or failures."
+    }
+  ]
+}
