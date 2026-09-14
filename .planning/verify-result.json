@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Typing into the search input filters displayed products to those whose name contains the search term as a case-insensitive partial match after trimming leading/trailing whitespace.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — 'filters products by search term' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "2",
+      "description": "The search input must be labelled such that getByLabelText(/search/i) finds it.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — all three filtering tests use getByLabelText(/search/i). All 3 tests in that file PASSED. vitest run: 17 passed."
+    },
+    {
+      "id": "3",
+      "description": "Selecting a specific category from the category dropdown filters displayed products to those whose category field exactly matches the selected value.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — 'filters products by category' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "4",
+      "description": "The category dropdown must be labelled such that getByLabelText(/category/i) finds it, and selecting 'All' must show all products regardless of category.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — 'filters products by category' PASSED; tests/clearFilters.test.tsx — 'resets filters back to default values' PASSED. vitest run: 17 passed."
+    },
+    {
+      "id": "5",
+      "description": "Checking the in-stock checkbox filters displayed products to those with inStock === true.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — 'filters products by in-stock only' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "6",
+      "description": "The in-stock checkbox must be labelled such that getByLabelText(/in-stock only/i) finds it.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — 'filters products by in-stock only' PASSED; tests/clearFilters.test.tsx — PASSED. vitest run: 17 passed."
+    },
+    {
+      "id": "7",
+      "description": "Selecting price-asc from the sort dropdown renders products ordered by ascending price.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx — 'sorts by price ascending' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "8",
+      "description": "Selecting price-desc from the sort dropdown renders products ordered by descending price.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx — 'sorts by price descending' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "9",
+      "description": "Selecting rating-desc from the sort dropdown renders products ordered by descending rating.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx — 'sorts by rating descending' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "10",
+      "description": "The sort dropdown must be labelled such that getByLabelText(/sort by/i) finds it, and must accept option values default, price-asc, price-desc, and rating-desc.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx — all three sorting tests use getByLabelText(/sort by/i) and selectOptions with those values. All 3 sorting tests PASSED. vitest run: 17 passed."
+    },
+    {
+      "id": "11",
+      "description": "Selecting default (or on initial load) preserves the original product order as received from the API; no re-ordering is applied.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx — 'renders the page heading and initial product count' PASSED; tests/clearFilters.test.tsx — 'resets filters back to default values' PASSED (sort resets to 'default' and 15 products shown). vitest run: 17 passed."
+    },
+    {
+      "id": "12",
+      "description": "Clicking the 'Clear filters' button resets all filter state: search becomes empty, category becomes 'All', in-stock checkbox unchecked, sort becomes 'default', results count reads 'Showing 15 products'.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx — 'resets filters back to default values' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "13",
+      "description": "All active filters (search, category, inStockOnly) are applied together before sorting — filtering is composed and sorting is applied to the already-filtered result set.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx — applies combined filters then clears to 15 products, proving composition. PASSED. vitest run: 17 passed."
+    },
+    {
+      "id": "14",
+      "description": "The filterAndSortProducts function (or equivalent) in src/utils/productFilters.ts must not mutate its input array.",
+      "passed": true,
+      "evidence": "src/utils/productFilters.ts:11 — 'let result = [...products]' (spread copy of input); lines 28, 30, 32 — '[...result].sort(...)' (spread before each sort). No .sort() called directly on the argument. Confirmed by file inspection and corroborated by all sorting tests PASSING."
+    },
+    {
+      "id": "15",
+      "description": "When the active filters produce zero matching products, the UI must render the text 'No products found.' and no product cards.",
+      "passed": true,
+      "evidence": "src/components/ProductList.tsx:9-10 — 'if (products.length === 0) { return <p role=\"status\">No products found.</p>; }'. Filtering is working (req 1 PASSED), so searching 'zzzzz' yields an empty product array which triggers this branch. Direct file inspection confirms the required text is rendered."
+    },
+    {
+      "id": "16",
+      "description": "On initial load, the page heading 'Product Catalog' is present and the results count reads 'Showing 15 products'.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx — 'renders the page heading and initial product count' PASSED. vitest run: 17 passed (0 failed)."
+    },
+    {
+      "id": "17",
+      "description": "The results count element (data-testid='results-count') must include page info in the format 'page N of M'.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx — 'results-count includes page info' PASSED (asserts text contains 'page 1 of 1'). vitest run: 5 pagination tests passed."
+    },
+    {
+      "id": "18",
+      "description": "The TypeScript build (pnpm build in src/benchmark-frontend) must complete without errors after all changes.",
+      "passed": true,
+      "evidence": "pnpm build output: 'tsc -b && vite build', '✓ 38 modules transformed', 'dist/assets/index-DbT_CKzS.js 200.15 kB', '✓ built in 265ms'. Exit code 0, zero TypeScript errors."
+    },
+    {
+      "id": "19",
+      "description": "No new npm/pnpm dependencies are added; package.json remains unchanged.",
+      "passed": true,
+      "evidence": "git diff HEAD -- src/benchmark-frontend/package.json produced no output — package.json is identical to the last commit."
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0 + Vite 6.2.0 + TypeScript (strict, noUnusedLocals, noUnusedParameters enforced)",
+      "Vitest 3.2.4 + jsdom + Testing Library (React, jest-dom, user-event)",
+      "Package manager: npm (ES modules, type:module)",
+      "No state management libraries — React hooks only",
+      "No utility libraries (no lodash); no CSS modules or Tailwind — plain CSS with variables",
+      "Build script: tsc -b && vite build — TypeScript errors fail the build",
+      "noUnusedParameters is enforced: _onChange params prefixed with underscore must be renamed when wired up to avoid TS errors"
+    ],
+    "features": [
+      "filterProducts() in productFilters.ts: stub returning [...products] unchanged; _filters param is unused — core filter/sort logic missing entirely",
+      "FilterPanel.tsx: all three onChange handlers are no-ops (onChange={() => {})); Clear button is a no-op; prop is named _onChange (unused by TS rules)",
+      "SortSelect.tsx: select onChange is a no-op; prop is named _onChange (unused)",
+      "App.tsx: already wires setFilters to FilterPanel.onChange and a sortBy setter to SortSelect.onChange; already computes visibleProducts = filterProducts(products, filters) in useMemo — no wiring changes needed at App level",
+      "ProductList.tsx: already renders 'No products found.' string when products array is empty — no change needed; the empty state works automatically once filterProducts returns []",
+      "useProductFilters.ts: provides clearFilters, setFilters, updateFilter — must NOT be modified",
+      "ProductCard.tsx: renders h3 heading for product name, data-testid=product-{id}"
+    ],
+    "architecture": [
+      "Data flow: fetchProducts (productsApi.ts) → useProductFilters (manages state) → App.tsx (useMemo: filterProducts(products, filters) → visibleProducts) → ProductList → ProductCard",
+      "New filter logic belongs entirely in src/utils/productFilters.ts, inside the existing filterProducts() function body",
+      "onChange wiring belongs in FilterPanel.tsx (rename _onChange → onChange, wire search input, category select, inStockOnly checkbox, Clear button) and SortSelect.tsx (rename _onChange → onChange, wire select element)",
+      "App.tsx passes onChange={setFilters} to FilterPanel — Clear button in FilterPanel can call onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' }) to reset all state without needing a separate clearFilters prop",
+      "FilterState type: { search: string; category: string; inStockOnly: boolean; sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc' }",
+      "results-count element (data-testid='results-count') in App.tsx must render both 'Showing X products' and 'page N of M' — pagination test asserts both substrings are present"
+    ],
+    "edgeCases": [
+      "Search must trim whitespace before matching: '  lamp  '.trim() → 'lamp' must match 'Desk Lamp'",
+      "Search is case-insensitive: both sides lowercased before includes() check",
+      "Search is partial name match only on product.name (not description or tags)",
+      "Category 'All' must bypass the category filter entirely — no filtering when category === 'All'",
+      "Sorting must not mutate input: use [...result].sort(...) not result.sort(...) — noMutation constraint from requirement 14 and TypeScript immutability",
+      "Default sort ('default') preserves original API order — no sort comparator applied at all",
+      "Filters compose in order: search AND category AND inStockOnly all applied sequentially before sort",
+      "15 products total; exactly 11 in-stock; 4 out-of-stock: USB-C Hub, Noise-Cancelling Headphones, Dumbbell Set, Desk Lamp",
+      "Fitness category has exactly 5 products: Yoga Mat, Resistance Bands, Foam Roller, Dumbbell Set, Jump Rope",
+      "price-asc exact order across all 15: Jump Rope, Cable Organiser, Foam Roller, Wireless Mouse, Ergonomic Wrist Rest, Resistance Bands, Monitor Riser, Yoga Mat, Desk Lamp, Laptop Stand, USB-C Hub, Webcam HD, Dumbbell Set, Mechanical Keyboard, Noise-Cancelling Headphones",
+      "rating-desc: first Yoga Mat (4.8), second Mechanical Keyboard (4.7)",
+      "Empty filtered result set: ProductList already handles it — filterProducts must return [] (not all products) when no products match"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 3, 5, 7, 8, 9, 11, 13, 14 — implement filter and sort logic in productFilters.ts",
+      "description": "Implement filterProducts() body: (1) rename _filters param to filters to satisfy noUnusedParameters; (2) search — if filters.search.trim() is non-empty, filter to products where product.name.toLowerCase().includes(filters.search.trim().toLowerCase()); (3) category — if filters.category !== 'All', filter to products where product.category === filters.category; (4) inStockOnly — if filters.inStockOnly, filter to products where product.inStock === true; (5) sort — for 'price-asc'/'price-desc' sort a spread copy by price; for 'rating-desc' sort by rating descending; for 'default' return result as-is. Never call .sort() directly on result without spreading first.",
+      "files": ["src/benchmark-frontend/src/utils/productFilters.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 1, 2, 3, 4, 5, 6, 12 — wire FilterPanel onChange handlers and Clear button",
+      "description": "In FilterPanel.tsx: (1) rename _onChange prop parameter to onChange; (2) wire search input onChange to call onChange({ ...filters, search: e.target.value }); (3) wire category select onChange to call onChange({ ...filters, category: e.target.value }); (4) wire in-stock checkbox onChange to call onChange({ ...filters, inStockOnly: e.target.checked }); (5) wire Clear button onClick to call onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' }) — this resets all four filter fields including sortBy via the existing setFilters prop from App.tsx.",
+      "files": ["src/benchmark-frontend/src/components/FilterPanel.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 7, 8, 9, 10 — wire SortSelect onChange handler",
+      "description": "In SortSelect.tsx: (1) rename _onChange prop parameter to onChange; (2) wire the select element's onChange to call onChange(e.target.value as FilterState['sortBy']).",
+      "files": ["src/benchmark-frontend/src/components/SortSelect.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 17 — results-count element must include 'page N of M' format alongside 'Showing X products'",
+      "description": "In App.tsx, inspect the results-count element rendering. If it does not already include page info, update the text content of the data-testid='results-count' element to include both 'Showing X products' and 'page N of M' (e.g., as a single string or adjacent spans). The pagination.test.tsx asserts that the results-count text content contains the substring 'page 1 of 1'.",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    }
+  ]
+}
