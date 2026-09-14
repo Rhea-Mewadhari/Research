@@ -7,13 +7,23 @@ export type FilterState = {
   sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
 };
 
-export function filterProducts(products: Product[], _filters: FilterState): Product[] {
-  let result = [...products];
+export function filterProducts(products: Product[], filters: FilterState): Product[] {
+  const trimmedSearch = filters.search.trim().toLowerCase();
 
-  // TODO: implement search filter
-  // TODO: implement category filter
-  // TODO: implement in-stock filter
-  // TODO: implement sorting
+  let result = products.filter((p) => {
+    if (trimmedSearch !== '' && !p.name.toLowerCase().includes(trimmedSearch)) return false;
+    if (filters.category !== 'All' && p.category !== filters.category) return false;
+    if (filters.inStockOnly && !p.inStock) return false;
+    return true;
+  });
+
+  if (filters.sortBy === 'price-asc') {
+    result = [...result].sort((a, b) => a.price - b.price);
+  } else if (filters.sortBy === 'price-desc') {
+    result = [...result].sort((a, b) => b.price - a.price);
+  } else if (filters.sortBy === 'rating-desc') {
+    result = [...result].sort((a, b) => b.rating - a.rating);
+  }
 
   return result;
 }

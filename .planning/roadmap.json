@@ -1,0 +1,69 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19 with JSX (modern react-jsx transform — no React import needed in components)",
+      "Vite 6 build tool; build command is `tsc -b && vite build` (TypeScript check runs first)",
+      "Vitest with @testing-library/react and @testing-library/user-event; jsdom environment; globals enabled",
+      "TypeScript ~5.7.2, strict mode: noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch all active",
+      "ESM (type: module), bundler module resolution",
+      "Coverage tracked only for src/utils/productFilters.ts via v8 JSON reporter",
+      "No ESLint/Prettier config found — no automated style enforcement beyond tsc"
+    ],
+    "features": [
+      "COMPLETE — App.tsx: orchestrates the full application; computes categories list; calls filterProducts; manages pagination; handles loading/error states; must not be modified",
+      "COMPLETE — useProductFilters.ts: fetches products, manages FilterState, exposes updateFilter/clearFilters/setFilters; must not be modified",
+      "COMPLETE — types/product.ts: Product interface, PaginatedResponse, FilterState, SortBy types; must not be modified",
+      "COMPLETE — ProductList.tsx: renders product grid, shows 'No products found.' when empty; must not be modified",
+      "SKELETON — utils/productFilters.ts: filterProducts function exists but returns unfiltered/unsorted products; 4 TODO comments mark the missing steps",
+      "SKELETON — components/FilterPanel.tsx: full UI structure (search input, category select, in-stock checkbox, clear button) but all onChange handlers are stubbed as () => {}",
+      "SKELETON — components/SortSelect.tsx: full UI structure with all 4 sort options but onChange is stubbed as () => {}"
+    ],
+    "architecture": [
+      "Data flow: fetchProducts(page) → useProductFilters hook (state: filters, products, isLoading, error, page, totalPages) → App.tsx → FilterPanel / SortSelect / ProductList",
+      "FilterState shape: { search: string; category: string; inStockOnly: boolean; sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc' }",
+      "FilterPanel props: { filters: FilterState; onChange: (next: FilterState) => void; categories: string[] }",
+      "SortSelect props: { value: FilterState['sortBy']; onChange: (sortBy: FilterState['sortBy']) => void }",
+      "filterProducts(products, filters) is called in App.tsx before rendering ProductList — filters apply over the full products array fetched by the hook",
+      "New filter/sort logic belongs entirely in src/utils/productFilters.ts inside filterProducts()",
+      "New event handler wiring belongs in src/components/FilterPanel.tsx and src/components/SortSelect.tsx — no structural changes needed, only filling in the stubbed callbacks"
+    ],
+    "edgeCases": [
+      "Search trimming: '  lamp  ' must match 'Desk Lamp' — trim filters.search before comparison (requirement 1)",
+      "Search case-insensitivity: 'MOUSE' must match 'Wireless Mouse' — lowercase both sides before comparison (requirement 1)",
+      "Empty/whitespace search: when filters.search.trim() === '' no products are excluded (requirement 1)",
+      "Category 'All': when filters.category === 'All' all products pass through regardless of actual category (requirement 2)",
+      "Filters are applied sequentially: search → category → inStockOnly → sort; sort operates on the already-filtered subset (requirements 1–6)",
+      "Array immutability: sort must operate on a copy ([...products] or .slice()) not the original — mutation would corrupt state across sequential test runs (requirement 8)",
+      "sortBy 'default': must return products in original order — do not sort at all, just return filtered array as-is (requirement 7)",
+      "Empty result set: when all products are excluded filterProducts returns [] and ProductList renders 'No products found.' (requirement 14 — ProductList already handles this)",
+      "TypeScript strict mode: all switch/if cases must be exhaustive; no unused variables in new code",
+      "Clear filters must reset all four fields: search to '', category to 'All', inStockOnly to false, sortBy to 'default' (requirement 12)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1–8: filterProducts must apply case-insensitive trimmed partial-match search, exact-match category filter (pass-through when 'All'), inStockOnly exclusion, and sortBy (price-asc, price-desc, rating-desc, default) — sorting on an array copy to avoid mutation",
+      "description": "Implement the body of filterProducts() in productFilters.ts. Apply filters in sequence: (1) if filters.search.trim() is non-empty, keep only products whose name.toLowerCase() includes search.trim().toLowerCase(); (2) if filters.category !== 'All', keep only products whose category === filters.category; (3) if filters.inStockOnly, keep only products with inStock === true; (4) if sortBy !== 'default', sort a copy ([...filtered]) by price asc/desc or rating desc before returning. Return the original array order unchanged when sortBy === 'default'.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 9–12: FilterPanel search input must call onChange({...filters, search: e.target.value}); category select must call onChange({...filters, category: e.target.value}); in-stock checkbox must call onChange({...filters, inStockOnly: e.target.checked}); Clear filters button must call onChange({search: '', category: 'All', inStockOnly: false, sortBy: 'default'})",
+      "description": "Replace the four stubbed () => {} handlers in FilterPanel.tsx with real implementations. Search input onChange: spread filters and override search with event.target.value. Category select onChange: spread and override category. Checkbox onChange: spread and override inStockOnly with event.target.checked. Clear button onClick: call onChange with the full default FilterState object.",
+      "files": [
+        "src/benchmark-frontend/src/components/FilterPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 13: SortSelect <select> must call onChange(event.target.value as FilterState['sortBy']) on change; all four options (default, price-asc, price-desc, rating-desc) must be present",
+      "description": "Replace the stubbed onChange={() => {}} in SortSelect.tsx with a real handler that calls the onChange prop with event.target.value cast to FilterState['sortBy']. The four option elements are already present in the JSX and must remain unchanged.",
+      "files": [
+        "src/benchmark-frontend/src/components/SortSelect.tsx"
+      ]
+    }
+  ]
+}
