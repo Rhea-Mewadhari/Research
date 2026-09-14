@@ -1,0 +1,30 @@
+{
+  "taskId": "task1",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Implement filterProducts logic in src/utils/productFilters.ts",
+      "status": "done",
+      "notes": "Implemented search (case-insensitive, trimmed), category, inStockOnly filters, and price-asc/price-desc/rating-desc sorting. Filtering/sorting tests remain red until phases 2 and 3 wire up the UI handlers."
+    },
+    {
+      "id": "phase-2",
+      "title": "Wire up FilterPanel event handlers (search, category, inStockOnly, clear)",
+      "status": "done",
+      "notes": "Renamed _onChange to onChange, wired onChange handlers for search input, category select, inStockOnly checkbox, and Clear filters button. Added DEFAULT_FILTERS constant for reset. All filtering and clearFilters tests now pass."
+    },
+    {
+      "id": "phase-3",
+      "title": "Wire up SortSelect onChange handler",
+      "status": "done",
+      "notes": "Renamed _onChange back to onChange, wired select's onChange to call onChange(e.target.value as FilterState['sortBy']). All 17 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run tests and confirm build passes",
+      "status": "done",
+      "notes": "All 17 tests pass (6 test files). Build succeeds: tsc -b and vite build both clean, producing dist/assets/index-BiwU3GZh.js (200 kB)."
+    }
+  ]
+}
