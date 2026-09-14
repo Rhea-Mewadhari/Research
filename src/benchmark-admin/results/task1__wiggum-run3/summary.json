@@ -1,0 +1,126 @@
+{
+  "taskId": "task1",
+  "runId": "wiggum-run3",
+  "timestamp": "2026-09-14T18:18:38.195Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 15,
+    "failed": 0,
+    "total": 15,
+    "expectedFiles": 6,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1496,
+    "hiddenMs": 1252,
+    "buildMs": 1155,
+    "totalMs": 3951
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.77,
+    "overallScore": 0.908
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task1",
+    "wall_duration_ms": 290835,
+    "cost_usd": 1.2242358,
+    "num_turns": 60,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "cb465a3e-c0a1-4f0b-a7b6-34a043af780f",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Implement filterProducts logic in productFilters.ts",
+          "status": "done",
+          "notes": "Implemented search (case-insensitive, trimmed), category, inStockOnly, and sortBy filters. Build passes; remaining test failures are UI-level and depend on phases 2 and 3."
+        },
+        {
+          "id": "phase-2",
+          "title": "Wire up FilterPanel.tsx event handlers and Clear filters button",
+          "status": "done",
+          "notes": "Wired onChange to search input, category select, and inStockOnly checkbox. Clear filters button resets to default FilterState. clearFilters and filtering tests pass; build succeeds. Sorting tests still fail (SortSelect not yet wired — phase 3)."
+        },
+        {
+          "id": "phase-3",
+          "title": "Wire up SortSelect.tsx onChange handler",
+          "status": "done",
+          "notes": "Renamed _onChange to onChange and wired the select's onChange to call it with the cast value. All 17 tests pass, build succeeds."
+        },
+        {
+          "id": "phase-4",
+          "title": "Verify: run tests and build to confirm all pass",
+          "status": "done",
+          "notes": "All 17 tests pass (6 test files). Build succeeds with tsc + vite, producing dist/assets cleanly."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 88444,
+          "cost_usd": 0.3076971,
+          "num_turns": 16,
+          "session_id": "0e74b22e-2c35-4816-934f-1f2292f672d2",
+          "is_error": false
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 52827,
+          "cost_usd": 0.2885487,
+          "num_turns": 13,
+          "session_id": "d6fdb1fe-bd4f-4601-9f57-877543595f1e",
+          "is_error": false
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 47055,
+          "cost_usd": 0.19571100000000002,
+          "num_turns": 11,
+          "session_id": "87b227ad-8f8f-451f-8221-d7e6919860a1",
+          "is_error": false
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 30039,
+          "cost_usd": 0.1678233,
+          "num_turns": 9,
+          "session_id": "cb465a3e-c0a1-4f0b-a7b6-34a043af780f",
+          "is_error": false
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
