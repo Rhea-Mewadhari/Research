@@ -1,0 +1,63 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript ~5.7.2, Vite 6 — build command is `tsc -b && vite build` (type-check first, then bundle)",
+      "Vitest 3 + jsdom + @testing-library/react — test command is `vitest run`",
+      "JSX transform: react-jsx (automatic) — no `import React` needed in JSX files",
+      "verbatimModuleSyntax: true — type-only imports must use `import type`",
+      "noUnusedLocals, noUnusedParameters enabled — any introduced dead code will fail the build",
+      "noEmit: true in tsconfig — TypeScript only type-checks; Vite handles transpilation",
+      "Vitest globals enabled — no need to import describe/it/expect in test files"
+    ],
+    "features": [
+      "App.tsx: main catalog page — manages filter state, pagination, API fetch, renders ProductList + SortSelect + FilterPanel",
+      "ProductCard.tsx: renders a single product card; shows a discount badge when discountPct is non-null; calls formatPrice with the discount value",
+      "SortSelect.tsx: <select> dropdown that calls onChange prop with the chosen sort key",
+      "ProductList.tsx: purely presentational — accepts `products: Product[]` and renders ProductCard for each",
+      "Tests covering: initial render (app.render.test.tsx), sorting (sorting.test.tsx), filtering (filtering.test.tsx), clear-filters (clearFilters.test.tsx), pagination (pagination.test.tsx), loading/error states (loadingError.test.tsx)",
+      "No test files may be modified per constraints"
+    ],
+    "architecture": [
+      "src/types/product.ts defines Product type with `discountPct?: number` (not discountPercent)",
+      "src/utils/productFilters.ts defines FilterState with `sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc'`",
+      "src/styles/style.css EXISTS at the correct path",
+      "src/styles.css does NOT exist — the wrong import path in App.tsx causes a build failure",
+      "ProductList props: `{ products: Product[] }` — no other props; self-closing tag is valid",
+      "Components live in src/components/; hooks in src/hooks/; utils in src/utils/; types in src/types/"
+    ],
+    "edgeCases": [
+      "ProductCard.tsx line 9: `product.discountPercent != null` uses loose inequality — intentionally catches both null and undefined for the optional field; must not be changed to strict inequality when renaming to discountPct",
+      "ProductCard.tsx line 25: badge text interpolation `{product.discountPercent}%` — rename only, no logic change",
+      "ProductCard.tsx line 37: `formatPrice(product.price, product.discountPercent)` — rename only, function signature unchanged",
+      "SortSelect.tsx line 16: `e.target.value` at runtime will always be one of the four option values; the cast `as FilterState['sortBy']` is type-safe even though TypeScript cannot verify it statically",
+      "App.tsx line 47: closing `/>` must not add or remove any props — only add the self-closing slash before the angle bracket",
+      "Requirement 6 forbids any changes beyond the four targeted lines — no refactoring, no additional files"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — App.tsx imports the stylesheet from the correct path './styles/style.css' (not './styles.css')",
+      "description": "Change line 2 of App.tsx from `import './styles.css'` to `import './styles/style.css'`",
+      "files": ["benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — App.tsx closes the <ProductList> JSX element with /> before the sibling <div className=\"pagination\">",
+      "description": "On line 47 of App.tsx, add `/>` to close `<ProductList products={visibleProducts}` so it reads `<ProductList products={visibleProducts} />`",
+      "files": ["benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — ProductCard.tsx references product.discountPct (not product.discountPercent) in all three places",
+      "description": "In ProductCard.tsx, rename `product.discountPercent` to `product.discountPct` on lines 9, 25, and 37. Preserve the `!= null` guard on line 9 exactly as-is.",
+      "files": ["benchmark-frontend/src/components/ProductCard.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — SortSelect.tsx casts e.target.value to FilterState['sortBy'] before passing it to onChange",
+      "description": "On line 16 of SortSelect.tsx, change `onChange(e.target.value)` to `onChange(e.target.value as FilterState['sortBy'])`",
+      "files": ["benchmark-frontend/src/components/SortSelect.tsx"]
+    }
+  ]
+}
