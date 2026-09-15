@@ -1,0 +1,30 @@
+{
+  "taskId": "task2",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix case-insensitive and trimmed search in productFilters.ts",
+      "status": "done",
+      "notes": "Trimmed and lowercased both search term and product name before comparison. All 17 tests pass."
+    },
+    {
+      "id": "phase-2",
+      "title": "Move sort to after all filters in productFilters.ts",
+      "status": "done",
+      "notes": "Moved sort block to after search, category, and inStock filters. All 17 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix clear filters to also reset sortBy in FilterPanel.tsx",
+      "status": "done",
+      "notes": "Added sortBy: 'default' to the Clear filters onClick handler. All 17 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify all pass",
+      "status": "done",
+      "notes": "All 17 tests pass across 6 test files. Build succeeds with tsc and vite."
+    }
+  ]
+}

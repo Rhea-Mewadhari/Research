@@ -1,0 +1,126 @@
+{
+  "taskId": "task2",
+  "runId": "wiggum-run2",
+  "timestamp": "2026-09-15T16:58:40.382Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 15,
+    "failed": 0,
+    "total": 15,
+    "expectedFiles": 6,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1708,
+    "hiddenMs": 1296,
+    "buildMs": 1101,
+    "totalMs": 4158
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task2",
+    "wall_duration_ms": 309409,
+    "cost_usd": 1.1273898,
+    "num_turns": 65,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "a7dcfcd6-e757-4b63-954b-ae0cc0349fad",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix case-insensitive and trimmed search in productFilters.ts",
+          "status": "done",
+          "notes": "Trimmed and lowercased both search term and product name before comparison. All 17 tests pass."
+        },
+        {
+          "id": "phase-2",
+          "title": "Move sort to after all filters in productFilters.ts",
+          "status": "done",
+          "notes": "Moved sort block to after search, category, and inStock filters. All 17 tests pass, build succeeds."
+        },
+        {
+          "id": "phase-3",
+          "title": "Fix clear filters to also reset sortBy in FilterPanel.tsx",
+          "status": "done",
+          "notes": "Added sortBy: 'default' to the Clear filters onClick handler. All 17 tests pass, build succeeds."
+        },
+        {
+          "id": "phase-4",
+          "title": "Run tests and verify all pass",
+          "status": "done",
+          "notes": "All 17 tests pass across 6 test files. Build succeeds with tsc and vite."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 52660,
+          "cost_usd": 0.22318799999999997,
+          "num_turns": 14,
+          "session_id": "1081fb72-5fa2-4afb-978e-df4dcf1c0d02",
+          "is_error": false
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 54180,
+          "cost_usd": 0.19569899999999998,
+          "num_turns": 11,
+          "session_id": "bdef7f02-9983-4930-96df-2ef9da08af19",
+          "is_error": false
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 48700,
+          "cost_usd": 0.22074480000000002,
+          "num_turns": 14,
+          "session_id": "a6643879-3648-4ed1-9790-0899c4bf39b8",
+          "is_error": false
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 47619,
+          "cost_usd": 0.1809669,
+          "num_turns": 9,
+          "session_id": "a7dcfcd6-e757-4b63-954b-ae0cc0349fad",
+          "is_error": false
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
