@@ -1,0 +1,66 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19 + TypeScript ~5.7.2 + Vite 6.2.0 (pnpm workspace, ESM-first)",
+      "verbatimModuleSyntax: true — type-only imports must use `import type { ... }`",
+      "jsx: react-jsx (automatic transform) — no `import React` needed in component files",
+      "noUnusedLocals/noUnusedParameters: true — unused identifiers are compile errors",
+      "strict mode NOT explicitly enabled (but verbatimModuleSyntax + noUnused* are strict-adjacent)",
+      "Test runner: Vitest 3.2 + jsdom 26 + @testing-library/react 16; globals: true (no explicit imports of describe/it/expect)",
+      "Setup file stubs fetch globally before each test — API calls are always mocked",
+      "Build command: `tsc -b && vite build`; type-check is part of build"
+    ],
+    "features": [
+      "App.tsx: root orchestrator — wires useProductFilters hook into FilterPanel, SortSelect, Spinner, ProductList, pagination",
+      "FilterPanel.tsx: search input, category dropdown, in-stock checkbox, clear-filters button — no errors",
+      "ProductCard.tsx: renders image, name, category, truncated description, formatted price, discount badge, rating, tags, stock status — has discountPercent bug",
+      "ProductList.tsx: maps products array to ProductCard; shows empty-state message — no errors",
+      "SortSelect.tsx: four-option sort dropdown — has type mismatch on onChange",
+      "Spinner.tsx: minimal loading indicator with aria-label — no errors",
+      "useProductFilters.ts: manages filter state, pagination, and async fetchProducts — no errors",
+      "productFilters.ts: pure filterProducts function + FilterState type — no errors",
+      "formatters.ts: formatPrice (accepts discountPct?:number), formatRating, truncate — no errors",
+      "productsApi.ts: fetchProducts(page) calling localhost:3001/products — no errors (hardcoded token is a pre-existing issue, not in scope)",
+      "types/product.ts: Product (with discountPct?: number), PaginatedResponse<T>, Category — no errors",
+      "data/products.ts: 15 static mock products correctly using discountPct field — no errors",
+      "Must not regress: search, category filter, in-stock filter, sort (4 options), clear filters, pagination (prev/next), loading spinner, error alert, results count, empty state, discount badge + price formatting"
+    ],
+    "architecture": [
+      "Layers (bottom to top): types/ → data/ → api/ → utils/ → hooks/ → components/ → App.tsx",
+      "FilterState type lives in utils/productFilters.ts and is consumed by hooks/ and components/",
+      "Components use named exports for types (`import type { FilterState }`); default exports for component functions",
+      "All fixes are in the component/orchestrator layer — no changes needed in types/, utils/, hooks/, api/, or data/",
+      "Fix placement: App.tsx (orchestrator), ProductCard.tsx (component), SortSelect.tsx (component)",
+      "Import pattern to follow: `import type { X }` for type-only imports; relative paths (no aliases)"
+    ],
+    "edgeCases": [
+      "App.tsx: The broken <ProductList> tag is never closed, making <div className='pagination'> appear to be inside its props — a JSX parse error that prevents the entire app from mounting, blocking all tests",
+      "App.tsx fix: adding `/>` makes <div className='pagination'> a sibling inside the enclosing fragment — correct intended structure, no further JSX restructuring needed",
+      "ProductCard.tsx: discountPct is optional (discountPct?: number) — the existing `!= null` guard on line 9 correctly handles both undefined and null, so the rename preserves optional semantics",
+      "ProductCard.tsx: formatPrice in formatters.ts uses `if (!discountPct)` (falsy check) — a value of 0 would be treated as no discount, but this is a pre-existing issue in formatters.ts not introduced by the rename",
+      "ProductCard.tsx: no test asserts discount badge text or discounted price values, so Fix 2 introduces no test regression",
+      "SortSelect.tsx: the `as FilterState['sortBy']` cast is TypeScript-only (no runtime change); option values in JSX are constrained to the four union members, making the cast safe",
+      "SortSelect.tsx: sorting.test.tsx uses userEvent.selectOptions with 'price-asc', 'price-desc', 'rating-desc' — all valid union members; fix unblocks compilation without changing assertion values"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: App.tsx must close the <ProductList> element as a self-closing tag (<ProductList products={visibleProducts} />) so <div className='pagination'> is its sibling rather than part of an unclosed element",
+      "description": "In src/App.tsx line 47, change `<ProductList products={visibleProducts}` to `<ProductList products={visibleProducts} />` — add the self-closing `/>` to properly terminate the JSX element",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2: ProductCard.tsx must reference product.discountPct (matching the discountPct?: number field in types/product.ts) everywhere it currently references product.discountPercent (lines 9, 25, and 37)",
+      "description": "In src/components/ProductCard.tsx, rename all three occurrences of `product.discountPercent` to `product.discountPct`: line 9 (`const hasDiscount`), line 25 (badge display), line 37 (formatPrice call)",
+      "files": ["src/benchmark-frontend/src/components/ProductCard.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 3: SortSelect.tsx must cast e.target.value to FilterState['sortBy'] before passing it to the onChange prop, so that string does not violate the narrower union prop type",
+      "description": "In src/components/SortSelect.tsx line 16, change `onChange(e.target.value)` to `onChange(e.target.value as FilterState['sortBy'])` — add the type assertion to satisfy the prop's union type",
+      "files": ["src/benchmark-frontend/src/components/SortSelect.tsx"]
+    }
+  ]
+}

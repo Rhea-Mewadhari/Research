@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "src/benchmark-frontend/src/App.tsx must close the <ProductList> element as a self-closing tag (<ProductList products={visibleProducts} />), making <div className=\"pagination\"> its sibling rather than part of an unclosed element.",
+      "passed": true,
+      "evidence": "App.tsx line 47: `<ProductList products={visibleProducts} />` (self-closing), line 48: `<div className=\"pagination\">` (sibling). TypeScript check (`npx tsc --noEmit`) exited 0 with no JSX parse errors. Test suite tests/app.render.test.tsx passed (1 test, 60ms)."
+    },
+    {
+      "id": "2",
+      "description": "src/benchmark-frontend/src/components/ProductCard.tsx must reference product.discountPct (matching the discountPct?: number field declared in src/benchmark-frontend/src/types/product.ts) everywhere it currently references product.discountPercent (lines 9, 25, and 37).",
+      "passed": true,
+      "evidence": "grep of ProductCard.tsx shows `product.discountPct` at lines 9 (`const hasDiscount = product.discountPct != null`), 25 (`-{product.discountPct}%`), and 37 (`formatPrice(product.price, product.discountPct)`); zero occurrences of `product.discountPercent`. TypeScript check exited 0 with no 'Property discountPercent does not exist on type Product' diagnostic."
+    },
+    {
+      "id": "3",
+      "description": "src/benchmark-frontend/src/components/SortSelect.tsx must cast e.target.value to FilterState['sortBy'] before passing it to the onChange prop, so that string does not violate the narrower union prop type.",
+      "passed": true,
+      "evidence": "SortSelect.tsx line 16: `onChange={(e) => onChange(e.target.value as FilterState['sortBy'])}` — cast present using `FilterState['sortBy']` (not `any`). TypeScript check exited 0 with no 'Argument of type string is not assignable to parameter of type' diagnostic on SortSelect.tsx."
+    },
+    {
+      "id": "4",
+      "description": "The full test suite passes without any modification to files under tests/.",
+      "passed": true,
+      "evidence": "`pnpm test` output: 'Test Files  6 passed (6)', 'Tests  17 passed (17)', exit code 0. All 6 files passed: tests/app.render.test.tsx (1 test), tests/loadingError.test.tsx (4 tests), tests/pagination.test.tsx (5 tests), tests/clearFilters.test.tsx (1 test), tests/filtering.test.tsx (3 tests), tests/sorting.test.tsx (3 tests)."
+    },
+    {
+      "id": "5",
+      "description": "The application builds successfully (Vite production build) with no compilation errors.",
+      "passed": true,
+      "evidence": "`pnpm run build` output: 'tsc -b && vite build', '38 modules transformed', emitted dist/index.html (0.47 kB), dist/assets/index-CPuhpUi6.css (0.46 kB), dist/assets/index-dBF5sU86.js (200.14 kB). Build exit code 0."
+    }
+  ]
+}
