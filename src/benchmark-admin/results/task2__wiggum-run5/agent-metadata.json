@@ -1,0 +1,84 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task2",
+  "wall_duration_ms": 244984,
+  "cost_usd": 1.1090517,
+  "num_turns": 65,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "d04f1429-5f41-4e38-8520-c026fb520279",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix search: make case-insensitive and trim whitespace in productFilters.ts",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-2",
+        "title": "Fix sort order: move sort block to after all filter steps in productFilters.ts",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-3",
+        "title": "Fix clear filters: include sortBy: 'default' in the reset object in FilterPanel.tsx",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-4",
+        "title": "Run tests and verify all pass with no regressions",
+        "status": "done",
+        "notes": "All 17 tests passed across 6 test files. Build succeeded with no errors."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 56030,
+        "cost_usd": 0.2434482,
+        "num_turns": 17,
+        "session_id": "6f16d6d2-26ee-41f1-923b-1d8cc552fccd",
+        "is_error": false
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 34505,
+        "cost_usd": 0.1822278,
+        "num_turns": 10,
+        "session_id": "46330d9d-96ff-4e28-b73f-8a2a41899849",
+        "is_error": false
+      },
+      {
+        "index": 3,
+        "label": "iter3",
+        "exit_code": 0,
+        "wall_duration_ms": 44730,
+        "cost_usd": 0.2000457,
+        "num_turns": 13,
+        "session_id": "c4dc9537-81cb-4457-887e-1c79b3466e55",
+        "is_error": false
+      },
+      {
+        "index": 4,
+        "label": "iter4",
+        "exit_code": 0,
+        "wall_duration_ms": 25357,
+        "cost_usd": 0.14863980000000002,
+        "num_turns": 7,
+        "session_id": "d04f1429-5f41-4e38-8520-c026fb520279",
+        "is_error": false
+      }
+    ],
+    "contextResets": 4,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}
