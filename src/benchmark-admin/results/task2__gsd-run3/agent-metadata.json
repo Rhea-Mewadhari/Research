@@ -1,0 +1,130 @@
+{
+  "framework": "gsd",
+  "target": "frontend",
+  "taskId": "task2",
+  "wall_duration_ms": 1082537,
+  "cost_usd": 3.0459036999999998,
+  "num_turns": 111,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "aa85c567-c8ae-467d-9308-31cea58f6800",
+  "gsd": {
+    "phases": [
+      {
+        "name": "new-project",
+        "treeHash": "e95cd77a2bbd849114db544bc7316d95e7529c91",
+        "label": "new-project",
+        "exit_code": 0,
+        "wall_duration_ms": 60615,
+        "cost_usd": 0.23959020000000003,
+        "num_turns": 15,
+        "session_id": "3be96778-501b-4d36-9e1e-fa38c39a8fe9",
+        "is_error": false
+      },
+      {
+        "name": "discuss-phase",
+        "treeHash": "6d515f5474ebf86f00a9e3eae2beed1e3ccb0d4d",
+        "label": "discuss-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 110723,
+        "cost_usd": 0.2743302,
+        "num_turns": 12,
+        "session_id": "70099759-69d8-4630-b4cd-740b94073822",
+        "is_error": false
+      },
+      {
+        "name": "plan-phase",
+        "treeHash": "5313feeb479fab33325c2ce33f4e0c1589c33808",
+        "label": "plan-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 115054,
+        "cost_usd": 0.38954619999999995,
+        "num_turns": 9,
+        "session_id": "9515227d-8a38-426e-9514-f20ca6443a2f",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "c55adf319cd615c8bc4c64bf943ccfcac9446eaa",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 72710,
+        "cost_usd": 0.21827010000000002,
+        "num_turns": 7,
+        "session_id": "40ca68a6-d117-4d90-b9ce-65fd46bd88c0",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "eee56b392a72f02344f56fb9af48e735d6886a12",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 185746,
+        "cost_usd": 0.41790449999999996,
+        "num_turns": 13,
+        "session_id": "9f9dd657-5d92-4ca3-b4b4-4fefd898eaf8",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "b7ec355bf38d656b00068ea39f0b271d4dce1eab",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 41805,
+        "cost_usd": 0.17910569999999998,
+        "num_turns": 7,
+        "session_id": "dc0e13f7-89f3-4d04-8df2-78cac039a9e5",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "80228474ec0fbdb42527804f15c0ab2efdd839dd",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 203445,
+        "cost_usd": 0.47889299999999996,
+        "num_turns": 14,
+        "session_id": "64200e5e-143f-4045-8f60-19b0efd14cec",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "618c87cf1f4cc4f31e5f0d2f164f6f254bca84a8",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 29917,
+        "cost_usd": 0.1522134,
+        "num_turns": 7,
+        "session_id": "51c1d150-244b-4ee0-a33d-92d88a4affdc",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "c10c5fea40b8b2269536e20d19dbc5d6d825955e",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 188159,
+        "cost_usd": 0.48996,
+        "num_turns": 19,
+        "session_id": "95873437-ea06-4117-aa50-0982616b23c3",
+        "is_error": false
+      },
+      {
+        "name": "complete-milestone",
+        "treeHash": "bc829a787f0fcdba2ddb4f268ed0a98a41cda513",
+        "label": "complete-milestone",
+        "exit_code": 0,
+        "wall_duration_ms": 50313,
+        "cost_usd": 0.20609039999999998,
+        "num_turns": 8,
+        "session_id": "aa85c567-c8ae-467d-9308-31cea58f6800",
+        "is_error": false
+      }
+    ],
+    "passedFirstAttempt": false,
+    "reworkAttempts": 2,
+    "completed": true,
+    "failedAtPhase": null,
+    "failedCriteria": []
+  }
+}

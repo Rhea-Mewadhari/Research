@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Search filter is case-insensitive: typing a lowercase term (e.g. 'mouse') must return products whose name matches regardless of case (e.g. 'Wireless Mouse').",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > 'filters products by search term' PASSED (✓ 93ms). Implementation in src/utils/productFilters.ts:15 uses product.name.toLowerCase().includes(filters.search.trim().toLowerCase()) — confirmed case-insensitive. All 17 tests passed."
+    },
+    {
+      "id": "2",
+      "description": "Search filter trims leading/trailing whitespace: a query such as '  mouse  ' must produce the same results as 'mouse' — filters.search.trim() is used before matching.",
+      "passed": true,
+      "evidence": "Code inspection of src/utils/productFilters.ts lines 13-16: guard condition is 'if (filters.search.trim())' and filter expression is 'product.name.toLowerCase().includes(filters.search.trim().toLowerCase())' — .trim() is called in both places. Build succeeded: tsc -b && vite build completed in 290ms with no errors."
+    },
+    {
+      "id": "3",
+      "description": "Search filter matches only product.name, not any other field (category, description, etc.).",
+      "passed": true,
+      "evidence": "src/utils/productFilters.ts lines 14-16: filter expression references only 'product.name.toLowerCase()' — no other product fields. tests/filtering.test.tsx > 'filters products by search term' PASSED (✓ 93ms) — test asserts 'Wireless Mouse' is visible and count reads 'Showing 1 products'."
+    },
+    {
+      "id": "4",
+      "description": "All active filters combine with AND semantics: a product must satisfy every active filter (search, category, inStockOnly) simultaneously; enabling one filter must not reset or override another.",
+      "passed": true,
+      "evidence": "src/utils/productFilters.ts lines 11-25: let result = [...products] then each filter step re-assigns result — search (lines 13-17), category (lines 19-21), inStockOnly (lines 23-25) — each narrows the prior result. All 3 filtering tests in tests/filtering.test.tsx PASSED (17/17 total)."
+    },
+    {
+      "id": "5",
+      "description": "Category value 'All' disables category filtering and shows all products (subject to other active filters).",
+      "passed": true,
+      "evidence": "src/utils/productFilters.ts line 19: 'if (filters.category !== \"All\")' — filter only applied when category is not 'All'. tests/filtering.test.tsx > 'filters products by category' PASSED (✓ 27ms) — initial state with category='All' shows all products before narrowing to 'Fitness'."
+    },
+    {
+      "id": "6",
+      "description": "Selecting a specific category strictly matches product.category and excludes products in any other category.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > 'filters products by category' PASSED (✓ 27ms). src/utils/productFilters.ts line 20: 'product.category === filters.category' — strict equality. Test asserts Yoga Mat/Resistance Bands/Foam Roller visible, Wireless Mouse not visible, 'Showing 5 products'."
+    },
+    {
+      "id": "7",
+      "description": "In-stock filter excludes every product where inStock === false when inStockOnly is true.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > 'filters products by in-stock only' PASSED (✓ 26ms). Test asserts USB-C Hub, Noise-Cancelling Headphones, Dumbbell Set, Desk Lamp absent; count reads 'Showing 11 products'. src/utils/productFilters.ts lines 23-25: 'result.filter((product) => product.inStock)'."
+    },
+    {
+      "id": "8",
+      "description": "Sorting is applied after all filter steps; the sort block must appear below all result = result.filter(...) calls in productFilters.ts.",
+      "passed": true,
+      "evidence": "Code position check in src/utils/productFilters.ts: search filter at lines 13-17, category filter at lines 19-21, inStockOnly filter at lines 23-25, sort block at lines 27-33 (price-asc/price-desc/rating-desc branches), return result at line 35. Sort is the final block before return — all filter steps precede it."
+    },
+    {
+      "id": "9",
+      "description": "Sorting does not mutate the source array: filterProducts must copy the input with [...products] before sorting. Calling .sort() directly on the products argument is a defect.",
+      "passed": true,
+      "evidence": "src/utils/productFilters.ts line 11: 'let result = [...products];' — spread copy is the first operation. All .sort() calls at lines 28, 30, 32 act on 'result', not on 'products'. All 3 sorting tests passed: '✓ sorts by price ascending 94ms', '✓ sorts by price descending 32ms', '✓ sorts by rating descending 32ms'."
+    },
+    {
+      "id": "10",
+      "description": "sortBy: 'price-asc' orders the (filtered) result from lowest price to highest.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > 'sorts by price ascending' PASSED (✓ 94ms). Test asserts exact 15-product sequence: Jump Rope, Cable Organiser, Foam Roller, Wireless Mouse, Ergonomic Wrist Rest, Resistance Bands, Monitor Riser, Yoga Mat, Desk Lamp, Laptop Stand, USB-C Hub, Webcam HD, Dumbbell Set, Mechanical Keyboard, Noise-Cancelling Headphones."
+    },
+    {
+      "id": "11",
+      "description": "sortBy: 'price-desc' orders the (filtered) result from highest price to lowest.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > 'sorts by price descending' PASSED (✓ 32ms). Test asserts names[0]='Noise-Cancelling Headphones', names[1]='Mechanical Keyboard', names[names.length-1]='Jump Rope'."
+    },
+    {
+      "id": "12",
+      "description": "sortBy: 'rating-desc' orders the (filtered) result from highest rating to lowest.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > 'sorts by rating descending' PASSED (✓ 32ms). Test asserts names[0]='Yoga Mat', names[1]='Mechanical Keyboard'."
+    },
+    {
+      "id": "13",
+      "description": "sortBy: 'default' preserves the original (API-returned) product order — no sort comparison is applied.",
+      "passed": true,
+      "evidence": "src/utils/productFilters.ts lines 27-33: sort block only enters branches for 'price-asc', 'price-desc', 'rating-desc' — no branch for 'default', so result is returned in original order. tests/app.render.test.tsx > 'renders the page heading and initial product count' PASSED (✓ 63ms) — initial render with sortBy='default' shows products in source order."
+    },
+    {
+      "id": "14",
+      "description": "The 'Clear filters' button in FilterPanel.tsx resets all four filter fields: search → '', category → 'All', inStockOnly → false, sortBy → 'default'.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > 'resets filters back to default values' PASSED (✓ 134ms). Test asserts search='', category='All', in-stock checkbox unchecked, sort select='default', count='Showing 15 products'. Implementation confirmed: src/components/FilterPanel.tsx lines 67-73 clear handler calls onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' }) — all four fields explicitly reset, not spread from current state. Note: the test does not change sortBy from 'default' before clicking Clear, so the reset of a non-default sortBy is not exercised by this test, but the implementation is correct."
+    }
+  ]
+}
