@@ -1,0 +1,67 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0 with automatic JSX transform (react-jsx) — no 'import React' needed",
+      "TypeScript ~5.7.2; verbatimModuleSyntax: true — type-only imports must use 'import type'",
+      "Vite 6.2.0 + @vitejs/plugin-react (Babel); moduleResolution: 'bundler'",
+      "Vitest 3.2.4 in jsdom environment with @testing-library/react 16.x",
+      "Plain CSS only — no CSS Modules, no Tailwind; src/styles/style.css EXISTS, src/styles.css does NOT",
+      "noUnusedLocals and noUnusedParameters enforced — unused vars are errors",
+      "strict mode not globally set, but individual strict flags active",
+      "pnpm workspace; package name is 'benchmark-frontend'"
+    ],
+    "features": [
+      "Product type (src/types/product.ts): field is 'discountPct?: number' — no 'discountPercent' field exists",
+      "FilterState.sortBy union: 'default' | 'price-asc' | 'price-desc' | 'rating-desc'",
+      "ProductCard.tsx: references product.discountPercent at 3 sites (lines 9, 25, 37) — all must become product.discountPct",
+      "SortSelect.tsx: passes e.target.value (string) directly to onChange which expects FilterState['sortBy'] union — type mismatch",
+      "App.tsx line 2: imports './styles.css' — file does not exist; should be './styles/style.css'",
+      "App.tsx: <ProductList products={visibleProducts}> is not self-closed — missing '/>' causes JSX parse error",
+      "formatters.ts formatPrice(price, discountPct?) uses 'discountPct' naming — consistent with type",
+      "data/products.ts uses 'discountPct' correctly on sample products (products 4, 7, 13)"
+    ],
+    "architecture": [
+      "src/ tree: App.tsx, main.tsx, api/, components/, data/, hooks/, styles/, types/, utils/",
+      "src/styles/style.css exists and is the correct target for the CSS import fix",
+      "All imports use relative paths only — no aliases (@/, ~) configured in tsconfig or vite.config",
+      "Tests live under tests/ at project root (not src/tests/) — must not be modified per constraints",
+      "tsconfig.app.json includes both 'src' and 'tests' directories for type-checking",
+      "No monorepo wrapper — benchmark-frontend is a standalone pnpm package"
+    ],
+    "edgeCases": [
+      "discountPct is optional (?: number) — hasDiscount guard in ProductCard must use discountPct so products without discount render correctly (no undefined badge)",
+      "<ProductList /> self-close must retain products={visibleProducts} prop — omitting it would silence the product grid and fail sorting tests",
+      "Type cast in SortSelect must be 'as FilterState['sortBy']', NOT 'as any' — no-any is required per project TypeScript standard",
+      "No tests directly assert on discount display — discountPct rename fix is driven by TypeScript build error, not test failure",
+      "Sort tests (sorting.test.tsx) compare h3 heading arrays by product name — would catch a missing products prop on ProductList indirectly",
+      "app.render.test.tsx and pagination.test.tsx would fail if App.tsx JSX parse error is not fixed (app won't render at all)",
+      "verbatimModuleSyntax: true — if FilterState is only used as a type in SortSelect, its import must use 'import type'"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — App.tsx imports the CSS stylesheet from './styles/style.css', not './styles.css'",
+      "description": "In src/benchmark-frontend/src/App.tsx, change the CSS import on line 2 from `import './styles.css'` to `import './styles/style.css'`",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — The <ProductList> element in App.tsx is self-closed (/>) before the pagination <div>, forming valid JSX",
+      "description": "In src/benchmark-frontend/src/App.tsx, fix the unclosed <ProductList products={visibleProducts}> tag by adding '/>' to self-close it before the pagination <div>",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — ProductCard.tsx references product.discountPct in every occurrence — no reference to product.discountPercent remains",
+      "description": "In src/benchmark-frontend/src/components/ProductCard.tsx, replace all three occurrences of 'product.discountPercent' (at original lines 9, 25, 37) with 'product.discountPct'",
+      "files": ["src/benchmark-frontend/src/components/ProductCard.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — SortSelect.tsx casts e.target.value to FilterState['sortBy'] before passing it to onChange",
+      "description": "In src/benchmark-frontend/src/components/SortSelect.tsx, change the onChange handler to cast e.target.value as `FilterState['sortBy']` (not 'as any') before passing it to the onChange prop",
+      "files": ["src/benchmark-frontend/src/components/SortSelect.tsx"]
+    }
+  ]
+}
