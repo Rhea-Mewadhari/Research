@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "App.tsx — invalid JSX self-closing element: `<ProductList products={visibleProducts}` missing closing `/>` fixed.",
+      "passed": true,
+      "evidence": "App.tsx line 47 reads `<ProductList products={visibleProducts} />` — self-closing tag present. `pnpm run build` exits 0: `tsc -b && vite build`, `✓ 38 modules transformed.`, `✓ built in 353ms`. No TS1003 error in output."
+    },
+    {
+      "id": "2",
+      "description": "App.tsx — CSS import path corrected from `'./styles.css'` to `'./styles/style.css'`.",
+      "passed": true,
+      "evidence": "App.tsx line 2 reads `import './styles/style.css';` (confirmed by grep). `pnpm run build` exits 0 with no 'Failed to resolve import' or 'Cannot find module' Vite error — 38 modules transformed cleanly."
+    },
+    {
+      "id": "3",
+      "description": "ProductCard.tsx — all three `discountPercent` occurrences changed to `discountPct`.",
+      "passed": true,
+      "evidence": "ProductCard.tsx lines 9, 25, 37 all use `product.discountPct` (grep output: `9: const hasDiscount = product.discountPct != null;`, `25: <span className=\"badge badge-discount\">-{product.discountPct}%</span>`, `37: {formatPrice(product.price, product.discountPct)}`). No `discountPercent` occurrences remain. `pnpm exec tsc -b --noEmit` exits 0 with no output (zero type errors). `pnpm test` passes all 17 tests."
+    },
+    {
+      "id": "4",
+      "description": "SortSelect.tsx — `e.target.value` cast to `FilterState['sortBy']` to fix type mismatch.",
+      "passed": true,
+      "evidence": "SortSelect.tsx line 16 reads `onChange={(e) => onChange(e.target.value as FilterState['sortBy'])}` (confirmed by grep). `pnpm exec tsc -b --noEmit` exits 0 with no output. `pnpm test` shows `tests/sorting.test.tsx (3 tests)` passed."
+    },
+    {
+      "id": "5",
+      "description": "Build succeeds without errors.",
+      "passed": true,
+      "evidence": "`pnpm run build` exits 0. Full output: `tsc -b && vite build`, `vite v6.4.2 building for production...`, `✓ 38 modules transformed.`, `dist/assets/index-dBF5sU86.js 200.14 kB │ gzip: 62.82 kB`, `✓ built in 353ms`. No TypeScript or Vite errors in stderr."
+    },
+    {
+      "id": "6",
+      "description": "All tests pass across all six test suites.",
+      "passed": true,
+      "evidence": "`pnpm test` exits 0. Output: `Test Files  6 passed (6)`, `Tests  17 passed (17)`. Suites: app.render.test.tsx (1 test) ✓, loadingError.test.tsx (4 tests) ✓, clearFilters.test.tsx (1 test) ✓, pagination.test.tsx (5 tests) ✓, filtering.test.tsx (3 tests) ✓, sorting.test.tsx (3 tests) ✓. Duration: 7.34s."
+    }
+  ]
+}

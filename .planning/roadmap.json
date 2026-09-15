@@ -1,0 +1,71 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript ~5.7.2, Vite 6, Vitest 3 — all official packages via npm",
+      "JSX transform: 'react-jsx' (automatic) — no manual React import needed",
+      "TypeScript project references: tsconfig.app.json (src+tests), tsconfig.node.json (vite config)",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type'",
+      "strict is NOT set explicitly; noUnusedLocals and noUnusedParameters are enabled",
+      "Build command: pnpm run build → tsc -b && vite build (type-check first, then bundle)",
+      "Test command: pnpm test → vitest run (single pass, jsdom environment)",
+      "No path aliases; all imports use relative paths"
+    ],
+    "features": [
+      "App.tsx: orchestrates filters/sort state via useProductFilters hook, passes visibleProducts to ProductList",
+      "FilterPanel: search text, category select, in-stock checkbox, Clear Filters button",
+      "SortSelect: controlled select for 'default'|'price-asc'|'price-desc'|'rating-desc'",
+      "ProductCard: renders discount badge and discounted price when discountPct != null",
+      "ProductList: maps products[] to ProductCard or shows 'No products found.'",
+      "Spinner: shown while isLoading; hidden after fetch resolves",
+      "useProductFilters: pagination state, API fetch on page change, filter/sort state management",
+      "Bug — App.tsx line 47: <ProductList products={visibleProducts} missing '/>' — fatal parse error",
+      "Bug — App.tsx line 2: import './styles.css' — file does not exist; should be './styles/style.css'",
+      "Bug — ProductCard.tsx lines 9, 25, 37: product.discountPercent — field does not exist; should be product.discountPct",
+      "Bug — SortSelect.tsx line 16: onChange(e.target.value) passes string where FilterState['sortBy'] union is required",
+      "Must not regress: filtering, sorting, clear-filters reset, discount badge, pagination, loading/error states"
+    ],
+    "architecture": [
+      "Layers: api/ → hooks/ → App.tsx → components/ (types/ and utils/ are shared across all)",
+      "Component hierarchy: App → [FilterPanel, SortSelect, Spinner, ProductList → ProductCard]",
+      "Product type (src/types/product.ts): id, name, category, price, inStock, rating, reviewCount, description, tags, discountPct? (optional number)",
+      "FilterState (src/utils/productFilters.ts): includes sortBy: 'default'|'price-asc'|'price-desc'|'rating-desc'",
+      "CSS lives in src/styles/style.css — imported in App.tsx",
+      "All type imports use 'import type' convention (verbatimModuleSyntax enforced)"
+    ],
+    "edgeCases": [
+      "12 of 15 products have no discountPct — discount rendering must guard with '!= null' (not falsy check)",
+      "Products WITH discountPct: Webcam HD (20%), Resistance Bands (15%), Cable Organiser (25%)",
+      "Sort reset path: Clear Filters sets sortBy back to 'default' — 'default' is a valid union member, cast is safe",
+      "Empty filter results: results-count element must still render with 0 products",
+      "Error state: product list and results-count are hidden when fetch fails",
+      "Loading: spinner visible immediately on mount; hidden after data loads",
+      "No test files may be modified — all fixes must be in src/ files only"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — App.tsx: invalid JSX self-closing element — <ProductList products={visibleProducts} is missing closing '/>'",
+      "description": "Add missing '/>' to close the ProductList JSX element on line 47 of App.tsx",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — App.tsx: missing CSS import path — import './styles.css' references a non-existent file",
+      "description": "Change 'import ./styles.css' on line 2 of App.tsx to 'import ./styles/style.css' to match the actual file location",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — ProductCard.tsx: wrong property name — product.discountPercent used in 3 places; correct field is product.discountPct",
+      "description": "Replace all 3 occurrences of 'product.discountPercent' with 'product.discountPct' in ProductCard.tsx (lines 9, 25, 37)",
+      "files": ["src/benchmark-frontend/src/components/ProductCard.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — SortSelect.tsx: string passed where sort-key union is required — onChange(e.target.value) must cast to FilterState['sortBy']",
+      "description": "Change 'onChange(e.target.value)' to 'onChange(e.target.value as FilterState[\\'sortBy\\'])' in the select onChange handler in SortSelect.tsx",
+      "files": ["src/benchmark-frontend/src/components/SortSelect.tsx"]
+    }
+  ]
+}
