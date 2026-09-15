@@ -1,0 +1,24 @@
+{
+  "taskId": "task2",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix productFilters.ts: move sort after filtering and make search case-insensitive with trim",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix FilterPanel.tsx: clear filters button must also reset sortBy to 'default'",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Verify all tests pass with no regressions",
+      "status": "done",
+      "notes": "All 17 tests pass (6 test files). Build succeeds with no TypeScript errors."
+    }
+  ]
+}
