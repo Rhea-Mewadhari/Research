@@ -1,0 +1,24 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.accessibility.test.tsx (1 test) 18ms
+ ✓ tests/hidden.sorting.integrity.test.tsx (2 tests) 131ms
+ ✓ tests/hidden.console.test.tsx (1 test) 136ms
+ ✓ tests/hidden.async.loading.test.tsx (4 tests) 166ms
+ ❯ tests/hidden.combined.behavior.test.tsx (2 tests | 1 failed) 184ms
+   ✓ Hidden: combined filter behavior > combines category + inStockOnly + search correctly 122ms
+   × Hidden: combined filter behavior > clear filters also resets sorting 62ms
+     → [2mexpect([22m[31melement[39m[2m).toHaveValue([22m[32mdefault[39m[2m)[22m
+
+Expected the element to have value:
+[32m  default[39m
+Received:
+[31m  price-desc[39m
+ ✓ tests/hidden.filtering.edgecases.test.tsx (5 tests) 216ms
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 14 passed (15)
+   Start at  18:42:50
+   Duration  921ms (transform 82ms, setup 480ms, collect 973ms, tests 851ms, environment 1.81s, prepare 247ms)
+
+[ELIFECYCLE] Test failed. See above for more details.

@@ -1,0 +1,55 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, Vite 6, TypeScript (no strict mode; noUnusedLocals, noUnusedParameters, verbatimModuleSyntax enabled)",
+      "Vitest 3 + @testing-library/react 16 + @testing-library/user-event 14; tests run via `npm run test` (vitest run); test files live in /tests/ at project root",
+      "No external state management or utility libraries — all logic uses plain JS/TS array methods",
+      "FilterState is a plain object with four fields: search, category, inStockOnly, sortBy",
+      "Array immutability: filterProducts spreads into `let result = [...products]` before any sort — original array is never mutated",
+      "FilterPanel communicates via callback prop `onChange: (next: FilterState) => void`; must always pass a complete FilterState, never a partial"
+    ],
+    "features": [
+      "filterProducts() in productFilters.ts: creates spread copy, then (BUG 1) sorts first, then filters by category, inStockOnly, search (BUG 2: case-sensitive, untrimmed)",
+      "FilterPanel.tsx: renders search text input, category select, inStockOnly checkbox, Clear filters button; each control calls onChange with spread of current filters plus changed field",
+      "BUG 3: Clear filters onClick spreads ...filters and only overrides search/category/inStockOnly — sortBy is left unchanged from prior state",
+      "useProductFilters hook: exposes correct clearFilters() that resets all 4 fields to initialFilters; FilterPanel bypasses this and calls onChange directly",
+      "Category filter, inStockOnly filter, pagination, SortSelect, and app render are all working correctly and must not regress",
+      "Tests: filtering.test.tsx (3 cases), sorting.test.tsx (3 cases), clearFilters.test.tsx (1 case), app.render.test.tsx (1 case), pagination.test.tsx (5 cases)"
+    ],
+    "architecture": [
+      "Data flow: useProductFilters hook fetches products via API → App.tsx useMemo calls filterProducts(products, filters) → visibleProducts passed to ProductList → ProductCard per item",
+      "FilterState type defined in src/utils/productFilters.ts: { search: string; category: string; inStockOnly: boolean; sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc' }",
+      "FilterPanel receives { filters: FilterState; onChange: (next: FilterState) => void; categories: string[] } — no context, no store",
+      "SortSelect is a separate component; App.tsx merges its value: setFilters(prev => ({ ...prev, sortBy }))",
+      "filterProducts is a pure function called only in App.tsx useMemo — safe to reorder its internal steps without touching callers"
+    ],
+    "edgeCases": [
+      "Whitespace-only search ('   '): current guard `if (filters.search)` treats it as truthy and calls .includes('   ') matching nothing; fix: trim before the guard so '   ' collapses to '' and is skipped",
+      "Case mismatch in search: 'mouse' does not match 'Wireless Mouse' currently; fix: .toLowerCase() on both search term and product.name before .includes()",
+      "sortBy === 'default': no comparator branch runs — original insertion order is preserved by falling through; this is correct behavior, sort block just needs to be moved to after filters",
+      "Sort does not mutate original array: `let result = [...products]` spread copy is already the first operation and must remain so",
+      "Clear filters with active sort: onClick must emit explicit sortBy: 'default', not spread from current filters which may have a non-default value",
+      "Filter composition (AND logic): category and inStockOnly filters are correct; fix to search and sort must not alter the sequential reduction of result"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1 — Search matching is case-insensitive and ignores leading/trailing whitespace. filterProducts must normalize the search term with .trim().toLowerCase() and compare against product.name.toLowerCase(). The trimmed term must also be used for the truthiness gate so whitespace-only input behaves identically to empty string.",
+      "description": "In filterProducts(), compute `const searchTerm = filters.search.trim().toLowerCase()` before the filter steps. Replace the existing search guard `if (filters.search)` with `if (searchTerm)`, and replace `product.name.includes(filters.search)` with `product.name.toLowerCase().includes(searchTerm)`.",
+      "files": ["src/benchmark-frontend/src/utils/productFilters.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2 — Sorting is applied after all filters (search, category, inStockOnly) have been applied. Requirement 3 — Default sort preserves original dataset order (no comparator for 'default'). Requirement 4 — Sorting must not mutate the input products array (spread copy must remain the first operation).",
+      "description": "In filterProducts(), move the entire sort block (the if/else-if chain for price-asc, price-desc, rating-desc) to after the search, category, and inStockOnly filter steps. The `let result = [...products]` spread must remain the very first line. The sort block must operate on `result` (the already-filtered array), not on the original `products`.",
+      "files": ["src/benchmark-frontend/src/utils/productFilters.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5 — 'Clear filters' resets ALL filter fields including sortBy. The onClick handler on the Clear filters button must emit a FilterState with search: '', category: 'All', inStockOnly: false, AND sortBy: 'default'.",
+      "description": "In FilterPanel.tsx, update the Clear filters button onClick to call onChange with an explicit object literal containing all four fields: { search: '', category: 'All', inStockOnly: false, sortBy: 'default' }. Remove the ...filters spread so no prior filter state leaks into the reset.",
+      "files": ["src/benchmark-frontend/src/components/FilterPanel.tsx"]
+    }
+  ]
+}

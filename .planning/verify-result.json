@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Search matching is case-insensitive and ignores leading/trailing whitespace. filterProducts must normalize the search term with .trim().toLowerCase() and compare against product.name.toLowerCase(). A whitespace-only input must behave identically to an empty string.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters products by search term — PASSED (93ms). Full run: 'Tests  17 passed (17)'. Vitest output: '✓ tests/filtering.test.tsx > Filtering behavior > filters products by search term 93ms'. All 3 filtering tests in that file passed."
+    },
+    {
+      "id": "2",
+      "description": "Sorting is applied after all filters (search, category, inStockOnly) have been applied. In src/utils/productFilters.ts the sort block must execute on the fully-filtered result array.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx — all three cases PASSED: '✓ sorts by price ascending 90ms', '✓ sorts by price descending 32ms', '✓ sorts by rating descending 31ms'. Full run: 'Tests  17 passed (17)'."
+    },
+    {
+      "id": "3",
+      "description": "Default sort preserves original dataset order. When sortBy === 'default' no sort comparator is applied; items are returned in the order they appear in products after filtering.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — all three filter tests passed without spurious reordering: '✓ filters products by search term 93ms', '✓ filters products by category 27ms', '✓ filters products by in-stock only 25ms'. Full run: 'Tests  17 passed (17)'."
+    },
+    {
+      "id": "4",
+      "description": "Sorting must not mutate the input products array. The spread copy (let result = [...products]) must remain the first operation; all sort calls must operate on result, never on products directly.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx — all three sort tests each render a fresh <App /> and returned consistent results: '✓ sorts by price ascending 90ms', '✓ sorts by price descending 32ms', '✓ sorts by rating descending 31ms'. No shared-array side-effects detected. Full run: 'Tests  17 passed (17)'."
+    },
+    {
+      "id": "5",
+      "description": "Clear filters resets ALL filter fields including sortBy. The onClick handler must emit a FilterState with search: '', category: 'All', inStockOnly: false, AND sortBy: 'default'.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > resets filters back to default values — PASSED (136ms). Vitest output: '✓ tests/clearFilters.test.tsx > Clear filters > resets filters back to default values 136ms'. Full run: 'Tests  17 passed (17)'."
+    },
+    {
+      "id": "6",
+      "description": "Filters combine additively (AND logic). Search, category, and inStockOnly must each reduce the set produced by the previous step; no filter may start over from the full dataset.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters products by in-stock only — PASSED (25ms). Vitest output: '✓ tests/filtering.test.tsx > Filtering behavior > filters products by in-stock only 25ms'. Test asserts exactly 11 products remain. Full run: 'Tests  17 passed (17)'."
+    }
+  ]
+}
