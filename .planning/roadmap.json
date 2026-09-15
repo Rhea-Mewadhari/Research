@@ -1,0 +1,56 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7 (strict), Vite 6, ESM-only project",
+      "Vitest 3 + @testing-library/react 16 + jsdom — tests render real <App /> with no API mocks",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type'; both target files already comply",
+      "No third-party state management, no component libraries, no path aliases — relative imports throughout",
+      "Coverage scoped to src/utils/productFilters.ts only (v8 provider)",
+      "BUG comments are annotated directly in productFilters.ts and FilterPanel.tsx source files"
+    ],
+    "features": [
+      "FilterState = { search: string, category: string, inStockOnly: boolean, sortBy: 'default'|'price-asc'|'price-desc'|'rating-desc' }",
+      "filterProducts(products, filters) in utils/productFilters.ts: (1) copies array into result, (2) [BUG 1] sorts result immediately before any filtering, (3) filters by search via case-sensitive untrimmed includes [BUG 2], (4) filters by category, (5) filters by inStockOnly, (6) returns result",
+      "FilterPanel.tsx: fully controlled component; 'Clear filters' onClick spreads ...filters and resets only search/category/inStockOnly — leaves sortBy at current value [BUG 3]",
+      "State owned by useProductFilters hook; App.tsx calls filterProducts in useMemo and passes results to ProductList",
+      "Category filter (req 5), in-stock filter (req 6), filter combination (req 7), and array-copy non-mutation (req 8) are already correctly implemented",
+      "Search already matches only product.name (req 4) — just needs case normalization and trim"
+    ],
+    "architecture": [
+      "Layer: Component (FilterPanel, SortSelect) → App (useMemo) → Util (filterProducts) pure function; state in useProductFilters hook",
+      "productFilters.ts is a pure utility — no side effects, no imports of React or hooks; correct place for all filter/sort logic changes",
+      "FilterPanel.tsx is a fully controlled component — no internal state; correct place for the clear-button reset fix",
+      "SortSelect.tsx rendered separately from FilterPanel in App.tsx; sortBy state flows through the same setFilters callback",
+      "Changes for all 3 bugs are confined to exactly 2 files: src/utils/productFilters.ts and src/components/FilterPanel.tsx"
+    ],
+    "edgeCases": [
+      "All-whitespace search (e.g. '   '): trim() reduces to '' which is falsy; filter branch skips and all products pass — correct behavior once trim fix is applied",
+      "Mixed-case search (e.g. 'WiReLeSs'): both sides lowercased before compare — correct once case fix is applied",
+      "Sort on filtered subset (e.g. Fitness + price-asc): only works correctly when sort runs after category filter; this is exactly what Bug 1 fix enables",
+      "Clear filters when sortBy is already 'default': reset object still explicitly writes sortBy: 'default' — UI reflects correct value",
+      "No mutation: result is already a copy of the input array before sort; sort-in-place on the copy satisfies req 8 once order is corrected",
+      "Test suite asserts 'Showing 1 products' (intentionally ungrammatical); implementation must match this exact string",
+      "price-asc test asserts all 15 products in exact order — brittle to product data changes but not to the bug fixes"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1. filterProducts applies sorting after all filters, not before.",
+      "description": "Move the sort block (currently at the top of filterProducts, before any filter steps) to after all three filter steps (search, category, inStockOnly). The sort must operate on the already-filtered result array, not the full unfiltered copy.",
+      "files": ["src/benchmark-frontend/src/utils/productFilters.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 & 3. Search matching is case-insensitive and trims leading/trailing whitespace from the input value before comparing.",
+      "description": "In filterProducts(), replace product.name.includes(filters.search) with product.name.toLowerCase().includes(filters.search.trim().toLowerCase()). This satisfies both the case-insensitive requirement (req 2) and the trim requirement (req 3) while continuing to match only against product.name (req 4).",
+      "files": ["src/benchmark-frontend/src/utils/productFilters.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "9. The 'Clear filters' button resets all four FilterState fields: search to '', category to 'All', inStockOnly to false, and sortBy to 'default'.",
+      "description": "In FilterPanel.tsx, add sortBy: 'default' to the object literal passed to onChange in the 'Clear filters' button onClick handler. The current spread ({ ...filters, search: '', category: 'All', inStockOnly: false }) leaves sortBy at whatever its current value is; adding sortBy: 'default' completes the full reset.",
+      "files": ["src/benchmark-frontend/src/components/FilterPanel.tsx"]
+    }
+  ]
+}

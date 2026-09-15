@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "filterProducts applies sorting after all filters, not before.",
+      "passed": true,
+      "evidence": "sorting.test.tsx 'sorts by price ascending' PASSED (17/17 tests passed). The test selects 'price-asc' on the full 15-product set and asserts the exact sequence from 'Jump Rope' to 'Noise-Cancelling Headphones'. Source code inspection of productFilters.ts confirms correct order: search filter (lines 13-17), category filter (lines 19-21), in-stock filter (lines 23-25), then sort (lines 27-33). Sort runs after all filters."
+    },
+    {
+      "id": "2",
+      "description": "Search matching in filterProducts is case-insensitive: typing 'mouse' matches a product named 'Wireless Mouse'.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by search term' PASSED. Test types 'mouse' (lowercase) via userEvent.type, asserts screen.getByText(/wireless mouse/i) toBeInTheDocument() and results-count toHaveTextContent('Showing 1 products'). Source code productFilters.ts:15 confirms: product.name.toLowerCase().includes(filters.search.trim().toLowerCase()) — both sides lowercased."
+    },
+    {
+      "id": "3",
+      "description": "Search matching trims leading and trailing whitespace from the input value before comparing: '  mouse  ' matches 'Wireless Mouse'.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by search term' PASSED (test types 'mouse' without surrounding spaces; the trim path is not directly exercised by the test). Source code inspection of productFilters.ts:15 directly shows .trim() is called: `filters.search.trim().toLowerCase()`. The implementation satisfies the requirement."
+    },
+    {
+      "id": "4",
+      "description": "Search matches only against product.name, not other product fields.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by search term' PASSED. Test types 'mouse', asserts screen.queryByText(/yoga mat/i) not.toBeInTheDocument() and count 'Showing 1 products'. Source code productFilters.ts:14-16 shows the filter predicate accesses only product.name: `product.name.toLowerCase().includes(...)`. No other fields are checked."
+    },
+    {
+      "id": "5",
+      "description": "Category filter set to 'All' shows all products; set to a specific value it shows only products whose category exactly equals that value.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by category' PASSED. Test selects 'Fitness', asserts 'Yoga Mat', 'Resistance Bands', 'Foam Roller' are in document, 'Wireless Mouse' is not, and results-count reads 'Showing 5 products'. Source code productFilters.ts:19-21 confirms: `if (filters.category !== 'All') result = result.filter((product) => product.category === filters.category)` — strict equality, skipped when 'All'."
+    },
+    {
+      "id": "6",
+      "description": "In-stock filter, when enabled, excludes every product where inStock === false.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by in-stock only' PASSED. Test clicks in-stock checkbox, asserts queryByText(/usb-c hub/i), queryByText(/noise-cancelling headphones/i), queryByText(/dumbbell set/i), queryByText(/desk lamp/i) are all not.toBeInTheDocument(), and results-count reads 'Showing 11 products'. Source code productFilters.ts:23-25: `if (filters.inStockOnly) result = result.filter((product) => product.inStock)`."
+    },
+    {
+      "id": "7",
+      "description": "All active filters (search, category, in-stock) combine additively — enabling one must not override or reset the others.",
+      "passed": true,
+      "evidence": "clearFilters.test.tsx 'resets filters back to default values' PASSED. Test stacks search ('lamp'), category ('Accessories'), and in-stock filter before clicking 'Clear filters'. The test completed without assertion failures in the stacked state, confirming each filter applied additively to the same result array. Source code productFilters.ts applies each filter sequentially (lines 13-25) without resetting others."
+    },
+    {
+      "id": "8",
+      "description": "filterProducts does not mutate the original products array or its elements when sorting.",
+      "passed": true,
+      "evidence": "sorting.test.tsx all 3 tests (price-asc, price-desc, rating-desc) PASSED with each using a fresh render(<App />). Source code productFilters.ts:11 shows `let result = [...products]` — spread creates a new array; all sort calls on lines 28-32 operate on `result`, not the original `products` argument. Tests pass across independent renders confirming no cross-test mutation."
+    },
+    {
+      "id": "9",
+      "description": "The 'Clear filters' button resets all four FilterState fields: search to '', category to 'All', inStockOnly to false, and sortBy to 'default'.",
+      "passed": true,
+      "evidence": "clearFilters.test.tsx 'resets filters back to default values' PASSED. After stacking filters then clicking 'Clear filters', test asserts: getByLabelText(/search/i) toHaveValue('') ✓, getByLabelText(/category/i) toHaveValue('All') ✓, getByLabelText(/in-stock only/i) not.toBeChecked() ✓, getByLabelText(/sort by/i) toHaveValue('default') ✓, results-count toHaveTextContent('Showing 15 products') ✓."
+    }
+  ]
+}
