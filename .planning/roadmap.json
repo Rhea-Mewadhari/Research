@@ -1,0 +1,61 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, Vite 6, Vitest 3, TypeScript ~5.7 — ESM-first, no external state management or UI library",
+      "Test runner: Vitest with jsdom, @testing-library/react — tests live in /tests/ (not colocated with source)",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type'",
+      "noUnusedLocals / noUnusedParameters enforced — any added import must be used",
+      "fetch is globally stubbed in tests/setup.ts before each test — no MSW; mock data is fixed in test files",
+      "Coverage scoped to src/utils/productFilters.ts — changes there are most scrutinised by coverage reporter"
+    ],
+    "features": [
+      "productFilters.ts: filterProducts() — BUG 1 at sort block (sort runs before filter chain), BUG 2 at search includes() call (case-sensitive, no trim)",
+      "FilterPanel.tsx: 'Clear filters' inline onClick handler — BUG 3 spreads ...filters then overrides only search/category/inStockOnly, leaving sortBy unreset",
+      "useProductFilters.ts: clearFilters() correctly resets to initialFilters (all 4 fields) but is never wired to FilterPanel's clear button",
+      "App.tsx: passes setFilters (raw Dispatch) as FilterPanel.onChange; clearFilters from hook is exported but unused by the button",
+      "Must not regress: category 'All' passthrough, inStockOnly filter, pagination/loading/error states, SortSelect wiring, results-count showing visibleProducts.length"
+    ],
+    "architecture": [
+      "Filter state lives in useProductFilters hook as useState<FilterState>(initialFilters)",
+      "FilterState fields: search (string), category (string), inStockOnly (boolean), sortBy (string) — defined in productFilters.ts",
+      "initialFilters in hook: { search: '', category: 'All', inStockOnly: false, sortBy: 'default' }",
+      "Data flow: useProductFilters → App.tsx useMemo(filterProducts) → visibleProducts → ProductList",
+      "App passes filters and onChange={setFilters} to FilterPanel; clearFilters is not passed through",
+      "Fix for BUG 3 stays in FilterPanel.tsx — add sortBy: 'default' to the existing inline clear handler object (no new props needed)"
+    ],
+    "edgeCases": [
+      "Whitespace-only search (e.g. '   '): after .trim() becomes '' which is falsy — filter branch skipped, all products shown. Correct behavior.",
+      "Empty products array: [...products] yields [], all .filter() calls return [], .sort() is a no-op — safe",
+      "Mutation safety: [...]products] spread already present at top of filterProducts; .sort() operates on the copy — original array never mutated",
+      "Sort on filtered set: BUG 1 fix must move sort block to after all three filter guards, not just after one",
+      "Case + trim must both apply: filters.search.trim().toLowerCase() AND product.name.toLowerCase() — both sides must be lowercased",
+      "Clear button with non-default sortBy: after BUG 3 fix, sortBy must become 'default' regardless of what it was — hardcode 'default' in the clear handler"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — Sorting must be applied after all filters (search, category, in-stock) have been applied — not before",
+      "description": "In filterProducts(), move the sort block (the switch statement on filters.sortBy that mutates the result array) to after the three .filter() calls. Currently the sort runs on the full product set before any filtering; it must run on the already-filtered result.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2, 3, 4 — Search must be case-insensitive, must trim leading/trailing whitespace, and must match only against product.name",
+      "description": "In filterProducts(), change the search filter's .includes() call from product.name.includes(filters.search) to product.name.toLowerCase().includes(filters.search.trim().toLowerCase()). This single change satisfies case-insensitivity (req 2), whitespace trimming (req 3), and the existing field-scoping to product.name (req 4).",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "9 — 'Clear filters' button must reset ALL filter fields including sortBy to its default value 'default'",
+      "description": "In FilterPanel.tsx, update the 'Clear filters' button's inline onClick handler to include sortBy: 'default' in the object passed to onChange. The current handler spreads ...filters (which preserves sortBy) and overrides only search, category, and inStockOnly. Adding sortBy: 'default' to that object completes the reset without changing the component interface.",
+      "files": [
+        "src/benchmark-frontend/src/components/FilterPanel.tsx"
+      ]
+    }
+  ]
+}

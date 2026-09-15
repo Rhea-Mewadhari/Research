@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Sorting must be applied after all filters (search, category, in-stock) have been applied — not before.",
+      "passed": true,
+      "evidence": "test 'sorts by price ascending' in tests/sorting.test.tsx PASSED (✓ 82ms). Confirmed structurally: src/utils/productFilters.ts lines 13-23 apply search/category/inStock filters first; sort operations on lines 25-31 come after all filter steps — no BUG comment present, ordering is correct."
+    },
+    {
+      "id": "2",
+      "description": "Search filtering must be case-insensitive: typing `wireless` (all lowercase) must return the product 'Wireless Mouse'.",
+      "passed": true,
+      "evidence": "test 'filters products by search term' in tests/filtering.test.tsx PASSED (✓ 83ms). src/utils/productFilters.ts line 14 applies `.toLowerCase()` to both `filters.search` and `product.name` before comparing."
+    },
+    {
+      "id": "3",
+      "description": "Search filtering must trim leading and trailing whitespace from the input value before comparing.",
+      "passed": true,
+      "evidence": "test 'filters products by search term' in tests/filtering.test.tsx PASSED (✓ 83ms). src/utils/productFilters.ts line 14 explicitly calls `filters.search.trim().toLowerCase()` before the `.includes()` comparison."
+    },
+    {
+      "id": "4",
+      "description": "Search filtering must match only against `product.name`, not any other field.",
+      "passed": true,
+      "evidence": "test 'filters products by search term' in tests/filtering.test.tsx PASSED (✓ 83ms, showing 1 product for 'mouse'). src/utils/productFilters.ts line 14 filters on `product.name` exclusively — no other field is referenced in the filter expression."
+    },
+    {
+      "id": "5",
+      "description": "Category filter with value `All` must return all products; a specific category value must return only products whose `category` field strictly equals that value.",
+      "passed": true,
+      "evidence": "test 'filters products by category' in tests/filtering.test.tsx PASSED (✓ 29ms). src/utils/productFilters.ts line 18 uses strict equality `product.category === filters.category` guarded by `filters.category !== 'All'`."
+    },
+    {
+      "id": "6",
+      "description": "In-stock filter when enabled must exclude every product where `inStock === false`.",
+      "passed": true,
+      "evidence": "test 'filters products by in-stock only' in tests/filtering.test.tsx PASSED (✓ 26ms). src/utils/productFilters.ts lines 21-23 filter `product.inStock` when `filters.inStockOnly` is true."
+    },
+    {
+      "id": "7",
+      "description": "All active filters (search, category, in-stock) must combine additively — enabling one must not override or discard the others.",
+      "passed": true,
+      "evidence": "All three filter tests in tests/filtering.test.tsx PASSED (search ✓ 83ms, category ✓ 29ms, in-stock ✓ 26ms). src/utils/productFilters.ts applies each filter sequentially on the same `result` array (lines 13-23), each narrowing results without resetting others."
+    },
+    {
+      "id": "8",
+      "description": "Sorting must not mutate the original product dataset — subsequent unfiltered renders must still show the original order.",
+      "passed": true,
+      "evidence": "All three tests in tests/sorting.test.tsx PASSED (price-asc ✓ 82ms, price-desc ✓ 34ms, rating-desc ✓ 30ms). src/utils/productFilters.ts line 11 creates a copy with `[...products]` (spread) before any `.sort()` mutation."
+    },
+    {
+      "id": "9",
+      "description": "'Clear filters' button must reset ALL filter fields — `search`, `category`, `inStockOnly`, AND `sortBy` — to their initial/default values (`''`, `'All'`, `false`, `'default'`).",
+      "passed": true,
+      "evidence": "test 'resets filters back to default values' in tests/clearFilters.test.tsx PASSED (✓ 127ms). Asserts search input='', category select='All', in-stock unchecked, sort select='default', results-count='Showing 15 products'."
+    },
+    {
+      "id": "10",
+      "description": "All existing tests must continue to pass after the fix — no regressions in app render, loading/error states, or pagination.",
+      "passed": true,
+      "evidence": "pnpm test output: 'Test Files  6 passed (6), Tests  17 passed (17), Duration 1.07s'. All files: tests/app.render.test.tsx (1 ✓), tests/loadingError.test.tsx (4 ✓), tests/pagination.test.tsx (5 ✓), tests/filtering.test.tsx (3 ✓), tests/sorting.test.tsx (3 ✓), tests/clearFilters.test.tsx (1 ✓). Build: 'vite build' succeeded in 277ms with 0 errors."
+    }
+  ]
+}
