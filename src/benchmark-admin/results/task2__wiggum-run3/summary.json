@@ -1,0 +1,110 @@
+{
+  "taskId": "task2",
+  "runId": "wiggum-run3",
+  "timestamp": "2026-09-15T17:03:59.707Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 15,
+    "failed": 0,
+    "total": 15,
+    "expectedFiles": 6,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1623,
+    "hiddenMs": 1315,
+    "buildMs": 1133,
+    "totalMs": 4149
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task2",
+    "wall_duration_ms": 263144,
+    "cost_usd": 0.8956857,
+    "num_turns": 46,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "2762e612-da7e-4a07-b82c-9ac24bb3e0ba",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix productFilters.ts: sort after filtering and case-insensitive/trimmed search",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Fix FilterPanel.tsx: clear filters must also reset sortBy to 'default'",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Run tests and verify all pass",
+          "status": "done",
+          "notes": "All 17 tests passed across 6 test files. Build succeeded with tsc + vite."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 78606,
+          "cost_usd": 0.2647422,
+          "num_turns": 14,
+          "session_id": "dad9be7c-c6b2-41d0-a391-c62ea5e302f6",
+          "is_error": false
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 32627,
+          "cost_usd": 0.17005080000000003,
+          "num_turns": 9,
+          "session_id": "9e37c012-127c-434f-b7b1-943abbe56bc0",
+          "is_error": false
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 61053,
+          "cost_usd": 0.16507979999999997,
+          "num_turns": 9,
+          "session_id": "2762e612-da7e-4a07-b82c-9ac24bb3e0ba",
+          "is_error": false
+        }
+      ],
+      "contextResets": 3,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
