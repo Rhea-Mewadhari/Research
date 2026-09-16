@@ -2,9 +2,19 @@ import { render, screen } from '@testing-library/react';
 import App from '../src/App';
 
 describe('App rendering', () => {
-  it('renders the page heading and initial product count', async () => {
+  it('shows results-count with 15 products on initial load', async () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: /product catalog/i })).toBeInTheDocument();
-    expect(await screen.findByTestId('results-count')).toHaveTextContent('Showing 15 products');
+    await screen.findByTestId('results-count');
+    expect(screen.getByTestId('results-count')).toHaveTextContent(
+      'Showing 15 products (page 1 of 1)'
+    );
+  });
+
+  it('renders product names from all three categories', async () => {
+    render(<App />);
+    await screen.findByTestId('results-count');
+    screen.getByText('Wireless Mouse');
+    screen.getByText('Yoga Mat');
+    screen.getByText('Laptop Stand');
   });
 });
