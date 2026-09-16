@@ -1,0 +1,69 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19 with react-dom 19; no UI component library — plain HTML elements with custom CSS",
+      "TypeScript with strict-ish config: noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch enabled; strict is NOT set explicitly",
+      "moduleResolution: 'bundler' (Vite); allowImportingTsExtensions: true; verbatimModuleSyntax: true (type imports must use 'import type')",
+      "jsx: 'react-jsx' — no manual React import needed in JSX files; noEmit: true (TS only type-checks)",
+      "Build: Vite 6 with @vitejs/plugin-react (Babel-based); vite.config.ts doubles as Vitest config",
+      "Testing: Vitest 3 with globals:true (no explicit imports for describe/it/expect); jsdom environment; @testing-library/react + @testing-library/jest-dom",
+      "CSS: plain CSS files (no modules, no Tailwind, no CSS-in-JS); App.css exists at src/; styles/style.css also exists but is not the target import",
+      "SortSelect onChange fix must cast as FilterState['sortBy'] not 'as any'; verbatimModuleSyntax is active so type imports must stay as 'import type'"
+    ],
+    "features": [
+      "App.tsx: imports FilterPanel, ProductList, Spinner, SortSelect, filterProducts, useProductFilters; manages filters/page state",
+      "App.tsx: derives categories memo from products; computes visibleProducts via filterProducts(); renders toolbar + results + pagination",
+      "ProductCard.tsx: renders article card using id, name, category, description, price, discountPct (optional), rating, reviewCount, tags, inStock",
+      "ProductCard.tsx: discount display (badge + strikethrough original price) is gated on hasDiscount = product.discountPercent != null — guard uses wrong field name and must be updated to product.discountPct",
+      "SortSelect.tsx: onChange prop typed as (sortBy: FilterState['sortBy']) => void; receives e.target.value (string) without a cast — type mismatch",
+      "FilterState['sortBy'] union: 'default' | 'price-asc' | 'price-desc' | 'rating-desc' (defined in utils/productFilters.ts)",
+      "Features that must not regress: category filtering, sort by price/rating, client-side filtering, pagination, results count, discount badge, in-stock status, tag rendering, loading spinner, error alert"
+    ],
+    "architecture": [
+      "src/ flat root: App.tsx, App.css (exists), index.css, main.tsx",
+      "src/api/ — productsApi.ts; src/components/ — FilterPanel, ProductCard, ProductList, SortSelect, Spinner; src/data/ — products.ts",
+      "src/hooks/ — useProductFilters.ts; src/styles/ — style.css; src/types/ — product.ts; src/utils/ — formatters.ts, productFilters.ts",
+      "Product type defined in src/types/product.ts; FilterState defined in src/utils/productFilters.ts",
+      "App.css is the correct target for the CSS import fix — it exists at src/App.css (same directory as App.tsx); styles.css does not exist",
+      "Bug 1 fix location: App.tsx line 2 — change import './styles.css' to import './App.css'",
+      "Bug 2 fix location: App.tsx ~line 47 — add missing /> to <ProductList products={visibleProducts}",
+      "Bug 3 fix location: ProductCard.tsx lines 9, 25, 37 — rename all product.discountPercent to product.discountPct",
+      "Bug 4 fix location: SortSelect.tsx onChange handler — cast e.target.value as FilterState['sortBy']"
+    ],
+    "edgeCases": [
+      "discountPct is optional (discountPct?: number): the hasDiscount guard on line 9 of ProductCard.tsx uses the wrong field name (discountPercent) — must be renamed to discountPct or the guard always evaluates false, hiding discount badges for all products",
+      "All three occurrences in ProductCard.tsx (lines 9, 25, 37) must be updated — line 9 is the guard, lines 25 and 37 are render/display usages",
+      "No other file references discountPercent — the rename is isolated to ProductCard.tsx",
+      "FilterState['sortBy'] cast must use 'as FilterState['sortBy']' not 'as any' — App.tsx passes sortBy directly into setFilters, so widening with 'as any' would bypass TS narrowing",
+      "The four <option value> entries in SortSelect.tsx exactly match the FilterState['sortBy'] union literals — no option mismatch",
+      "Only App.css exists at src/ root; styles.css does not exist; styles/style.css exists but is not the target per requirements.md (requirement 1 specifies './App.css')",
+      "<ProductList> fix must only add missing /> — must not alter the products prop or add new props (requirement 7: no functionality changes)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — App.tsx imports './App.css', not './styles.css'",
+      "description": "In src/App.tsx, change the CSS import on line 2 from `import './styles.css'` to `import './App.css'`. No other changes to the file.",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — The <ProductList> JSX element in App.tsx is self-closing",
+      "description": "In src/App.tsx, find the unclosed `<ProductList products={visibleProducts}` tag (around line 47) and add the missing `/>` to make it self-closing. Must not alter the products prop or introduce new props.",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — All references to product.discountPercent in ProductCard.tsx are replaced with product.discountPct",
+      "description": "In src/components/ProductCard.tsx, rename all three occurrences of `product.discountPercent` to `product.discountPct` (lines 9, 25, 37). Line 9 is the hasDiscount guard (`product.discountPct != null`); lines 25 and 37 are render/display usages. No occurrence of the string 'discountPercent' may remain.",
+      "files": ["src/benchmark-frontend/src/components/ProductCard.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — The onChange handler in SortSelect.tsx passes e.target.value cast to FilterState['sortBy']",
+      "description": "In src/components/SortSelect.tsx, update the onChange handler to cast e.target.value: change `onChange(e.target.value)` to `onChange(e.target.value as FilterState['sortBy'])`. Must use the specific union type cast, not 'as any'.",
+      "files": ["src/benchmark-frontend/src/components/SortSelect.tsx"]
+    }
+  ]
+}
