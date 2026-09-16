@@ -1,0 +1,128 @@
+{
+  "taskId": "task4",
+  "runId": "gsd-run1",
+  "timestamp": "2026-09-16T06:33:12.733Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 18,
+    "failed": 0,
+    "total": 18,
+    "expectedFiles": 7,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 7080,
+    "hiddenMs": 1412,
+    "buildMs": 2337,
+    "totalMs": 10962
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "gsd",
+    "target": "frontend",
+    "taskId": "task4",
+    "wall_duration_ms": 624506,
+    "cost_usd": 1.5600412,
+    "num_turns": 72,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "90cfac2c-ce9e-40be-aaa6-0454992246a7",
+    "gsd": {
+      "phases": [
+        {
+          "name": "new-project",
+          "treeHash": "b6dac673c8095e74234396998e3503191cd5ec21",
+          "label": "new-project",
+          "exit_code": 0,
+          "wall_duration_ms": 63347,
+          "cost_usd": 0.28681260000000003,
+          "num_turns": 16,
+          "session_id": "80130e5a-53ad-48ee-b397-d0a780b73001",
+          "is_error": false
+        },
+        {
+          "name": "discuss-phase",
+          "treeHash": "48a5ed5dda2ca1695e6b9c938b359c51f49eff33",
+          "label": "discuss-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 69364,
+          "cost_usd": 0.20147340000000002,
+          "num_turns": 11,
+          "session_id": "0f1e15d7-1089-4a14-a9cf-a6263662baf6",
+          "is_error": false
+        },
+        {
+          "name": "plan-phase",
+          "treeHash": "a56063d396ef94faf288957f254c8d82c17c5a46",
+          "label": "plan-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 252933,
+          "cost_usd": 0.3730218999999999,
+          "num_turns": 8,
+          "session_id": "78e9996c-4b98-46cf-affc-bd308a0ac774",
+          "is_error": false
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "b165dff75ddd974f1c96faa00405c9bd36f6a7f4",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 70510,
+          "cost_usd": 0.22881360000000003,
+          "num_turns": 11,
+          "session_id": "b6d89691-97b2-47fa-8910-accb1fe23f97",
+          "is_error": false
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "79a72e0202e2a4bde350029f25a6f3b05f81c18c",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 103567,
+          "cost_usd": 0.2536389,
+          "num_turns": 15,
+          "session_id": "a9002fcf-b8c7-4075-8f67-18229475b095",
+          "is_error": false
+        },
+        {
+          "name": "complete-milestone",
+          "treeHash": "d809f69dee3524b23428c62151c88e5dff6eb462",
+          "label": "complete-milestone",
+          "exit_code": 0,
+          "wall_duration_ms": 39584,
+          "cost_usd": 0.2162808,
+          "num_turns": 11,
+          "session_id": "90cfac2c-ce9e-40be-aaa6-0454992246a7",
+          "is_error": false
+        }
+      ],
+      "passedFirstAttempt": true,
+      "reworkAttempts": 0,
+      "completed": true,
+      "failedAtPhase": null,
+      "failedCriteria": []
+    }
+  }
+}

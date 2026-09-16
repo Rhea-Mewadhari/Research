@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "The `visibleProducts` computation in `App.tsx` must delegate entirely to `filterProducts(products, filters)` — no inline `.filter()` or `.sort()` calls may remain inside that computation.",
+      "passed": true,
+      "evidence": "App.tsx line 19: `const visibleProducts = useMemo(() => filterProducts(products, filters), [products, filters]);` — single-line delegation with no inline logic. The only grep match for `.filter|.sort` in App.tsx is line 31 `value={filters.sortBy}` which is a JSX prop access in the render section, not inside the visibleProducts block."
+    },
+    {
+      "id": "2",
+      "description": "The `filterProducts` import in `App.tsx` must be present and actually used (not a dead import).",
+      "passed": true,
+      "evidence": "grep 'filterProducts' App.tsx returned 2 matches: line 7 `import { filterProducts } from './utils/productFilters';` and line 19 (call site). `npx tsc --noEmit` exited 0 with no unused-import diagnostics."
+    },
+    {
+      "id": "3",
+      "description": "The `normalizeSearch` function must be removed from `src/utils/productFilters.ts` (no declaration, no export).",
+      "passed": true,
+      "evidence": "`grep -n 'normalizeSearch' src/benchmark-frontend/src/utils/productFilters.ts` returned no output and exited with code 1 — no match found."
+    },
+    {
+      "id": "4",
+      "description": "No unused imports may remain in any of the four affected files: `App.tsx`, `productFilters.ts`, `FilterPanel.tsx`, `SortSelect.tsx`.",
+      "passed": true,
+      "evidence": "`npx tsc --noEmit` in src/benchmark-frontend exited 0 with no diagnostics — no unused-import or declared-but-never-read errors reported."
+    },
+    {
+      "id": "5",
+      "description": "All existing test suites must pass without any modification to test files.",
+      "passed": true,
+      "evidence": "`npm test -- --run` output: Test Files 6 passed (6), Tests 17 passed (17). All six files passed: app.render.test.tsx (1 test), clearFilters.test.tsx (1 test), filtering.test.tsx (3 tests), loadingError.test.tsx (4 tests), pagination.test.tsx (5 tests), sorting.test.tsx (3 tests)."
+    },
+    {
+      "id": "6",
+      "description": "No new runtime or dev dependencies may be introduced.",
+      "passed": true,
+      "evidence": "`git diff -- src/benchmark-frontend/package.json` produced no output — package.json has no added or changed lines under `dependencies` or `devDependencies`."
+    },
+    {
+      "id": "7",
+      "description": "`FilterPanel.tsx` and `SortSelect.tsx` must contain no inline filter or sort logic (they must only manage UI state and delegate via props).",
+      "passed": true,
+      "evidence": "grep for `.filter|.sort|sortBy.*=>` in both files returned only prop delegation callbacks: FilterPanel.tsx lines 11/16/20 call `onChange({ ...filters, ... })` (state updates via props), and SortSelect.tsx line 5 is a TypeScript prop type definition `onChange: (sortBy: FilterState['sortBy']) => void`. No product filtering or sorting logic implemented in either component."
+    }
+  ]
+}

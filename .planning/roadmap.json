@@ -1,0 +1,58 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7.2, Vite 6.2.0",
+      "tsconfig: noUnusedLocals=true, noUnusedParameters=true — TypeScript will error on unused imports/variables",
+      "tsconfig: verbatimModuleSyntax=true — type-only imports must use 'import type'",
+      "Test framework: Vitest 3.2.4 + @testing-library/react; run via 'pnpm --filter benchmark-frontend test'",
+      "Build: 'tsc -b && vite build' — TypeScript check runs before bundling",
+      "No linter rules beyond eslint recommended + typescript-eslint recommended"
+    ],
+    "features": [
+      "App.tsx: visibleProducts useMemo contains inline .filter() (search, category, inStock) and three .sort() branches (price-asc, price-desc, rating-desc) — duplicates filterProducts exactly",
+      "App.tsx: filterProducts already imported at line 7 but is never called — it is a dead import today",
+      "App.tsx: categories useMemo uses .map and Set to derive unique category names — not filter/sort logic, must remain untouched",
+      "productFilters.ts: filterProducts(products, filters) implements identical logic to the inline block; exports FilterState type",
+      "productFilters.ts: normalizeSearch trims+lowercases a string — comment says 'was used during early development, never cleaned up'; exported but called nowhere",
+      "FilterPanel.tsx: clean — only manages UI state (search input, category select, inStock checkbox, clear button); delegates via onChange prop",
+      "SortSelect.tsx: clean — only a dropdown that delegates sortBy changes via onChange prop; uses SORT_LABELS constant for display text",
+      "useProductFilters.ts: manages FilterState, pagination, and API fetching; exports filters, setFilters, updateFilter, clearFilters, products, isLoading, error, page, totalPages, setPage"
+    ],
+    "architecture": [
+      "Layer order: App.tsx (orchestrator) → components (FilterPanel, SortSelect, ProductList, Spinner) + hooks (useProductFilters) → utils (productFilters, formatters) → api (productsApi) → types (product)",
+      "filterProducts defined in src/utils/productFilters.ts; imported (unused) in src/App.tsx line 7",
+      "normalizeSearch defined in src/utils/productFilters.ts lines 10-13; not imported in any other file",
+      "FilterState type imported from productFilters in: FilterPanel.tsx, SortSelect.tsx, useProductFilters.ts",
+      "New code for task-1 belongs in App.tsx visibleProducts useMemo body only — no new files, no new layers",
+      "After refactor: App.tsx → filterProducts (active call) + useProductFilters (unchanged)"
+    ],
+    "edgeCases": [
+      "filterProducts signature is filterProducts(products: Product[], filters: FilterState): Product[] — matches App.tsx's available variables exactly; no type mismatches",
+      "useMemo import must be preserved: categories useMemo still depends on it; removing it would break the build",
+      "normalizeSearch is not referenced in App.tsx, FilterPanel.tsx, SortSelect.tsx, useProductFilters.ts, or any test file — deletion has zero side effects",
+      "categories useMemo uses .map (not .filter/.sort) — requirement 1 grep check only targets the visibleProducts computation; categories is unaffected",
+      "FilterPanel.tsx handleClear resets state to initial values — state-reset logic, not product filtering; passes requirement 7 grep (no .filter/.sort pattern)",
+      "SortSelect.tsx onChange passes a sortBy value upward — prop delegation, not inline sort logic; passes requirement 7 grep",
+      "Functional equivalence confirmed: both inline block and filterProducts apply the same search/category/inStock filters then the same three sort branches; no behavioral change",
+      "noUnusedLocals=true: after task-1 filterProducts becomes actively used (no longer a dead import); after task-2 normalizeSearch is gone; both changes move toward zero diagnostics, not away"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1 and 2: visibleProducts must delegate entirely to filterProducts(products, filters); filterProducts import must be present and actively used",
+      "description": "In App.tsx, replace the entire body of the visibleProducts useMemo (the inline .filter() block and the three .sort() branches) with a single expression: return filterProducts(products, filters). The filterProducts import already exists at line 7 and needs no change. The useMemo wrapper and its dependency array [products, filters] must remain.",
+      "files": [
+        "src/benchmark-frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 3 and 4: normalizeSearch must be removed from productFilters.ts; no unused imports may remain in the four affected files",
+      "description": "In productFilters.ts, delete the normalizeSearch function declaration (lines 10-13) and remove it from the module's exports. It is not imported anywhere. This leaves filterProducts and FilterState as the only exports. No other file changes are required for requirements 4, 7: FilterPanel.tsx and SortSelect.tsx are already clean, and after task-1 all imports in App.tsx will be in use.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    }
+  ]
+}
