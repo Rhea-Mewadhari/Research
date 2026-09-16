@@ -1,0 +1,30 @@
+{
+  "taskId": "task3",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix App.tsx syntax errors: unclosed JSX tag and wrong CSS import",
+      "status": "done",
+      "notes": "Two bugs in src/benchmark-frontend/src/App.tsx: (1) Line 2 imports './styles.css' which does not exist — determine the correct path (either './styles/style.css' or './App.css') by checking which CSS file contains the app's styles, then fix the import. (2) Line 47 has '<ProductList products={visibleProducts}' with no closing '/>'; add '/>'. These are the errors that prevent tsc -b from succeeding (TS1003: Identifier expected at line 48)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix ProductCard.tsx property name mismatch: discountPercent → discountPct",
+      "status": "done",
+      "notes": "src/benchmark-frontend/src/components/ProductCard.tsx references 'product.discountPercent' in three places (lines 9, 25, 37) but the Product type in src/benchmark-frontend/src/types/product.ts uses 'discountPct'. Replace all three occurrences of 'discountPercent' with 'discountPct'. Do not change any other logic."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix SortSelect.tsx type error: cast e.target.value to FilterState['sortBy']",
+      "status": "done",
+      "notes": "src/benchmark-frontend/src/components/SortSelect.tsx line 16 calls onChange(e.target.value) where e.target.value is typed as 'string' but onChange expects FilterState['sortBy'] (a union of four string literals). Add a type cast: onChange(e.target.value as FilterState['sortBy']). No logic change needed."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify build and all tests pass",
+      "status": "done",
+      "notes": "Build (tsc -b && vite build) exits 0 with no errors. All 17 tests across 6 test files pass with vitest run. No further fixes were needed."
+    }
+  ]
+}
