@@ -1,0 +1,61 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0, Vite 6.2.0, TypeScript ~5.7.2 — ESM project, bundler module resolution",
+      "Vitest 3.2.4 + @testing-library/react 16.3.2 + jsdom; tests run via `pnpm --filter benchmark-frontend test --run`",
+      "verbatimModuleSyntax: true — requires `import type` for type-only imports (already followed in productFilters.ts)",
+      "noUnusedLocals + noUnusedParameters TS flags — TypeScript acts as linter; `tsc -b` runs before build",
+      "No ESLint/Prettier; relative imports throughout; no path aliases",
+      "`filterProducts` is already imported in App.tsx line 7 — no new import statement needed for the refactor"
+    ],
+    "features": [
+      "`filterProducts(products: Product[], filters: FilterState): Product[]` — applies search, category, inStock filters then sorts; defined in src/utils/productFilters.ts",
+      "`normalizeSearch(val: string): string` — trims and lowercases; exported from productFilters.ts but never imported or called anywhere else; confirmed dead code",
+      "`visibleProducts` useMemo in App.tsx lines 19–44 — re-implements filter+sort inline despite `filterProducts` being imported; the import is currently dead weight",
+      "`handleCategoryChange` in FilterPanel.tsx — `const cat = e.target.value === 'all' ? 'All' : e.target.value;` — ternary true-branch is permanently unreachable because all `<option>` values are title-cased 'All'",
+      "Must-not-regress features: search by name, category dropdown, in-stock checkbox, sort (price-asc/price-desc/rating-desc/default), clear filters, loading spinner, error alert, pagination (Prev/Next, page count, results-count)",
+      "Test files: app.render.test.tsx, clearFilters.test.tsx, filtering.test.tsx, loadingError.test.tsx, pagination.test.tsx, sorting.test.tsx — all read-only"
+    ],
+    "architecture": [
+      "Layer flow: main.tsx → App.tsx → useProductFilters (hook) → productsApi (API) + productFilters (util) → FilterPanel / SortSelect / ProductList / Spinner (components)",
+      "Utility functions live in src/utils/; types centralised in src/types/product.ts with FilterState co-located in productFilters.ts",
+      "`filterProducts` defined at productFilters.ts line 15; imported in App.tsx line 7 as `import { filterProducts } from './utils/productFilters'`",
+      "FilterPanel and SortSelect are fully controlled — all filter state lives in useProductFilters; props flow down from App",
+      "Changes scope: App.tsx (useMemo body only), productFilters.ts (remove export), FilterPanel.tsx (simplify handler) — no new files or layers needed"
+    ],
+    "edgeCases": [
+      "`filterProducts` signature exactly matches App.tsx's needs — `filterProducts(products, filters)` is a valid call with existing local variables",
+      "Behavioral equivalence confirmed: inline `!p.inStock` vs filterProducts' `p.inStock === true` are identical when inStock is typed boolean; no-sort path returns same filtered array; only difference is an extra upfront array copy inside filterProducts (not observable)",
+      "`normalizeSearch` grep returns zero hits outside productFilters.ts — removal cannot break any consumer",
+      "`<option>` values are always raw category strings from the 'All'-headed array — `'all'` (lowercase) is never a possible select value, confirming dead branch is safe to remove",
+      "Removing the dead branch simplifies handleCategoryChange to `onChange({ ...filters, category: e.target.value })` — preserves 'All' pass-through since the select already emits 'All'",
+      "No package.json or pnpm-lock.yaml changes needed — filterProducts already imported, no new modules required"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — App.tsx delegates filtering and sorting to filterProducts() instead of reimplementing them inline",
+      "description": "Replace the body of the `visibleProducts` useMemo (lines 19–44) with a single call to `filterProducts(products, filters)`. Remove all inline `.filter(...)` and `.sort(...)` chains. The `filterProducts` import on line 7 is already present and requires no change.",
+      "files": [
+        "src/benchmark-frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — normalizeSearch is entirely removed from productFilters.ts",
+      "description": "Delete the comment on line 10 and the `normalizeSearch` function declaration on lines 11–13 from productFilters.ts. No other file imports or calls this function, so no other file needs updating.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — The unreachable branch in FilterPanel.tsx handleCategoryChange is removed",
+      "description": "Simplify `handleCategoryChange` to pass `e.target.value` directly as `category` without the ternary. Replace `const cat = e.target.value === 'all' ? 'All' : e.target.value; onChange({ ...filters, category: cat });` with `onChange({ ...filters, category: e.target.value });` and remove the `cat` local variable entirely.",
+      "files": [
+        "src/benchmark-frontend/src/components/FilterPanel.tsx"
+      ]
+    }
+  ]
+}
