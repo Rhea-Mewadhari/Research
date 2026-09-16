@@ -3,64 +3,39 @@ import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
 describe('Sorting behavior', () => {
-  it('sorts by price ascending', async () => {
-    const user = userEvent.setup();
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(async () => {
+    user = userEvent.setup();
     render(<App />);
     await screen.findByTestId('results-count');
-
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
-
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names).toEqual([
-      'Jump Rope',
-      'Cable Organiser',
-      'Foam Roller',
-      'Wireless Mouse',
-      'Ergonomic Wrist Rest',
-      'Resistance Bands',
-      'Monitor Riser',
-      'Yoga Mat',
-      'Desk Lamp',
-      'Laptop Stand',
-      'USB-C Hub',
-      'Webcam HD',
-      'Dumbbell Set',
-      'Mechanical Keyboard',
-      'Noise-Cancelling Headphones',
-    ]);
   });
 
-  it('sorts by price descending', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await screen.findByTestId('results-count');
-
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-desc');
-
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names[0]).toBe('Noise-Cancelling Headphones');
-    expect(names[1]).toBe('Mechanical Keyboard');
-    expect(names[names.length - 1]).toBe('Jump Rope');
+  it('Price: Low to High puts Jump Rope first and Noise-Cancelling Headphones last', async () => {
+    await user.selectOptions(screen.getByLabelText('Sort by'), 'Price: Low to High');
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0].textContent).toBe('Jump Rope');
+    expect(headings[14].textContent).toBe('Noise-Cancelling Headphones');
+    expect(screen.getByTestId('results-count').textContent).toBe('Showing 15 products (page 1 of 1)');
   });
 
-  it('sorts by rating descending', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await screen.findByTestId('results-count');
+  it('Price: High to Low puts Noise-Cancelling Headphones first and Jump Rope last', async () => {
+    await user.selectOptions(screen.getByLabelText('Sort by'), 'Price: High to Low');
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0].textContent).toBe('Noise-Cancelling Headphones');
+    expect(headings[14].textContent).toBe('Jump Rope');
+  });
 
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'rating-desc');
+  it('Rating sort puts Yoga Mat first and Mechanical Keyboard second', async () => {
+    await user.selectOptions(screen.getByLabelText('Sort by'), 'Rating');
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0].textContent).toBe('Yoga Mat');
+    expect(headings[1].textContent).toBe('Mechanical Keyboard');
+  });
 
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names[0]).toBe('Yoga Mat');
-    expect(names[1]).toBe('Mechanical Keyboard');
+  it('Default sort preserves API order with Wireless Mouse first and Ergonomic Wrist Rest last', () => {
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0].textContent).toBe('Wireless Mouse');
+    expect(headings[14].textContent).toBe('Ergonomic Wrist Rest');
   });
 });

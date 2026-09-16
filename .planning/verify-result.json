@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Loading spinner is present immediately after render, before fetch resolves.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > shows loading spinner immediately after render before fetch resolves — PASSED (17ms). `pnpm test --run` output: '✓ tests/app.render.test.tsx (3 tests)'. All 3 tests in this file passed."
+    },
+    {
+      "id": "2",
+      "description": "After fetch resolves, data-testid=\"results-count\" text reads exactly \"Showing 15 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > shows results-count with correct text after fetch resolves — PASSED (27ms). `pnpm test --run` output: '✓ tests/app.render.test.tsx (3 tests)'. All 3 tests in this file passed."
+    },
+    {
+      "id": "3",
+      "description": "After fetch resolves, all 15 product cards are in the DOM.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > renders all 15 product cards after fetch resolves — PASSED (13ms). `pnpm test --run` output: '✓ tests/app.render.test.tsx (3 tests)'. All 3 tests in this file passed."
+    },
+    {
+      "id": "4",
+      "description": "Typing a search term that matches one product narrows the count and shows only the matching product.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > search term matching one product narrows count and shows product — PASSED (90ms). `pnpm test --run` output: '✓ tests/filtering.test.tsx (6 tests)'. All 6 tests in this file passed."
+    },
+    {
+      "id": "5",
+      "description": "Search matching is case-insensitive.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > search matching is case-insensitive — PASSED (40ms). `pnpm test --run` output: '✓ tests/filtering.test.tsx (6 tests)'. All 6 tests in this file passed."
+    },
+    {
+      "id": "6",
+      "description": "Selecting category \"Electronics\" from the category select narrows to 5 products.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > selecting Electronics category narrows to 5 products — PASSED (23ms). `pnpm test --run` output: '✓ tests/filtering.test.tsx (6 tests)'. All 6 tests in this file passed."
+    },
+    {
+      "id": "7",
+      "description": "Checking the \"In-stock only\" checkbox narrows to 11 products.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > in-stock only checkbox narrows to 11 products — PASSED (19ms). `pnpm test --run` output: '✓ tests/filtering.test.tsx (6 tests)'. All 6 tests in this file passed."
+    },
+    {
+      "id": "8",
+      "description": "Combining category \"Electronics\" and in-stock filter narrows to 3 products.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > combining Electronics and in-stock narrows to 3 products — PASSED (28ms). `pnpm test --run` output: '✓ tests/filtering.test.tsx (6 tests)'. All 6 tests in this file passed."
+    },
+    {
+      "id": "9",
+      "description": "A search term matching no products produces a zero count and a \"No products found.\" status message.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > search matching no products shows zero count and status message — PASSED (34ms). `pnpm test --run` output: '✓ tests/filtering.test.tsx (6 tests)'. All 6 tests in this file passed."
+    },
+    {
+      "id": "10",
+      "description": "Selecting \"Price: Low to High\" (value price-asc) renders Jump Rope first and Noise-Cancelling Headphones last, count unchanged.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > Price: Low to High puts Jump Rope first and Noise-Cancelling Headphones last — PASSED (84ms). `pnpm test --run` output: '✓ tests/sorting.test.tsx (4 tests)'. All 4 tests in this file passed."
+    },
+    {
+      "id": "11",
+      "description": "Selecting \"Price: High to Low\" (value price-desc) renders Noise-Cancelling Headphones first and Jump Rope last.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > Price: High to Low puts Noise-Cancelling Headphones first and Jump Rope last — PASSED (30ms). `pnpm test --run` output: '✓ tests/sorting.test.tsx (4 tests)'. All 4 tests in this file passed."
+    },
+    {
+      "id": "12",
+      "description": "Selecting \"Rating\" (value rating-desc) renders Yoga Mat first (rating 4.8) and Mechanical Keyboard second (rating 4.7).",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > Rating sort puts Yoga Mat first and Mechanical Keyboard second — PASSED (30ms). `pnpm test --run` output: '✓ tests/sorting.test.tsx (4 tests)'. All 4 tests in this file passed."
+    },
+    {
+      "id": "13",
+      "description": "With \"Default\" sort, products are in API order — Wireless Mouse first, Ergonomic Wrist Rest last.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > Default sort preserves API order with Wireless Mouse first and Ergonomic Wrist Rest last — PASSED (12ms). `pnpm test --run` output: '✓ tests/sorting.test.tsx (4 tests)'. All 4 tests in this file passed."
+    },
+    {
+      "id": "14",
+      "description": "After applying a category filter, clicking \"Clear filters\" resets results-count to all 15 products.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > clicking Clear filters after category filter resets count to 15 — PASSED (89ms). `pnpm test --run` output: '✓ tests/clearFilters.test.tsx (2 tests)'. All 2 tests in this file passed."
+    },
+    {
+      "id": "15",
+      "description": "Clicking \"Clear filters\" resets the search input value to empty, category to \"All\", inStockOnly checkbox to unchecked, and sortBy to \"Default\".",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > clicking Clear filters resets all filter controls to initial state — PASSED (84ms). `pnpm test --run` output: '✓ tests/clearFilters.test.tsx (2 tests)'. All 2 tests in this file passed."
+    },
+    {
+      "id": "16",
+      "description": "On initial load with totalPages=1, both Prev and Next buttons are disabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > disables both Prev and Next when totalPages is 1 — PASSED (60ms). `pnpm test --run` output: '✓ tests/pagination.test.tsx (2 tests)'. All 2 tests in this file passed."
+    },
+    {
+      "id": "17",
+      "description": "With totalPages=3, Prev is disabled on page 1 and Next is enabled; after clicking Next (page 2), Prev becomes enabled and Next remains enabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > enables Next on page 1 and both on page 2 when totalPages is 3 — PASSED (26ms). `pnpm test --run` output: '✓ tests/pagination.test.tsx (2 tests)'. All 2 tests in this file passed."
+    },
+    {
+      "id": "18",
+      "description": "While fetch is pending, the spinner (aria-label=\"loading\") is in the DOM and results-count is absent.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows spinner and no results-count while fetch is pending — PASSED (16ms). `pnpm test --run` output: '✓ tests/loadingError.test.tsx (2 tests)'. All 2 tests in this file passed."
+    },
+    {
+      "id": "19",
+      "description": "When fetch rejects, the spinner disappears and a role=\"alert\" element with a non-empty error message appears.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows error alert and no spinner when fetch rejects — PASSED (26ms). `pnpm test --run` output: '✓ tests/loadingError.test.tsx (2 tests)'. All 2 tests in this file passed."
+    }
+  ]
+}

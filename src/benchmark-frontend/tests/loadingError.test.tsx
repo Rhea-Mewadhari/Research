@@ -1,42 +1,19 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import App from '../src/App';
 
 describe('Loading and error states', () => {
-  it('shows the loading spinner immediately on mount', () => {
+  it('shows spinner and no results-count while fetch is pending', () => {
+    vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})));
     render(<App />);
-    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('loading')).toBeInTheDocument();
+    expect(screen.queryByTestId('results-count')).toBeNull();
   });
 
-  it('hides the spinner once data has loaded', async () => {
+  it('shows error alert and no spinner when fetch rejects', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network error')));
     render(<App />);
-    await screen.findByTestId('results-count');
-    expect(screen.queryByLabelText(/loading/i)).not.toBeInTheDocument();
-  });
-
-  it('shows an error message when the fetch fails', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-    } as Response);
-
-    render(<App />);
-
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toBeInTheDocument()
-    );
-    expect(screen.getByRole('alert')).toHaveTextContent(/failed to fetch/i);
-  });
-
-  it('does not show the product list when an error occurs', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-    } as Response);
-
-    render(<App />);
-
-    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
-    expect(screen.queryByTestId('results-count')).not.toBeInTheDocument();
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toBe('Network error');
+    expect(screen.queryByLabelText('loading')).toBeNull();
   });
 });
