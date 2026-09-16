@@ -1,0 +1,24 @@
+{
+  "taskId": "task3",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Diagnose: run tsc and build to catalogue all syntax/type/JSX errors",
+      "status": "done",
+      "notes": "Errors found: (1) App.tsx:47 — <ProductList products={visibleProducts} missing closing '/>' causing TS1003 and esbuild parse failure; blocks all 6 test suites. (2) ProductCard.tsx:9,25,37 — references product.discountPercent but Product type in types/product.ts defines discountPct (potential TS2339 once App.tsx is fixed). (3) SortSelect.tsx:16 — e.target.value (string) passed to onChange expecting FilterState['sortBy'] union type (potential TS2345 once App.tsx is fixed)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix all syntax, TypeScript, JSX, and import/export errors in src/",
+      "status": "done",
+      "notes": "Fixed 4 errors: (1) App.tsx:47 added closing '/>' to ProductList JSX element; (2) ProductCard.tsx replaced 3 occurrences of product.discountPercent with product.discountPct to match Product type; (3) SortSelect.tsx:16 cast e.target.value as FilterState['sortBy'] to satisfy the union type; (4) App.tsx:2 corrected CSS import from './styles.css' to './styles/style.css'. All 17 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Verify: build succeeds, tests pass, no runtime errors",
+      "status": "done",
+      "notes": "All 17 tests pass across 6 test files (app.render, loadingError, clearFilters, pagination, filtering, sorting). Build succeeds: tsc -b and vite build both complete cleanly, producing dist/assets/index-dBF5sU86.js (200.14 kB) and dist/assets/index-CPuhpUi6.css."
+    }
+  ]
+}
