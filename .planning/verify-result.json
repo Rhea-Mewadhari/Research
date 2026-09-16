@@ -1,0 +1,167 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "After awaiting data-testid=\"results-count\", the page heading \"Product Catalog\" is visible.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > renders the Product Catalog heading after initial load — PASSED (pnpm test output: ✓ 55ms). Test Files 6 passed (6), Tests 26 passed (26)."
+    },
+    {
+      "id": "2",
+      "description": "After awaiting data-testid=\"results-count\", the results-count element contains the text \"Showing 15 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > shows results count for all 15 products on initial load — PASSED (pnpm test output: ✓ 11ms)."
+    },
+    {
+      "id": "3",
+      "description": "After awaiting data-testid=\"results-count\", all 15 product cards are present in the DOM (data-testid=\"product-1\" through data-testid=\"product-15\").",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > renders 15 product cards on initial load — PASSED (pnpm test output: ✓ 17ms)."
+    },
+    {
+      "id": "4",
+      "description": "Typing \"Yoga\" into the #search input reduces the results-count to \"Showing 1 products (page 1 of 1)\" and only h3 \"Yoga Mat\" is visible.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > typing \"Yoga\" shows only Yoga Mat — PASSED (pnpm test output: ✓ 82ms)."
+    },
+    {
+      "id": "5",
+      "description": "Search is case-insensitive: typing \"yoga\" (lowercase) also shows only \"Yoga Mat\".",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > search is case-insensitive: typing \"yoga\" shows Yoga Mat — PASSED (pnpm test output: ✓ 33ms)."
+    },
+    {
+      "id": "6",
+      "description": "Typing a term with no matches (e.g. \"zzz\") renders <p role=\"status\">No products found.</p> and removes section[aria-label=\"Product results\"] from the DOM.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > typing \"zzz\" shows no-products status and removes product section — PASSED (pnpm test output: ✓ 26ms)."
+    },
+    {
+      "id": "7",
+      "description": "Selecting \"Electronics\" from #category results in \"Showing 5 products (page 1 of 1)\" and exactly 5 product cards.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > selecting Electronics shows 5 products — PASSED (pnpm test output: ✓ 24ms)."
+    },
+    {
+      "id": "8",
+      "description": "Selecting \"Fitness\" from #category results in \"Showing 5 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > selecting Fitness shows 5 products — PASSED (pnpm test output: ✓ 21ms)."
+    },
+    {
+      "id": "9",
+      "description": "Selecting \"Accessories\" from #category results in \"Showing 5 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > selecting Accessories shows 5 products — PASSED (pnpm test output: ✓ 19ms)."
+    },
+    {
+      "id": "10",
+      "description": "Checking #inStockOnly results in \"Showing 11 products (page 1 of 1)\" and the four out-of-stock products are absent from the DOM.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > checking in-stock only shows 11 products and removes OOS products — PASSED (pnpm test output: ✓ 19ms)."
+    },
+    {
+      "id": "11",
+      "description": "Combined filter: selecting \"Electronics\" AND checking #inStockOnly results in \"Showing 3 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > Electronics + in-stock only shows 3 products — PASSED (pnpm test output: ✓ 29ms)."
+    },
+    {
+      "id": "12",
+      "description": "Combined filter: typing \"keyboard\" AND selecting \"Electronics\" results in \"Showing 1 products\" with only \"Mechanical Keyboard\" visible.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > typing \"keyboard\" with Electronics category shows only Mechanical Keyboard — PASSED (pnpm test output: ✓ 39ms)."
+    },
+    {
+      "id": "13",
+      "description": "Selecting \"Price: Low to High\" (price-asc) makes \"Jump Rope\" the first h3 and \"Noise-Cancelling Headphones\" the last.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > price-asc makes Jump Rope first and Noise-Cancelling Headphones last — PASSED (pnpm test output: ✓ 80ms)."
+    },
+    {
+      "id": "14",
+      "description": "Selecting \"Price: High to Low\" (price-desc) makes \"Noise-Cancelling Headphones\" first and \"Jump Rope\" last.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > price-desc makes Noise-Cancelling Headphones first and Jump Rope last — PASSED (pnpm test output: ✓ 31ms)."
+    },
+    {
+      "id": "15",
+      "description": "Selecting \"Rating\" (rating-desc) makes \"Yoga Mat\" first and \"Mechanical Keyboard\" second.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > rating-desc makes Yoga Mat first and Mechanical Keyboard second — PASSED (pnpm test output: ✓ 31ms)."
+    },
+    {
+      "id": "16",
+      "description": "With #sortBy at \"Default\", the first product h3 is \"Wireless Mouse\" (original array order preserved).",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > default order makes Wireless Mouse the first product — PASSED (pnpm test output: ✓ 12ms)."
+    },
+    {
+      "id": "17",
+      "description": "After typing \"Yoga\" into #search, clicking \"Clear filters\" resets results-count to 15 and #search value is \"\".",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > clear after search resets count to 15 and empties search input — PASSED (pnpm test output: ✓ 95ms)."
+    },
+    {
+      "id": "18",
+      "description": "After selecting \"Fitness\" from #category, clicking \"Clear filters\" sets it back to \"All\" and shows 15 products.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > clear after category selection resets to All and shows 15 products — PASSED (pnpm test output: ✓ 41ms)."
+    },
+    {
+      "id": "19",
+      "description": "After checking #inStockOnly, clicking \"Clear filters\" unchecks the checkbox and shows 15 products.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > clear after checking in-stock unchecks checkbox and shows 15 products — PASSED (pnpm test output: ✓ 34ms)."
+    },
+    {
+      "id": "20",
+      "description": "After changing #sortBy to \"price-asc\", clicking \"Clear filters\" resets it to \"Default\" and first product is \"Wireless Mouse\".",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > clear after sort resets to default and Wireless Mouse is first — PASSED (pnpm test output: ✓ 39ms)."
+    },
+    {
+      "id": "21",
+      "description": "On initial render (totalPages: 1, page: 1), the \"Prev\" button is disabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > Prev button is disabled on initial render when totalPages is 1 — PASSED (pnpm test output: ✓ 56ms)."
+    },
+    {
+      "id": "22",
+      "description": "On initial render (totalPages: 1, page: 1), the \"Next\" button is disabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > Next button is disabled on initial render when totalPages is 1 — PASSED (pnpm test output: ✓ 14ms)."
+    },
+    {
+      "id": "23",
+      "description": "When fetch mock returns totalPages: 2, the \"Next\" button is enabled on page 1.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > Next button is enabled on page 1 when totalPages is 2 — PASSED (pnpm test output: ✓ 11ms)."
+    },
+    {
+      "id": "24",
+      "description": "After clicking \"Next\" when totalPages: 2, the \"Prev\" button becomes enabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > Prev button is enabled after clicking Next when totalPages is 2 — PASSED (pnpm test output: ✓ 32ms)."
+    },
+    {
+      "id": "25",
+      "description": "Before the fetch resolves, div[aria-label=\"loading\"] is present in the DOM.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows loading spinner before fetch resolves — PASSED (pnpm test output: ✓ 16ms)."
+    },
+    {
+      "id": "26",
+      "description": "When fetch rejects with 'Network error', p[role=\"alert\"] appears with text \"Network error\" and loading spinner is absent.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows error alert when fetch rejects and spinner is absent — PASSED (pnpm test output: ✓ 24ms)."
+    },
+    {
+      "id": "27",
+      "description": "Running pnpm test produces zero failing tests and all six test files report at least one passing test each.",
+      "passed": true,
+      "evidence": "pnpm test exit code 0. Output: 'Test Files 6 passed (6), Tests 26 passed (26)'. All six suites passed: app.render.test.tsx (3 tests), filtering.test.tsx (9 tests), sorting.test.tsx (4 tests), clearFilters.test.tsx (4 tests), pagination.test.tsx (4 tests), loadingError.test.tsx (2 tests). Build also succeeded: tsc -b && vite build completed with exit code 0, producing dist/index.html, dist/assets/index-CPuhpUi6.css, dist/assets/index-dBF5sU86.js."
+    }
+  ]
+}
