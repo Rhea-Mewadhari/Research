@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import './styles/style.css';
+import './App.css';
 import FilterPanel from './components/FilterPanel';
 import ProductList from './components/ProductList';
 import Spinner from './components/Spinner';

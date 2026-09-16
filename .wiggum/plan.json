@@ -1,0 +1,36 @@
+{
+  "taskId": "task3",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix App.tsx JSX syntax error: add missing /> to self-closing ProductList element (line 47)",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix App.tsx bad CSS import: change './styles.css' to the correct path (file does not exist; use './App.css' or './styles/style.css')",
+      "status": "done",
+      "notes": "Changed import './styles.css' to import './App.css' on line 2. All 17 tests pass."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix ProductCard.tsx field name mismatch: replace product.discountPercent with product.discountPct to match the Product type",
+      "status": "done",
+      "notes": "Replaced all three occurrences of product.discountPercent with product.discountPct. All 17 tests pass."
+    },
+    {
+      "id": "phase-4",
+      "title": "Fix SortSelect.tsx TypeScript type error: cast e.target.value to FilterState['sortBy'] in the onChange handler",
+      "status": "done",
+      "notes": "Cast e.target.value as FilterState['sortBy'] in the onChange handler. All 17 tests pass and tsc build succeeds."
+    },
+    {
+      "id": "phase-5",
+      "title": "Verify: run tsc build and vitest to confirm all errors are resolved and all tests pass",
+      "status": "done",
+      "notes": "All 17 tests pass (6 test files). tsc + vite build succeeds with no errors."
+    }
+  ]
+}
