@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchProducts } from '../api/productsApi';
 import type { FilterState } from '../utils/productFilters';
 import type { Product } from '../types/product';
@@ -32,14 +32,5 @@ export function useProductFilters() {
       });
   }, [page]);
 
-  const updateFilter = useCallback(
-    <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-      setFilters((prev) => ({ ...prev, [key]: value }));
-    },
-    []
-  );
-
-  const clearFilters = useCallback(() => setFilters(initialFilters), []);
-
-  return { filters, setFilters, updateFilter, clearFilters, products, isLoading, error, page, totalPages, setPage };
+  return { filters, setFilters, products, isLoading, error, page, totalPages, setPage };
 }

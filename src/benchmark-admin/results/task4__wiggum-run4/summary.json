@@ -1,0 +1,110 @@
+{
+  "taskId": "task4",
+  "runId": "wiggum-run4",
+  "timestamp": "2026-09-16T12:07:21.842Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 18,
+    "failed": 0,
+    "total": 18,
+    "expectedFiles": 7,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 5566,
+    "hiddenMs": 1428,
+    "buildMs": 1376,
+    "totalMs": 8475
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task4",
+    "wall_duration_ms": 340036,
+    "cost_usd": 1.2308613000000002,
+    "num_turns": 66,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "44eb80a0-edf6-495b-a90d-21da987d5494",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Use filterProducts in App.tsx instead of inline logic",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Remove dead code: normalizeSearch, FilterPanel 'all' mapping, unused hook exports",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Verify all tests pass",
+          "status": "done",
+          "notes": "All 17 tests pass across 6 test files. Build succeeds cleanly."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 83124,
+          "cost_usd": 0.26502929999999997,
+          "num_turns": 16,
+          "session_id": "40376e71-9d02-4d54-b4f9-a5754c847d2c",
+          "is_error": false
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 112434,
+          "cost_usd": 0.46508819999999995,
+          "num_turns": 25,
+          "session_id": "79e04fa8-bff9-4f98-9a52-9781bdd17f4d",
+          "is_error": false
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 38554,
+          "cost_usd": 0.1685163,
+          "num_turns": 10,
+          "session_id": "44eb80a0-edf6-495b-a90d-21da987d5494",
+          "is_error": false
+        }
+      ],
+      "contextResets": 3,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
