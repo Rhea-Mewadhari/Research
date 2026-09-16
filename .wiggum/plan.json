@@ -1,0 +1,30 @@
+{
+  "taskId": "task4",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Replace inline filter/sort logic in App.tsx with filterProducts() call",
+      "status": "done",
+      "notes": "App.tsx imports filterProducts from productFilters.ts but never calls it. Instead, visibleProducts useMemo re-implements identical filter+sort logic inline (lines 19–44 of src/App.tsx). Fix: replace the entire useMemo body with `filterProducts(products, filters)` so it reads: `const visibleProducts = useMemo(() => filterProducts(products, filters), [products, filters]);`. This removes the inline duplication and satisfies the separation-of-concerns requirement."
+    },
+    {
+      "id": "phase-2",
+      "title": "Remove normalizeSearch dead code from productFilters.ts",
+      "status": "done",
+      "notes": "productFilters.ts exports a `normalizeSearch` function (lines 10–13) with a comment that it was from early development and never cleaned up. Grep confirms it is unused everywhere in the codebase. Remove the function and its comment entirely."
+    },
+    {
+      "id": "phase-3",
+      "title": "Export defaultFilters from productFilters.ts and use it in FilterPanel.tsx",
+      "status": "done",
+      "notes": "Added `export const defaultFilters: FilterState` to productFilters.ts. Updated FilterPanel.tsx to import `defaultFilters` and use `onChange(defaultFilters)` in handleClear instead of the inline literal. All 17 tests pass."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests to verify no regressions",
+      "status": "done",
+      "notes": "All 17 tests pass across 6 test files. Build also succeeds (tsc + vite). No regressions introduced by any prior phase."
+    }
+  ]
+}
