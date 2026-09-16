@@ -1,0 +1,64 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript ~5.7.2, Vite 6, Vitest 3 — ESM throughout",
+      "noUnusedLocals: true and noUnusedParameters: true — unused imports/vars are compile ERRORS, not warnings",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type' syntax",
+      "tsc -b runs before vite build; TypeScript must be clean for the build to succeed",
+      "Tests run via 'pnpm test' (vitest run); TS checked via 'pnpm --filter benchmark-frontend exec tsc --noEmit'",
+      "Coverage is scoped specifically to src/utils/productFilters.ts — changes there are under measurement",
+      "No path aliases; all imports use relative paths"
+    ],
+    "features": [
+      "filterProducts(products, filters) applies: search (trim+lowercase), category (strict equality, skipped when 'All'), inStock (skipped when false), then sort",
+      "visibleProducts useMemo in App.tsx is a full inline reimplementation of filterProducts — duplicated logic that produces identical results",
+      "filterProducts is imported in App.tsx but NEVER called — this is an unused import (TS error under noUnusedLocals)",
+      "normalizeSearch does val.trim().toLowerCase() — exported from productFilters.ts, referenced nowhere else, admitted dead code",
+      "filterProducts has 4 return statements: 3 early returns after each sort branch (price-asc, price-desc, rating-desc), 1 final 'return result' for sortBy='default'",
+      "Features that must not regress: search (case-insensitive, trimmed), category filter, in-stock filter, all sort modes, clear filters, initial render count, pagination"
+    ],
+    "architecture": [
+      "Layer structure: types/ → utils/ (pure functions) → api/ → hooks/ (async state) → components/ (dumb UI) → App.tsx (orchestrator)",
+      "Data flow: useProductFilters returns raw products+filters state → App derives visibleProducts → passes to ProductList/FilterPanel/SortSelect",
+      "filterProducts belongs in utils/ (pure, no React); it should be called in App.tsx where products and filters are co-located",
+      "Test files live in tests/ at project root (one level above src/); they render the full App component and must not be modified",
+      "Only 2 source files need to change: src/App.tsx and src/utils/productFilters.ts",
+      "Files that must stay unchanged: all tests/, hooks/useProductFilters.ts, components/*, types/product.ts"
+    ],
+    "edgeCases": [
+      "sortBy='default': both implementations skip sorting and return filtered array in original order — refactor preserves this",
+      "sortBy='name' is not in the FilterState type union and not handled — falls through to unsorted result (same as 'default'); no test covers it",
+      "Search trimming: both implementations call .trim() before matching — behavior identical after refactor",
+      "Whitespace-only search input (e.g. '   '): trimmed to '', filter is skipped, all products pass — no test covers this explicitly",
+      "Empty product list: filterProducts([]) returns [] safely; categories useMemo in App.tsx yields ['All'] — no crash",
+      "normalizeSearch has zero import sites in src/ and zero in tests/ — deletion causes no TS errors and no test failures",
+      "Removing the inline sort branches and using a single consolidated return must still handle sortBy='default' returning unsorted filtered list"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "3. normalizeSearch is deleted from productFilters.ts and is not referenced anywhere else in the codebase.",
+      "description": "Delete the normalizeSearch function (and its comment) from productFilters.ts. It has no import sites anywhere in src/ or tests/, so deletion is safe and will eliminate the dead export that noUnusedLocals would flag.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "4. filterProducts in productFilters.ts does not contain multiple early-return statements for individual sort branches; the sort-and-return pattern is consolidated into a single return.",
+      "description": "Refactor the sort logic inside filterProducts: replace the three separate if-blocks that each set 'sorted' and return early with a single block that sets 'sorted' once based on sortBy, then return sorted exactly once at the end of the function. The 'default' case (no sort) must still return the unsorted filtered array.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "1. App.tsx visibleProducts useMemo must call filterProducts(products, filters) and must contain no inline filter or sort logic. 2. The filterProducts import in App.tsx is used (no unused import).",
+      "description": "Replace the body of the visibleProducts useMemo in App.tsx with a single call: return filterProducts(products, filters). Remove all inline .filter() and .sort() logic from that useMemo. The existing 'import { filterProducts }' statement at the top of App.tsx is already present and becomes used by this change — no import changes needed.",
+      "files": [
+        "src/benchmark-frontend/src/App.tsx"
+      ]
+    }
+  ]
+}

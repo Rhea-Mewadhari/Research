@@ -16,9 +16,10 @@ export default function App() {
     [products]
   );
 
-  const visibleProducts = useMemo(() => {
-    return filterProducts(products, filters);
-  }, [products, filters]);
+  const visibleProducts = useMemo(
+    () => filterProducts(products, filters),
+    [products, filters]
+  );
 
   return (
     <main className="container">
