@@ -1,0 +1,93 @@
+{
+  "investigations": {
+    "techStack": [
+      "Test runner: Vitest 3.2.4 with jsdom 26.1.0 environment",
+      "@testing-library/react 16.3.2, @testing-library/user-event 14.6.1, @testing-library/jest-dom 6.9.1",
+      "React 19.0.0, TypeScript 5.7.2, Vite 6.2.0",
+      "Vitest globals enabled (describe, it, expect, vi available without import)",
+      "tests/setup.ts auto-imported by vitest config — stubs global.fetch via vi.stubGlobal in beforeEach, restores via vi.unstubAllGlobals in afterEach",
+      "userEvent v14 API: must call userEvent.setup() before render; use returned instance for user.type(), user.click(), user.selectOptions()",
+      "No path aliases; test files import App as '../src/App'"
+    ],
+    "features": [
+      "results-count element: <p data-testid=\"results-count\"> — text format 'Showing N products (page X of Y)'",
+      "Product cards: <article data-testid=\"product-{id}\"> — queried via getAllByRole('article')",
+      "Error state: <p role=\"alert\"> — rendered instead of results-count when fetch fails",
+      "Spinner: <div aria-label=\"loading\"> — rendered only during initial async fetch",
+      "Empty state: <p role=\"status\"> — rendered by ProductList when filter yields 0 results",
+      "Setup.ts mock returns all 15 products from products.ts fixture + { totalPages: 1 }",
+      "Test stub files already have necessary imports (render, screen, userEvent where applicable, App) but empty describe blocks",
+      "Products fixture fields: id, name, category, price, inStock, rating, reviewCount, description, tags, discountPct?"
+    ],
+    "architecture": [
+      "State managed in useProductFilters hook: filters, products, isLoading, error, page, totalPages via useState",
+      "State flows: hook → App → FilterPanel (filters + onChange + categories), SortSelect (value + onChange), ProductList (products)",
+      "Prev/Next buttons live in App.tsx: Prev disabled when page<=1, Next disabled when page>=totalPages",
+      "Loading branch renders <Spinner /> only; error branch renders <p role=\"alert\">{error}</p> only; both exclude results-count",
+      "Test files live at src/benchmark-frontend/tests/ (sibling to src/), not at root tests/ or src/tests/",
+      "productFilters.ts: search is case-insensitive substring on name; category is exact match or 'All'; sortBy: default|price-asc|price-desc|rating-desc",
+      "Categories generated dynamically in App from product data: ['All', 'Electronics', 'Fitness', 'Accessories']"
+    ],
+    "edgeCases": [
+      "userEvent v14: const user = userEvent.setup() must be called before render(<App />) in each test that uses interactions",
+      "Async load: always await screen.findByTestId('results-count') before any filter/sort interactions",
+      "Error test override: use vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network error'))) in the test body before render — setup.ts beforeEach runs first but this overrides it for that test",
+      "Out-of-stock products (inStock: false): USB-C Hub, Noise-Cancelling Headphones, Dumbbell Set, Desk Lamp — 11 products in stock",
+      "Sort selectOptions must use value strings ('price-asc', 'price-desc', 'rating-desc'), not display labels",
+      "Category selectOptions must use exact strings ('Electronics', 'Fitness', 'Accessories'), not 'All' for filtering",
+      "Rating sort: only assert first two unambiguous positions (Yoga Mat 4.8, Mechanical Keyboard 4.7) to avoid flakiness from ties",
+      "Each test needs its own render(<App />) call — React Testing Library cleanup runs between tests automatically",
+      "loadingError.test.tsx: spinner check must happen synchronously after render() before any await; results-count must be absent (queryByTestId returns null) after fetch error"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1 and 2 (app.render.test.tsx): initial render shows 'Showing 15 products (page 1 of 1)' and all 15 product names in the DOM",
+      "description": "Fill in app.render.test.tsx with two tests: (1) await findByTestId('results-count') and assert exact text 'Showing 15 products (page 1 of 1)'; (2) assert getByText succeeds for all 15 fixture product names after load",
+      "files": [
+        "src/benchmark-frontend/tests/app.render.test.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 3–6 (filtering.test.tsx): search, category, in-stock, and combined filter tests",
+      "description": "Fill in filtering.test.tsx with four tests using userEvent.setup(): (3) type 'mouse' → 1 result, Wireless Mouse present, Yoga Mat absent; (4) select 'Electronics' → 5 results, 5 names present, Yoga Mat absent; (5) click inStockOnly → 11 results, 4 OOS products absent; (6) Electronics + inStockOnly → 3 results (Wireless Mouse, Mechanical Keyboard, Webcam HD)",
+      "files": [
+        "src/benchmark-frontend/tests/filtering.test.tsx"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 7–10 (sorting.test.tsx): price-asc, price-desc, rating-desc, and default sort order",
+      "description": "Fill in sorting.test.tsx with four tests using userEvent.setup(): (7) select 'price-asc' → getAllByRole('article')[0] contains 'Jump Rope', last contains 'Noise-Cancelling Headphones'; (8) 'price-desc' → first 'Noise-Cancelling Headphones', last 'Jump Rope'; (9) 'rating-desc' → first 'Yoga Mat', second 'Mechanical Keyboard'; (10) no sort action → first 'Wireless Mouse', last 'Ergonomic Wrist Rest'",
+      "files": [
+        "src/benchmark-frontend/tests/sorting.test.tsx"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 11 (clearFilters.test.tsx): clear filters button resets search input and restores all 15 products",
+      "description": "Fill in clearFilters.test.tsx: type 'mouse' in search → results-count shows 1 product → click 'Clear filters' button → assert results-count returns to 'Showing 15 products (page 1 of 1)' and search textbox value is ''",
+      "files": [
+        "src/benchmark-frontend/tests/clearFilters.test.tsx"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirement 12 (pagination.test.tsx): Prev and Next buttons both disabled on page 1 of 1",
+      "description": "Fill in pagination.test.tsx: after await findByTestId('results-count'), assert getByRole('button', {name: 'Prev'}) is disabled and getByRole('button', {name: 'Next'}) is disabled (mock returns totalPages: 1)",
+      "files": [
+        "src/benchmark-frontend/tests/pagination.test.tsx"
+      ]
+    },
+    {
+      "id": "task-6",
+      "requirement": "Requirements 13–14 (loadingError.test.tsx): spinner visible before load; error alert rendered and results-count absent on fetch failure",
+      "description": "Fill in loadingError.test.tsx: (13) after render(<App />) synchronously assert getByLabelText('loading') exists, then await findByTestId('results-count') to confirm spinner gone; (14) vi.stubGlobal fetch to mockRejectedValue(new Error('Network error')), render, await findByRole('alert'), assert it contains 'Network error', assert queryByTestId('results-count') is null",
+      "files": [
+        "src/benchmark-frontend/tests/loadingError.test.tsx"
+      ]
+    }
+  ]
+}

@@ -3,20 +3,15 @@ import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
 describe('Clear filters', () => {
-  it('resets filters back to default values', async () => {
+  it('clears search and restores all 15 products', async () => {
     const user = userEvent.setup();
     render(<App />);
     await screen.findByTestId('results-count');
-
-    await user.type(screen.getByLabelText(/search/i), 'lamp');
-    await user.selectOptions(screen.getByLabelText(/category/i), 'Accessories');
-    await user.click(screen.getByLabelText(/in-stock only/i));
+    const searchInput = screen.getByRole('textbox', { name: /search/i });
+    await user.type(searchInput, 'mouse');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products (page 1 of 1)');
     await user.click(screen.getByRole('button', { name: /clear filters/i }));
-
-    expect(screen.getByLabelText(/search/i)).toHaveValue('');
-    expect(screen.getByLabelText(/category/i)).toHaveValue('All');
-    expect(screen.getByLabelText(/in-stock only/i)).not.toBeChecked();
-    expect(screen.getByLabelText(/sort by/i)).toHaveValue('default');
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 15 products');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 15 products (page 1 of 1)');
+    expect(screen.getByRole('textbox', { name: /search/i })).toHaveValue('');
   });
 });

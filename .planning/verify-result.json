@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "After the async initial load, data-testid=\"results-count\" contains exactly the text \"Showing 15 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > shows results-count with 15 products after load — PASSED (vitest run, 34ms). Build: tsc -b && vite build succeeded with 0 errors."
+    },
+    {
+      "id": "2",
+      "description": "After the async initial load, all 15 product names from the fixture are present in the DOM.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > renders all 15 product names after load — PASSED (vitest run, 28ms). 6 test files, 14 tests all passed."
+    },
+    {
+      "id": "3",
+      "description": "Typing \"mouse\" into the search input reduces results-count to \"Showing 1 products (page 1 of 1)\" and \"Wireless Mouse\" is in the DOM. All other product names are absent.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters by search \"mouse\" to show 1 product — PASSED (vitest run, 78ms)."
+    },
+    {
+      "id": "4",
+      "description": "Selecting \"Electronics\" from the category select shows exactly 5 products; results-count reads \"Showing 5 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters by Electronics category to show 5 products — PASSED (vitest run, 28ms)."
+    },
+    {
+      "id": "5",
+      "description": "Checking the \"In-stock only\" checkbox shows 11 products. The 4 out-of-stock products (USB-C Hub, Noise-Cancelling Headphones, Dumbbell Set, Desk Lamp) are absent. results-count reads \"Showing 11 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > filters by In-stock only to show 11 products — PASSED (vitest run, 21ms)."
+    },
+    {
+      "id": "6",
+      "description": "Combined filter: selecting \"Electronics\" category then checking \"In-stock only\" shows exactly 3 products (Wireless Mouse, Mechanical Keyboard, Webcam HD); results-count reads \"Showing 3 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > combined Electronics + In-stock only shows 3 products — PASSED (vitest run, 33ms)."
+    },
+    {
+      "id": "7",
+      "description": "With sortBy set to \"price-asc\", products are ordered cheapest-first. First card is \"Jump Rope\" ($15) and last is \"Noise-Cancelling Headphones\" ($149).",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > sorts by price-asc: Jump Rope first, Noise-Cancelling Headphones last — PASSED (vitest run, 76ms)."
+    },
+    {
+      "id": "8",
+      "description": "With sortBy set to \"price-desc\", products are ordered most expensive-first. First card is \"Noise-Cancelling Headphones\" ($149) and last is \"Jump Rope\" ($15).",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > sorts by price-desc: Noise-Cancelling Headphones first, Jump Rope last — PASSED (vitest run, 28ms)."
+    },
+    {
+      "id": "9",
+      "description": "With sortBy set to \"rating-desc\", products are ordered highest-rated-first. First card is \"Yoga Mat\" (4.8) and second is \"Mechanical Keyboard\" (4.7).",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > sorts by rating-desc: Yoga Mat first, Mechanical Keyboard second — PASSED (vitest run, 25ms)."
+    },
+    {
+      "id": "10",
+      "description": "Default sort (no sort action taken): products appear in fixture order — \"Wireless Mouse\" is the first rendered card and \"Ergonomic Wrist Rest\" is the last.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > default sort: Wireless Mouse first, Ergonomic Wrist Rest last — PASSED (vitest run, 11ms)."
+    },
+    {
+      "id": "11",
+      "description": "After typing \"mouse\" in the search input, clicking the \"Clear filters\" button resets results-count to \"Showing 15 products (page 1 of 1)\" and the search input value becomes \"\".",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > clears search and restores all 15 products — PASSED (vitest run, 100ms)."
+    },
+    {
+      "id": "12",
+      "description": "On initial load with totalPages: 1, the \"Prev\" button is disabled and the \"Next\" button is disabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > disables Prev and Next buttons when totalPages is 1 — PASSED (vitest run, 58ms). Confirmed pagination.test.tsx no longer imports userEvent; build (tsc -b && vite build) succeeds with 0 TS errors."
+    },
+    {
+      "id": "13",
+      "description": "Immediately after render(<App />) (before any await), the loading spinner element with aria-label=\"loading\" is present in the DOM.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows loading spinner immediately after render before async load — PASSED (vitest run, 37ms)."
+    },
+    {
+      "id": "14",
+      "description": "When fetch is overridden to reject with new Error('Network error'), an element with role=\"alert\" is rendered containing the text \"Network error\", and data-testid=\"results-count\" is NOT in the DOM.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows error alert when fetch fails and results-count is absent — PASSED (vitest run, 19ms)."
+    }
+  ]
+}
