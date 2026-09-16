@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "App.tsx delegates all filter and sort computation to filterProducts(products, filters) — the visibleProducts useMemo block contains no inline Array.prototype.filter() or .sort() calls.",
+      "passed": true,
+      "evidence": "grep -n '.filter(|.sort(' src/benchmark-frontend/src/App.tsx returned no output (exit 1 = no matches). App.tsx line 19 reads: const visibleProducts = useMemo(() => filterProducts(products, filters), [products, filters]); — only delegates to filterProducts. All 17 tests pass (pnpm test exit 0)."
+    },
+    {
+      "id": "2",
+      "description": "productFilters.ts does not export normalizeSearch — the function body and its comment are deleted from the file.",
+      "passed": true,
+      "evidence": "grep 'normalizeSearch' src/benchmark-frontend/src/utils/productFilters.ts returned no output (exit 1 = no matches). File read confirms productFilters.ts contains only FilterState type and filterProducts function — no normalizeSearch definition or export."
+    },
+    {
+      "id": "3",
+      "description": "normalizeSearch is not referenced anywhere in source files under src/benchmark-frontend/src/.",
+      "passed": true,
+      "evidence": "grep -rn 'normalizeSearch' src/benchmark-frontend/src/ --include='*.ts' --include='*.tsx' returned no output (exit 1 = no matches across all .ts and .tsx files in that directory tree)."
+    },
+    {
+      "id": "4",
+      "description": "FilterPanel.tsx handleClear does not contain a hardcoded FilterState object literal; instead it calls a passed onClear prop that resets state to the canonical initial values defined in useProductFilters.ts.",
+      "passed": true,
+      "evidence": "grep -n 'search.*''' src/benchmark-frontend/src/components/FilterPanel.tsx returned no match. FilterPanel.tsx lines 24-26 show: function handleClear() { onClear(); } — only calls the passed prop with no hardcoded values. clearFilters.test.tsx passed (1/1 test, confirmed in pnpm test output)."
+    },
+    {
+      "id": "5",
+      "description": "App.tsx passes clearFilters (returned by useProductFilters) to FilterPanel as onClear, replacing the raw setFilters call that previously duplicated the initial filter literal.",
+      "passed": true,
+      "evidence": "App.tsx line 11: const { filters, setFilters, clearFilters, ... } = useProductFilters(); — clearFilters is destructured. Line 29: <FilterPanel filters={filters} onChange={setFilters} onClear={clearFilters} categories={categories} /> — clearFilters forwarded as onClear prop."
+    },
+    {
+      "id": "6",
+      "description": "No unused imports or variables remain in any modified file (App.tsx, productFilters.ts, FilterPanel.tsx, useProductFilters.ts).",
+      "passed": true,
+      "evidence": "pnpm --filter benchmark-frontend exec tsc --noEmit exited with code 0 (no TypeScript errors, no unused import/variable errors)."
+    },
+    {
+      "id": "7",
+      "description": "All existing tests pass without any modification to files under tests/.",
+      "passed": true,
+      "evidence": "pnpm test output: Test Files 6 passed (6), Tests 17 passed (17), 0 failing. Test files: app.render.test.tsx (1), loadingError.test.tsx (4), pagination.test.tsx (5), clearFilters.test.tsx (1), filtering.test.tsx (3), sorting.test.tsx (3). git diff --name-only returned empty output — no uncommitted changes to any files including tests/."
+    },
+    {
+      "id": "8",
+      "description": "No files outside src/benchmark-frontend/src/ are modified (no new dependencies added, no config changes, no test file changes).",
+      "passed": true,
+      "evidence": "git diff --name-only returned empty output (working tree is fully clean). No files in any path outside src/benchmark-frontend/src/ show as modified in the working tree."
+    }
+  ]
+}

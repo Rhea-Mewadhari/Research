@@ -8,7 +8,7 @@ import { filterProducts } from './utils/productFilters';
 import { useProductFilters } from './hooks/useProductFilters';
 
 export default function App() {
-  const { filters, setFilters, products, isLoading, error, page, totalPages, setPage } =
+  const { filters, setFilters, clearFilters, products, isLoading, error, page, totalPages, setPage } =
     useProductFilters();
 
   const categories = useMemo(
@@ -16,9 +16,7 @@ export default function App() {
     [products]
   );
 
-  const visibleProducts = useMemo(() => {
-    return filterProducts(products, filters);
-  }, [products, filters]);
+  const visibleProducts = useMemo(() => filterProducts(products, filters), [products, filters]);
 
   return (
     <main className="container">
@@ -28,7 +26,7 @@ export default function App() {
       </header>
 
       <div className="toolbar">
-        <FilterPanel filters={filters} onChange={setFilters} categories={categories} />
+        <FilterPanel filters={filters} onChange={setFilters} onClear={clearFilters} categories={categories} />
         <SortSelect
           value={filters.sortBy}
           onChange={(sortBy) => setFilters((prev) => ({ ...prev, sortBy }))}

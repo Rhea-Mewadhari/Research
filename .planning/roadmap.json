@@ -1,0 +1,65 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript ~5.7.2, Vite 6 — ESM, strict noUnusedLocals/noUnusedParameters enforced at build time",
+      "Vitest 3 + jsdom + @testing-library/react — tests live under tests/, not src/",
+      "ESLint flat config with react-hooks plugin — rules-of-hooks enforced, React Refresh required for components",
+      "verbatimModuleSyntax enabled — type-only imports must use 'import type'",
+      "noUnusedLocals: true means every removed export or replaced import MUST be cleaned up or tsc --noEmit will fail"
+    ],
+    "features": [
+      "filterProducts(products, filters) in productFilters.ts already handles all branches: search (case-insensitive substring), category (exact match), inStockOnly (boolean), sortBy (price-asc, price-desc, rating-desc, default falls through returning unchanged order)",
+      "App.tsx useMemo for visibleProducts duplicates filterProducts logic identically — safe to replace with a direct call",
+      "App.tsx imports filterProducts but never calls it — fixing the memo also resolves the unused import",
+      "normalizeSearch is defined in productFilters.ts with a 'never cleaned up' comment; zero references anywhere in src/ or tests/",
+      "useProductFilters exports clearFilters as useCallback(() => setFilters(initialFilters), []) — resets all 4 fields; App.tsx currently does not destructure it",
+      "App.tsx passes setFilters as onChange to FilterPanel; FilterPanel.handleClear calls onChange with a hardcoded literal — this coupling is what requirements 4 and 5 break",
+      "Tests: clearFilters.test.tsx, filtering.test.tsx, sorting.test.tsx, pagination.test.tsx, app.render.test.tsx, loadingError.test.tsx — none import normalizeSearch or filterProducts directly"
+    ],
+    "architecture": [
+      "Layer structure: api/ → data/ → utils/ → hooks/ → components/ → App.tsx",
+      "FilterState type is defined and exported from utils/productFilters.ts; used across all layers",
+      "clearFilters already exported from hooks/useProductFilters.ts — no new hook logic needed",
+      "FilterPanel Props type is local to FilterPanel.tsx — onClear: () => void must be added there",
+      "App.tsx is the composition root: it owns useProductFilters(), passes props to FilterPanel, and owns the visibleProducts memo",
+      "utils/productFilters.ts is the canonical home for filter/sort logic — consistent with requirement 1 delegation model",
+      "No changes needed to useProductFilters.ts, SortSelect.tsx, ProductList.tsx, or any file outside src/benchmark-frontend/src/"
+    ],
+    "edgeCases": [
+      "sortBy 'default': filterProducts returns the filtered array unmodified (no sort applied), identical to inline code — no behavior change",
+      "normalizeSearch removal: zero references in src/ or tests/ — no transitive import issues, no test breakage",
+      "onClear must be required (not optional) in FilterPanel Props — if optional, a missing prop would silently no-op the clear button",
+      "clearFilters resets all 4 fields (search, category, inStockOnly, sortBy) matching the hardcoded literal currently in FilterPanel.handleClear — clearFilters.test.tsx validates this",
+      "App.tsx must stop passing setFilters as onChange to FilterPanel for the clear path — but onChange={f => setFilters(f)} is still needed for individual filter changes; only the clear wiring changes",
+      "After replacing useMemo body, filterProducts import is now actually used — no unused-import error; setFilters is still used for onChange so it stays in scope",
+      "If clearFilters is destructured but setFilters remains (for onChange), no unused-variable error arises",
+      "TypeScript build (tsc --noEmit) must pass: removing normalizeSearch removes an export but since it has no importers, no module resolution errors occur"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "2 — productFilters.ts does not export normalizeSearch; 3 — normalizeSearch is not referenced anywhere in src/benchmark-frontend/src/",
+      "description": "Delete the normalizeSearch function body, its JSDoc comment, and its export from productFilters.ts. No other file references it so no follow-up changes are needed.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "4 — FilterPanel handleClear calls a passed onClear prop instead of hardcoding a FilterState literal; 6 — no unused imports or variables in modified files",
+      "description": "In FilterPanel.tsx: add onClear: () => void to the Props type; replace the handleClear body so it calls onClear() instead of onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' }). The onChange prop and its callers remain unchanged.",
+      "files": [
+        "src/benchmark-frontend/src/components/FilterPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "1 — App.tsx delegates visibleProducts computation to filterProducts(products, filters) with no inline .filter() or .sort(); 5 — App.tsx passes clearFilters from useProductFilters to FilterPanel as onClear; 6 — no unused imports or variables in modified files",
+      "description": "In App.tsx: (a) destructure clearFilters from useProductFilters() alongside existing destructured values; (b) replace the visibleProducts useMemo body with a single return filterProducts(products, filters) call, removing all inline filter/sort branches; (c) add onClear={clearFilters} to the <FilterPanel> JSX. The filterProducts import is already present and becomes actively used. setFilters remains in scope for the onChange prop.",
+      "files": [
+        "src/benchmark-frontend/src/App.tsx"
+      ]
+    }
+  ]
+}

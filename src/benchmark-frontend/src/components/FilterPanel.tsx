@@ -3,10 +3,28 @@ import type { FilterState } from '../utils/productFilters';
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  onClear: () => void;
   categories: string[];
 };
 
-export default function FilterPanel({ filters, onChange: _onChange, categories }: Props) {
+export default function FilterPanel({ filters, onChange, onClear, categories }: Props) {
+  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+    onChange({ ...filters, search: e.target.value });
+  }
+
+  function handleCategoryChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const cat = e.target.value === 'all' ? 'All' : e.target.value;
+    onChange({ ...filters, category: cat });
+  }
+
+  function handleStockChange(e: React.ChangeEvent<HTMLInputElement>) {
+    onChange({ ...filters, inStockOnly: e.target.checked });
+  }
+
+  function handleClear() {
+    onClear();
+  }
+
   return (
     <section aria-label="Filters" className="panel">
       <h2>Filters</h2>
@@ -18,7 +36,7 @@ export default function FilterPanel({ filters, onChange: _onChange, categories }
           name="search"
           type="text"
           value={filters.search}
-          onChange={() => {}}
+          onChange={handleSearchChange}
           placeholder="Search by product name"
         />
       </div>
@@ -29,7 +47,7 @@ export default function FilterPanel({ filters, onChange: _onChange, categories }
           id="category"
           name="category"
           value={filters.category}
-          onChange={() => {}}
+          onChange={handleCategoryChange}
         >
           {categories.map((category) => (
             <option key={category} value={category}>
@@ -46,13 +64,13 @@ export default function FilterPanel({ filters, onChange: _onChange, categories }
             name="inStockOnly"
             type="checkbox"
             checked={filters.inStockOnly}
-            onChange={() => {}}
+            onChange={handleStockChange}
           />
           In-stock only
         </label>
       </div>
 
-      <button type="button" onClick={() => {}}>
+      <button type="button" onClick={handleClear}>
         Clear filters
       </button>
     </section>
