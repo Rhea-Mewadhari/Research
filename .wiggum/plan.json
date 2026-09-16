@@ -1,0 +1,24 @@
+{
+  "taskId": "task4",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Remove dead normalizeSearch function from productFilters.ts",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Replace inline filter/sort logic in App.tsx with filterProducts call",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Run tests to verify no regression",
+      "status": "done",
+      "notes": "All 17 tests passed (6 test files). Build succeeded with no TypeScript errors."
+    }
+  ]
+}
