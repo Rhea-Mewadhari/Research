@@ -1,0 +1,86 @@
+{
+  "investigations": {
+    "techStack": [
+      "Test runner: Vitest v3.2.4 (NOT Jest) — configured in vite.config.ts with environment:'jsdom', globals:true, setupFiles:'./tests/setup.ts'",
+      "@testing-library/react v16.3.2 — imports: render, screen",
+      "@testing-library/user-event v14.6.1 — requires setup() API: const user = userEvent.setup(); await user.click(el)",
+      "@testing-library/jest-dom v6.9.1 — initialised in setup.ts via import '@testing-library/jest-dom'",
+      "TypeScript v5.7.2, strict mode; test globals (describe, it, expect, beforeEach, afterEach, vi) available without imports",
+      "Global fetch mock: vi.stubGlobal('fetch', ...) in beforeEach; vi.unstubAllGlobals() in afterEach — both in setup.ts",
+      "Fetch mock default response shape: { ok:true, json: async () => ({ data: [...15products], total:15, page:1, limit:15, totalPages:1 }) }"
+    ],
+    "features": [
+      "data-testid='results-count': paragraph showing 'Showing N products (page X of Y)'",
+      "data-testid='product-{id}': each product card rendered as <article> (role='article')",
+      "aria-label='loading': Spinner div shown while isLoading is true",
+      "role='alert': error paragraph rendered when fetch fails (rejection or ok:false)",
+      "role='status': 'No products found.' paragraph in ProductList when visibleProducts is empty",
+      "Form control IDs: search (text input), category (select), inStockOnly (checkbox), sortBy (sort select)",
+      "Sort values: 'default', 'price-asc', 'Price: Low to High', 'price-desc' 'Price: High to Low', 'rating-desc' 'Rating'",
+      "Buttons: 'Prev' (disabled when page<=1), 'Next' (disabled when page>=totalPages), 'Clear filters'",
+      "Products: id1 Wireless Mouse $25 4.3 Electronics inStock | id2 USB-C Hub $60 4.1 Electronics outOfStock | id3 Mechanical Keyboard $95 4.7 Electronics inStock | id4 Webcam HD $79 4.2 Electronics inStock | id5 Noise-Cancelling Headphones $149 4.6 Electronics outOfStock | id6 Yoga Mat $40 4.8 Fitness inStock | id7 Resistance Bands $30 4.0 Fitness inStock | id8 Foam Roller $22 4.4 Fitness inStock | id9 Dumbbell Set $85 4.5 Fitness outOfStock | id10 Jump Rope $15 4.2 Fitness inStock | id11 Laptop Stand $55 4.6 Accessories inStock | id12 Desk Lamp $45 3.9 Accessories outOfStock | id13 Cable Organiser $18 4.1 Accessories inStock | id14 Monitor Riser $38 4.3 Accessories inStock | id15 Ergonomic Wrist Rest $28 4.0 Accessories inStock",
+      "Out-of-stock items (4): USB-C Hub(2), Noise-Cancelling Headphones(5), Dumbbell Set(9), Desk Lamp(12) — 11 in stock"
+    ],
+    "architecture": [
+      "All 6 stub test files already have correct imports: render, screen from '@testing-library/react'; userEvent from '@testing-library/user-event'; App from '../src/App'",
+      "Each stub has one empty describe block; render(<App />) must be called inside each individual it() block (no beforeEach render)",
+      "Async load pattern: await screen.findByTestId('results-count') before any filter/sort interactions — waits for fetch promise to resolve",
+      "userEvent v14 pattern per test: const user = userEvent.setup(); then await user.type(), await user.click(), await user.selectOptions()",
+      "Error case tests must override the global fetch stub per-test using vi.stubGlobal('fetch', ...) BEFORE render — setup.ts beforeEach runs first, test-level stubGlobal overwrites it",
+      "Import path: '../src/App' (tests/ -> src/); no path aliases",
+      "Coverage only tracks src/utils/productFilters.ts — no test file constraints beyond not modifying src/"
+    ],
+    "edgeCases": [
+      "Spinner is synchronous: screen.getByLabelText('loading') must work immediately after render() with NO await — fetch is pending at that point",
+      "Error from fetch rejection exposes err.message in the alert; 'Network error' must appear in role='alert' text",
+      "ok:false path: override fetch to return { ok:false, json: async () => ({}) } — hook throws 'Failed to fetch products: undefined', role='alert' appears, results-count absent",
+      "clearFilters resets ALL four fields: search='', category='All', inStockOnly=false, sortBy='default'",
+      "After clearFilters: verify via element.value / element.checked (DOM properties), not just results-count text",
+      "Prev disabled: page<=1 (always true for default mock returning page:1, totalPages:1)",
+      "Next disabled: page>=totalPages (always true for default mock returning page:1, totalPages:1)",
+      "Search is case-insensitive: 'yoga' and 'Yoga' both return 1 result (Yoga Mat)",
+      "Combined filter Electronics+inStock: 5 Electronics - 2 outOfStock (USB-C Hub, Noise-Cancelling Headphones) = 3 products",
+      "Headphones+inStock=0: 'Noise-Cancelling Headphones' is out of stock, so 0 results and role='status' shows 'No products found.'",
+      "rating-desc second place: Mechanical Keyboard (4.7) is second after Yoga Mat (4.8) — must assert data-testid='product-3' at index [1]",
+      "Default sort order matches source array: Wireless Mouse (id=1) is first — assert data-testid='product-1' at index [0] without any sort interaction"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3 (app.render.test.tsx: initial render, results-count text, heading presence, filter controls presence)",
+      "description": "Fill tests/app.render.test.tsx with 3 it() blocks: (1) await findByTestId('results-count') and assert 'Showing 15 products (page 1 of 1)'; (2) assert getByRole('heading', {name:/Product Catalog/i}) exists; (3) assert all four filter controls present via getByLabelText and getByRole. Each test: render(<App />), await findByTestId('results-count') to confirm load.",
+      "files": ["src/benchmark-frontend/tests/app.render.test.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 4, 5, 6, 7, 8, 9, 10, 11 (filtering.test.tsx: search, category, inStock, combined filters)",
+      "description": "Fill tests/filtering.test.tsx with 8 it() blocks. Pattern per test: render(<App />); const user = userEvent.setup(); await screen.findByTestId('results-count') to wait for load; then interact and assert results-count text. Req4: type 'Yoga' -> '/Showing 1 products/' + getByText('Yoga Mat'). Req5: type 'yoga' -> same. Req6-8: selectOptions category -> '/Showing 5 products/'. Req9: click inStockOnly -> '/Showing 11 products/'. Req10: selectOptions 'Electronics' + click inStockOnly -> '/Showing 3 products/' + 3 named products. Req11: type 'Headphones' + click inStockOnly -> '/Showing 0 products/' + getByRole('status') contains 'No products found.'",
+      "files": ["src/benchmark-frontend/tests/filtering.test.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 12, 13, 14, 15 (sorting.test.tsx: price-asc, price-desc, rating-desc, default order)",
+      "description": "Fill tests/sorting.test.tsx with 4 it() blocks. Pattern: render(<App />); const user = userEvent.setup(); const sortSelect = await screen.findByRole('combobox', ...) or getByLabelText equivalent after findByTestId; await user.selectOptions(sortSelect, value); assert getAllByRole('article')[0] has correct data-testid. Req12: 'price-asc' -> product-10. Req13: 'price-desc' -> product-5. Req14: 'rating-desc' -> product-6 at [0], product-3 at [1]. Req15: no sort interaction -> product-1 at [0].",
+      "files": ["src/benchmark-frontend/tests/sorting.test.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirements 16, 17, 18 (clearFilters.test.tsx: clear resets filters, all controls reset to defaults)",
+      "description": "Fill tests/clearFilters.test.tsx with 3 it() blocks. Pattern: render(<App />); const user = userEvent.setup(); await screen.findByTestId('results-count'); apply filter; await user.click(screen.getByRole('button', {name:/clear filters/i})); assert. Req16: type 'Yoga' then clear -> results-count matches '/Showing 15 products/'. Req17: after clear assert searchInput.value==='' AND categorySelect.value==='All' AND inStockCheckbox.checked===false AND sortSelect.value==='default' (use container or getByLabelText to access element.value/.checked directly). Req18: selectOptions 'Electronics' then clear -> '/Showing 15 products/'.",
+      "files": ["src/benchmark-frontend/tests/clearFilters.test.tsx"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirements 19, 20 (pagination.test.tsx: Prev disabled on page 1, Next disabled when totalPages=1)",
+      "description": "Fill tests/pagination.test.tsx with 2 it() blocks. Pattern: render(<App />); await screen.findByTestId('results-count'); then assert button disabled state. Req19: getByRole('button', {name:/prev/i}) -> expect(btn).toBeDisabled(). Req20: getByRole('button', {name:/next/i}) -> expect(btn).toBeDisabled(). Default mock returns page:1, totalPages:1 so both conditions are true on initial load.",
+      "files": ["src/benchmark-frontend/tests/pagination.test.tsx"]
+    },
+    {
+      "id": "task-6",
+      "requirement": "Requirements 21, 22, 23, 24 (loadingError.test.tsx: spinner during load, spinner gone after load, fetch rejection error, ok:false error)",
+      "description": "Fill tests/loadingError.test.tsx with 4 it() blocks. Req21 (synchronous spinner): render(<App />); getByLabelText('loading') immediately — no await. Req22 (spinner gone): render(<App />); await findByTestId('results-count'); expect(screen.queryByLabelText('loading')).toBeNull(). Req23 (rejection): vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network error'))); render(<App />); const alert = await findByRole('alert'); expect(alert).toHaveTextContent('Network error'); expect(screen.queryByTestId('results-count')).toBeNull(). Req24 (ok:false): vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ok:false, json: async()=>({})})); render(<App />); await findByRole('alert'); expect(screen.queryByTestId('results-count')).toBeNull().",
+      "files": ["src/benchmark-frontend/tests/loadingError.test.tsx"]
+    }
+  ]
+}

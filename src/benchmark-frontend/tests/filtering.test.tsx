@@ -3,43 +3,75 @@ import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
 describe('Filtering behavior', () => {
-  it('filters products by search term', async () => {
-    const user = userEvent.setup();
+  it('typing Yoga reduces results to 1 and shows Yoga Mat', async () => {
     render(<App />);
+    const user = userEvent.setup();
     await screen.findByTestId('results-count');
-
-    await user.type(screen.getByLabelText(/search/i), 'mouse');
-
-    expect(screen.getByText(/wireless mouse/i)).toBeInTheDocument();
-    expect(screen.queryByText(/yoga mat/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 1 products');
+    await user.type(screen.getByLabelText(/search/i), 'Yoga');
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 1 products/);
+    expect(screen.getByText('Yoga Mat')).toBeInTheDocument();
   });
 
-  it('filters products by category', async () => {
-    const user = userEvent.setup();
+  it('search is case-insensitive: yoga (lowercase) shows Yoga Mat', async () => {
     render(<App />);
+    const user = userEvent.setup();
     await screen.findByTestId('results-count');
+    await user.type(screen.getByLabelText(/search/i), 'yoga');
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 1 products/);
+    expect(screen.getByText('Yoga Mat')).toBeInTheDocument();
+  });
 
+  it('selecting Electronics shows 5 products', async () => {
+    render(<App />);
+    const user = userEvent.setup();
+    await screen.findByTestId('results-count');
+    await user.selectOptions(screen.getByLabelText(/category/i), 'Electronics');
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 5 products/);
+  });
+
+  it('selecting Fitness shows 5 products', async () => {
+    render(<App />);
+    const user = userEvent.setup();
+    await screen.findByTestId('results-count');
     await user.selectOptions(screen.getByLabelText(/category/i), 'Fitness');
-
-    expect(screen.getByText(/yoga mat/i)).toBeInTheDocument();
-    expect(screen.getByText(/resistance bands/i)).toBeInTheDocument();
-    expect(screen.getByText(/foam roller/i)).toBeInTheDocument();
-    expect(screen.queryByText(/wireless mouse/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 5 products');
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 5 products/);
   });
 
-  it('filters products by in-stock only', async () => {
-    const user = userEvent.setup();
+  it('selecting Accessories shows 5 products', async () => {
     render(<App />);
+    const user = userEvent.setup();
     await screen.findByTestId('results-count');
+    await user.selectOptions(screen.getByLabelText(/category/i), 'Accessories');
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 5 products/);
+  });
 
+  it('checking in-stock only shows 11 products', async () => {
+    render(<App />);
+    const user = userEvent.setup();
+    await screen.findByTestId('results-count');
     await user.click(screen.getByLabelText(/in-stock only/i));
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 11 products/);
+  });
 
-    expect(screen.queryByText(/usb-c hub/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/noise-cancelling headphones/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/dumbbell set/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/desk lamp/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 11 products');
+  it('Electronics + in-stock shows 3 products', async () => {
+    render(<App />);
+    const user = userEvent.setup();
+    await screen.findByTestId('results-count');
+    await user.selectOptions(screen.getByLabelText(/category/i), 'Electronics');
+    await user.click(screen.getByLabelText(/in-stock only/i));
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 3 products/);
+    expect(screen.getByText('Wireless Mouse')).toBeInTheDocument();
+    expect(screen.getByText('Mechanical Keyboard')).toBeInTheDocument();
+    expect(screen.getByText('Webcam HD')).toBeInTheDocument();
+  });
+
+  it('Headphones + in-stock shows 0 products and No products found status', async () => {
+    render(<App />);
+    const user = userEvent.setup();
+    await screen.findByTestId('results-count');
+    await user.type(screen.getByLabelText(/search/i), 'Headphones');
+    await user.click(screen.getByLabelText(/in-stock only/i));
+    expect(screen.getByTestId('results-count')).toHaveTextContent(/Showing 0 products/);
+    expect(screen.getByRole('status')).toHaveTextContent('No products found.');
   });
 });

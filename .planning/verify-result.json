@@ -1,0 +1,149 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "After <App /> renders and the async fetch resolves, the element with data-testid=\"results-count\" contains the text \"Showing 15 products (page 1 of 1)\".",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > results-count shows correct text after fetch resolves — PASSED (vitest output: ✓ 37ms; Test Files 6 passed (6), Tests 24 passed (24))"
+    },
+    {
+      "id": "2",
+      "description": "After load, the heading \"Product Catalog\" is present in the document.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > Product Catalog heading is present after load — PASSED (vitest output: ✓ 37ms)"
+    },
+    {
+      "id": "3",
+      "description": "After load, the filter controls are present: search input (id=\"search\"), category select (id=\"category\"), in-stock checkbox (id=\"inStockOnly\"), and a \"Clear filters\" button.",
+      "passed": true,
+      "evidence": "tests/app.render.test.tsx > App rendering > all filter controls are present after load — PASSED (vitest output: ✓ 16ms)"
+    },
+    {
+      "id": "4",
+      "description": "Typing \"Yoga\" into the search input reduces the results-count to \"Showing 1 products\" and the product card for \"Yoga Mat\" is visible.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > typing Yoga reduces results to 1 and shows Yoga Mat — PASSED (vitest output: ✓ 78ms)"
+    },
+    {
+      "id": "5",
+      "description": "Search is case-insensitive: typing \"yoga\" (lowercase) also shows 1 product and \"Yoga Mat\" is visible.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > search is case-insensitive: yoga (lowercase) shows Yoga Mat — PASSED (vitest output: ✓ 30ms)"
+    },
+    {
+      "id": "6",
+      "description": "Selecting \"Electronics\" in the category select shows exactly 5 products.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > selecting Electronics shows 5 products — PASSED (vitest output: ✓ 21ms)"
+    },
+    {
+      "id": "7",
+      "description": "Selecting \"Fitness\" in the category select shows exactly 5 products.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > selecting Fitness shows 5 products — PASSED (vitest output: ✓ 18ms)"
+    },
+    {
+      "id": "8",
+      "description": "Selecting \"Accessories\" in the category select shows exactly 5 products.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > selecting Accessories shows 5 products — PASSED (vitest output: ✓ 21ms)"
+    },
+    {
+      "id": "9",
+      "description": "Clicking the in-stock checkbox shows exactly 11 products (the 4 out-of-stock items are hidden).",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > checking in-stock only shows 11 products — PASSED (vitest output: ✓ 16ms)"
+    },
+    {
+      "id": "10",
+      "description": "Selecting \"Electronics\" and checking in-stock shows exactly 3 products (Wireless Mouse, Mechanical Keyboard, Webcam HD).",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > Electronics + in-stock shows 3 products — PASSED (vitest output: ✓ 27ms)"
+    },
+    {
+      "id": "11",
+      "description": "Typing \"Headphones\" in search and checking in-stock shows 0 products and the \"No products found.\" status message appears.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx > Filtering behavior > Headphones + in-stock shows 0 products and No products found status — PASSED (vitest output: ✓ 42ms)"
+    },
+    {
+      "id": "12",
+      "description": "Selecting \"Price: Low to High\" in the sort select causes Jump Rope to appear first among all rendered product articles.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > price-asc: Jump Rope appears first — PASSED (vitest output: ✓ 77ms)"
+    },
+    {
+      "id": "13",
+      "description": "Selecting \"Price: High to Low\" causes Noise-Cancelling Headphones to appear first.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > price-desc: Noise-Cancelling Headphones appears first — PASSED (vitest output: ✓ 27ms)"
+    },
+    {
+      "id": "14",
+      "description": "Selecting \"Rating\" causes Yoga Mat to appear first and Mechanical Keyboard to appear second.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > rating-desc: Yoga Mat first, Mechanical Keyboard second — PASSED (vitest output: ✓ 26ms)"
+    },
+    {
+      "id": "15",
+      "description": "Default sort order renders Wireless Mouse as the first product (matches source array order).",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx > Sorting behavior > default sort: Wireless Mouse is first product — PASSED (vitest output: ✓ 9ms)"
+    },
+    {
+      "id": "16",
+      "description": "After applying a search filter (\"Yoga\", showing 1 product), clicking \"Clear filters\" resets results-count to \"Showing 15 products\".",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > after search filter Yoga, clicking Clear filters resets to 15 products — PASSED (vitest output: ✓ 96ms)"
+    },
+    {
+      "id": "17",
+      "description": "After clicking \"Clear filters\", the search input value is empty, the category select value is \"All\", the in-stock checkbox is unchecked, and the sort select value is \"default\".",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > after clicking Clear filters, all controls reset to their defaults — PASSED (vitest output: ✓ 44ms)"
+    },
+    {
+      "id": "18",
+      "description": "After applying a category filter (\"Electronics\", showing 5 products), clicking \"Clear filters\" resets results-count to \"Showing 15 products\".",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx > Clear filters > after category filter Electronics, clicking Clear filters resets to 15 products — PASSED (vitest output: ✓ 34ms)"
+    },
+    {
+      "id": "19",
+      "description": "On initial load (page=1, totalPages=1 from mock), the \"Prev\" button is disabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > Prev button is disabled on page 1 — PASSED (vitest output: ✓ 57ms)"
+    },
+    {
+      "id": "20",
+      "description": "On initial load (page=1, totalPages=1 from mock), the \"Next\" button is disabled.",
+      "passed": true,
+      "evidence": "tests/pagination.test.tsx > Pagination controls > Next button is disabled when totalPages equals current page — PASSED (vitest output: ✓ 16ms)"
+    },
+    {
+      "id": "21",
+      "description": "While the fetch is pending (not yet resolved), the spinner element with aria-label=\"loading\" is present in the document.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > spinner is present synchronously while fetch is pending — PASSED (vitest output: ✓ 15ms)"
+    },
+    {
+      "id": "22",
+      "description": "After the fetch resolves successfully, the spinner is removed from the document and data-testid=\"results-count\" is visible.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > spinner is removed and results-count is visible after successful load — PASSED (vitest output: ✓ 27ms)"
+    },
+    {
+      "id": "23",
+      "description": "When the fetch mock rejects with new Error('Network error'), a role=\"alert\" element is rendered containing the error message text, and data-testid=\"results-count\" is not present.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows error alert containing Network error when fetch rejects, no results-count — PASSED (vitest output: ✓ 20ms)"
+    },
+    {
+      "id": "24",
+      "description": "When the fetch mock resolves with { ok: false }, the app renders an error alert and does not show the results-count.",
+      "passed": true,
+      "evidence": "tests/loadingError.test.tsx > Loading and error states > shows error alert when fetch responds with ok:false, no results-count — PASSED (vitest output: ✓ 5ms)"
+    }
+  ]
+}
