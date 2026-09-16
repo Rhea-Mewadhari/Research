@@ -1,0 +1,48 @@
+{
+  "taskId": "task5",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Write tests/app.render.test.tsx — initial render and results-count display",
+      "status": "done",
+      "notes": "All 4 tests pass: heading, results-count text, page info, and 15 product cards."
+    },
+    {
+      "id": "phase-2",
+      "title": "Write tests/loadingError.test.tsx — loading spinner and fetch error state",
+      "status": "done",
+      "notes": "All 4 tests pass: spinner visible during pending fetch, spinner gone after resolve, error alert on rejected Error, generic error message on non-Error rejection."
+    },
+    {
+      "id": "phase-3",
+      "title": "Write tests/filtering.test.tsx — search, category, in-stock, and combined filters",
+      "status": "done",
+      "notes": "All 4 tests pass: search by term (1 result), category filter (5 results), in-stock only (11 results), combined category+in-stock (3 results)."
+    },
+    {
+      "id": "phase-4",
+      "title": "Write tests/sorting.test.tsx — price-asc, price-desc, rating-desc, and default sort",
+      "status": "done",
+      "notes": "All 4 tests pass: price-asc (Jump Rope first, Noise-Cancelling Headphones last), price-desc (Noise-Cancelling Headphones first, Mechanical Keyboard second), rating-desc (Yoga Mat first, Mechanical Keyboard second), default (Wireless Mouse first after switching back from price-asc)."
+    },
+    {
+      "id": "phase-5",
+      "title": "Write tests/clearFilters.test.tsx — clear button resets all active filters",
+      "status": "done",
+      "notes": "All 4 tests pass: clear after search (1→15), clear after category (5→15), clear after in-stock (11→15), clear after combined Fitness+in-stock (4→15)."
+    },
+    {
+      "id": "phase-6",
+      "title": "Write tests/pagination.test.tsx — Prev/Next button enabled/disabled states",
+      "status": "done",
+      "notes": "All 4 tests pass: both disabled on page 1 of 1 (default mock), Prev disabled/Next enabled on page 1 of 3 (override mock totalPages:3), Prev enabled after clicking Next (page 2), Next disabled on last page (page 3 of 3) after clicking Next twice. Used waitFor to handle async re-fetch on page change."
+    },
+    {
+      "id": "phase-7",
+      "title": "Run pnpm test and fix any failures across all 6 test files",
+      "status": "done",
+      "notes": "All 24 tests pass across 6 test files (app.render, loadingError, filtering, sorting, clearFilters, pagination). Build also succeeds with no errors."
+    }
+  ]
+}
