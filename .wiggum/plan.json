@@ -1,0 +1,30 @@
+{
+  "taskId": "task3",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix App.tsx: wrong CSS import path and unclosed ProductList JSX tag",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix SortSelect.tsx: cast e.target.value to FilterState['sortBy'] to satisfy TypeScript",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix ProductCard.tsx: rename discountPercent to discountPct to match Product type",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify build succeeds and all tests pass",
+      "status": "done",
+      "notes": "All 17 tests pass (6 test files). TypeScript compile and Vite production build succeed cleanly."
+    }
+  ]
+}
