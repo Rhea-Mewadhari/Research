@@ -1,0 +1,54 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19 + TypeScript 5.7 with strict mode: noUnusedLocals and noUnusedParameters both enabled — dead exports like normalizeSearch will cause compile errors",
+      "Vitest 3 + React Testing Library 16 with jsdom — tests use userEvent and render integration, not unit mocks of filterProducts",
+      "Vite 6 with verbatimModuleSyntax:true — type-only imports must use 'import type'; value imports must not be mixed with type imports",
+      "ESLint react-hooks plugin enforces exhaustive deps on useMemo — dependency array must accurately reflect what the callback references",
+      "Build pipeline: tsc -b first, then vite build — TypeScript errors block the build before bundling"
+    ],
+    "features": [
+      "filterProducts(products: Product[], filters: FilterState): Product[] is fully implemented in productFilters.ts and is functionally correct — applies search (case-insensitive trim), category, inStockOnly, and sortBy in sequence",
+      "App.tsx's visibleProducts useMemo (lines 19-44) duplicates all of filterProducts() inline — the two implementations are behaviorally identical across all test paths",
+      "filterProducts is already imported in App.tsx but never called — it is dead import usage (the logic is inlined instead)",
+      "normalizeSearch (productFilters.ts lines 10-13) is exported but never imported or called anywhere in the codebase — pure dead code with a comment acknowledging it",
+      "FilterPanel.tsx and SortSelect.tsx are pure UI components with no filter/sort business logic — they must not be changed",
+      "6 integration test files cover: filtering (search/category/stock), sorting (3 modes), clear filters, pagination, render, and loading/error states — plus a hidden edge-cases file covering case-insensitivity, whitespace trimming, empty results, and category='All'"
+    ],
+    "architecture": [
+      "Layer structure: api/ → hooks/ → App.tsx → components/; utils/ contains pure functions consumed by App.tsx and hooks/",
+      "useProductFilters.ts owns filter state (FilterState) and data fetching — it returns raw products and filters separately; App.tsx is responsible for applying filterProducts()",
+      "Requirement 1 explicitly mandates the useMemo in App.tsx calls filterProducts — the correct call site is App.tsx, not useProductFilters.ts (contra architecture agent's suggestion)",
+      "FilterState type is exported from productFilters.ts and imported by FilterPanel.tsx, SortSelect.tsx, and useProductFilters.ts — must remain stable",
+      "Files requiring changes: App.tsx (replace inline useMemo body), productFilters.ts (remove normalizeSearch)",
+      "Files that must not change: all components, hooks/useProductFilters.ts, api/, types/, utils/formatters.ts, tests/"
+    ],
+    "edgeCases": [
+      "Inline logic in App.tsx and filterProducts() are functionally identical — trim/lowercase for search, strict equality for category/stock, spread-before-sort for immutability — no behavioral regression when swapping",
+      "whitespace-only search (e.g. '   ') must still be treated as empty — filterProducts uses filters.search.trim() !== '' guard, which handles this correctly; covered by hidden edge-cases test",
+      "useMemo wrapper must be preserved with the same [products, filters] dependency array — it is a React performance primitive, not business logic; removing or mis-specifying deps would break render tests",
+      "filterProducts import in App.tsx must remain after the refactor — it becomes the active call; removing it would cause a TypeScript compile error (noUnusedLocals would also flag it if the call were removed)",
+      "normalizeSearch has no type exports or imports in any file — removing it causes zero TypeScript fallout beyond its own declaration",
+      "category 'All' must show all products — filterProducts skips category filter when filters.category === 'All'; this path is tested in hidden edge-cases suite",
+      "Sort 'default' must return original fetch order — filterProducts returns the filtered array unsorted when sortBy === 'default'; covered by initial render test"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 2: normalizeSearch must be removed from productFilters.ts — neither the function declaration, the export keyword for it, nor the stale comment block may remain.",
+      "description": "Delete the normalizeSearch function declaration, its export, and the accompanying stale comment block from productFilters.ts. The FilterState type and filterProducts function must remain untouched.",
+      "files": [
+        "src/benchmark-frontend/src/utils/productFilters.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 1: App.tsx must delegate product filtering and sorting to filterProducts — the visibleProducts useMemo body must call filterProducts(products, filters) and must contain no inline .filter() or .sort() chains that re-implement that logic.",
+      "description": "Replace the inline filter/sort chains inside the visibleProducts useMemo in App.tsx with a single call to filterProducts(products, filters). Keep the useMemo wrapper and the [products, filters] dependency array intact. The filterProducts import at the top of App.tsx is already present and must remain.",
+      "files": [
+        "src/benchmark-frontend/src/App.tsx"
+      ]
+    }
+  ]
+}
