@@ -1,0 +1,30 @@
+{
+  "taskId": "task6",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Implement filterProducts in src/utils/productFilters.ts",
+      "status": "done",
+      "notes": "Implemented search (case-insensitive trim), category (exact match, 'All' means no filter), inStockOnly, and sorting (price-asc, price-desc, rating-desc). Build passes. Remaining test failures are pre-existing and require phases 2-3."
+    },
+    {
+      "id": "phase-2",
+      "title": "Wire up event handlers in FilterPanel.tsx",
+      "status": "done",
+      "notes": "Wired search input, category select, inStockOnly checkbox, and Clear filters button to call onChange with updated FilterState. Build passes. 3 sorting test failures are pre-existing (require phase 3 — SortSelect not yet wired)."
+    },
+    {
+      "id": "phase-3",
+      "title": "Wire up onChange handler in SortSelect.tsx",
+      "status": "done",
+      "notes": "Replaced _onChange alias with onChange, and wired select's onChange to call onChange(e.target.value as FilterState['sortBy']). All 17 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Wrap setFilters in App.tsx to also reset page to 1 on filter change",
+      "status": "done",
+      "notes": "Added handleFilterChange wrapper that calls setFilters(next) and setPage(1) together. Passed it to FilterPanel's onChange. Updated SortSelect's onChange inline to also call setPage(1). All 17 tests pass, build succeeds."
+    }
+  ]
+}
