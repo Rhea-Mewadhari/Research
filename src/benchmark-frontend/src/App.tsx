@@ -28,10 +28,14 @@ export default function App() {
       </header>
 
       <div className="toolbar">
-        <FilterPanel filters={filters} onChange={setFilters} categories={categories} />
+        <FilterPanel
+          filters={filters}
+          onChange={(next) => { setFilters(next); setPage(1); }}
+          categories={categories}
+        />
         <SortSelect
           value={filters.sortBy}
-          onChange={(sortBy) => setFilters((prev) => ({ ...prev, sortBy }))}
+          onChange={(sortBy) => { setFilters((prev) => ({ ...prev, sortBy })); setPage(1); }}
         />
       </div>
 

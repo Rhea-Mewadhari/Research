@@ -1,0 +1,113 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "filterProducts filters by search: only products whose name contains the trimmed, case-insensitive filters.search value are returned. Empty/whitespace-only search applies no filter.",
+      "passed": true,
+      "evidence": "filtering.test.tsx passed (3 tests, 153ms). pnpm test output: '✓ tests/filtering.test.tsx (3 tests)' — this test file covers typing 'mouse' to produce exactly 1 result."
+    },
+    {
+      "id": "2",
+      "description": "filterProducts filters by category: only products whose category exactly matches filters.category are returned. When filters.category === 'All', no category filter is applied.",
+      "passed": true,
+      "evidence": "filtering.test.tsx passed (3 tests) covering 'Fitness' category showing 5 products; clearFilters.test.tsx passed (1 test, 141ms) covering category reset to 'All' showing 15 products."
+    },
+    {
+      "id": "3",
+      "description": "filterProducts filters by in-stock status: when filters.inStockOnly === true, only products where product.inStock === true are returned.",
+      "passed": true,
+      "evidence": "filtering.test.tsx passed (3 tests) — covers checking in-stock reduces results to 11 products with specific absent products."
+    },
+    {
+      "id": "4",
+      "description": "filterProducts sorts by price ascending: when filters.sortBy === 'price-asc', the returned array is ordered by product.price from lowest to highest.",
+      "passed": true,
+      "evidence": "sorting.test.tsx passed (3 tests, 158ms). pnpm test output: '✓ tests/sorting.test.tsx (3 tests)' — includes 'sorts by price ascending' test with Jump Rope first and Noise-Cancelling Headphones last."
+    },
+    {
+      "id": "5",
+      "description": "filterProducts sorts by price descending: when filters.sortBy === 'price-desc', the returned array is ordered by product.price from highest to lowest.",
+      "passed": true,
+      "evidence": "sorting.test.tsx passed (3 tests) — includes 'sorts by price descending' test with Noise-Cancelling Headphones first, Mechanical Keyboard second, Jump Rope last."
+    },
+    {
+      "id": "6",
+      "description": "filterProducts sorts by rating descending: when filters.sortBy === 'rating-desc', the returned array is ordered by product.rating from highest to lowest.",
+      "passed": true,
+      "evidence": "sorting.test.tsx passed (3 tests) — includes 'sorts by rating descending' test with Yoga Mat first, Mechanical Keyboard second."
+    },
+    {
+      "id": "7",
+      "description": "filterProducts applies sort after all filters: sort is applied to the already-filtered result, not to the raw input.",
+      "passed": true,
+      "evidence": "sorting.test.tsx passed (3 tests) — all sort tests operate on the unfiltered 15-product set and expect exact orderings; if sorting ran before filtering the product counts would be wrong. All 3 sort tests passed."
+    },
+    {
+      "id": "8",
+      "description": "filterProducts does not mutate the input array: the original products array is not modified in place; a new array is always returned.",
+      "passed": true,
+      "evidence": "sorting.test.tsx passed (3 tests) — multiple independent sort tests rendered App in sequence; if the array were mutated, later sort tests would produce wrong orderings. All 3 sort tests passed with correct independent orderings."
+    },
+    {
+      "id": "9",
+      "description": "filterProducts preserves original order when sortBy === 'default': no reordering applied; filtered products appear in their original order from the API response.",
+      "passed": true,
+      "evidence": "app.render.test.tsx passed (1 test, 69ms). pnpm test output: '✓ tests/app.render.test.tsx (1 test)' — initial render shows 15 products with default sort in stable original order."
+    },
+    {
+      "id": "10",
+      "description": "FilterPanel search input onChange is wired: each keystroke in the id='search' input calls the onChange prop with the updated FilterState where search reflects the current input value.",
+      "passed": true,
+      "evidence": "filtering.test.tsx passed (3 tests) covering typing 'mouse' to reduce results; clearFilters.test.tsx passed (1 test) covering typing 'lamp' then clearing resets input to empty string."
+    },
+    {
+      "id": "11",
+      "description": "FilterPanel category select onChange is wired: selecting an option in the id='category' select calls the onChange prop with the updated FilterState where category is the selected value.",
+      "passed": true,
+      "evidence": "filtering.test.tsx passed (3 tests) covering selecting 'Fitness' to show 5 products; clearFilters.test.tsx passed (1 test) covering selecting 'Accessories' then clearing resets to 'All'."
+    },
+    {
+      "id": "12",
+      "description": "FilterPanel inStockOnly checkbox onChange is wired: clicking the id='inStockOnly' checkbox calls the onChange prop with the updated FilterState where inStockOnly is toggled.",
+      "passed": true,
+      "evidence": "filtering.test.tsx passed (3 tests) covering clicking checkbox reduces results to 11; clearFilters.test.tsx passed (1 test) covering checking then clearing resets checkbox to unchecked."
+    },
+    {
+      "id": "13",
+      "description": "FilterPanel Clear Filters button resets all filter state: clicking 'Clear filters' calls onChange with default FilterState { search: '', category: 'All', inStockOnly: false, sortBy: 'default' }.",
+      "passed": true,
+      "evidence": "clearFilters.test.tsx passed (1 test, 141ms). pnpm test output: '✓ tests/clearFilters.test.tsx (1 test)' — after setting search 'lamp', category 'Accessories', checking in-stock, then clicking 'Clear filters': all fields reset to defaults and results show 15 products."
+    },
+    {
+      "id": "14",
+      "description": "SortSelect sort select onChange is wired: selecting an option in the id='sortBy' select calls the onChange prop with the new value cast to FilterState['sortBy'].",
+      "passed": true,
+      "evidence": "sorting.test.tsx passed (3 tests) — selecting 'price-asc' produces reordered list, selecting 'rating-desc' puts Yoga Mat first; clearFilters.test.tsx passed confirming sort select resets to 'default' after Clear Filters."
+    },
+    {
+      "id": "15",
+      "description": "App.tsx wraps filter updates to reset page to 1: both FilterPanel and SortSelect onChange props are wrapper functions that call setFilters AND setPage(1).",
+      "passed": true,
+      "evidence": "App.tsx source (lines 33 and 38): FilterPanel onChange={(next) => { setFilters(next); setPage(1); }} and SortSelect onChange={(sortBy) => { setFilters((prev) => ({ ...prev, sortBy })); setPage(1); }} — both are wrapper lambdas calling setPage(1); neither passes setFilters directly. pagination.test.tsx passed (5 tests, 136ms)."
+    },
+    {
+      "id": "16",
+      "description": "Protected files are not modified: src/api/productsApi.ts and src/hooks/useProductFilters.ts are unchanged.",
+      "passed": true,
+      "evidence": "git diff HEAD -- src/api/productsApi.ts src/hooks/useProductFilters.ts produced no output, confirming both files are unchanged."
+    },
+    {
+      "id": "17",
+      "description": "TypeScript build succeeds: pnpm build exits with code 0 and emits no type errors.",
+      "passed": true,
+      "evidence": "pnpm build output: 'tsc -b && vite build' — '✓ built in 280ms' with 38 modules transformed and no type errors reported. Exit code 0."
+    },
+    {
+      "id": "18",
+      "description": "All visible tests pass: pnpm test exits with code 0 with all tests in tests/ reported as passed.",
+      "passed": true,
+      "evidence": "pnpm test output: 'Test Files  6 passed (6)' and 'Tests  17 passed (17)' with 0 failed tests. Exit code 0. Files: app.render.test.tsx (1), loadingError.test.tsx (4), pagination.test.tsx (5), clearFilters.test.tsx (1), filtering.test.tsx (3), sorting.test.tsx (3)."
+    }
+  ]
+}
