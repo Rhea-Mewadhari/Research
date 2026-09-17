@@ -1,0 +1,126 @@
+{
+  "taskId": "task6",
+  "runId": "wiggum-run1",
+  "timestamp": "2026-09-17T09:09:54.615Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 16,
+    "failed": 0,
+    "total": 16,
+    "expectedFiles": 6,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 6678,
+    "hiddenMs": 1317,
+    "buildMs": 1426,
+    "totalMs": 9746
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.75,
+    "overallScore": 0.9
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task6",
+    "wall_duration_ms": 357476,
+    "cost_usd": 1.7708078999999999,
+    "num_turns": 83,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "a9fbbc7e-402a-4a90-9d40-8f3e3af13ec8",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Implement filterProducts in src/utils/productFilters.ts",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Wire up onChange handlers in FilterPanel.tsx and SortSelect.tsx",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Wrap setFilters in App.tsx to reset page to 1 on filter change",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-4",
+          "title": "Run tests and verify build passes",
+          "status": "done",
+          "notes": "All 17 tests passed (6 test files). Build succeeded with tsc and vite."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 80979,
+          "cost_usd": 0.36336329999999994,
+          "num_turns": 18,
+          "session_id": "0a5e3106-616e-4585-8b37-4c4fc78438cc",
+          "is_error": false
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 80564,
+          "cost_usd": 0.3933495,
+          "num_turns": 20,
+          "session_id": "54b0e024-891d-4e8c-8714-a0bc262e766a",
+          "is_error": false
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 83978,
+          "cost_usd": 0.3944265,
+          "num_turns": 18,
+          "session_id": "c2615c88-c730-4187-bff2-700f414042b2",
+          "is_error": false
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 33790,
+          "cost_usd": 0.20693849999999997,
+          "num_turns": 8,
+          "session_id": "a9fbbc7e-402a-4a90-9d40-8f3e3af13ec8",
+          "is_error": false
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import './styles/style.css';
 import FilterPanel from './components/FilterPanel';
 import ProductList from './components/ProductList';
@@ -10,6 +10,14 @@ import { useProductFilters } from './hooks/useProductFilters';
 export default function App() {
   const { filters, setFilters, products, isLoading, error, page, totalPages, setPage } =
     useProductFilters();
+
+  const handleSetFilters = useCallback(
+    (next: Parameters<typeof setFilters>[0]) => {
+      setFilters(next);
+      setPage(1);
+    },
+    [setFilters, setPage]
+  );
 
   const categories = useMemo(
     () => ['All', ...new Set(products.map((p) => p.category))],
@@ -28,10 +36,10 @@ export default function App() {
       </header>
 
       <div className="toolbar">
-        <FilterPanel filters={filters} onChange={setFilters} categories={categories} />
+        <FilterPanel filters={filters} onChange={handleSetFilters} categories={categories} />
         <SortSelect
           value={filters.sortBy}
-          onChange={(sortBy) => setFilters((prev) => ({ ...prev, sortBy }))}
+          onChange={(sortBy) => handleSetFilters({ ...filters, sortBy })}
         />
       </div>
 

@@ -1,0 +1,30 @@
+{
+  "taskId": "task6",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Implement filterProducts in src/utils/productFilters.ts",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Wire up onChange handlers in FilterPanel.tsx and SortSelect.tsx",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Wrap setFilters in App.tsx to reset page to 1 on filter change",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify build passes",
+      "status": "done",
+      "notes": "All 17 tests passed (6 test files). Build succeeded with tsc and vite."
+    }
+  ]
+}
