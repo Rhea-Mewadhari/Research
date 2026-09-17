@@ -1,0 +1,24 @@
+{
+  "taskId": "task1",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix queryParser.ts to accept hyphenated sort values (price-asc, price-desc, rating-desc)",
+      "status": "done",
+      "notes": "Added HYPHENATED_SORT_MAP in queryParser.ts to normalize price-asc, price-desc, rating-desc (and name variants) to internal camelCase. Also fixed pre-existing type error: changed ProductQuery & { sort?: InternalSort } to Omit<ProductQuery, 'sort'> & { sort?: InternalSort } in both queryParser.ts and productService.ts to resolve the conflicting intersection. Build passes; 16/18 tests pass (2 remaining failures are response envelope field names, phase 2)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix productService.ts response envelope: rename count→total and pages→totalPages",
+      "status": "done",
+      "notes": "Changed return statement in productService.ts line 44 from { data, count, page, limit, pages } to { data, total: count, page, limit, totalPages: pages }. All 18 tests now pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Run tests and verify all visible tests pass",
+      "status": "done",
+      "notes": "All 18 tests pass, build clean (tsc exits 0). No changes needed — prior phases already delivered working code."
+    }
+  ]
+}
