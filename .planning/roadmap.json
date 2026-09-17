@@ -1,0 +1,52 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express v5 with CORS middleware; routes: GET /products (auth-protected), GET /health (public)",
+      "TypeScript ~6.0.2 in ESM mode (type:module, module:esnext, noEmit:true); dev runner: tsx watch",
+      "Vitest v4 + supertest v7 for integration tests; test script: vitest run (CI-style, non-watch)",
+      "Query parsing centralised in src/utils/queryParser.ts, called from controller before service",
+      "Auth middleware at src/middleware/auth.ts (requireAuth) — must not be modified"
+    ],
+    "features": [
+      "queryParser.ts VALID_SORT_OPTIONS contains only camelCase: priceAsc, priceDesc, ratingDesc, nameAsc, nameDesc",
+      "Hyphenated values (price-asc, price-desc, rating-desc) fail the includes() check and are silently dropped — sort field omitted",
+      "productService.ts getAllProducts returns envelope: { data, count, page, limit, pages }",
+      "count = total matching products before pagination; pages = Math.ceil(count/limit)",
+      "Controller is a pure pass-through: req.query → parseProductQuery → getAllProducts → res.json(result), no transformation"
+    ],
+    "architecture": [
+      "Layer chain: routes → middleware (requireAuth) → controller (productController.ts) → queryParser.ts → service (productService.ts) → dataFetcher.ts",
+      "Sort normalisation belongs in queryParser.ts — that is the single entry point for all query param parsing",
+      "Response envelope is constructed entirely in productService.ts getAllProducts — the only place to rename count/pages",
+      "types/product.ts defines PaginatedResponse<T> with correct field names (total, totalPages) but service uses Record<string,unknown> — type file must not be changed (req 10)",
+      "InternalSort type is locally defined in both queryParser.ts and productService.ts — both files switch on the same camelCase tokens; keep this consistent"
+    ],
+    "edgeCases": [
+      "Unknown/unrecognised sort values (e.g. sort=foo, sort=priceAsc after the fix): sort field must be omitted from parsed query — no error returned",
+      "CamelCase sort values (priceAsc, priceDesc, ratingDesc) must become unrecognised after the change — only hyphenated frontend format accepted",
+      "nameAsc and nameDesc are internal-only sorts with no hyphenated frontend form — they must remain reachable through the camelCase path in the service switch",
+      "Empty results (unknown category or no search match): total===0, totalPages===0, data===[] — Math.ceil(0/limit)===0 must hold",
+      "Pagination: limit=100 clamped to 50; page=2 returns a different set from page=1; page/limit fields in envelope unchanged",
+      "Auth digit-sum rule: token digits summing to even → 200; odd → 401; no Bearer prefix → 401; /health exempt from auth",
+      "totalPages formula: Math.ceil(total / limit); with 15 products and limit=5, totalPages===3"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3 — GET /products?sort=price-asc, ?sort=price-desc, ?sort=rating-desc must return HTTP 200 with products sorted correctly",
+      "description": "In queryParser.ts, replace the VALID_SORT_OPTIONS string-array allowlist with a hyphenated-to-camelCase mapping object ({ 'price-asc': 'priceAsc', 'price-desc': 'priceDesc', 'rating-desc': 'ratingDesc' }). When raw.sort matches a key in the map, set parsed.sort to the mapped camelCase InternalSort value. When raw.sort is absent or not a key in the map (including former camelCase values), omit the sort field from the returned query object — no error.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 4, 5, 6 — Response envelope must use field names total and totalPages; must NOT contain count or pages",
+      "description": "In productService.ts getAllProducts, rename the two envelope fields in the return statement: count → total and pages → totalPages. No logic change — only the property names in the returned object literal change.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}

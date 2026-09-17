@@ -1,9 +1,17 @@
-import type { ProductQuery, SortOption } from '../types/product';
+import type { ProductQuery } from '../types/product';
 
-const VALID_SORT_OPTIONS: SortOption[] = ['price_asc', 'price_desc', 'name_asc', 'name_desc'];
+type InternalSort = 'priceAsc' | 'priceDesc' | 'ratingDesc' | 'nameAsc' | 'nameDesc';
 
-export function parseProductQuery(raw: Record<string, unknown>): ProductQuery {
-  const query: ProductQuery = {};
+const SORT_MAP: Record<string, InternalSort> = {
+  'price-asc': 'priceAsc',
+  'price-desc': 'priceDesc',
+  'rating-desc': 'ratingDesc',
+};
+
+type ParsedQuery = Omit<ProductQuery, 'sort'> & { sort?: InternalSort };
+
+export function parseProductQuery(raw: Record<string, unknown>): ParsedQuery {
+  const query: ParsedQuery = {};
 
   if (typeof raw.search === 'string') {
     query.search = raw.search;
@@ -19,8 +27,8 @@ export function parseProductQuery(raw: Record<string, unknown>): ProductQuery {
     query.inStock = false;
   }
 
-  if (VALID_SORT_OPTIONS.includes(raw.sort as SortOption)) {
-    query.sort = raw.sort as SortOption;
+  if (typeof raw.sort === 'string' && raw.sort in SORT_MAP) {
+    query.sort = SORT_MAP[raw.sort];
   }
 
   const pageVal = parseInt(String(raw.page), 10);

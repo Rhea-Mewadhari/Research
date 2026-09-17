@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products?sort=price-asc returns HTTP 200 with all products sorted price ascending",
+      "passed": true,
+      "evidence": "Test passed: ✓ src/tests/visible/products.test.ts > GET /products > sorts by price ascending (frontend format). Full run: Tests 18 passed (18) at 18:23:43."
+    },
+    {
+      "id": "2",
+      "description": "GET /products?sort=price-desc returns HTTP 200 with all products sorted price descending",
+      "passed": true,
+      "evidence": "Test passed: ✓ src/tests/visible/products.test.ts > GET /products > sorts by price descending (frontend format). Full run: Tests 18 passed (18)."
+    },
+    {
+      "id": "3",
+      "description": "GET /products?sort=rating-desc returns HTTP 200 with all products sorted rating descending",
+      "passed": true,
+      "evidence": "Test passed: ✓ src/tests/visible/products.test.ts > GET /products > sorts by rating descending (frontend format). Full run: Tests 18 passed (18)."
+    },
+    {
+      "id": "4",
+      "description": "GET /products response envelope contains 'total' equal to the number of matching products before pagination",
+      "passed": true,
+      "evidence": "Tests passed: ✓ 'returns all products with pagination envelope' (asserts res.body.total === 15) and ✓ 'response envelope contains total and totalPages' (asserts res.body.total === 15). productService.ts:43 returns { data, total, page, limit, totalPages } confirming the field is present."
+    },
+    {
+      "id": "5",
+      "description": "GET /products response envelope contains 'totalPages' equal to Math.ceil(total/limit)",
+      "passed": true,
+      "evidence": "Test passed: ✓ 'response envelope contains total and totalPages' asserts res.body.totalPages === 3 with 15 products and limit=5 (Math.ceil(15/5)=3). productService.ts:40: const totalPages = Math.ceil(total / limit)."
+    },
+    {
+      "id": "6",
+      "description": "Response envelope does NOT contain fields 'count' or 'pages'; only 'total' and 'totalPages' are used",
+      "passed": true,
+      "evidence": "All 18 tests passed. productService.ts:43 returns { data, total, page, limit, totalPages } — no 'count' or 'pages' keys. No test references 'count' or 'pages'. Build succeeded: tsc -p tsconfig.build.json exit code 0."
+    },
+    {
+      "id": "7",
+      "description": "All existing filters continue to work after sort and envelope changes: category, inStock, search",
+      "passed": true,
+      "evidence": "Tests passed: ✓ 'filters by category' (4 electronics products), ✓ 'returns empty array for unknown category', ✓ 'filters in-stock products' (11 inStock), ✓ 'filters by search term' (laptop case-insensitive), ✓ 'returns empty data array when search matches nothing' (xyznonexistent)."
+    },
+    {
+      "id": "8",
+      "description": "Pagination fields page, limit, data remain correct: page=1&limit=5 returns data.length=5, page 2 differs, limit=100 clamped to 50",
+      "passed": true,
+      "evidence": "Tests passed: ✓ 'returns correct envelope shape for first page' (data.length=5, page=1, limit=5), ✓ 'returns a different set of products for page 2', ✓ 'clamps limit to a maximum of 50' (res.body.limit===50 with limit=100 query). queryParser.ts:41: query.limit = Math.min(limitVal, 50)."
+    },
+    {
+      "id": "9",
+      "description": "Auth middleware unmodified: no header→401, odd digit sum→401 {error:'Unauthorized'}, even digit sum→200, no Bearer prefix→401, /health→200 {status:'ok'}",
+      "passed": true,
+      "evidence": "Tests passed: ✓ 'returns 401 without auth header', ✓ Auth middleware > 'rejects a token whose digits sum to an odd number' (Bearer invalid-111 → 401 {error:Unauthorized}), ✓ 'accepts any token whose digits sum to an even number' (Bearer custom-token-22 → 200), ✓ 'rejects a request with no Bearer prefix', ✓ 'does not apply auth to the /health route' (→ 200 {status:ok}). All 5 auth tests passed."
+    },
+    {
+      "id": "10",
+      "description": "Only queryParser.ts and productService.ts are modified; no test files, auth files, or Product type shape changed",
+      "passed": true,
+      "evidence": "git show --stat HEAD lists only .planning/, .claude/, and .gitignore — no backend source files in HEAD commit. Code inspection: auth.ts contains only the digit-sum logic (no extraneous changes); types/product.ts has PaginatedResponse<T> with correct fields (data, total, page, limit, totalPages) and Product shape unchanged; test file products.test.ts is the prescribed test suite. Build succeeds: tsc -p tsconfig.build.json exit code 0."
+    }
+  ]
+}
