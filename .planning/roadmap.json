@@ -1,0 +1,56 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript ~6.0.2, ESM modules (type: module), target ES2023, moduleResolution: bundler",
+      "Express 5.2.1 — req.query is Record<string, unknown>; response via res.json()",
+      "Vitest 4.1.5 + Supertest 7.2.2 for HTTP integration tests",
+      "noUnusedLocals and noUnusedParameters are enabled — no dead variables allowed after changes",
+      "No external query/validation libraries — custom parsing in queryParser.ts",
+      "strict: true is NOT set, but individual checks are enabled (noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch)"
+    ],
+    "features": [
+      "queryParser.ts defines local InternalSort type ('priceAsc' | 'priceDesc' | 'ratingDesc' | 'nameAsc' | 'nameDesc') and validates against a set of allowed camelCase values; hyphenated values are silently dropped",
+      "productService.ts returns object with 'count' and 'pages' instead of 'total' and 'totalPages'; sort comparisons use camelCase InternalSort values",
+      "Filters (search, category, inStock) are applied sequentially and are correct — must not change",
+      "Pagination math (Math.ceil(count / limit)) is correct — only the field names in the return object are wrong",
+      "Controller is a thin pass-through: parseProductQuery(req.query) → getAllProducts(query) → res.json(result); no transformation happens there",
+      "Tests assert: total (not count), totalPages (not pages), data, page, limit; sort tests use hyphenated query params (price-asc, price-desc, rating-desc)"
+    ],
+    "architecture": [
+      "Layer order: routes → middleware (auth) → controllers → services → utils → data",
+      "InternalSort is defined locally in both queryParser.ts and productService.ts — changing it in both files is self-contained and does not require touching product.ts",
+      "types/product.ts defines PaginatedResponse<T> with 'total' and 'totalPages' — the service's return type should conform to this but currently does not",
+      "getAllProducts return type is Promise<Record<string, unknown>> — renaming fields in the returned object literal is sufficient; no function signature changes needed for tests to pass",
+      "Only two files may be modified per requirement 10: src/utils/queryParser.ts and src/services/productService.ts",
+      "No index files or re-exports exist — each file imports directly from source; no cascading changes needed"
+    ],
+    "edgeCases": [
+      "Unknown sort value (e.g. sort=unknown): must remain silently ignored; no sort applied — existing guard logic handles this and must be preserved",
+      "Sort param omitted: products return in default insertion order — existing fallback handles this",
+      "camelCase sort values (priceAsc, etc.): no visible tests assert they work; implementation may drop camelCase acceptance as long as hyphenated values work per requirements 1–3",
+      "totalPages when total=0: Math.ceil(0/limit)=0 — correct, no special case needed",
+      "totalPages when total is exactly divisible by limit (15/5=3): Math.ceil gives 3 — correct",
+      "total reflects filtered pre-pagination count, not original dataset size — existing count variable already captures this before the slice",
+      "InternalSort type must be consistent between queryParser.ts and productService.ts — both define it locally, both must use the same string literals so comparisons work",
+      "TypeScript must compile cleanly: after changing InternalSort values, all comparison branches in productService.ts must use the updated literals or tsc will catch the mismatch"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3 — GET /products?sort=price-asc, sort=price-desc, sort=rating-desc must return correctly sorted results",
+      "description": "In src/utils/queryParser.ts: update the valid sort values set and InternalSort type to use hyphenated format ('price-asc', 'price-desc', 'rating-desc', 'name-asc', 'name-desc'). Update the sort validation/mapping logic so that incoming hyphenated query strings are accepted and passed through as the new InternalSort values. Remove or replace the camelCase literals throughout this file.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 1, 2, 3, 4, 5 — sort must work end-to-end; response envelope must contain 'total' and 'totalPages' instead of 'count' and 'pages'",
+      "description": "In src/services/productService.ts: (a) Update the local InternalSort type to match the hyphenated literals from task-1 ('price-asc', 'price-desc', 'rating-desc', 'name-asc', 'name-desc'). Update all sort comparison branches to use the new hyphenated literals. (b) In the returned object, rename 'count' to 'total' and 'pages' to 'totalPages'. The intermediate variable names (e.g. const count = ...) may be renamed or kept — only the returned object keys must change.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}
