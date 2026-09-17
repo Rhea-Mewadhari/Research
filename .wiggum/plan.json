@@ -1,0 +1,18 @@
+{
+  "taskId": "task1",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix sort parameter parsing in queryParser.ts to accept hyphenated format",
+      "status": "done",
+      "notes": "Added HYPHEN_TO_CAMEL map in queryParser.ts to normalize price-asc/price-desc/rating-desc to camelCase before validation. Fixed pre-existing TS type collision by using Omit<ProductQuery, 'sort'> in both queryParser.ts and productService.ts, and removed unused Product import. Build now passes; 16/18 tests pass (2 remaining failures are phase-2 envelope field names)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix response envelope field names in productService.ts (count→total, pages→totalPages)",
+      "status": "done",
+      "notes": "Changed return statement in productService.ts line 44: `count` renamed to `total` and `pages` renamed to `totalPages`. All 18 tests now pass and build succeeds."
+    }
+  ]
+}
