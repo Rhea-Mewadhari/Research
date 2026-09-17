@@ -1,0 +1,142 @@
+{
+  "taskId": "task6",
+  "runId": "wiggum-run5",
+  "timestamp": "2026-09-17T12:01:30.435Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 16,
+    "failed": 0,
+    "total": 16,
+    "expectedFiles": 6,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 5703,
+    "hiddenMs": 1510,
+    "buildMs": 2370,
+    "totalMs": 9729
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.67,
+    "overallScore": 0.868
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task6",
+    "wall_duration_ms": 450582,
+    "cost_usd": 2.0890259999999996,
+    "num_turns": 96,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "76b267e5-9bb4-45f3-92ea-51902a3aeefb",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Implement filterProducts in src/utils/productFilters.ts",
+          "status": "done",
+          "notes": "Implemented search (case-insensitive trim), category (All = no filter), inStockOnly, and sort (price-asc, price-desc, rating-desc) without mutating input. Build passes. Remaining test failures are in phases 2-3 (UI handlers still stubbed)."
+        },
+        {
+          "id": "phase-2",
+          "title": "Wire up event handlers in src/components/FilterPanel.tsx",
+          "status": "done",
+          "notes": "Wired search input, category dropdown, inStockOnly checkbox, and Clear filters button to call onChange. Reset values use the same defaults as initialFilters in useProductFilters (sortBy:'default'). Filtering and clearFilters tests all pass. Build passes. Sorting tests still fail — SortSelect not yet wired (phase-3)."
+        },
+        {
+          "id": "phase-3",
+          "title": "Wire up onChange handler in src/components/SortSelect.tsx",
+          "status": "done",
+          "notes": "Renamed _onChange to onChange and wired the select's onChange to call onChange(e.target.value). All 17 tests pass, build succeeds."
+        },
+        {
+          "id": "phase-4",
+          "title": "Wrap setFilters in App.tsx to reset page to 1 on filter change",
+          "status": "done",
+          "notes": "Added handleFiltersChange wrapper (calls setFilters + setPage(1)) passed to FilterPanel. Updated SortSelect inline lambda to also call setPage(1). All 17 tests pass, build succeeds."
+        },
+        {
+          "id": "phase-5",
+          "title": "Run tests and verify build passes",
+          "status": "done",
+          "notes": "All 17 tests pass (6 test files). Build succeeds with tsc -b and vite build producing dist/ artifacts."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 127734,
+          "cost_usd": 0.48067259999999984,
+          "num_turns": 23,
+          "session_id": "851e8d60-b368-40b0-9d0e-ef5d5080b43c",
+          "is_error": false
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 86759,
+          "cost_usd": 0.43418729999999994,
+          "num_turns": 22,
+          "session_id": "3ea23691-cccf-41de-a74d-b4c37e16afee",
+          "is_error": false
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 42791,
+          "cost_usd": 0.24469019999999997,
+          "num_turns": 12,
+          "session_id": "44bef2d4-552f-4f4f-b2b4-d79c06f2012f",
+          "is_error": false
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 75287,
+          "cost_usd": 0.37531169999999997,
+          "num_turns": 17,
+          "session_id": "51ed38fe-6e47-4f23-8d37-f8192b9329cb",
+          "is_error": false
+        },
+        {
+          "index": 5,
+          "label": "iter5",
+          "exit_code": 0,
+          "wall_duration_ms": 42044,
+          "cost_usd": 0.20925539999999995,
+          "num_turns": 8,
+          "session_id": "76b267e5-9bb4-45f3-92ea-51902a3aeefb",
+          "is_error": false
+        }
+      ],
+      "contextResets": 5,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
