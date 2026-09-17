@@ -1,0 +1,48 @@
+{
+  "taskId": "task5",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Write app.render.test.tsx — initial render and results-count",
+      "status": "done",
+      "notes": "5 tests pass: heading, 15-product count, page 1 of 1, product cards, filter/sort controls."
+    },
+    {
+      "id": "phase-2",
+      "title": "Write filtering.test.tsx — search, category, in-stock, combined filters",
+      "status": "done",
+      "notes": "8 tests pass: search single match, search partial, category Electronics (5), category Fitness (5), in-stock only (11), combined category+in-stock (4), combined search+category (1), no match shows empty message."
+    },
+    {
+      "id": "phase-3",
+      "title": "Write sorting.test.tsx — price-asc, price-desc, rating-desc, default order",
+      "status": "done",
+      "notes": "4 tests pass: price-asc (Jump Rope first, Noise-Cancelling Headphones last), price-desc (reversed), rating-desc (Yoga Mat 4.8 first, Mechanical Keyboard 4.7 second), default order (Wireless Mouse first, Ergonomic Wrist Rest last). Build failures are pre-existing TS unused-import errors in other empty stub files (phases 4-6)."
+    },
+    {
+      "id": "phase-4",
+      "title": "Write clearFilters.test.tsx — clear button resets all active filters",
+      "status": "done",
+      "notes": "4 tests pass: clears search, clears category, clears in-stock checkbox, clears combined filters — all restore 15 products and reset UI controls."
+    },
+    {
+      "id": "phase-5",
+      "title": "Write pagination.test.tsx — Prev/Next button disabled states",
+      "status": "done",
+      "notes": "4 tests pass: Prev disabled on page 1, Next disabled on single page, Next enabled and Prev disabled on first page of multi-page results, Prev enabled and Next disabled on last page."
+    },
+    {
+      "id": "phase-6",
+      "title": "Write loadingError.test.tsx — loading spinner and fetch error display",
+      "status": "done",
+      "notes": "4 tests pass: spinner visible (aria-label=loading) during pending fetch, spinner confirmed via getByLabelText, error message in role=alert on fetch rejection, results-count absent on error. All 29 tests pass, build clean."
+    },
+    {
+      "id": "phase-7",
+      "title": "Run pnpm test and fix any failures",
+      "status": "done",
+      "notes": "All 29 tests pass across 6 test files. Build is clean (tsc + vite, no errors)."
+    }
+  ]
+}

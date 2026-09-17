@@ -3,64 +3,52 @@ import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
 describe('Sorting behavior', () => {
-  it('sorts by price ascending', async () => {
+  it('sorts by price ascending — cheapest product appears first', async () => {
     const user = userEvent.setup();
     render(<App />);
     await screen.findByTestId('results-count');
 
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
+    await user.selectOptions(screen.getByLabelText(/sort by/i), 'Price: Low to High');
 
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names).toEqual([
-      'Jump Rope',
-      'Cable Organiser',
-      'Foam Roller',
-      'Wireless Mouse',
-      'Ergonomic Wrist Rest',
-      'Resistance Bands',
-      'Monitor Riser',
-      'Yoga Mat',
-      'Desk Lamp',
-      'Laptop Stand',
-      'USB-C Hub',
-      'Webcam HD',
-      'Dumbbell Set',
-      'Mechanical Keyboard',
-      'Noise-Cancelling Headphones',
-    ]);
+    const cards = screen.getAllByRole('article');
+    expect(cards[0]).toHaveAttribute('data-testid', 'product-10'); // Jump Rope $15
+    expect(cards[cards.length - 1]).toHaveAttribute('data-testid', 'product-5'); // Noise-Cancelling Headphones $149
   });
 
-  it('sorts by price descending', async () => {
+  it('sorts by price descending — most expensive product appears first', async () => {
     const user = userEvent.setup();
     render(<App />);
     await screen.findByTestId('results-count');
 
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-desc');
+    await user.selectOptions(screen.getByLabelText(/sort by/i), 'Price: High to Low');
 
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names[0]).toBe('Noise-Cancelling Headphones');
-    expect(names[1]).toBe('Mechanical Keyboard');
-    expect(names[names.length - 1]).toBe('Jump Rope');
+    const cards = screen.getAllByRole('article');
+    expect(cards[0]).toHaveAttribute('data-testid', 'product-5'); // Noise-Cancelling Headphones $149
+    expect(cards[cards.length - 1]).toHaveAttribute('data-testid', 'product-10'); // Jump Rope $15
   });
 
-  it('sorts by rating descending', async () => {
+  it('sorts by rating descending — highest-rated product appears first', async () => {
     const user = userEvent.setup();
     render(<App />);
     await screen.findByTestId('results-count');
 
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'rating-desc');
+    await user.selectOptions(screen.getByLabelText(/sort by/i), 'Rating');
 
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Yoga Mat'); // 4.8
+    expect(headings[1]).toHaveTextContent('Mechanical Keyboard'); // 4.7
+  });
 
-    expect(names[0]).toBe('Yoga Mat');
-    expect(names[1]).toBe('Mechanical Keyboard');
+  it('default sort preserves original product order', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByTestId('results-count');
+
+    await user.selectOptions(screen.getByLabelText(/sort by/i), 'Price: Low to High');
+    await user.selectOptions(screen.getByLabelText(/sort by/i), 'Default');
+
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Wireless Mouse'); // first in original dataset
+    expect(headings[headings.length - 1]).toHaveTextContent('Ergonomic Wrist Rest'); // last in original dataset
   });
 });
