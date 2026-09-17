@@ -1,0 +1,48 @@
+{
+  "taskId": "task5",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Write tests/app.render.test.tsx — initial render and results-count display",
+      "status": "done",
+      "notes": "5 tests written and passing: heading render, loading spinner, results count text, page 1 of 1 text, and 15 product cards."
+    },
+    {
+      "id": "phase-2",
+      "title": "Write tests/filtering.test.tsx — search, category, in-stock, and combined filters",
+      "status": "done",
+      "notes": "10 tests written and passing: search by term, case-insensitive search, no-match search, Electronics/Fitness/Accessories category filters, in-stock filter (11 products), out-of-stock exclusion, and combined category+inStock and search+category filters."
+    },
+    {
+      "id": "phase-3",
+      "title": "Write tests/sorting.test.tsx — price-asc, price-desc, rating-desc, and default order",
+      "status": "done",
+      "notes": "4 tests written and passing: price-asc (Jump Rope first, Noise-Cancelling Headphones last), price-desc (Noise-Cancelling Headphones first, Jump Rope last), rating-desc (Yoga Mat first, Desk Lamp last), and default order (Wireless Mouse first). Uses within() to verify DOM order."
+    },
+    {
+      "id": "phase-4",
+      "title": "Write tests/clearFilters.test.tsx — Clear filters button resets all filter state",
+      "status": "done",
+      "notes": "6 tests written and passing: reset search, reset category (verifying select value), reset in-stock (verifying checkbox unchecked), reset combined filters, clear search input text, and restore out-of-stock products after clearing in-stock filter."
+    },
+    {
+      "id": "phase-5",
+      "title": "Write tests/pagination.test.tsx — Prev/Next button enabled/disabled states",
+      "status": "done",
+      "notes": "5 tests written and passing: Prev disabled on page 1, Next disabled with totalPages=1, Next enabled when totalPages>1 (Prev still disabled), clicking Next advances to page 2 (Prev enabled, Next disabled at last page), clicking Prev returns to page 1 (Prev disabled, Next re-enabled). Tests override the fetch mock inline to simulate multi-page responses."
+    },
+    {
+      "id": "phase-6",
+      "title": "Write tests/loadingError.test.tsx — loading spinner and fetch error message",
+      "status": "done",
+      "notes": "5 tests written and passing: spinner visible during fetch, spinner hidden after load, error message on fetch rejection (Network error), error message on non-ok status (500), and no product cards rendered when fetch errors."
+    },
+    {
+      "id": "phase-7",
+      "title": "Run pnpm test and fix any failures",
+      "status": "done",
+      "notes": "All 35 tests pass across 6 test files. pnpm run build also succeeds (tsc + vite build, 351ms). No failures to fix."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.async.loading.test.tsx (4 tests) 142ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  07:17:13
+   Duration  754ms (transform 44ms, setup 53ms, collect 216ms, tests 142ms, environment 191ms, prepare 35ms)
+

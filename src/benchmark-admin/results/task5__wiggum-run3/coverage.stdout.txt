@@ -1,0 +1,16 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+      Coverage enabled with v8
+
+ ✓ tests/loadingError.test.tsx (5 tests) 98ms
+ ✓ tests/app.render.test.tsx (5 tests) 112ms
+ ✓ tests/sorting.test.tsx (4 tests) 194ms
+ ✓ tests/pagination.test.tsx (5 tests) 196ms
+ ✓ tests/clearFilters.test.tsx (6 tests) 390ms
+ ✓ tests/filtering.test.tsx (10 tests) 402ms
+
+ Test Files  6 passed (6)
+      Tests  35 passed (35)
+   Start at  07:17:11
+   Duration  1.24s (transform 82ms, setup 447ms, collect 870ms, tests 1.39s, environment 1.82s, prepare 511ms)
+
