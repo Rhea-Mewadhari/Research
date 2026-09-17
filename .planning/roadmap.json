@@ -1,0 +1,51 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript 6.0.2, strict mode (noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch), target ES2023, ESM (type: module)",
+      "Express.js 5.2.1 for HTTP server; CORS 2.8.6 middleware",
+      "Vitest 4.1.5 with globals enabled; run via `npm test` (or `pnpm --filter benchmark-backend test`)",
+      "moduleResolution: bundler; verbatimModuleSyntax: true — imports must use explicit .ts extensions",
+      "Package manager: npm; relevant scripts: `npm test`, `npm run build`, `npm run dev`"
+    ],
+    "features": [
+      "queryParser.ts currently accepts only camelCase sort values: priceAsc, priceDesc, ratingDesc, nameAsc, nameDesc — checked against VALID_SORT_OPTIONS array",
+      "Frontend sends hyphenated sort values (price-asc, price-desc, rating-desc) which currently match nothing — silently dropped, no sort applied",
+      "productService.ts response envelope currently returns: { data, count, page, limit, pages }",
+      "Tests expect envelope: { data, total, page, limit, totalPages } — count and pages fields cause 18 visible tests to fail",
+      "Filters that must not regress: search (case-insensitive name match), category (case-insensitive), inStock (boolean), pagination (page/limit capped at 50)",
+      "Sort logic for all five camelCase values already implemented correctly in productService.ts — just unreachable from frontend due to parser mismatch"
+    ],
+    "architecture": [
+      "Layer order: productRoutes.ts → requireAuth middleware → productController.ts → parseProductQuery (queryParser.ts) → getAllProducts (productService.ts) → fetchAllProducts data",
+      "parseProductQuery(raw) in queryParser.ts: validates and coerces raw query params; VALID_SORT_OPTIONS defined at top of file; sort validity check assigns sort only if value is in the array",
+      "getAllProducts(query) in productService.ts: chains search → category → inStock filters → sort → pagination; builds and returns envelope object at end of function",
+      "productController.ts calls parseProductQuery then getAllProducts and passes result directly to res.json() — no transformation layer; fix must happen in the two target files only",
+      "PaginatedResponse<T> interface in types/product.ts already declares fields as total and totalPages — fixing productService aligns runtime output with declared type"
+    ],
+    "edgeCases": [
+      "Unrecognised sort values after mapping (e.g. ?sort=invalid, ?sort=name-asc): map lookup returns undefined, value remains as-is, validity check rejects it, sort is silently omitted — default order preserved",
+      "Backward-compat for camelCase sort values (nameAsc, nameDesc, priceAsc sent directly): these won't match any map key so pass through unchanged; validity check still accepts them — no regression",
+      "Mapping must be applied before the VALID_SORT_OPTIONS check, not after, so hyphenated values are translated before they would be rejected",
+      "count → total and pages → totalPages rename only affects the productService return statement; no other callers transform these fields before res.json()",
+      "TypeScript strict mode: renaming the return object fields in productService must use the correct property names to satisfy the PaginatedResponse<T> type — no separate type file changes needed since the interface already uses total/totalPages"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3 — GET /products?sort=price-asc, price-desc, rating-desc must return products sorted accordingly; Requirement 6 — only queryParser.ts and productService.ts modified",
+      "description": "In queryParser.ts, add a hyphen-to-camelCase mapping object ({ 'price-asc': 'priceAsc', 'price-desc': 'priceDesc', 'rating-desc': 'ratingDesc' }) and apply it to the raw sort value before the VALID_SORT_OPTIONS validity check, so frontend hyphenated sort strings are translated to the internal camelCase format the sort logic already handles",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 4, 5 — response envelope field for total count must be named total (not count); field for total page count must be named totalPages (not pages); Requirement 6 — only productService.ts modified",
+      "description": "In productService.ts, in the return statement of getAllProducts, rename the count property to total and the pages property to totalPages so the response envelope matches what the frontend and visible tests expect",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}

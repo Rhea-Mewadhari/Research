@@ -1,9 +1,17 @@
-import type { ProductQuery, SortOption } from '../types/product';
+import type { ProductQuery } from '../types/product';
 
-const VALID_SORT_OPTIONS: SortOption[] = ['price_asc', 'price_desc', 'name_asc', 'name_desc'];
+type InternalSort = 'priceAsc' | 'priceDesc' | 'ratingDesc' | 'nameAsc' | 'nameDesc';
 
-export function parseProductQuery(raw: Record<string, unknown>): ProductQuery {
-  const query: ProductQuery = {};
+const VALID_SORT_OPTIONS: InternalSort[] = ['priceAsc', 'priceDesc', 'ratingDesc', 'nameAsc', 'nameDesc'];
+
+const SORT_ALIAS_MAP: Record<string, InternalSort> = {
+  'price-asc': 'priceAsc',
+  'price-desc': 'priceDesc',
+  'rating-desc': 'ratingDesc',
+};
+
+export function parseProductQuery(raw: Record<string, unknown>): ProductQuery & { sort?: InternalSort } {
+  const query: ProductQuery & { sort?: InternalSort } = {};
 
   if (typeof raw.search === 'string') {
     query.search = raw.search;
@@ -19,8 +27,11 @@ export function parseProductQuery(raw: Record<string, unknown>): ProductQuery {
     query.inStock = false;
   }
 
-  if (VALID_SORT_OPTIONS.includes(raw.sort as SortOption)) {
-    query.sort = raw.sort as SortOption;
+  const resolvedSort = typeof raw.sort === 'string' ? (SORT_ALIAS_MAP[raw.sort] ?? raw.sort) : raw.sort;
+  if (VALID_SORT_OPTIONS.includes(resolvedSort as InternalSort)) {
+    // ProductQuery.sort uses underscore SortOption while InternalSort is camelCase; the
+    // intersection type resolves to never. Cast through the InternalSort view to assign.
+    (query as { sort?: InternalSort }).sort = resolvedSort as InternalSort;
   }
 
   const pageVal = parseInt(String(raw.page), 10);

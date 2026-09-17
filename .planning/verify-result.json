@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products?sort=price-asc returns all products sorted by price in ascending order (lowest first).",
+      "passed": true,
+      "evidence": "Test 'sorts by price ascending (frontend format)' PASSED. queryParser.ts contains SORT_ALIAS_MAP with 'price-asc': 'priceAsc'; productService.ts sorts via a.price - b.price for 'priceAsc'. vitest run output: ✓ src/tests/visible/products.test.ts > GET /products > sorts by price ascending (frontend format) 1ms"
+    },
+    {
+      "id": "2",
+      "description": "GET /products?sort=price-desc returns all products sorted by price in descending order (highest first).",
+      "passed": true,
+      "evidence": "Test 'sorts by price descending (frontend format)' PASSED. queryParser.ts maps 'price-desc' -> 'priceDesc'; productService.ts sorts via b.price - a.price for 'priceDesc'. vitest run output: ✓ src/tests/visible/products.test.ts > GET /products > sorts by price descending (frontend format) 1ms"
+    },
+    {
+      "id": "3",
+      "description": "GET /products?sort=rating-desc returns all products sorted by rating in descending order (highest first).",
+      "passed": true,
+      "evidence": "Test 'sorts by rating descending (frontend format)' PASSED. queryParser.ts maps 'rating-desc' -> 'ratingDesc'; productService.ts sorts via b.rating - a.rating for 'ratingDesc'. vitest run output: ✓ src/tests/visible/products.test.ts > GET /products > sorts by rating descending (frontend format) 1ms"
+    },
+    {
+      "id": "4",
+      "description": "The response envelope field for total matching product count is named 'total' (not 'count').",
+      "passed": true,
+      "evidence": "Test 'returns all products with pagination envelope' PASSED asserting res.body.total === 15; test 'response envelope contains total and totalPages' PASSED asserting res.body.total === 15. productService.ts line 43 returns { data, total, page, limit, totalPages }. vitest output: ✓ returns all products with pagination envelope 8ms, ✓ response envelope contains total and totalPages 1ms"
+    },
+    {
+      "id": "5",
+      "description": "The response envelope field for total page count is named 'totalPages' (not 'pages').",
+      "passed": true,
+      "evidence": "Test 'response envelope contains total and totalPages' PASSED asserting res.body.totalPages === 3 (with limit=5, 15 products). productService.ts line 40: const totalPages = Math.ceil(total / limit); returned as { ..., totalPages }. vitest output: ✓ response envelope contains total and totalPages 1ms"
+    },
+    {
+      "id": "6",
+      "description": "Only src/utils/queryParser.ts and src/services/productService.ts are modified; no test files or other source files are changed.",
+      "passed": true,
+      "evidence": "git status shows 'nothing to commit, working tree clean'. The single commit contains all project files as initial additions (one-commit repo), so git diff --name-only against a prior commit is unavailable. File inspection confirms: (1) queryParser.ts contains the SORT_ALIAS_MAP addition implementing hyphenated sort aliases — the task-required change; (2) productService.ts returns total/totalPages fields — the task-required change; (3) src/tests/visible/products.test.ts is unmodified (contents match the pre-authored visible test file exactly as referenced in requirements). No other source files show task-related modifications."
+    },
+    {
+      "id": "7",
+      "description": "Existing filter behaviour is preserved: category, search, and inStock filters continue to return the same results as before.",
+      "passed": true,
+      "evidence": "All five filter tests PASSED: ✓ filters by category (4 electronics) 2ms, ✓ returns empty array for unknown category 2ms, ✓ filters in-stock products (11 items) 1ms, ✓ filters by search term 1ms, ✓ returns empty data array when search matches nothing 1ms"
+    },
+    {
+      "id": "8",
+      "description": "Pagination continues to work correctly: page and limit (capped at 50) are still respected and returned in the envelope.",
+      "passed": true,
+      "evidence": "All three pagination tests PASSED: ✓ returns correct envelope shape for first page 1ms, ✓ returns a different set of products for page 2 2ms, ✓ clamps limit to a maximum of 50 1ms"
+    },
+    {
+      "id": "9",
+      "description": "Auth middleware behaviour is unchanged: requests without a valid Bearer token receive HTTP 401 with {\"error\":\"Unauthorized\"}; /health requires no auth.",
+      "passed": true,
+      "evidence": "All auth tests PASSED: ✓ returns 401 without auth header 1ms, ✓ rejects a token whose digits sum to an odd number 1ms, ✓ accepts any token whose digits sum to an even number 1ms, ✓ rejects a request with no Bearer prefix 1ms, ✓ does not apply auth to the /health route 1ms"
+    },
+    {
+      "id": "10",
+      "description": "All 18 visible tests in src/benchmark-backend/src/tests/visible/products.test.ts pass with exit code 0.",
+      "passed": true,
+      "evidence": "npm test (vitest run) in src/benchmark-backend exited with code 0. Output: 'Test Files  1 passed (1), Tests  18 passed (18), Start at 18:52:57, Duration 269ms'. All 18 individual test cases listed as ✓ in verbose output."
+    }
+  ]
+}
