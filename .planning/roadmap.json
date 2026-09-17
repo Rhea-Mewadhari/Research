@@ -1,0 +1,50 @@
+{
+  "investigations": {
+    "techStack": [
+      "Runtime: Node.js ESM ('type': 'module'), Express v5, TypeScript ~6.0.2",
+      "TypeScript strict mode: verbatimModuleSyntax, erasableSyntaxOnly, noUnusedLocals/Parameters — no enums with initialisers, explicit 'import type' for type-only imports",
+      "Test runner: Vitest v4 with globals mode; setup file stubs fetch before each test",
+      "Build: tsc (noEmit) for type-checking, tsc -p tsconfig.build.json for emit to dist/; pnpm workspace monorepo",
+      "No path aliases; no linter/formatter config present"
+    ],
+    "features": [
+      "VALID_SORT_OPTIONS in queryParser.ts accepts only camelCase: priceAsc, priceDesc, ratingDesc, nameAsc, nameDesc — hyphenated values are silently dropped today",
+      "productService.ts returns envelope: { data, count, page, limit, pages } — 'count' and 'pages' are wrong; frontend expects 'total' and 'totalPages'",
+      "ratingDesc sort branch already exists in productService.ts (lines 29-30) and is correct — only unreachable because parser drops 'rating-desc'",
+      "Existing tests assert res.body.total and res.body.totalPages (not count/pages) — they are currently failing; no test asserts count or pages",
+      "Must not regress: auth digit-sum middleware, /health route, category/inStock/search filters, page/limit/data envelope fields, limit clamped to 50"
+    ],
+    "architecture": [
+      "Request flow: app.ts → requireAuth middleware → productRoutes.ts → productController.ts → parseProductQuery (queryParser.ts) → getAllProducts (productService.ts) → res.json",
+      "parseProductQuery is called in exactly one place: controllers/productController.ts line 6; no other callers",
+      "Response envelope is assembled in productService.ts getAllProducts, returned to controller which passes it straight to res.json — no inspection of fields in controller",
+      "PaginatedResponse<T> in types/product.ts already declares 'total: number' and 'totalPages: number' — the service return object just doesn't match it yet",
+      "InternalSort type is duplicated in queryParser.ts and productService.ts (identical values); no change needed for the task"
+    ],
+    "edgeCases": [
+      "Hyphen mapping must be applied BEFORE VALID_SORT_OPTIONS.includes() check; placing it after leaves the raw hyphenated string to fail validation silently",
+      "Mapping is case-sensitive: only lowercase 'price-asc', 'price-desc', 'rating-desc' are mapped; 'PRICE-ASC' remains silently dropped (no requirement for case folding)",
+      "Unrecognised sort values (e.g. 'foo', 'name-asc') still pass through unmapped and are dropped by the existing validation gate — no change to that contract",
+      "Empty result pagination: Math.ceil(0 / limit) = 0, so totalPages = 0 when no products match; this is correct and pre-existing behaviour",
+      "getAllProducts return type is Promise<Record<string, unknown>> — TypeScript does not enforce the envelope shape at compile time; rename is safe from type perspective but no new compiler guard added (out of scope)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 4: parseProductQuery maps the three hyphenated frontend sort values to camelCase equivalents (price-asc → priceAsc, price-desc → priceDesc, rating-desc → ratingDesc) before the VALID_SORT_OPTIONS membership check",
+      "description": "In parseProductQuery, add a lookup table mapping the three hyphenated strings to their camelCase equivalents. Apply the mapping to the raw sort value before the VALID_SORT_OPTIONS.includes() guard so the mapped camelCase value is stored as query.sort. Values not in the lookup table pass through unchanged and are handled by the existing validation (silently dropped if not in VALID_SORT_OPTIONS).",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 5: The response envelope contains 'total' (count of matching products before pagination) and 'totalPages' (Math.ceil(total / limit)); legacy fields 'count' and 'pages' must not appear in their place",
+      "description": "In getAllProducts in productService.ts, rename the local variable 'count' to 'total' and 'pages' to 'totalPages' (or update the return literal keys), so the returned object is { data, total, page, limit, totalPages }. Ensure the values remain the same: total = filtered.length and totalPages = Math.ceil(total / limit).",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}
