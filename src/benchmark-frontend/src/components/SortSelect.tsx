@@ -5,7 +5,7 @@ type Props = {
   onChange: (sortBy: FilterState['sortBy']) => void;
 };
 
-export default function SortSelect({ value, onChange: _onChange }: Props) {
+export default function SortSelect({ value, onChange }: Props) {
   return (
     <div className="panel">
       <label htmlFor="sortBy">Sort by</label>
@@ -13,7 +13,7 @@ export default function SortSelect({ value, onChange: _onChange }: Props) {
         id="sortBy"
         name="sortBy"
         value={value}
-        onChange={() => {}}
+        onChange={(e) => onChange(e.target.value as FilterState['sortBy'])}
       >
         <option value="default">Default</option>
         <option value="price-asc">Price: Low to High</option>

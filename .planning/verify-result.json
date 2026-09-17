@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "filterProducts filters by name: given a non-empty filters.search, only products whose name contains the trimmed search string (case-insensitive) are returned.",
+      "passed": true,
+      "evidence": "productFilters.ts:11-18 trims the search and does case-insensitive includes filter. tests/filtering.test.tsx passed: '3 tests' in 133ms — 'filters products by search term' included. Full run: 17 passed (17), exit code 0."
+    },
+    {
+      "id": "2",
+      "description": "filterProducts filters by category: when filters.category is not 'All', only products whose category exactly matches are returned; 'All' applies no category filtering.",
+      "passed": true,
+      "evidence": "productFilters.ts:20-22 applies category filter when !== 'All'. tests/filtering.test.tsx passed: 3 tests including 'filters products by category'. Exit code 0."
+    },
+    {
+      "id": "3",
+      "description": "filterProducts filters by in-stock status: when filters.inStockOnly is true, only products where inStock === true are returned.",
+      "passed": true,
+      "evidence": "productFilters.ts:24-26 applies inStock filter. tests/filtering.test.tsx passed: 3 tests including 'filters products by in-stock only'. Exit code 0."
+    },
+    {
+      "id": "4",
+      "description": "filterProducts sorts output after filtering — price-asc, price-desc, rating-desc. sortBy: 'default' leaves order unchanged. The input array must not be mutated.",
+      "passed": true,
+      "evidence": "productFilters.ts:13 creates a copy with [...products] and sorts only that copy. Sorting at lines 28-34 operates on result (the copy), never on products directly. tests/sorting.test.tsx passed: 3 tests. Exit code 0."
+    },
+    {
+      "id": "5",
+      "description": "FilterPanel.tsx search input onChange handler calls the onChange prop with updated FilterState (spreading existing filters and setting search to new input value).",
+      "passed": true,
+      "evidence": "FilterPanel.tsx search input onChange spreads existing filters. tests/filtering.test.tsx 'filters products by search term' test passes — product list updated on typing. Exit code 0."
+    },
+    {
+      "id": "6",
+      "description": "FilterPanel.tsx category select onChange handler calls the onChange prop with category set to the selected option value.",
+      "passed": true,
+      "evidence": "FilterPanel.tsx:32 onChange={(e) => onChange({ ...filters, category: e.target.value })}. tests/filtering.test.tsx 'filters products by category' passes. Exit code 0."
+    },
+    {
+      "id": "7",
+      "description": "FilterPanel.tsx in-stock checkbox onChange handler calls the onChange prop with inStockOnly set to the checkbox's new checked value.",
+      "passed": true,
+      "evidence": "FilterPanel.tsx checkbox onChange handler sets inStockOnly. tests/filtering.test.tsx 'filters products by in-stock only' passes. Exit code 0."
+    },
+    {
+      "id": "8",
+      "description": "FilterPanel.tsx Clear Filters button onClick calls onChange with default filter values: { search: '', category: 'All', inStockOnly: false, sortBy: 'default' }.",
+      "passed": true,
+      "evidence": "FilterPanel.tsx:55 onClick={() => onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' })}. tests/clearFilters.test.tsx passed: 1 test. Exit code 0."
+    },
+    {
+      "id": "9",
+      "description": "SortSelect.tsx sort select onChange handler calls the onChange prop with the selected sort key.",
+      "passed": true,
+      "evidence": "SortSelect.tsx:16 onChange={(e) => onChange(e.target.value as FilterState['sortBy'])}. tests/sorting.test.tsx passed: 3 tests. Exit code 0."
+    },
+    {
+      "id": "10",
+      "description": "App.tsx wraps setFilters in a handler (handleFiltersChange) that calls both setFilters(next) and setPage(1) together, and passes this wrapper to FilterPanel (onChange) and SortSelect (onChange) instead of raw setFilters.",
+      "passed": true,
+      "evidence": "App.tsx:24-27 defines handleFiltersChange calling setFilters(next) then setPage(1). App.tsx:37 passes handleFiltersChange to FilterPanel onChange, App.tsx:40 passes it to SortSelect onChange. tests/pagination.test.tsx passed: 5 tests; tests/clearFilters.test.tsx passed: 1 test. Exit code 0."
+    },
+    {
+      "id": "11",
+      "description": "The category select in FilterPanel.tsx is populated exclusively from the categories prop (which App.tsx derives dynamically from fetched product data via useMemo). No hardcoded category list exists anywhere in the component tree.",
+      "passed": true,
+      "evidence": "FilterPanel.tsx:34-37 renders categories.map() from the prop only — no hardcoded list in component. App.tsx:15-18 derives categories via useMemo from products data. Build succeeded (tsc -b exit code 0 confirms TypeScript types). tests/filtering.test.tsx 'filters products by category' selects 'Fitness' — passes. Exit code 0."
+    },
+    {
+      "id": "12",
+      "description": "The project TypeScript build succeeds with no type errors in any modified file.",
+      "passed": true,
+      "evidence": "pnpm run build output: 'tsc -b && vite build' — no type errors; '38 modules transformed'; '✓ built in 282ms'. Exit code 0."
+    },
+    {
+      "id": "13",
+      "description": "All visible test suites pass: app.render.test.tsx, clearFilters.test.tsx, filtering.test.tsx, loadingError.test.tsx, pagination.test.tsx, sorting.test.tsx.",
+      "passed": true,
+      "evidence": "pnpm test --run output: '✓ tests/app.render.test.tsx (1 test)', '✓ tests/loadingError.test.tsx (4 tests)', '✓ tests/pagination.test.tsx (5 tests)', '✓ tests/clearFilters.test.tsx (1 test)', '✓ tests/filtering.test.tsx (3 tests)', '✓ tests/sorting.test.tsx (3 tests)'. Test Files 6 passed (6), Tests 17 passed (17). Exit code 0."
+    }
+  ]
+}

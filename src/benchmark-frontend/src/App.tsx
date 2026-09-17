@@ -5,6 +5,7 @@ import ProductList from './components/ProductList';
 import Spinner from './components/Spinner';
 import SortSelect from './components/SortSelect';
 import { filterProducts } from './utils/productFilters';
+import type { FilterState } from './utils/productFilters';
 import { useProductFilters } from './hooks/useProductFilters';
 
 export default function App() {
@@ -20,6 +21,11 @@ export default function App() {
     return filterProducts(products, filters);
   }, [products, filters]);
 
+  const handleFiltersChange = (next: FilterState) => {
+    setFilters(next);
+    setPage(1);
+  };
+
   return (
     <main className="container">
       <header>
@@ -28,10 +34,10 @@ export default function App() {
       </header>
 
       <div className="toolbar">
-        <FilterPanel filters={filters} onChange={setFilters} categories={categories} />
+        <FilterPanel filters={filters} onChange={handleFiltersChange} categories={categories} />
         <SortSelect
           value={filters.sortBy}
-          onChange={(sortBy) => setFilters((prev) => ({ ...prev, sortBy }))}
+          onChange={(sortBy) => handleFiltersChange({ ...filters, sortBy })}
         />
       </div>
 
