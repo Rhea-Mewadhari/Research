@@ -1,0 +1,67 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7, Vite 6, Vitest 3 with jsdom + @testing-library/react",
+      "noUnusedLocals and noUnusedParameters are enabled — _onChange aliases must be fully removed, not just unused",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type'",
+      "Vitest globals enabled (describe/it/expect available without imports); setup file at tests/setup.ts",
+      "No state management library — React built-in hooks only",
+      "ESM-first project; coverage scoped to src/utils/productFilters.ts (primary unit-tested util)"
+    ],
+    "features": [
+      "filterProducts(products, _filters) is a stub: parameter aliased _filters, body returns unmodified array with 4 TODO comments — all filtering and sorting unimplemented",
+      "FilterPanel: onChange prop aliased as _onChange (unused); all 4 handlers (search input, category select, checkbox, Clear button) are empty () => {} stubs; UI renders correctly but nothing responds",
+      "SortSelect: onChange prop aliased as _onChange (unused); <select onChange> is () => {} stub; value is controlled but immutable from user perspective",
+      "App.tsx: already derives categories via useMemo as ['All', ...unique categories from products] — req 11 is pre-existing and satisfied",
+      "App.tsx: passes setFilters directly to FilterPanel (no setPage(1) wrapper) and an inline sort setter to SortSelect (also no setPage(1)) — req 10 needs wrapper addition",
+      "useProductFilters.ts: fully implemented — exposes filters, setFilters, products, isLoading, error, page, totalPages, setPage; clearFilters resets to initialFilters; must not regress",
+      "FilterState type: { search: string; category: string; inStockOnly: boolean; sortBy: 'default'|'price-asc'|'price-desc'|'rating-desc' } — already defined, no changes needed"
+    ],
+    "architecture": [
+      "Prop drilling only — no Context API or global store; all state flows from useProductFilters hook → App → components",
+      "filterProducts is a pure utility called in App's useMemo; filtering/sorting logic belongs only in src/utils/productFilters.ts",
+      "Pagination reset belongs in App.tsx as a wrapper around setFilters calls (per req 10), NOT as a useEffect in the hook",
+      "Hybrid fetch model: server-side pagination (page → API) + client-side filter/sort (filterProducts runs on current page's products) — this is by design",
+      "All 4 files requiring changes (productFilters.ts, FilterPanel.tsx, SortSelect.tsx, App.tsx) are isolated with no circular dependencies",
+      "Tests render bare <App /> with no wrapper providers; default fetch mock returns all 15 products as totalPages=1; tests await results-count before interacting"
+    ],
+    "edgeCases": [
+      "Empty or whitespace-only search: filters.search.trim() === '' — all products pass; must trim before matching",
+      "Whitespace search like ' mouse ': trim() normalizes to 'mouse' before case-insensitive includes() check",
+      "filters.category === 'All': bypass category filter entirely, do not compare against product.category",
+      "filters.inStockOnly === false: all products pass regardless of inStock field",
+      "filters.sortBy === 'default': preserve original filtered order — no sort applied",
+      "Input array must not be mutated by sort: spread or slice before calling .sort() on the filtered result",
+      "Sort applied after all filters: filter chain runs first, then sort on the filtered subset only",
+      "Clear filters resets sortBy to 'default' along with search/'All'/false — the default FilterState object must include sortBy: 'default'",
+      "Pagination page must reset to 1 on every filter change AND every sort change — both FilterPanel onChange and SortSelect onChange wrappers in App.tsx must call setPage(1)",
+      "noUnusedParameters TSC flag: once _onChange is renamed to onChange and used, the alias is removed and TS compilation passes; leaving _onChange unused after wiring would be a TS error"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1–4: filterProducts filters by name (case-insensitive, trimmed), by category (exact match, 'All' = no filter), by inStockOnly (boolean toggle), and sorts by price-asc/price-desc/rating-desc/default — without mutating the input array",
+      "description": "Implement the body of filterProducts in productFilters.ts: (1) filter by search using products whose name.toLowerCase().includes(filters.search.trim().toLowerCase()), skipping when trim is empty; (2) filter by category with exact match, skipping when category is 'All'; (3) filter by inStock when inStockOnly is true; (4) copy the filtered array and sort by price ascending, price descending, rating descending, or return unsorted for 'default'. Rename the _filters parameter to filters.",
+      "files": ["src/benchmark-frontend/src/utils/productFilters.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 5–8: FilterPanel onChange handlers for search input, category select, in-stock checkbox, and Clear filters button must call the onChange prop with updated FilterState; onChange prop must no longer be aliased as _onChange",
+      "description": "In FilterPanel.tsx: rename _onChange to onChange in the destructured props. Wire search <input onChange> to call onChange({ ...filters, search: e.target.value }). Wire category <select onChange> to call onChange({ ...filters, category: e.target.value }). Wire in-stock <input type='checkbox' onChange> to call onChange({ ...filters, inStockOnly: e.target.checked }). Wire Clear filters <button onClick> to call onChange({ search: '', category: 'All', inStockOnly: false, sortBy: 'default' }).",
+      "files": ["src/benchmark-frontend/src/components/FilterPanel.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 9: SortSelect onChange must call the onChange prop with the selected sortBy value; onChange prop must no longer be aliased as _onChange",
+      "description": "In SortSelect.tsx: rename _onChange to onChange in the destructured props. Wire the <select onChange> to call onChange(e.target.value as FilterState['sortBy']).",
+      "files": ["src/benchmark-frontend/src/components/SortSelect.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 10: App.tsx must pass wrapper functions to FilterPanel's onChange and SortSelect's onChange that call both setFilters and setPage(1), not setFilters directly",
+      "description": "In App.tsx: replace the direct setFilters passed to FilterPanel's onChange with a wrapper: (nextFilters) => { setFilters(nextFilters); setPage(1); }. Replace the inline sort arrow passed to SortSelect's onChange with a wrapper: (sortBy) => { setFilters(prev => ({ ...prev, sortBy })); setPage(1); }.",
+      "files": ["src/benchmark-frontend/src/App.tsx"]
+    }
+  ]
+}
