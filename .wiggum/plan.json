@@ -1,0 +1,24 @@
+{
+  "taskId": "task1",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix queryParser.ts: map hyphenated sort values to internal camelCase",
+      "status": "done",
+      "notes": "Added HYPHENATED_SORT_MAP to queryParser.ts mapping price-asc, price-desc, rating-desc, name-asc, name-desc to their camelCase counterparts. Backward-compatible: camelCase values still accepted. 16 tests pass; 2 remaining failures are for phase-2 (envelope field names)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix productService.ts: rename 'count' -> 'total' and 'pages' -> 'totalPages' in response envelope",
+      "status": "done",
+      "notes": "Changed return statement to use 'total' and 'totalPages'. Also fixed type errors introduced in phase-1: used Omit<ProductQuery, 'sort'> & { sort?: InternalSort } in both productService.ts and queryParser.ts to avoid the never-type intersection, and removed unused Product import. All 18 tests pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Verify: run tests and confirm all success criteria pass",
+      "status": "done",
+      "notes": "All 18 tests pass (pnpm test). Build clean (pnpm run build / tsc exits 0). No code changes needed — phases 1 and 2 already satisfied all requirements."
+    }
+  ]
+}
