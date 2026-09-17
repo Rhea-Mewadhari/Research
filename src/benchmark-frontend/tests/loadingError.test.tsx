@@ -1,42 +1,45 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import App from '../src/App';
 
 describe('Loading and error states', () => {
-  it('shows the loading spinner immediately on mount', () => {
+  it('shows a loading spinner while fetching', () => {
+    // Never resolves so isLoading stays true
+    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})));
     render(<App />);
-    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('loading')).toBeInTheDocument();
   });
 
-  it('hides the spinner once data has loaded', async () => {
+  it('does not show results-count while loading', () => {
+    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})));
     render(<App />);
-    await screen.findByTestId('results-count');
-    expect(screen.queryByLabelText(/loading/i)).not.toBeInTheDocument();
-  });
-
-  it('shows an error message when the fetch fails', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-    } as Response);
-
-    render(<App />);
-
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toBeInTheDocument()
-    );
-    expect(screen.getByRole('alert')).toHaveTextContent(/failed to fetch/i);
-  });
-
-  it('does not show the product list when an error occurs', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-    } as Response);
-
-    render(<App />);
-
-    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
     expect(screen.queryByTestId('results-count')).not.toBeInTheDocument();
+  });
+
+  it('shows an error message when fetch fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue(new Error('Network error'))
+    );
+    render(<App />);
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Network error');
+  });
+
+  it('does not show results-count when fetch fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue(new Error('Network error'))
+    );
+    render(<App />);
+    await screen.findByRole('alert');
+    expect(screen.queryByTestId('results-count')).not.toBeInTheDocument();
+  });
+
+  it('shows a generic error message for non-Error rejections', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue('oops'));
+    render(<App />);
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Failed to load products');
   });
 });

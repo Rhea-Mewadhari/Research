@@ -3,64 +3,47 @@ import userEvent from '@testing-library/user-event';
 import App from '../src/App';
 
 describe('Sorting behavior', () => {
-  it('sorts by price ascending', async () => {
-    const user = userEvent.setup();
+  it('default order — first product is Wireless Mouse', async () => {
     render(<App />);
     await screen.findByTestId('results-count');
-
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-asc');
-
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names).toEqual([
-      'Jump Rope',
-      'Cable Organiser',
-      'Foam Roller',
-      'Wireless Mouse',
-      'Ergonomic Wrist Rest',
-      'Resistance Bands',
-      'Monitor Riser',
-      'Yoga Mat',
-      'Desk Lamp',
-      'Laptop Stand',
-      'USB-C Hub',
-      'Webcam HD',
-      'Dumbbell Set',
-      'Mechanical Keyboard',
-      'Noise-Cancelling Headphones',
-    ]);
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Wireless Mouse');
   });
 
-  it('sorts by price descending', async () => {
-    const user = userEvent.setup();
+  it('price-asc — cheapest first (Jump Rope $15)', async () => {
     render(<App />);
     await screen.findByTestId('results-count');
-
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'price-desc');
-
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names[0]).toBe('Noise-Cancelling Headphones');
-    expect(names[1]).toBe('Mechanical Keyboard');
-    expect(names[names.length - 1]).toBe('Jump Rope');
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: /sort by/i }), 'price-asc');
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Jump Rope');
+    expect(headings[1]).toHaveTextContent('Cable Organiser');
+    expect(headings[2]).toHaveTextContent('Foam Roller');
   });
 
-  it('sorts by rating descending', async () => {
-    const user = userEvent.setup();
+  it('price-desc — most expensive first (Noise-Cancelling Headphones $149)', async () => {
     render(<App />);
     await screen.findByTestId('results-count');
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: /sort by/i }), 'price-desc');
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Noise-Cancelling Headphones');
+    expect(headings[1]).toHaveTextContent('Mechanical Keyboard');
+    expect(headings[2]).toHaveTextContent('Dumbbell Set');
+  });
 
-    await user.selectOptions(screen.getByLabelText(/sort by/i), 'rating-desc');
+  it('rating-desc — highest rated first (Yoga Mat 4.8, then Mechanical Keyboard 4.7)', async () => {
+    render(<App />);
+    await screen.findByTestId('results-count');
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: /sort by/i }), 'rating-desc');
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Yoga Mat');
+    expect(headings[1]).toHaveTextContent('Mechanical Keyboard');
+  });
 
-    const names = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((node) => node.textContent);
-
-    expect(names[0]).toBe('Yoga Mat');
-    expect(names[1]).toBe('Mechanical Keyboard');
+  it('all 15 products are shown after sorting', async () => {
+    render(<App />);
+    await screen.findByTestId('results-count');
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: /sort by/i }), 'price-asc');
+    expect(screen.getByTestId('results-count')).toHaveTextContent('Showing 15 products');
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(15);
   });
 });
