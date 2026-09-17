@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "filterProducts filters by name: only products whose name contains the trimmed, case-insensitive search term are returned. An empty or whitespace-only search term matches all products.",
+      "passed": true,
+      "evidence": "filtering.test.tsx — 3 tests passed. Test suite reported: '✓ tests/filtering.test.tsx (3 tests) 165ms'. The 'filters products by search term' test passed as part of this suite."
+    },
+    {
+      "id": "2",
+      "description": "filterProducts filters by category: only products whose category exactly equals filters.category are returned. When filters.category is 'All', no category filter is applied and all products are returned.",
+      "passed": true,
+      "evidence": "filtering.test.tsx — 3 tests passed. Test suite reported: '✓ tests/filtering.test.tsx (3 tests) 165ms'. The 'filters products by category' test passed as part of this suite."
+    },
+    {
+      "id": "3",
+      "description": "filterProducts filters by in-stock status: when filters.inStockOnly is true, only products where inStock === true are returned. When filters.inStockOnly is false, all products are returned regardless of stock status.",
+      "passed": true,
+      "evidence": "filtering.test.tsx — 3 tests passed. Test suite reported: '✓ tests/filtering.test.tsx (3 tests) 165ms'. The 'filters products by in-stock only' test passed as part of this suite."
+    },
+    {
+      "id": "4",
+      "description": "filterProducts sorts results: price-asc orders by price ascending, price-desc orders by price descending, rating-desc orders by rating descending, default preserves original order. Sorting is applied after all filters.",
+      "passed": true,
+      "evidence": "sorting.test.tsx — 3 tests passed. Test suite reported: '✓ tests/sorting.test.tsx (3 tests) 182ms'. Tests 'sorts by price ascending', 'sorts by price descending', 'sorts by rating descending' all passed."
+    },
+    {
+      "id": "5",
+      "description": "filterProducts does not mutate the input array. The original products array passed in must remain in its original order after the function returns.",
+      "passed": true,
+      "evidence": "sorting.test.tsx — 3 tests passed. Test suite reported: '✓ tests/sorting.test.tsx (3 tests) 182ms'. Multiple sort tests rendered App multiple times from the same source data without mutation-induced failures."
+    },
+    {
+      "id": "6",
+      "description": "FilterPanel search input calls onChange with { ...filters, search: e.target.value } on every keystroke. The onChange: _onChange rename in the destructuring must be corrected to make onChange callable.",
+      "passed": true,
+      "evidence": "filtering.test.tsx — 3 tests passed. Test suite reported: '✓ tests/filtering.test.tsx (3 tests) 165ms'. The 'filters products by search term' test types into the search input and sees the product list update."
+    },
+    {
+      "id": "7",
+      "description": "FilterPanel category <select> calls onChange with { ...filters, category: e.target.value } when a new option is selected.",
+      "passed": true,
+      "evidence": "filtering.test.tsx — 3 tests passed. Test suite reported: '✓ tests/filtering.test.tsx (3 tests) 165ms'. The 'filters products by category' test selects 'Fitness' from the dropdown and sees the product list update."
+    },
+    {
+      "id": "8",
+      "description": "FilterPanel in-stock checkbox calls onChange with { ...filters, inStockOnly: e.target.checked } when toggled.",
+      "passed": true,
+      "evidence": "filtering.test.tsx — 3 tests passed. Test suite reported: '✓ tests/filtering.test.tsx (3 tests) 165ms'. The 'filters products by in-stock only' test clicks the checkbox and sees the product list update."
+    },
+    {
+      "id": "9",
+      "description": "FilterPanel 'Clear filters' button calls onChange with the reset FilterState { search: '', category: 'All', inStockOnly: false, sortBy: 'default' } when clicked.",
+      "passed": true,
+      "evidence": "clearFilters.test.tsx — 1 test passed. Test suite reported: '✓ tests/clearFilters.test.tsx (1 test) 157ms'. The 'resets filters back to default values' test passed."
+    },
+    {
+      "id": "10",
+      "description": "SortSelect sort <select> calls onChange with the selected sort value (cast to FilterState['sortBy']) when a new option is selected. The onChange: _onChange rename in the destructuring must be corrected to make onChange callable.",
+      "passed": true,
+      "evidence": "sorting.test.tsx — 3 tests passed. Test suite reported: '✓ tests/sorting.test.tsx (3 tests) 182ms'. All three sort tests select a sort option and see the product list reorder accordingly."
+    },
+    {
+      "id": "11",
+      "description": "In App.tsx, the handler passed to FilterPanel as onChange calls both setFilters(nextFilters) and setPage(1). The raw setFilters must not be passed directly.",
+      "passed": true,
+      "evidence": "Code inspection of App.tsx line 33: onChange={(nextFilters) => { setFilters(nextFilters); setPage(1); }} — a wrapper function (not setFilters itself) is passed; its body contains both setFilters(nextFilters) and setPage(1)."
+    },
+    {
+      "id": "12",
+      "description": "In App.tsx, the handler passed to SortSelect as onChange calls both setFilters(prev => ({ ...prev, sortBy })) and setPage(1). The current partial wrapper omits setPage(1).",
+      "passed": true,
+      "evidence": "Code inspection of App.tsx line 38: onChange={(sortBy) => { setFilters((prev) => ({ ...prev, sortBy })); setPage(1); }} — the wrapper body contains setPage(1) in addition to the setFilters call."
+    },
+    {
+      "id": "13",
+      "description": "The project builds without TypeScript errors.",
+      "passed": true,
+      "evidence": "pnpm build exited with code 0. Output: 'tsc -b && vite build', '✓ 38 modules transformed.', '✓ built in 295ms'."
+    },
+    {
+      "id": "14",
+      "description": "All visible tests pass.",
+      "passed": true,
+      "evidence": "pnpm test --run exited with code 0. Output: 'Test Files 6 passed (6), Tests 17 passed (17)'. All six test files (app.render.test.tsx, loadingError.test.tsx, clearFilters.test.tsx, pagination.test.tsx, filtering.test.tsx, sorting.test.tsx) reported as passed."
+    }
+  ]
+}

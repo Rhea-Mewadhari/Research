@@ -1,0 +1,15 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.accessibility.test.tsx (1 test) 17ms
+ ✓ tests/hidden.sorting.integrity.test.tsx (2 tests) 121ms
+ ✓ tests/hidden.pagination.reset.test.tsx (2 tests) 145ms
+ ✓ tests/hidden.async.loading.test.tsx (4 tests) 164ms
+ ✓ tests/hidden.combined.behavior.test.tsx (2 tests) 192ms
+ ✓ tests/hidden.filtering.edgecases.test.tsx (5 tests) 223ms
+
+ Test Files  6 passed (6)
+      Tests  16 passed (16)
+   Start at  10:42:34
+   Duration  889ms (transform 88ms, setup 457ms, collect 896ms, tests 863ms, environment 1.58s, prepare 374ms)
+

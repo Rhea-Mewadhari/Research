@@ -7,13 +7,29 @@ export type FilterState = {
   sortBy: 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
 };
 
-export function filterProducts(products: Product[], _filters: FilterState): Product[] {
+export function filterProducts(products: Product[], filters: FilterState): Product[] {
   let result = [...products];
 
-  // TODO: implement search filter
-  // TODO: implement category filter
-  // TODO: implement in-stock filter
-  // TODO: implement sorting
+  const term = filters.search.trim().toLowerCase();
+  if (term) {
+    result = result.filter((p) => p.name.toLowerCase().includes(term));
+  }
+
+  if (filters.category !== 'All') {
+    result = result.filter((p) => p.category === filters.category);
+  }
+
+  if (filters.inStockOnly) {
+    result = result.filter((p) => p.inStock);
+  }
+
+  if (filters.sortBy === 'price-asc') {
+    result = [...result].sort((a, b) => a.price - b.price);
+  } else if (filters.sortBy === 'price-desc') {
+    result = [...result].sort((a, b) => b.price - a.price);
+  } else if (filters.sortBy === 'rating-desc') {
+    result = [...result].sort((a, b) => b.rating - a.rating);
+  }
 
   return result;
 }
