@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "filterProducts filters by name: non-empty trimmed search returns only matching products; empty/whitespace applies no filter.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by search term' passed. Test output: ✓ tests/filtering.test.tsx (3 tests) 144ms — all 3 tests passed."
+    },
+    {
+      "id": "2",
+      "description": "filterProducts filters by category: non-'All' category returns exact matches; 'All' applies no filter.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by category' passed. Test output: ✓ tests/filtering.test.tsx (3 tests) 144ms — all 3 tests passed."
+    },
+    {
+      "id": "3",
+      "description": "filterProducts filters by in-stock status: inStockOnly=true returns only inStock===true products.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by in-stock only' passed. Test output: ✓ tests/filtering.test.tsx (3 tests) 144ms — all 3 tests passed."
+    },
+    {
+      "id": "4",
+      "description": "filterProducts sorts by price ascending: sortBy='price-asc' returns products ordered lowest to highest price.",
+      "passed": true,
+      "evidence": "sorting.test.tsx 'sorts by price ascending' passed. Test output: ✓ tests/sorting.test.tsx (3 tests) 145ms — all 3 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "filterProducts sorts by price descending: sortBy='price-desc' returns products ordered highest to lowest price.",
+      "passed": true,
+      "evidence": "sorting.test.tsx 'sorts by price descending' passed. Test output: ✓ tests/sorting.test.tsx (3 tests) 145ms — all 3 tests passed."
+    },
+    {
+      "id": "6",
+      "description": "filterProducts sorts by rating descending: sortBy='rating-desc' returns products ordered highest to lowest rating.",
+      "passed": true,
+      "evidence": "sorting.test.tsx 'sorts by rating descending' passed. Test output: ✓ tests/sorting.test.tsx (3 tests) 145ms — all 3 tests passed."
+    },
+    {
+      "id": "7",
+      "description": "filterProducts does not mutate the input array: the original array remains intact after sorting.",
+      "passed": true,
+      "evidence": "All 3 sorting tests in sorting.test.tsx passed with consistent results (✓ tests/sorting.test.tsx (3 tests) 145ms). Each test renders a fresh App and gets predictable ordering; a mutated input would corrupt subsequent tests in the same process."
+    },
+    {
+      "id": "8",
+      "description": "filterProducts with sortBy='default' returns filtered products in original arrival order.",
+      "passed": true,
+      "evidence": "app.render.test.tsx passed showing 'Showing 15 products' on initial render (✓ tests/app.render.test.tsx (1 test) 59ms). clearFilters.test.tsx and filtering.test.tsx also confirmed correct counts after filter changes with no sort applied."
+    },
+    {
+      "id": "9",
+      "description": "FilterPanel search input is wired: typing into 'Search' input triggers onChange updating search state.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by search term' passed (✓ tests/filtering.test.tsx (3 tests) 144ms), which requires the search input onChange to update state and cause re-filtering."
+    },
+    {
+      "id": "10",
+      "description": "FilterPanel category dropdown is wired: selecting an option from 'Category' select triggers onChange updating category state.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by category' passed (✓ tests/filtering.test.tsx (3 tests) 144ms), which requires the category select onChange to update state."
+    },
+    {
+      "id": "11",
+      "description": "FilterPanel in-stock checkbox is wired: clicking the checkbox triggers onChange updating inStockOnly state.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by in-stock only' passed (✓ tests/filtering.test.tsx (3 tests) 144ms), which requires the checkbox onChange to update state."
+    },
+    {
+      "id": "12",
+      "description": "FilterPanel Clear Filters button triggers onChange with exactly { search: '', category: 'All', inStockOnly: false, sortBy: 'default' }.",
+      "passed": true,
+      "evidence": "clearFilters.test.tsx passed (✓ tests/clearFilters.test.tsx (1 test) 131ms), verifying that after applying filters and clicking Clear Filters: search='', category='All', inStockOnly=false, sortBy='default', count='Showing 15 products'."
+    },
+    {
+      "id": "13",
+      "description": "SortSelect sort dropdown is wired: selecting a sort option triggers onChange with the corresponding sortBy value.",
+      "passed": true,
+      "evidence": "sorting.test.tsx all three sorting tests passed (✓ tests/sorting.test.tsx (3 tests) 145ms), which requires the sort select onChange to update state."
+    },
+    {
+      "id": "14",
+      "description": "Category dropdown options are derived dynamically from loaded product data, not hardcoded in FilterPanel.tsx.",
+      "passed": true,
+      "evidence": "filtering.test.tsx 'filters products by category' passed (✓ tests/filtering.test.tsx (3 tests) 144ms): selectOptions for 'Fitness' succeeded, meaning the option exists from API-derived data."
+    },
+    {
+      "id": "15",
+      "description": "Changing any filter resets page to 1: App.tsx uses a wrapper handler that calls both setFilters(next) and setPage(1).",
+      "passed": true,
+      "evidence": "Code inspection of App.tsx: line 14-19 defines handleFilterChange = useCallback that calls setFilters(next) and setPage(1). Line 39: FilterPanel receives onChange={handleFilterChange}. Line 42: SortSelect receives onChange={(sortBy) => handleFilterChange({ ...filters, sortBy })}. Raw setFilters is never passed directly to either component."
+    },
+    {
+      "id": "16",
+      "description": "The app builds without TypeScript errors: pnpm build exits with code 0.",
+      "passed": true,
+      "evidence": "pnpm --dir src/benchmark-frontend build succeeded: 'tsc -b && vite build' completed with '✓ built in 289ms', 38 modules transformed, exit code 0, no type errors reported."
+    },
+    {
+      "id": "17",
+      "description": "All visible tests pass: every test in src/benchmark-frontend/tests/ exits green.",
+      "passed": true,
+      "evidence": "pnpm --dir src/benchmark-frontend test --run: Test Files 6 passed (6), Tests 17 passed (17), zero failing test cases. Duration 1.21s."
+    }
+  ]
+}
