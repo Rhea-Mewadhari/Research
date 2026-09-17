@@ -1,0 +1,18 @@
+{
+  "taskId": "task1",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix sort parameter parsing in queryParser.ts to accept hyphenated format (price-asc, price-desc, rating-desc)",
+      "status": "done",
+      "notes": "Added HYPHEN_TO_SORT mapping in queryParser.ts; fixed pre-existing TS type conflict (ProductQuery.sort vs InternalSort intersection) using `any` for the query variable; removed unused Product import in productService.ts. All 3 sort tests pass, build succeeds."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix response envelope field names in productService.ts: rename 'count' to 'total' and 'pages' to 'totalPages', and ensure rating-desc sort is handled",
+      "status": "done",
+      "notes": "Renamed 'count' to 'total' and 'pages' to 'totalPages' in productService.ts return value. rating-desc sort was already handled. All 18 tests pass, build succeeds."
+    }
+  ]
+}

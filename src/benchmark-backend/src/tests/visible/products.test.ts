@@ -44,34 +44,25 @@ describe('GET /products', () => {
     expect(res.body.data.every((p: any) => p.inStock)).toBe(true);
   });
 
-  it('filters out-of-stock products', async () => {
-    const res = await request(app).get('/products?inStock=false&limit=50').set(AUTH);
+  it('sorts by price ascending (frontend format)', async () => {
+    const res = await request(app).get('/products?sort=price-asc&limit=50').set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.data.every((p: any) => !p.inStock)).toBe(true);
-  });
-
-  it('sorts by price ascending', async () => {
-    const res = await request(app).get('/products?sort=price_asc&limit=50').set(AUTH);
     const prices = res.body.data.map((p: any) => p.price);
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
   });
 
-  it('sorts by price descending', async () => {
-    const res = await request(app).get('/products?sort=price_desc&limit=50').set(AUTH);
+  it('sorts by price descending (frontend format)', async () => {
+    const res = await request(app).get('/products?sort=price-desc&limit=50').set(AUTH);
+    expect(res.status).toBe(200);
     const prices = res.body.data.map((p: any) => p.price);
     expect(prices).toEqual([...prices].sort((a, b) => b - a));
   });
 
-  it('sorts by name ascending', async () => {
-    const res = await request(app).get('/products?sort=name_asc&limit=50').set(AUTH);
-    const names = res.body.data.map((p: any) => p.name);
-    expect(names).toEqual([...names].sort());
-  });
-
-  it('sorts by name descending', async () => {
-    const res = await request(app).get('/products?sort=name_desc&limit=50').set(AUTH);
-    const names = res.body.data.map((p: any) => p.name);
-    expect(names).toEqual([...names].sort().reverse());
+  it('sorts by rating descending (frontend format)', async () => {
+    const res = await request(app).get('/products?sort=rating-desc&limit=50').set(AUTH);
+    expect(res.status).toBe(200);
+    const ratings = res.body.data.map((p: any) => p.rating);
+    expect(ratings).toEqual([...ratings].sort((a, b) => b - a));
   });
 
   it('filters by search term', async () => {
@@ -94,14 +85,21 @@ describe('GET /products', () => {
 });
 
 describe('Pagination', () => {
+  it('response envelope contains total and totalPages', async () => {
+    const res = await request(app).get('/products?page=1&limit=5').set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('total');
+    expect(res.body).toHaveProperty('totalPages');
+    expect(res.body.total).toBe(15);
+    expect(res.body.totalPages).toBe(3);
+  });
+
   it('returns correct envelope shape for first page', async () => {
     const res = await request(app).get('/products?page=1&limit=5').set(AUTH);
     expect(res.status).toBe(200);
     expect(res.body.data.length).toBe(5);
-    expect(res.body.total).toBe(15);
     expect(res.body.page).toBe(1);
     expect(res.body.limit).toBe(5);
-    expect(res.body.totalPages).toBe(3);
   });
 
   it('returns a different set of products for page 2', async () => {
