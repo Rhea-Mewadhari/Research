@@ -1,0 +1,57 @@
+{
+  "investigations": {
+    "techStack": [
+      "Package manager: npm; build: tsc -p tsconfig.build.json; dev: tsx watch (ESM-native, no compile step)",
+      "Framework: Express 5; no ORM or validation library; data comes from dataFetcher abstraction",
+      "TypeScript 6, target es2023, moduleResolution: bundler, verbatimModuleSyntax: true — type-only imports must use `import type`",
+      "noEmit: true — tsc is type-check only; noUnusedLocals and noUnusedParameters are enforced — unused variables cause build errors",
+      "Test runner: Vitest 4 + supertest; run with `npm test` or `pnpm test` in src/benchmark-backend",
+      "getAllProducts return type is Promise<Record<string, unknown>> — key renames are not type-constrained at compile time",
+      "InternalSort = 'priceAsc' | 'priceDesc' | 'ratingDesc' | 'nameAsc' | 'nameDesc' — declared identically in both queryParser.ts and productService.ts"
+    ],
+    "features": [
+      "GET /products registered in app.ts behind requireAuth middleware; route delegates to getProducts controller",
+      "Controller calls parseProductQuery(req.query) then getAllProducts(query) then res.json(result) — thin pass-through",
+      "queryParser.ts: VALID_SORT_OPTIONS whitelist contains only camelCase values (priceAsc, priceDesc, ratingDesc, nameAsc, nameDesc); hyphenated inputs silently fall through to undefined",
+      "productService.ts: response envelope returns { data, count, page, limit, pages } — count and pages are the wrong field names; a code comment on line 44 already flags this bug",
+      "Filtering (search, category, inStock) and pagination (page, limit capped at 50) are implemented in productService.ts and are unaffected by either change",
+      "SortOption type in product.ts uses underscore convention and is unused — not involved in either fix",
+      "PaginatedResponse<T> in product.ts already declares the correct shape (total, totalPages) but getAllProducts does not use it as its return type"
+    ],
+    "architecture": [
+      "Data flow: app.ts → requireAuth middleware → productRoutes.ts → productController.ts → queryParser.ts → productService.ts → dataFetcher.ts → response",
+      "queryParser.ts sits between controller and service; input is req.query cast to Record<string, unknown>; output is ProductQuery & { sort?: InternalSort }",
+      "productService.ts assembles the entire response envelope; controller passes it unchanged to res.json()",
+      "Controller layer is thin with no transformation logic — the only place to fix the sort mapping is queryParser.ts and the only place to fix the envelope fields is productService.ts",
+      "No other file reads the sort parameter or the envelope field names — changes are fully self-contained to the two target files"
+    ],
+    "edgeCases": [
+      "Unknown sort strings (e.g. ?sort=foobar): must remain silently dropped — query.sort stays undefined, no sort applied",
+      "camelCase sort values (priceAsc, priceDesc, etc.) must continue to pass the whitelist check unchanged — the mapping must be additive, not a replacement",
+      "name-asc and name-desc have no hyphenated test coverage; they will be silently dropped like unknown strings if not mapped — consistent with test expectations",
+      "The mapped camelCase value (not the raw hyphenated string) must be assigned before the `as InternalSort` type assertion in queryParser.ts",
+      "totalPages when total=0: Math.ceil(0/limit) === 0 — correct, no special case needed",
+      "count and pages are local variables used only in the return statement of getAllProducts — renaming returned keys does not affect any other file",
+      "noUnusedLocals: if local variable names count/pages are kept but only used to populate differently-named keys, there is no issue; if they are renamed, ensure old names are removed entirely",
+      "page and limit fields in the envelope are NOT renamed — tests assert res.body.page and res.body.limit and these must remain"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3, 10 — GET /products?sort=price-asc, price-desc, rating-desc must return correctly sorted results; hyphenated strings must be translated to InternalSort camelCase values; camelCase inputs must remain accepted",
+      "description": "In queryParser.ts, add a translation step before the VALID_SORT_OPTIONS whitelist check that maps hyphenated sort strings to their camelCase InternalSort equivalents: 'price-asc' → 'priceAsc', 'price-desc' → 'priceDesc', 'rating-desc' → 'ratingDesc'. The raw sort value from req.query should be passed through this mapping before the whitelist validates it. Existing camelCase values must continue to pass the whitelist unchanged. The mapped (camelCase) value must be what is assigned to query.sort to satisfy the `as InternalSort` type assertion.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 4, 5 — Every GET /products response must include total (not count) and totalPages (not pages); old field names must not appear",
+      "description": "In productService.ts, rename the response envelope keys in the return statement of getAllProducts: change 'count' to 'total' and 'pages' to 'totalPages'. The local variable names (count, pages) may be kept and mapped to new key names (total: count, totalPages: pages) or renamed — either way ensure noUnusedLocals is not violated. The page and limit fields remain unchanged.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}

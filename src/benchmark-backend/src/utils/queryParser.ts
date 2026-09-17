@@ -1,9 +1,11 @@
-import type { ProductQuery, SortOption } from '../types/product';
+import type { ProductQuery } from '../types/product';
 
-const VALID_SORT_OPTIONS: SortOption[] = ['price_asc', 'price_desc', 'name_asc', 'name_desc'];
+type InternalSort = 'priceAsc' | 'priceDesc' | 'ratingDesc' | 'nameAsc' | 'nameDesc';
 
-export function parseProductQuery(raw: Record<string, unknown>): ProductQuery {
-  const query: ProductQuery = {};
+const VALID_SORT_OPTIONS: InternalSort[] = ['priceAsc', 'priceDesc', 'ratingDesc', 'nameAsc', 'nameDesc'];
+
+export function parseProductQuery(raw: Record<string, unknown>): ProductQuery & { sort?: InternalSort } {
+  const query: ProductQuery & { sort?: InternalSort } = {};
 
   if (typeof raw.search === 'string') {
     query.search = raw.search;
@@ -19,8 +21,19 @@ export function parseProductQuery(raw: Record<string, unknown>): ProductQuery {
     query.inStock = false;
   }
 
-  if (VALID_SORT_OPTIONS.includes(raw.sort as SortOption)) {
-    query.sort = raw.sort as SortOption;
+  const HYPHENATED_SORT_MAP: Record<string, InternalSort> = {
+    'price-asc': 'priceAsc',
+    'price-desc': 'priceDesc',
+    'rating-desc': 'ratingDesc',
+  };
+  const sortNormalized = typeof raw.sort === 'string' && raw.sort in HYPHENATED_SORT_MAP
+    ? HYPHENATED_SORT_MAP[raw.sort]
+    : raw.sort;
+
+  const matchedSort = VALID_SORT_OPTIONS.find(v => v === sortNormalized);
+  if (matchedSort !== undefined) {
+    // ProductQuery.sort (SortOption) ∩ InternalSort = never in TS6; cast to the intended write type.
+    (query as { sort?: InternalSort }).sort = matchedSort;
   }
 
   const pageVal = parseInt(String(raw.page), 10);

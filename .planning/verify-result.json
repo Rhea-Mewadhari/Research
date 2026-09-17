@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products?sort=price-asc returns HTTP 200 and a data array whose price values are sorted ascending.",
+      "passed": true,
+      "evidence": "vitest run --reporter=verbose: '✓ GET /products > sorts by price ascending (frontend format)' PASSED. 18/18 tests passed."
+    },
+    {
+      "id": "2",
+      "description": "GET /products?sort=price-desc returns HTTP 200 and a data array whose price values are sorted descending.",
+      "passed": true,
+      "evidence": "vitest run --reporter=verbose: '✓ GET /products > sorts by price descending (frontend format)' PASSED. 18/18 tests passed."
+    },
+    {
+      "id": "3",
+      "description": "GET /products?sort=rating-desc returns HTTP 200 and a data array whose rating values are sorted descending.",
+      "passed": true,
+      "evidence": "vitest run --reporter=verbose: '✓ GET /products > sorts by rating descending (frontend format)' PASSED. 18/18 tests passed."
+    },
+    {
+      "id": "4",
+      "description": "Every GET /products response envelope includes a total field equal to the count of matching products (before pagination) and a totalPages field equal to Math.ceil(total / limit).",
+      "passed": true,
+      "evidence": "vitest run --reporter=verbose: '✓ Pagination > response envelope contains total and totalPages' PASSED (asserts res.body.total === 15 and res.body.totalPages === 3); '✓ GET /products > returns all products with pagination envelope' PASSED (asserts res.body.total === 15). productService.ts:43 returns { data, total: count, page, limit, totalPages: pages }. 18/18 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "The response envelope must NOT use old field names count or pages; total and totalPages must be present. page and limit fields remain unchanged.",
+      "passed": true,
+      "evidence": "productService.ts:43 returns { data, total: count, page, limit, totalPages: pages } — uses total and totalPages, not count or pages. vitest run --reporter=verbose: '✓ Pagination > returns correct envelope shape for first page' PASSED (asserts res.body.page === 1 and res.body.limit === 5); '✓ Pagination > response envelope contains total and totalPages' PASSED. 18/18 tests passed."
+    },
+    {
+      "id": "6",
+      "description": "All existing filter behaviours work: category (case-insensitive), inStock, search (substring, case-insensitive), combined filters.",
+      "passed": true,
+      "evidence": "vitest run --reporter=verbose: '✓ GET /products > filters by category' PASSED; '✓ GET /products > filters in-stock products' PASSED; '✓ GET /products > filters by search term' PASSED; '✓ GET /products > returns empty array for unknown category' PASSED; '✓ GET /products > returns empty data array when search matches nothing' PASSED. 18/18 tests passed."
+    },
+    {
+      "id": "7",
+      "description": "Pagination works: ?page=<n>&limit=<m> returns the correct slice; limit clamped to 50; page 2 returns a different set from page 1.",
+      "passed": true,
+      "evidence": "vitest run --reporter=verbose: '✓ Pagination > returns a different set of products for page 2' PASSED; '✓ Pagination > returns correct envelope shape for first page' PASSED; '✓ Pagination > clamps limit to a maximum of 50' PASSED. queryParser.ts:46 applies Math.min(limitVal, 50). 18/18 tests passed."
+    },
+    {
+      "id": "8",
+      "description": "Auth behaviour unchanged: requests without a valid Bearer token receive HTTP 401 {\"error\":\"Unauthorized\"}; /health remains unprotected.",
+      "passed": true,
+      "evidence": "vitest run --reporter=verbose: '✓ GET /products > returns 401 without auth header' PASSED; '✓ Auth middleware > rejects a token whose digits sum to an odd number' PASSED; '✓ Auth middleware > accepts any token whose digits sum to an even number' PASSED; '✓ Auth middleware > rejects a request with no Bearer prefix' PASSED; '✓ Auth middleware > does not apply auth to the /health route' PASSED. 18/18 tests passed."
+    },
+    {
+      "id": "9",
+      "description": "Only queryParser.ts and productService.ts are modified; pnpm run build exits 0 with no TypeScript errors.",
+      "passed": true,
+      "evidence": "pnpm run build: 'tsc -p tsconfig.build.json' completed with exit 0 and no error output. git diff --name-only returns empty (no uncommitted changes). File inspection confirms implementation changes are in queryParser.ts (HYPHENATED_SORT_MAP, lines 24-31) and productService.ts (total/totalPages, line 43); auth.ts contains only the standard isValidToken/requireAuth implementation with no modifications."
+    },
+    {
+      "id": "10",
+      "description": "Hyphenated sort mapping implemented in queryParser.ts: price-asc→priceAsc, price-desc→priceDesc, rating-desc→ratingDesc; camelCase values continue to be accepted.",
+      "passed": true,
+      "evidence": "queryParser.ts:24-28 defines HYPHENATED_SORT_MAP = { 'price-asc': 'priceAsc', 'price-desc': 'priceDesc', 'rating-desc': 'ratingDesc' }. Lines 29-31 apply the map before the VALID_SORT_OPTIONS lookup. VALID_SORT_OPTIONS (line 5) includes all camelCase variants (priceAsc, priceDesc, ratingDesc, nameAsc, nameDesc), ensuring backward compatibility. All three sort tests (price-asc, price-desc, rating-desc) PASSED in vitest run --reporter=verbose. 18/18 tests passed."
+    }
+  ]
+}
