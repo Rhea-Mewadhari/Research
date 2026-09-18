@@ -1,0 +1,48 @@
+{
+  "taskId": "task3",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Write authentication tests (missing header, invalid token, valid token, /health no auth)",
+      "status": "done",
+      "notes": "4 auth tests written in describe('Auth middleware'): missing header → 401, odd-digit-sum token → 401, even-digit-sum token → 200, /health without auth → 200. All 4 pass. Overall suite still failing due to empty GET /products and Pagination describe blocks (placeholders for later phases)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Write filtering tests (category exact/case-insensitive, inStock true/false, unknown category)",
+      "status": "done",
+      "notes": "5 filtering tests written in describe('GET /products') > describe('Filtering'): category exact match, category case-insensitive, inStock=true, inStock=false, unknown category → empty data. Also added it.todo placeholder to the empty Pagination describe block to prevent 'No test found in suite' runner error. All 9 tests pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Write search tests (case-insensitive, partial match, whitespace trimming)",
+      "status": "done",
+      "notes": "3 search tests written in describe('GET /products') > describe('Search'): LAPTOP case-insensitive match, 'smart' partial match → Smartphone, ' Laptop ' whitespace-trimmed match. All 12 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Write sorting tests (price_asc, price_desc, name_asc, name_desc)",
+      "status": "done",
+      "notes": "4 sorting tests added inside describe('GET /products') > describe('Sorting'): price_asc (first=19, last=999, ascending order), price_desc (first=999, last=19, descending), name_asc (first=Bookshelf, last=Yoga Mat, alphabetical), name_desc (first=Yoga Mat, last=Bookshelf, reverse alphabetical). All 16 tests pass, build clean."
+    },
+    {
+      "id": "phase-5",
+      "title": "Write pagination tests (envelope shape, different pages return different products, limit clamped to 50)",
+      "status": "done",
+      "notes": "4 pagination tests added to describe('Pagination'): envelope shape (total=15, page=1, limit=10, totalPages=2, data.length=10), page 2 returns 5 remaining products, different pages return disjoint product IDs, limit=100 clamped to limit=50 in response. All 20 tests pass, build clean."
+    },
+    {
+      "id": "phase-6",
+      "title": "Write combined filter tests (multiple query params applied together)",
+      "status": "done",
+      "notes": "4 combined filter tests added in describe('GET /products') > describe('Combined filters'): category+inStock=true (electronics → 3 products), category+sort=price_asc (furniture → ascending prices 149/399/549), search+inStock=true (yoga → only Yoga Mat), category+inStock=true+sort=price_asc (electronics in-stock sorted ascending). All 24 tests pass, build clean."
+    },
+    {
+      "id": "phase-7",
+      "title": "Run vitest and verify all tests pass",
+      "status": "done",
+      "notes": "All 24 tests pass (vitest run). Build also clean (tsc -p tsconfig.build.json exits 0). All phases complete."
+    }
+  ]
+}
