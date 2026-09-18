@@ -1,0 +1,30 @@
+{
+  "taskId": "task2",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Extract filterProducts helper from getAllProducts",
+      "status": "done",
+      "notes": "filterProducts helper extracted. All 19 tests pass. Build was already failing before this phase due to pre-existing unused DEFAULT_LIMIT constant (noUnusedLocals:true) — to be removed in phase 3."
+    },
+    {
+      "id": "phase-2",
+      "title": "Extract sortProducts helper from getAllProducts",
+      "status": "done",
+      "notes": "sortProducts helper extracted. All 19 tests pass. Build still fails on pre-existing DEFAULT_LIMIT unused constant (noUnusedLocals:true) — to be removed in phase 3."
+    },
+    {
+      "id": "phase-3",
+      "title": "Remove dead code and clean up boolean checks",
+      "status": "done",
+      "notes": "Removed unused DEFAULT_LIMIT constant and sanitizeSearch export. Simplified inStock filter from nested if/else with === true/=== false to a single filter using p.inStock === query.inStock. All 19 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify all tests pass with no regressions",
+      "status": "done",
+      "notes": "All 19 tests pass and build is clean (no TypeScript errors). No regressions introduced by prior phases."
+    }
+  ]
+}
