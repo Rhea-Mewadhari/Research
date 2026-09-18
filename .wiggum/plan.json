@@ -1,0 +1,42 @@
+{
+  "taskId": "task3",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Write filtering tests (category and inStock)",
+      "status": "done",
+      "notes": "Added 5 filtering tests (category exact, case-insensitive, unknown, inStock true/false) to the GET /products describe block. Added it.todo placeholders to empty Pagination and Auth middleware describe blocks to prevent vitest empty-suite errors. All 5 tests pass, build clean."
+    },
+    {
+      "id": "phase-2",
+      "title": "Write search tests (case-insensitive, partial, whitespace)",
+      "status": "done",
+      "notes": "Added 3 search tests inside GET /products > Search describe block: case-insensitive (LAPTOP→Laptop), partial match (book→Bookshelf), and whitespace trimming (  laptop  →Laptop). All 8 tests pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Write sorting tests (price_asc, price_desc, name_asc, name_desc)",
+      "status": "done",
+      "notes": "Added 4 sorting tests inside GET /products > Sorting describe block: price_asc (cheapest first, full order check), price_desc (most expensive first, full order check), name_asc (Bookshelf→Yoga Mat, localeCompare order check), name_desc (Yoga Mat→Bookshelf, reverse order check). All 12 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Write pagination tests (envelope shape, multi-page, limit clamp)",
+      "status": "done",
+      "notes": "Added 3 pagination tests inside Pagination describe block: envelope shape (total=15, page=1, limit=10, totalPages=2, data length=10), different pages (page=1&limit=5 vs page=2&limit=5 return non-overlapping IDs), limit clamped to 50 (limit=100 → limit=50, all 15 products returned, totalPages=1). All 15 tests pass, build clean."
+    },
+    {
+      "id": "phase-5",
+      "title": "Write combined filter and auth middleware tests",
+      "status": "done",
+      "notes": "Added 3 combined filter tests (category+inStock, category+sort, search+category) inside GET /products > Combined filters describe block. Replaced auth middleware it.todo placeholder with 4 real tests (missing header→401, odd digit sum→401, even digit sum→200, /health without auth→200). All 22 tests pass, build clean."
+    },
+    {
+      "id": "phase-6",
+      "title": "Run vitest and verify all tests pass",
+      "status": "done",
+      "notes": "Ran `pnpm test` from src/benchmark-backend: 22 tests passed (1 test file). Ran `pnpm run build`: tsc compiled cleanly with no errors."
+    }
+  ]
+}
