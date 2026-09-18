@@ -1,0 +1,18 @@
+{
+  "taskId": "task1",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix sort parameter parsing in queryParser.ts to accept hyphenated format",
+      "status": "done",
+      "notes": "Added HYPHENATED_SORT_MAP to convert price-asc, price-desc, rating-desc, name-asc, name-desc to camelCase equivalents. All sort-related tests pass."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix response envelope field names in productService.ts (count→total, pages→totalPages)",
+      "status": "done",
+      "notes": "Renamed count→total and pages→totalPages in productService.ts return value. Also fixed pre-existing build errors: removed unused Product import, and corrected InternalSort type incompatibility with SortOption by using Omit<ProductQuery, 'sort'> & { sort?: InternalSort } in both queryParser.ts and productService.ts. All 18 tests pass, build succeeds."
+    }
+  ]
+}

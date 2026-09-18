@@ -1,15 +1,39 @@
 import { fetchAllProducts } from './dataFetcher';
-import type { Product, ProductQuery, PaginatedResponse } from '../types/product';
+import type { ProductQuery } from '../types/product';
 
-export async function getAllProducts(query: ProductQuery): Promise<PaginatedResponse<Product>> {
+type InternalSort = 'priceAsc' | 'priceDesc' | 'ratingDesc' | 'nameAsc' | 'nameDesc';
+type ParsedQuery = Omit<ProductQuery, 'sort'> & { sort?: InternalSort };
+
+export async function getAllProducts(query: ParsedQuery): Promise<Record<string, unknown>> {
   const products = await fetchAllProducts();
   let result = [...products];
 
-  // TODO (agent must implement):
-  // - apply search filter (case-insensitive partial match, trim whitespace)
-  // - apply category filter (case-insensitive exact match)
-  // - apply inStock filter
-  // - apply sorting (price_asc, price_desc, name_asc, name_desc)
+  if (query.search) {
+    const term = query.search.trim().toLowerCase();
+    result = result.filter((p) => p.name.toLowerCase().includes(term));
+  }
+
+  if (query.category) {
+    result = result.filter(
+      (p) => p.category.toLowerCase() === query.category!.toLowerCase()
+    );
+  }
+
+  if (query.inStock !== undefined) {
+    result = result.filter((p) => p.inStock === query.inStock);
+  }
+
+  if (query.sort === 'priceAsc') {
+    result = [...result].sort((a, b) => a.price - b.price);
+  } else if (query.sort === 'priceDesc') {
+    result = [...result].sort((a, b) => b.price - a.price);
+  } else if (query.sort === 'ratingDesc') {
+    result = [...result].sort((a, b) => b.rating - a.rating);
+  } else if (query.sort === 'nameAsc') {
+    result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+  } else if (query.sort === 'nameDesc') {
+    result = [...result].sort((a, b) => b.name.localeCompare(a.name));
+  }
 
   const total = result.length;
   const page = query.page ?? 1;
