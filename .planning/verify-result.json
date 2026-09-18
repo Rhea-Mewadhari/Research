@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products?category=electronics with valid auth returns HTTP 200, res.body.total === 4, res.body.data has length 4, and every item has category === 'electronics'.",
+      "passed": true,
+      "evidence": "Test 'category=electronics returns 4 electronics products' (products.test.ts:44): expect(res.body.total).toBe(4), expect(res.body.data).toHaveLength(4), res.body.data.every(p => p.category === 'electronics') asserted true. vitest run: 21 passed (21)."
+    },
+    {
+      "id": "2",
+      "description": "GET /products?category=ELECTRONICS (uppercase) with valid auth returns HTTP 200, res.body.total === 4.",
+      "passed": true,
+      "evidence": "Test 'category=ELECTRONICS (uppercase) returns 4 electronics products' (products.test.ts:52): expect(res.body.total).toBe(4). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "3",
+      "description": "GET /products?inStock=true with valid auth returns HTTP 200, res.body.total === 11, and every item has inStock === true.",
+      "passed": true,
+      "evidence": "Test 'inStock=true returns 11 in-stock products' (products.test.ts:58): expect(res.body.total).toBe(11), res.body.data.every(p => p.inStock === true) asserted true. vitest run: 21 passed (21)."
+    },
+    {
+      "id": "4",
+      "description": "GET /products?inStock=false with valid auth returns HTTP 200, res.body.total === 4, and every item has inStock === false.",
+      "passed": true,
+      "evidence": "Test 'inStock=false returns 4 out-of-stock products' (products.test.ts:65): expect(res.body.total).toBe(4), res.body.data.every(p => p.inStock === false) asserted true. vitest run: 21 passed (21)."
+    },
+    {
+      "id": "5",
+      "description": "GET /products?category=unknowncategory with valid auth returns HTTP 200, res.body.data is [], and res.body.total === 0.",
+      "passed": true,
+      "evidence": "Test 'category=unknowncategory returns empty results' (products.test.ts:72): expect(res.body.total).toBe(0), expect(res.body.data).toEqual([]). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "6",
+      "description": "GET /products?search=LAPTOP with valid auth returns HTTP 200, res.body.total === 1, and res.body.data[0].name === 'Laptop' (case-insensitive).",
+      "passed": true,
+      "evidence": "Test 'search=LAPTOP returns Laptop (case-insensitive)' (products.test.ts:79): expect(res.body.total).toBe(1), expect(res.body.data[0].name).toBe('Laptop'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "7",
+      "description": "GET /products?search=lap with valid auth returns HTTP 200, res.body.total === 1, and res.body.data[0].name === 'Laptop' (partial match).",
+      "passed": true,
+      "evidence": "Test 'search=lap returns Laptop (partial match)' (products.test.ts:86): expect(res.body.total).toBe(1), expect(res.body.data[0].name).toBe('Laptop'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "8",
+      "description": "GET /products?search=%20Laptop%20 with valid auth returns HTTP 200, res.body.total === 1, and res.body.data[0].name === 'Laptop' (whitespace trimmed).",
+      "passed": true,
+      "evidence": "Test 'search with surrounding whitespace returns Laptop (trimmed)' (products.test.ts:93): expect(res.body.total).toBe(1), expect(res.body.data[0].name).toBe('Laptop'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "9",
+      "description": "GET /products?sort=price_asc&limit=15 with valid auth returns HTTP 200 and res.body.data[0].price === 19 (Jump Rope, cheapest).",
+      "passed": true,
+      "evidence": "Test 'sort=price_asc returns cheapest product first' (products.test.ts:20): expect(res.body.data[0].price).toBe(19). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "10",
+      "description": "GET /products?sort=price_desc&limit=15 with valid auth returns HTTP 200 and res.body.data[0].price === 999 (Laptop, most expensive).",
+      "passed": true,
+      "evidence": "Test 'sort=price_desc returns most expensive product first' (products.test.ts:26): expect(res.body.data[0].price).toBe(999). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "11",
+      "description": "GET /products?sort=name_asc&limit=15 with valid auth returns HTTP 200 and res.body.data[0].name === 'Bookshelf' (alphabetically first).",
+      "passed": true,
+      "evidence": "Test 'sort=name_asc returns alphabetically first product first' (products.test.ts:32): expect(res.body.data[0].name).toBe('Bookshelf'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "12",
+      "description": "GET /products?sort=name_desc&limit=15 with valid auth returns HTTP 200 and res.body.data[0].name === 'Yoga Mat' (alphabetically last).",
+      "passed": true,
+      "evidence": "Test 'sort=name_desc returns alphabetically last product first' (products.test.ts:38): expect(res.body.data[0].name).toBe('Yoga Mat'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "13",
+      "description": "GET /products (no params) with valid auth returns HTTP 200 with envelope keys data, total, page, limit, totalPages with defaults page=1, limit=10, total=15, totalPages=2, data.length=10.",
+      "passed": true,
+      "evidence": "Test 'GET /products with no params returns default paginated envelope' (products.test.ts:116): expect(res.body.data).toHaveLength(10), expect(res.body.total).toBe(15), expect(res.body.page).toBe(1), expect(res.body.limit).toBe(10), expect(res.body.totalPages).toBe(2). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "14",
+      "description": "GET /products?page=2&limit=10 with valid auth returns HTTP 200, res.body.page === 2, data.length === 5, and data[0].id !== 1.",
+      "passed": true,
+      "evidence": "Test 'page=2&limit=10 returns second page with 5 items' (products.test.ts:126): expect(res.body.page).toBe(2), expect(res.body.data).toHaveLength(5), expect(res.body.data[0].id).not.toBe(1). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "15",
+      "description": "GET /products?limit=100 with valid auth returns HTTP 200 and res.body.limit === 50 (clamped to max 50).",
+      "passed": true,
+      "evidence": "Test 'limit=100 is clamped to 50' (products.test.ts:134): expect(res.body.limit).toBe(50). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "16",
+      "description": "GET /products?category=electronics&inStock=true with valid auth returns HTTP 200, res.body.total === 3, and every item has category === 'electronics' and inStock === true.",
+      "passed": true,
+      "evidence": "Test 'category=electronics&inStock=true returns 3 in-stock electronics' (products.test.ts:100): expect(res.body.total).toBe(3), res.body.data.every(p => p.category === 'electronics' && p.inStock === true) asserted true. vitest run: 21 passed (21)."
+    },
+    {
+      "id": "17",
+      "description": "GET /products?category=sports&sort=price_asc with valid auth returns HTTP 200, res.body.total === 3, and res.body.data[0].name === 'Jump Rope'.",
+      "passed": true,
+      "evidence": "Test 'category=sports&sort=price_asc returns Jump Rope first' (products.test.ts:107): expect(res.body.total).toBe(3), expect(res.body.data[0].name).toBe('Jump Rope'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "18",
+      "description": "GET /products with no Authorization header returns HTTP 401 with body { error: 'Unauthorized' }.",
+      "passed": true,
+      "evidence": "Test 'GET /products with no Authorization header returns 401' (products.test.ts:142): expect(res.status).toBe(401), expect(res.body.error).toBe('Unauthorized'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "19",
+      "description": "GET /products with Authorization: Bearer benchmark-token-2025 (digit sum 9, odd) returns HTTP 401 with body { error: 'Unauthorized' }.",
+      "passed": true,
+      "evidence": "Test 'GET /products with odd digit-sum token returns 401' (products.test.ts:148): expect(res.status).toBe(401), expect(res.body.error).toBe('Unauthorized'). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "20",
+      "description": "GET /products with Authorization: Bearer benchmark-token-2024 (digit sum 8, even) returns HTTP 200.",
+      "passed": true,
+      "evidence": "Test 'GET /products with even digit-sum token returns 200' (products.test.ts:154): expect(res.status).toBe(200). vitest run: 21 passed (21)."
+    },
+    {
+      "id": "21",
+      "description": "GET /health with no Authorization header returns HTTP 200 (health endpoint exempt from auth middleware).",
+      "passed": true,
+      "evidence": "Test 'GET /health with no Authorization header returns 200' (products.test.ts:159): expect(res.status).toBe(200). vitest run: 21 passed (21)."
+    }
+  ]
+}

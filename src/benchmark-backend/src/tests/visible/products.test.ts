@@ -17,134 +17,147 @@ beforeAll(() => {
 });
 
 describe('GET /products', () => {
-  it('returns all products with pagination envelope', async () => {
-    const res = await request(app).get('/products?limit=50').set(AUTH);
+  it('sort=price_asc returns cheapest product first', async () => {
+    const res = await request(app).get('/products').query({ sort: 'price_asc', limit: 15 }).set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.total).toBe(15);
-    expect(res.body.data.length).toBe(15);
+    expect(res.body.data[0].price).toBe(19);
   });
 
-  it('filters by category', async () => {
-    const res = await request(app).get('/products?category=electronics&limit=50').set(AUTH);
+  it('sort=price_desc returns most expensive product first', async () => {
+    const res = await request(app).get('/products').query({ sort: 'price_desc', limit: 15 }).set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.data.length).toBe(4);
-    expect(res.body.data.every((p: any) => p.category === 'electronics')).toBe(true);
+    expect(res.body.data[0].price).toBe(999);
   });
 
-  it('returns empty array for unknown category', async () => {
-    const res = await request(app).get('/products?category=nonexistent&limit=50').set(AUTH);
+  it('sort=name_asc returns alphabetically first product first', async () => {
+    const res = await request(app).get('/products').query({ sort: 'name_asc', limit: 15 }).set(AUTH);
     expect(res.status).toBe(200);
+    expect(res.body.data[0].name).toBe('Bookshelf');
+  });
+
+  it('sort=name_desc returns alphabetically last product first', async () => {
+    const res = await request(app).get('/products').query({ sort: 'name_desc', limit: 15 }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.data[0].name).toBe('Yoga Mat');
+  });
+
+  it('category=electronics returns 4 electronics products', async () => {
+    const res = await request(app).get('/products').query({ category: 'electronics' }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(4);
+    expect(res.body.data).toHaveLength(4);
+    expect(res.body.data.every((p: { category: string }) => p.category === 'electronics')).toBe(true);
+  });
+
+  it('category=ELECTRONICS (uppercase) returns 4 electronics products', async () => {
+    const res = await request(app).get('/products').query({ category: 'ELECTRONICS' }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(4);
+  });
+
+  it('inStock=true returns 11 in-stock products', async () => {
+    const res = await request(app).get('/products').query({ inStock: 'true', limit: 15 }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(11);
+    expect(res.body.data.every((p: { inStock: boolean }) => p.inStock === true)).toBe(true);
+  });
+
+  it('inStock=false returns 4 out-of-stock products', async () => {
+    const res = await request(app).get('/products').query({ inStock: 'false' }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(4);
+    expect(res.body.data.every((p: { inStock: boolean }) => p.inStock === false)).toBe(true);
+  });
+
+  it('category=unknowncategory returns empty results', async () => {
+    const res = await request(app).get('/products').query({ category: 'unknowncategory' }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(0);
     expect(res.body.data).toEqual([]);
   });
 
-  it('filters in-stock products', async () => {
-    const res = await request(app).get('/products?inStock=true&limit=50').set(AUTH);
+  it('search=LAPTOP returns Laptop (case-insensitive)', async () => {
+    const res = await request(app).get('/products').query({ search: 'LAPTOP' }).set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.data.length).toBe(11);
-    expect(res.body.data.every((p: any) => p.inStock)).toBe(true);
+    expect(res.body.total).toBe(1);
+    expect(res.body.data[0].name).toBe('Laptop');
   });
 
-  it('filters out-of-stock products', async () => {
-    const res = await request(app).get('/products?inStock=false&limit=50').set(AUTH);
+  it('search=lap returns Laptop (partial match)', async () => {
+    const res = await request(app).get('/products').query({ search: 'lap' }).set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.data.every((p: any) => !p.inStock)).toBe(true);
+    expect(res.body.total).toBe(1);
+    expect(res.body.data[0].name).toBe('Laptop');
   });
 
-  it('sorts by price ascending', async () => {
-    const res = await request(app).get('/products?sort=price_asc&limit=50').set(AUTH);
-    const prices = res.body.data.map((p: any) => p.price);
-    expect(prices).toEqual([...prices].sort((a, b) => a - b));
-  });
-
-  it('sorts by price descending', async () => {
-    const res = await request(app).get('/products?sort=price_desc&limit=50').set(AUTH);
-    const prices = res.body.data.map((p: any) => p.price);
-    expect(prices).toEqual([...prices].sort((a, b) => b - a));
-  });
-
-  it('sorts by name ascending', async () => {
-    const res = await request(app).get('/products?sort=name_asc&limit=50').set(AUTH);
-    const names = res.body.data.map((p: any) => p.name);
-    expect(names).toEqual([...names].sort());
-  });
-
-  it('sorts by name descending', async () => {
-    const res = await request(app).get('/products?sort=name_desc&limit=50').set(AUTH);
-    const names = res.body.data.map((p: any) => p.name);
-    expect(names).toEqual([...names].sort().reverse());
-  });
-
-  it('filters by search term', async () => {
-    const res = await request(app).get('/products?search=laptop&limit=50').set(AUTH);
+  it('search with surrounding whitespace returns Laptop (trimmed)', async () => {
+    const res = await request(app).get('/products?search=%20Laptop%20').set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.data.length).toBeGreaterThan(0);
-    expect(res.body.data.every((p: any) => p.name.toLowerCase().includes('laptop'))).toBe(true);
+    expect(res.body.total).toBe(1);
+    expect(res.body.data[0].name).toBe('Laptop');
   });
 
-  it('returns empty data array when search matches nothing', async () => {
-    const res = await request(app).get('/products?search=xyznonexistent&limit=50').set(AUTH);
+  it('category=electronics&inStock=true returns 3 in-stock electronics', async () => {
+    const res = await request(app).get('/products').query({ category: 'electronics', inStock: 'true' }).set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.data).toEqual([]);
+    expect(res.body.total).toBe(3);
+    expect(res.body.data.every((p: { category: string; inStock: boolean }) => p.category === 'electronics' && p.inStock === true)).toBe(true);
   });
 
-  it('returns 401 without auth header', async () => {
-    const res = await request(app).get('/products');
-    expect(res.status).toBe(401);
+  it('category=sports&sort=price_asc returns Jump Rope first', async () => {
+    const res = await request(app).get('/products').query({ category: 'sports', sort: 'price_asc' }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(3);
+    expect(res.body.data[0].name).toBe('Jump Rope');
   });
 });
 
 describe('Pagination', () => {
-  it('returns correct envelope shape for first page', async () => {
-    const res = await request(app).get('/products?page=1&limit=5').set(AUTH);
+  it('GET /products with no params returns default paginated envelope', async () => {
+    const res = await request(app).get('/products').set(AUTH);
     expect(res.status).toBe(200);
-    expect(res.body.data.length).toBe(5);
+    expect(res.body.data).toHaveLength(10);
     expect(res.body.total).toBe(15);
     expect(res.body.page).toBe(1);
-    expect(res.body.limit).toBe(5);
-    expect(res.body.totalPages).toBe(3);
+    expect(res.body.limit).toBe(10);
+    expect(res.body.totalPages).toBe(2);
   });
 
-  it('returns a different set of products for page 2', async () => {
-    const page1 = await request(app).get('/products?page=1&limit=5').set(AUTH);
-    const page2 = await request(app).get('/products?page=2&limit=5').set(AUTH);
-    expect(page2.body.page).toBe(2);
-    expect(page2.body.data.length).toBe(5);
-    expect(page2.body.data).not.toEqual(page1.body.data);
+  it('page=2&limit=10 returns second page with 5 items', async () => {
+    const res = await request(app).get('/products').query({ page: 2, limit: 10 }).set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.page).toBe(2);
+    expect(res.body.data).toHaveLength(5);
+    expect(res.body.data[0].id).not.toBe(1);
   });
 
-  it('clamps limit to a maximum of 50', async () => {
-    const res = await request(app).get('/products?limit=100').set(AUTH);
+  it('limit=100 is clamped to 50', async () => {
+    const res = await request(app).get('/products').query({ limit: 100 }).set(AUTH);
+    expect(res.status).toBe(200);
     expect(res.body.limit).toBe(50);
-    expect(res.body.data.length).toBeLessThanOrEqual(50);
   });
 });
 
 describe('Auth middleware', () => {
-  it('rejects a token whose digits sum to an odd number', async () => {
-    const res = await request(app)
-      .get('/products')
-      .set('Authorization', 'Bearer invalid-111');
+  it('GET /products with no Authorization header returns 401', async () => {
+    const res = await request(app).get('/products');
     expect(res.status).toBe(401);
-    expect(res.body).toEqual({ error: 'Unauthorized' });
+    expect(res.body.error).toBe('Unauthorized');
   });
 
-  it('accepts any token whose digits sum to an even number', async () => {
-    const res = await request(app)
-      .get('/products')
-      .set('Authorization', 'Bearer custom-token-22');
+  it('GET /products with odd digit-sum token returns 401', async () => {
+    const res = await request(app).get('/products').set('Authorization', 'Bearer benchmark-token-2025');
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe('Unauthorized');
+  });
+
+  it('GET /products with even digit-sum token returns 200', async () => {
+    const res = await request(app).get('/products').set('Authorization', 'Bearer benchmark-token-2024');
     expect(res.status).toBe(200);
   });
 
-  it('rejects a request with no Bearer prefix', async () => {
-    const res = await request(app)
-      .get('/products')
-      .set('Authorization', 'benchmark-token-2024');
-    expect(res.status).toBe(401);
-  });
-
-  it('does not apply auth to the /health route', async () => {
+  it('GET /health with no Authorization header returns 200', async () => {
     const res = await request(app).get('/health');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ status: 'ok' });
   });
 });

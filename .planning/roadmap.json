@@ -1,0 +1,95 @@
+{
+  "investigations": {
+    "techStack": [
+      "Test framework: Vitest v4.1.5 with built-in assertions; no separate assertion library",
+      "HTTP testing: Supertest v7.2.0, imported as `import request from 'supertest'`, used as `request(app)`",
+      "Mock pattern already established: vi.hoisted() wraps mock factory, vi.mock('../../services/dataFetcher') declares the mock at module level",
+      "TypeScript: ES2023 target, ESNext modules, bundler resolution; vitest/globals types included (no explicit imports needed for describe/it/expect/vi)",
+      "Test script: `pnpm --filter benchmark-backend test` runs `vitest run`; setup file is `./tests/setup.ts`",
+      "Coverage scoped to `src/services/productService.ts` only"
+    ],
+    "features": [
+      "MOCK_PRODUCTS (15 total): electronics×4 (Laptop $999 inStock, Smartphone $699 inStock, Wireless Headphones $149 out, Mechanical Keyboard $89 inStock), clothing×3 (Linen Shirt $49 inStock, Running Shoes $119 inStock, Winter Jacket $189 out), furniture×3 (Ergonomic Chair $549 inStock, Standing Desk $399 out, Bookshelf $149 inStock), sports×3 (Yoga Mat $39 inStock, Resistance Bands $24 inStock, Jump Rope $19 out), books×2 (Clean Code $35 inStock, The Pragmatic Programmer $42 inStock)",
+      "11 products inStock:true, 4 inStock:false",
+      "Test file already has: `import { MOCK_PRODUCTS }` from data/products, `import request from 'supertest'`, `import app`, AUTH constant `{ Authorization: 'Bearer benchmark-token-2024' }`, beforeAll mock returning MOCK_PRODUCTS",
+      "Three describe blocks present but empty: 'GET /products', 'Pagination', 'Auth middleware'",
+      "GET /health returns { status: 'ok' } with no auth required",
+      "GET /products returns paginated envelope: { data, total, page, limit, totalPages }"
+    ],
+    "architecture": [
+      "fetchAllProducts: named export from `src/services/dataFetcher.ts`; mocked in tests via vi.mock('../../services/dataFetcher')",
+      "productService.ts imports fetchAllProducts directly (hard dependency, no injection); mock intercepts at module boundary",
+      "Express app mounts health at /health (unauthenticated), products at /products with requireAuth middleware applied at route group level",
+      "queryParser.ts normalises: search — trimmed (.trim()); category — passed through raw (NOT trimmed, but compared case-insensitively in service); inStock — 'true'/'false' strings to boolean; sort — validated against whitelist, invalid ignored; page — integer > 0, default 1; limit — integer > 0, clamped to max 50, default 10",
+      "productService filters in order: category (case-insensitive), inStock, search (case-insensitive, trimmed, name-only substring); then sorts; then paginates"
+    ],
+    "edgeCases": [
+      "Auth digit-sum: only '0'-'9' chars are summed; 'benchmark-token-2024' → [2,0,2,4] → 8 (even) → valid; 'benchmark-token-2025' → [2,0,2,5] → 9 (odd) → invalid",
+      "Missing or malformed Authorization header → 401 { error: 'Unauthorized' }",
+      "limit=100 → clamped to 50; limit=0 or negative → invalid, defaults to 10",
+      "page=0 or negative → invalid, defaults to 1; page beyond totalPages → empty data array",
+      "Search is name-only (not tags/description); substring match via .includes(); both sides lowercased; leading/trailing whitespace trimmed",
+      "Category filter: both sides lowercased, exact match after lowercase; NOT trimmed (e.g. ' electronics' would not match); unknown category returns empty array, not 404",
+      "Invalid sort value silently ignored (no sort applied)",
+      "Default pagination: page=1, limit=10, totalPages=ceil(total/limit)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1–5 (Filtering: category, inStock, unknown category)",
+      "description": "Inside the existing 'GET /products' describe block in `src/benchmark-backend/src/tests/visible/products.test.ts`, add tests: (1) category=electronics → 200, total=4, all items have category 'electronics'; (2) category=ELECTRONICS → 200, total=4; (3) inStock=true → 200, total=11, all items inStock true; (4) inStock=false → 200, total=4, all items inStock false; (5) category=unknowncategory → 200, total=0, data=[]. Use AUTH header from existing constant.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts",
+        "src/benchmark-backend/src/utils/queryParser.ts",
+        "src/benchmark-backend/src/data/products.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 6–8 (Search: case-insensitive, partial, whitespace trim)",
+      "description": "Inside the 'GET /products' describe block in `src/benchmark-backend/src/tests/visible/products.test.ts`, add tests: (6) search=LAPTOP → 200, total=1, data[0].name='Laptop'; (7) search=lap → 200, total=1, data[0].name='Laptop'; (8) search=%20Laptop%20 (URL-encoded spaces) → 200, total=1, data[0].name='Laptop'. Use .set(AUTH) or .query() with the auth header.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts",
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 9–12 (Sorting: all four sort orders)",
+      "description": "Inside the 'GET /products' describe block in `src/benchmark-backend/src/tests/visible/products.test.ts`, add tests with limit=15 to fetch all products: (9) sort=price_asc → data[0].price=19 (Jump Rope); (10) sort=price_desc → data[0].price=999 (Laptop); (11) sort=name_asc → data[0].name='Bookshelf'; (12) sort=name_desc → data[0].name='Yoga Mat'.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts",
+        "src/benchmark-backend/src/utils/queryParser.ts",
+        "src/benchmark-backend/src/data/products.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirements 13–15 (Pagination: default envelope, page 2, limit clamping)",
+      "description": "Inside the existing 'Pagination' describe block in `src/benchmark-backend/src/tests/visible/products.test.ts`, add tests: (13) GET /products with no params → 200, envelope has keys data/total/page/limit/totalPages with values data.length=10, total=15, page=1, limit=10, totalPages=2; (14) page=2&limit=10 → page=2, data.length=5, data[0].id !== 1; (15) limit=100 → limit=50 in response (clamped).",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts",
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirements 16–17 (Combined Filters: category+inStock, category+sort)",
+      "description": "Inside the 'GET /products' describe block in `src/benchmark-backend/src/tests/visible/products.test.ts`, add tests: (16) category=electronics&inStock=true → 200, total=3, every item has category='electronics' and inStock=true; (17) category=sports&sort=price_asc → 200, total=3, data[0].name='Jump Rope'.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts",
+        "src/benchmark-backend/src/data/products.ts"
+      ]
+    },
+    {
+      "id": "task-6",
+      "requirement": "Requirements 18–21 (Authentication: missing header, odd digit-sum, even digit-sum, health exempt)",
+      "description": "Inside the existing 'Auth middleware' describe block in `src/benchmark-backend/src/tests/visible/products.test.ts`, add tests: (18) GET /products with no Authorization header → 401, body.error='Unauthorized'; (19) Authorization: Bearer benchmark-token-2025 (digit sum 9, odd) → 401, body.error='Unauthorized'; (20) Authorization: Bearer benchmark-token-2024 (digit sum 8, even) → 200; (21) GET /health with no Authorization header → 200.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts",
+        "src/benchmark-backend/src/app.ts"
+      ]
+    }
+  ]
+}
