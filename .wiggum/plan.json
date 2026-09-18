@@ -1,0 +1,48 @@
+{
+  "taskId": "task3",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Write authentication tests (missing header, invalid token, valid token, /health no-auth)",
+      "status": "done",
+      "notes": "All 4 auth tests pass. The describe blocks for GET /products and Pagination are still empty (pre-existing) and will fail until phases 2-6 fill them in."
+    },
+    {
+      "id": "phase-2",
+      "title": "Write filtering tests (by category case-insensitive, inStock true/false, unknown category returns empty)",
+      "status": "done",
+      "notes": "6 filtering tests added to the GET /products describe block. All 10 tests pass (6 new + 4 auth from phase-1). The empty Pagination describe block still causes a suite-level failure — pre-existing, noted in phase-1, will be resolved in phase-5. Build passes cleanly."
+    },
+    {
+      "id": "phase-3",
+      "title": "Write search tests (case-insensitive match, partial match, whitespace trimming)",
+      "status": "done",
+      "notes": "3 search tests added inside GET /products > Search describe block. All 13 tests pass (3 new + 6 filtering + 4 auth). Empty Pagination suite still causes suite-level failure — pre-existing, will be resolved in phase-5. Build passes cleanly."
+    },
+    {
+      "id": "phase-4",
+      "title": "Write sorting tests (price_asc, price_desc, name_asc, name_desc)",
+      "status": "done",
+      "notes": "4 sorting tests added inside GET /products > Sorting describe block. All 17 tests pass (4 new + 3 search + 6 filtering + 4 auth). Uses limit=15 to fetch all 15 products and asserts on first element and monotonic order. Empty Pagination suite still causes suite-level failure — pre-existing, will be resolved in phase-5. Build passes cleanly."
+    },
+    {
+      "id": "phase-5",
+      "title": "Write pagination tests (envelope shape, different pages return different products, limit clamped to 50)",
+      "status": "done",
+      "notes": "3 pagination tests added: envelope shape (total=15, page=1, limit=10, totalPages=2, data length=10), different pages have no overlapping product IDs, limit=100 is clamped to 50. All 20 tests pass. Build passes cleanly."
+    },
+    {
+      "id": "phase-6",
+      "title": "Write combined-filter tests (multiple query params applied together)",
+      "status": "done",
+      "notes": "4 combined-filter tests added inside GET /products > Combined filters describe block: category+inStock, category+sort, category+inStock+sort, inStock+sort+pagination. All 24 tests pass (4 new + prior 20). Build passes cleanly."
+    },
+    {
+      "id": "phase-7",
+      "title": "Run vitest and confirm all tests pass",
+      "status": "done",
+      "notes": "All 24 tests pass (vitest run). Build (tsc -p tsconfig.build.json) exits cleanly with no errors."
+    }
+  ]
+}
