@@ -1,0 +1,30 @@
+{
+  "taskId": "task2",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Extract filter helper: move search/category/inStock filtering into a dedicated named function with idiomatic boolean checks",
+      "status": "done",
+      "notes": "Extracted applyFilters(products, query) helper. Replaced !== undefined checks with idiomatic truthiness for search/category; kept inStock's === undefined guard (needed to distinguish false from absent). All 19 tests pass. Build failure on DEFAULT_LIMIT is pre-existing (noUnusedLocals) and is phase-3 work."
+    },
+    {
+      "id": "phase-2",
+      "title": "Extract sort helper: move all sort branches into a dedicated named function with a consistent structure",
+      "status": "done",
+      "notes": "Extracted applySort(products, sort) helper using a switch statement for consistent structure. getAllProducts now calls applySort(result, query.sort). All 19 tests pass. Build still fails on DEFAULT_LIMIT (pre-existing noUnusedLocals error, phase-3 work)."
+    },
+    {
+      "id": "phase-3",
+      "title": "Remove dead code: delete the unused DEFAULT_LIMIT constant and the unused sanitizeSearch export from productService.ts",
+      "status": "done",
+      "notes": "Deleted DEFAULT_LIMIT constant and sanitizeSearch export from productService.ts. All 19 tests pass and build is clean (no tsc errors)."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run the full test suite and confirm all tests pass with no behaviour regression",
+      "status": "done",
+      "notes": "All 19 tests pass and build is clean (tsc exits with no errors). No behaviour regression detected."
+    }
+  ]
+}
