@@ -1,0 +1,60 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript ~6.0.2 with target ES2023, ESNext modules, verbatimModuleSyntax:true — type-only imports must use 'import type'",
+      "noUnusedLocals and noUnusedParameters enforced by the compiler — removing sanitizeSearch will satisfy this automatically",
+      "Vitest ^4.1.5 is the test runner; tests use globals (describe/it/expect) without explicit imports",
+      "Express ^5.2.1 only; no lodash or array utility libraries — all array ops use native JS (filter, sort, slice, spread)",
+      "ESM throughout ('type':'module' in package.json); named exports only, no default exports"
+    ],
+    "features": [
+      "getAllProducts currently: (1) fetchAllProducts() → spread into result, (2) inline search filter, (3) inline category filter, (4) inline inStock filter, (5) four sequential independent 'if' sort blocks each doing [...result].sort(), (6) paginate via slice, (7) return { data, total, page, limit, totalPages }",
+      "filterProducts must extract: search (trim+lowercase name includes), category (case-insensitive equality), inStock (!== undefined guard then boolean match)",
+      "sortProducts must extract: price_asc (a.price-b.price), price_desc (b.price-a.price), name_asc (a.name.localeCompare(b.name)), name_desc (b.name.localeCompare(a.name))",
+      "sanitizeSearch does term.trim().toLowerCase() — never called anywhere, confirmed dead code, safe to delete",
+      "11 product tests + 3 pagination tests + 4 auth tests must all remain green; limit=100 clamping to 50 is enforced in the route/controller layer, not in productService — do not touch it"
+    ],
+    "architecture": [
+      "Layer order: routes → middleware → controller → utils (queryParser) → services → dataFetcher",
+      "filterProducts and sortProducts should be module-private helpers in the same productService.ts file — they are not reused elsewhere, so no separate util file is warranted",
+      "Only getAllProducts is a public named export; helpers must NOT be exported (consistent with codebase convention: internal helpers are unexported)",
+      "Naming conventions: camelCase functions, PascalCase types/interfaces, UPPER_SNAKE_CASE constants, snake_case sort string literals",
+      "fetchAllProducts() is async, returns Promise<Product[]>, uses module-level in-memory cache — getAllProducts must await it"
+    ],
+    "edgeCases": [
+      "inStock is boolean|undefined in ProductQuery — the guard must be '!== undefined' (not truthy) because false is a valid value that must filter out-of-stock items; a truthy check would silently ignore inStock=false",
+      "Replace p.inStock === true with p.inStock and p.inStock === false with !p.inStock inside filterProducts (idiomatic; still correct since Product.inStock is boolean)",
+      "sortProducts must spread before sorting: [...input].sort(...) — JS Array.sort mutates in place; the test suite's mock array is shared and would be corrupted without a copy",
+      "filterProducts receives the products array and returns a new array via .filter() — no mutation risk since filter() always returns a new array",
+      "Unknown sort value (not in SortOption): none of the else-if branches match, so the input is returned as-is — this is the correct no-op behaviour and must be preserved",
+      "The sort else-if chain must cover all four SortOption values; no 'else' fallback is needed since the no-match case is already handled by returning the input unchanged",
+      "query.category!: the current non-null assertion on category can be dropped inside filterProducts since the !== undefined guard already narrows the type"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "4 — The sanitizeSearch export must be removed from productService.ts",
+      "description": "Delete the sanitizeSearch function and its export from productService.ts. It is dead code (never called) and its trim+toLowerCase logic is already inlined at the call site.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "1, 5 — filterProducts must exist containing search/category/inStock logic; no redundant === true / === false comparisons may remain",
+      "description": "Add a module-private (unexported) function filterProducts(products: Product[], query: ProductQuery): Product[] in productService.ts. It must contain all three filter steps: search (query.search !== undefined guard, then trim+lowercase name includes), category (query.category !== undefined guard, then case-insensitive equality), inStock (query.inStock !== undefined guard, then p.inStock for true case and !p.inStock for false case — no === true or === false literals).",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "2, 6 — sortProducts must exist containing all four sort comparators; must use a single if/else if chain not four independent if blocks",
+      "description": "Add a module-private (unexported) function sortProducts(products: Product[], sort: SortOption | undefined): Product[] in productService.ts. It must: (a) spread the input before sorting to avoid mutation ([...products].sort(...)), (b) use a single if / else if / else if / else if chain for price_asc, price_desc, name_asc, name_desc, (c) return the spread+sorted array when a branch matches, (d) return the original products array unchanged when no branch matches.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "3 — getAllProducts must be a thin orchestrator with no inlined filter or sort logic",
+      "description": "Rewrite the body of getAllProducts in productService.ts so it only: (1) awaits fetchAllProducts(), (2) calls filterProducts(products, query), (3) calls sortProducts(filtered, query.sort), (4) computes pagination (total, page, limit, totalPages) and slices, (5) returns the envelope. No Array.prototype.filter or .sort calls may remain directly in getAllProducts.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}
