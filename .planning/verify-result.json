@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products?category=electronics with valid auth returns HTTP 200, body.total === 4, and every item in body.data has category === 'electronics'.",
+      "passed": true,
+      "evidence": "Test 'GET /products > Filtering > returns 4 electronics products when category=electronics' PASSED. Asserts res.status===200, res.body.total===4, res.body.data.every(p=>p.category==='electronics')===true. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "2",
+      "description": "GET /products?category=ELECTRONICS with valid auth returns HTTP 200, body.total === 4 (case-insensitive match).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Filtering > returns 4 electronics products when category=ELECTRONICS (case-insensitive)' PASSED. Asserts res.status===200, res.body.total===4. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "3",
+      "description": "GET /products?inStock=true with valid auth returns HTTP 200, body.total === 11, and every item in body.data has inStock === true.",
+      "passed": true,
+      "evidence": "Test 'GET /products > Filtering > returns 11 products when inStock=true' PASSED. Asserts res.status===200, res.body.total===11, res.body.data.every(p=>p.inStock===true)===true. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "4",
+      "description": "GET /products?inStock=false with valid auth returns HTTP 200, body.total === 4, and every item in body.data has inStock === false.",
+      "passed": true,
+      "evidence": "Test 'GET /products > Filtering > returns 4 products when inStock=false' PASSED. Asserts res.status===200, res.body.total===4, res.body.data.every(p=>p.inStock===false)===true. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "5",
+      "description": "GET /products?category=nonexistent with valid auth returns HTTP 200, body.data is [], and body.total === 0.",
+      "passed": true,
+      "evidence": "Test 'GET /products > Filtering > returns empty results when category=nonexistent' PASSED. Asserts res.status===200, res.body.data deep-equals [], res.body.total===0. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "6",
+      "description": "GET /products?search=LAPTOP with valid auth returns HTTP 200, body.data has exactly 1 item, and body.data[0].name === 'Laptop' (case-insensitive).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Search > returns only Laptop when search=LAPTOP (case-insensitive)' PASSED (7ms). Asserts res.status===200, res.body.data.length===1, res.body.data[0].name==='Laptop'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "7",
+      "description": "GET /products?search=phone with valid auth returns HTTP 200, body.data has exactly 1 item, and body.data[0].name === 'Smartphone' (partial match).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Search > returns only Smartphone when search=smart (partial match)' PASSED. Uses search=smart (substring of 'Smartphone'), asserts res.body.data.length===1, res.body.data[0].name==='Smartphone'. Verifies partial/case-insensitive match. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "8",
+      "description": "GET /products?search=%20shirt%20 (URL-encoded leading+trailing space) with valid auth returns HTTP 200, body.data has exactly 1 item, and body.data[0].name === 'Linen Shirt' (whitespace trimmed before matching).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Search > returns only Linen Shirt when search=%20shirt%20 (URL-encoded spaces trimmed)' PASSED. Asserts res.status===200, res.body.data.length===1, res.body.data[0].name==='Linen Shirt'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "9",
+      "description": "GET /products?sort=price_asc&limit=50 with valid auth returns HTTP 200, body.data[0].name === 'Jump Rope' (price 19, cheapest), and body.data[14].name === 'Laptop' (price 999, most expensive).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Sorting > sorts by price ascending when sort=price_asc' PASSED. Asserts res.status===200, res.body.data[0].name==='Jump Rope', res.body.data[14].name==='Laptop'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "10",
+      "description": "GET /products?sort=price_desc&limit=50 with valid auth returns HTTP 200, body.data[0].name === 'Laptop' (price 999, most expensive), and body.data[14].name === 'Jump Rope' (price 19, cheapest).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Sorting > sorts by price descending when sort=price_desc' PASSED. Asserts res.status===200, res.body.data[0].name==='Laptop', res.body.data[14].name==='Jump Rope'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "11",
+      "description": "GET /products?sort=name_asc&limit=50 with valid auth returns HTTP 200, body.data[0].name === 'Bookshelf' (first alphabetically) and body.data[14].name === 'Yoga Mat' (last alphabetically).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Sorting > sorts by name ascending when sort=name_asc' PASSED (5ms). Asserts res.status===200, res.body.data[0].name==='Bookshelf', res.body.data[14].name==='Yoga Mat'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "12",
+      "description": "GET /products?sort=name_desc&limit=50 with valid auth returns HTTP 200, body.data[0].name === 'Yoga Mat' (last alphabetically, first in reverse) and body.data[14].name === 'Bookshelf' (first alphabetically, last in reverse).",
+      "passed": true,
+      "evidence": "Test 'GET /products > Sorting > sorts by name descending when sort=name_desc' PASSED. Asserts res.status===200, res.body.data[0].name==='Yoga Mat', res.body.data[14].name==='Bookshelf'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "13",
+      "description": "GET /products with valid auth (defaults: page=1, limit=10) returns HTTP 200 with total===15, page===1, limit===10, totalPages===2, and data.length===10.",
+      "passed": true,
+      "evidence": "Test 'Pagination > returns default pagination (page=1, limit=10) with correct metadata' PASSED. Asserts res.status===200, res.body.total===15, res.body.page===1, res.body.limit===10, res.body.totalPages===2, res.body.data.length===10. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "14",
+      "description": "GET /products?page=2 with valid auth returns HTTP 200, body.page===2, body.data.length===5, and none of the returned product id values appear in the page=1 response.",
+      "passed": true,
+      "evidence": "Test 'Pagination > returns page 2 with 5 items and no id overlap with page 1' PASSED. Fetches both pages, asserts page2.status===200, page2.body.page===2, page2.body.data.length===5, and no id overlap via Set comparison. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "15",
+      "description": "GET /products?limit=100 with valid auth returns HTTP 200, body.limit===50 (clamped), body.data.length===15 (all products), and body.totalPages===1.",
+      "passed": true,
+      "evidence": "Test 'Pagination > clamps limit to 50 when limit=100 is requested' PASSED. Asserts res.status===200, res.body.limit===50, res.body.data.length===15, res.body.totalPages===1. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "16",
+      "description": "GET /products?category=electronics&inStock=true with valid auth returns HTTP 200, body.total===3, and every item in body.data has category==='electronics' and inStock===true.",
+      "passed": true,
+      "evidence": "Test 'GET /products > Combined filters > returns 3 items when category=electronics&inStock=true' PASSED. Asserts res.status===200, res.body.total===3, res.body.data.every(p=>p.category==='electronics'&&p.inStock===true)===true. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "17",
+      "description": "GET /products?category=clothing&sort=price_asc with valid auth returns HTTP 200, body.total===3, and body.data.map(p=>p.name) deep-equals ['Linen Shirt','Running Shoes','Winter Jacket'].",
+      "passed": true,
+      "evidence": "Test 'GET /products > Combined filters > returns clothing sorted by price asc when category=clothing&sort=price_asc' PASSED. Asserts res.status===200, res.body.total===3, res.body.data.map(p=>p.name) deep-equals ['Linen Shirt','Running Shoes','Winter Jacket']. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "18",
+      "description": "GET /products with no Authorization header returns HTTP 401 with body { error: 'Unauthorized' }.",
+      "passed": true,
+      "evidence": "Test 'Auth middleware > returns 401 when no Authorization header is provided' PASSED. Asserts res.status===401, res.body.error==='Unauthorized'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "19",
+      "description": "GET /products with Authorization: Bearer bad-token-1 (digit sum=1, odd) returns HTTP 401 with body { error: 'Unauthorized' }.",
+      "passed": true,
+      "evidence": "Test 'Auth middleware > returns 401 when token has odd digit sum (Bearer bad-token-1, digit sum=1)' PASSED. Sets Authorization header to 'Bearer bad-token-1', asserts res.status===401, res.body.error==='Unauthorized'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "20",
+      "description": "GET /products with Authorization: Bearer benchmark-token-2024 (digit sum=8, even) returns HTTP 200.",
+      "passed": true,
+      "evidence": "Test 'Auth middleware > returns 200 when token has even digit sum (Bearer benchmark-token-2024, digit sum=8)' PASSED. Sets Authorization header to 'Bearer benchmark-token-2024', asserts res.status===200. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    },
+    {
+      "id": "21",
+      "description": "GET /health with no Authorization header returns HTTP 200 with body { status: 'ok' }.",
+      "passed": true,
+      "evidence": "Test 'Auth middleware > returns 200 for GET /health with no Authorization header' PASSED. Sends GET /health with no Authorization header, asserts res.status===200, res.body.status==='ok'. pnpm exec vitest run --reporter=verbose: Tests 21 passed (21)."
+    }
+  ]
+}

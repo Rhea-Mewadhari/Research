@@ -1,0 +1,81 @@
+{
+  "investigations": {
+    "techStack": [
+      "Vitest v4.1.5 with globals enabled (describe/it/beforeAll etc. without imports)",
+      "supertest v7.2.2 for HTTP assertions; import as default: `import request from 'supertest'`",
+      "TypeScript ESNext/ESM, moduleResolution=bundler, no path aliases — relative imports only",
+      "vi.hoisted() for mock declarations that must hoist above imports; vi.mock() for module replacement",
+      "Setup file tests/setup.ts stubs global fetch via vi.stubGlobal() to block real DummyJSON calls",
+      "vitest/globals types configured — no need to import describe/it/beforeAll/expect"
+    ],
+    "features": [
+      "GET /products accepts: search, category, inStock, sort (price_asc|price_desc|name_asc|name_desc), page, limit",
+      "requireAuth middleware: extracts Bearer token, sums digit chars, rejects if digit sum is odd, returns 401 {error:'Unauthorized'}",
+      "ProductService.getAllProducts returns {data, total, page, limit, totalPages}; default page=1, default limit=10",
+      "15 MOCK_PRODUCTS: electronics(4 — Laptop/999, Smartphone/699, Wireless Headphones/149, Mechanical Keyboard/89), clothing(3 — Linen Shirt/49, Running Shoes/119, Winter Jacket/189), furniture(3 — Ergonomic Chair/549, Standing Desk/399, Bookshelf/149), sports(3 — Yoga Mat/39, Resistance Bands/24, Jump Rope/19), books(2 — Clean Code/35, The Pragmatic Programmer/42)",
+      "inStock totals: 11 true (Laptop, Smartphone, Mechanical Keyboard, Linen Shirt, Running Shoes, Ergonomic Chair, Bookshelf, Yoga Mat, Resistance Bands, Clean Code, The Pragmatic Programmer), 4 false (Wireless Headphones, Winter Jacket, Standing Desk, Jump Rope)",
+      "fetchAllProducts is the only export from src/services/dataFetcher — mocked via vi.mock('../../services/dataFetcher')",
+      "GET /health is public (no auth required), returns 200 {status:'ok'}",
+      "Valid test auth token: 'Bearer benchmark-token-2024' (digits 2+0+2+4=8, even) — already in AUTH constant in scaffold"
+    ],
+    "architecture": [
+      "Test file is src/benchmark-backend/src/tests/visible/products.test.ts — the ONLY file to modify",
+      "Scaffold already has: vi.hoisted mockFetchAllProducts, vi.mock('../../services/dataFetcher'), imports for request/app/MOCK_PRODUCTS, AUTH constant, beforeAll mock setup",
+      "Three existing describe blocks to fill: 'GET /products', 'Pagination', 'Auth middleware'",
+      "Relative paths from tests/visible/: app=../../app, data=../../data/products, services=../../services/dataFetcher",
+      "app is a default export from src/app.ts (Express instance)",
+      "MOCK_PRODUCTS is a named export 'products' from src/data/products, imported as MOCK_PRODUCTS in scaffold",
+      "beforeAll already sets mockFetchAllProducts.mockResolvedValue([...MOCK_PRODUCTS]) — no need to repeat this setup per test"
+    ],
+    "edgeCases": [
+      "Auth error body is exactly {error: 'Unauthorized'} — string is 'Unauthorized' not 'unauthorized'",
+      "Digit extraction uses char range check (c>='0'&&c<='9'), non-digit chars in token are ignored; token with no digits has digitSum=0 (even, valid)",
+      "Category filter: p.category.toLowerCase() === query.category.toLowerCase() — exact match after lowercasing, partial match not supported",
+      "Search: server trims and lowercases before substring match — URL-encoded spaces (%20) in query are decoded by Express before reaching service",
+      "Sorting with unknown sort value is a no-op (unspecified/no-op default); tests must pass sort=price_asc with limit=50 to see all 15 products ordered",
+      "inStock query param parsed as boolean before service — strict equality p.inStock === query.inStock; string 'true'/'false' will not match boolean",
+      "Pagination: totalPages = Math.ceil(total/limit); page=2 with total=15 limit=10 returns exactly 5 items; no id overlap between pages",
+      "Limit clamping to max 50 is specified in requirements (body.limit===50 when limit=100 sent) — route handler enforces this before service call",
+      "Sorting: name_asc uses localeCompare — 'Bookshelf' is first alphabetically, 'Yoga Mat' is last among the 15 products",
+      "Sorting: price_asc — cheapest is Jump Rope ($19), most expensive is Laptop ($999)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 18–21 — Authentication",
+      "description": "Fill the 'Auth middleware' describe block with 4 tests: (18) GET /products with no Authorization header → 401 {error:'Unauthorized'}; (19) GET /products with 'Bearer bad-token-1' (digit sum=1, odd) → 401 {error:'Unauthorized'}; (20) GET /products with AUTH constant (benchmark-token-2024) → 200; (21) GET /health with no Authorization header → 200 {status:'ok'}",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 1–5 — Filtering by category and inStock",
+      "description": "Inside the 'GET /products' describe block, add a nested 'Filtering' describe with 5 tests: (1) ?category=electronics → 200, total=4, every item.category==='electronics'; (2) ?category=ELECTRONICS → 200, total=4 (case-insensitive); (3) ?inStock=true → 200, total=11, every item.inStock===true; (4) ?inStock=false → 200, total=4, every item.inStock===false; (5) ?category=nonexistent → 200, data=[], total=0",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 6–8 — Full-text search",
+      "description": "Inside the 'GET /products' describe block, add a nested 'Search' describe with 3 tests: (6) ?search=LAPTOP → 200, data.length=1, data[0].name==='Laptop'; (7) ?search=phone → 200, data.length=1, data[0].name==='Smartphone'; (8) ?search=%20shirt%20 (URL-encoded spaces) → 200, data.length=1, data[0].name==='Linen Shirt'",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirements 9–12 — Sorting",
+      "description": "Inside the 'GET /products' describe block, add a nested 'Sorting' describe with 4 tests (all using limit=50 to see all 15 products): (9) ?sort=price_asc&limit=50 → data[0].name==='Jump Rope', data[14].name==='Laptop'; (10) ?sort=price_desc&limit=50 → data[0].name==='Laptop', data[14].name==='Jump Rope'; (11) ?sort=name_asc&limit=50 → data[0].name==='Bookshelf', data[14].name==='Yoga Mat'; (12) ?sort=name_desc&limit=50 → data[0].name==='Yoga Mat', data[14].name==='Bookshelf'",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirements 13–15 — Pagination",
+      "description": "Fill the 'Pagination' describe block with 3 tests: (13) GET /products (no params) → 200, body has keys {data,total,page,limit,totalPages} with values total=15,page=1,limit=10,totalPages=2,data.length=10; (14) ?page=2 → page=2, data.length=5, no id overlap with page=1 response (fetch both and compare id sets); (15) ?limit=100 → body.limit=50 (clamped), data.length=15, totalPages=1",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-6",
+      "requirement": "Requirements 16–17 — Combined filters",
+      "description": "Inside the 'GET /products' describe block, add a nested 'Combined filters' describe with 2 tests: (16) ?category=electronics&inStock=true → 200, total=3, every item has category==='electronics' AND inStock===true; (17) ?category=clothing&sort=price_asc → 200, total=3, data.map(p=>p.name) deep-equals ['Linen Shirt','Running Shoes','Winter Jacket']",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    }
+  ]
+}
