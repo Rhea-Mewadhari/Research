@@ -1,0 +1,30 @@
+{
+  "taskId": "task2",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Remove dead code: delete sanitizeSearch export and DEFAULT_LIMIT constant from productService.ts",
+      "status": "done",
+      "notes": "Removed DEFAULT_LIMIT constant and sanitizeSearch export. All 19 tests pass."
+    },
+    {
+      "id": "phase-2",
+      "title": "Extract filterProducts helper: move search/category/inStock inline logic into a named function, replacing redundant boolean checks (=== true, !== undefined) with idiomatic equivalents",
+      "status": "done",
+      "notes": "Extracted filterProducts helper. Replaced redundant inStock boolean checks with idiomatic p.inStock === query.inStock. All 19 tests pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Extract sortProducts helper: move the four sort branches into a named function; make getAllProducts a thin fetch→filter→sort→paginate orchestrator",
+      "status": "done",
+      "notes": "Extracted sortProducts helper with four sort branches. getAllProducts is now a thin fetch→filter→sort→paginate orchestrator. All 19 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run the test suite and confirm all tests pass with no regressions",
+      "status": "done",
+      "notes": "All 19 tests pass, build clean. No regressions."
+    }
+  ]
+}
