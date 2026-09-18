@@ -1,0 +1,125 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Authentication — missing Authorization header returns 401",
+      "passed": true,
+      "evidence": "Test 'no Authorization header returns 401 Unauthorized' in describe('Auth middleware') passed. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "2",
+      "description": "Authentication — invalid token (odd digit sum) returns 401",
+      "passed": true,
+      "evidence": "Test 'invalid token with odd digit sum returns 401 Unauthorized' in describe('Auth middleware') passed. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "3",
+      "description": "Authentication — valid token (even digit sum) returns 200",
+      "passed": true,
+      "evidence": "Test 'valid token with even digit sum returns 200' in describe('Auth middleware') passed. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "4",
+      "description": "Authentication — GET /health is exempt from auth",
+      "passed": true,
+      "evidence": "Test 'GET /health with no Authorization header returns 200' in describe('Auth middleware') passed. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "5",
+      "description": "Filtering — category exact match (case-insensitive, lowercase input)",
+      "passed": true,
+      "evidence": "Test 'category=electronics returns 4 electronics products' in describe('GET /products') asserts res.body.total === 4 and every item has category === 'electronics'. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "6",
+      "description": "Filtering — category match is case-insensitive (uppercase input)",
+      "passed": true,
+      "evidence": "Test 'category=ELECTRONICS returns 4 electronics products (case-insensitive)' in describe('GET /products') asserts res.body.total === 4 and all items have category === 'electronics'. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "7",
+      "description": "Filtering — unknown category returns empty data array",
+      "passed": true,
+      "evidence": "Test 'category=nonexistent returns empty data and total 0' in describe('GET /products') asserts res.body.data.length === 0 and res.body.total === 0. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "8",
+      "description": "Filtering — inStock=true returns only in-stock products",
+      "passed": true,
+      "evidence": "Test 'inStock=true returns only in-stock products' in describe('GET /products') asserts res.body.total === 11 and every item has inStock === true. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "9",
+      "description": "Filtering — inStock=false returns only out-of-stock products",
+      "passed": true,
+      "evidence": "Test 'inStock=false returns only out-of-stock products' in describe('GET /products') asserts res.body.total === 4 and every item has inStock === false. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "10",
+      "description": "Search — case-insensitive name matching",
+      "passed": true,
+      "evidence": "Test 'search=LAPTOP returns 1 product named Laptop (case-insensitive)' in describe('GET /products') asserts res.body.total === 1 and res.body.data[0].name === 'Laptop'. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "11",
+      "description": "Search — partial name matching",
+      "passed": true,
+      "evidence": "Test 'search=phone returns products with phone in name (partial match)' in describe('GET /products') asserts res.body.total >= 1 and res.body.data[0].name === 'Smartphone'. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "12",
+      "description": "Search — leading and trailing whitespace is trimmed",
+      "passed": true,
+      "evidence": "Test 'search with surrounding whitespace is trimmed' in describe('GET /products') sends search: ' laptop ' and asserts res.body.total === 1 and res.body.data[0].name === 'Laptop'. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "13",
+      "description": "Sorting — price_asc orders products cheapest first",
+      "passed": true,
+      "evidence": "Test 'sort=price_asc returns products in ascending price order' in describe('GET /products') asserts res.body.data[0].price === 19 and all adjacent pairs are non-decreasing by price. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "14",
+      "description": "Sorting — price_desc orders products most expensive first",
+      "passed": true,
+      "evidence": "Test 'sort=price_desc returns products in descending price order' in describe('GET /products') asserts res.body.data[0].price === 999 and all adjacent pairs are non-increasing by price. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "15",
+      "description": "Sorting — name_asc orders products alphabetically",
+      "passed": true,
+      "evidence": "Test 'sort=name_asc returns products in ascending alphabetical order' in describe('GET /products') asserts res.body.data[0].name === 'Bookshelf' and adjacent names satisfy localeCompare <= 0. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "16",
+      "description": "Sorting — name_desc orders products reverse-alphabetically",
+      "passed": true,
+      "evidence": "Test 'sort=name_desc returns products in descending alphabetical order' in describe('GET /products') asserts res.body.data[0].name === 'Yoga Mat' and adjacent names satisfy localeCompare >= 0. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "17",
+      "description": "Pagination — default response envelope has correct shape and values",
+      "passed": true,
+      "evidence": "Test 'default request returns 10 items, total 15, page 1, limit 10, totalPages 2' in describe('Pagination') asserts res.body.data.length === 10, total === 15, page === 1, limit === 10, totalPages === 2. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "18",
+      "description": "Pagination — page 2 returns the second slice of products",
+      "passed": true,
+      "evidence": "Test 'page=2&limit=10 returns 5 items with no id overlap with page 1' in describe('Pagination') asserts page2.body.data.length === 5, page === 2, total === 15, limit === 10, totalPages === 2, and no id overlap with page 1. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "19",
+      "description": "Pagination — limit is clamped to a maximum of 50",
+      "passed": true,
+      "evidence": "Test 'limit=100 is clamped to 50, returns all 15 products, totalPages 1' in describe('Pagination') asserts res.body.limit === 50, res.body.data.length === 15, res.body.totalPages === 1. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    },
+    {
+      "id": "20",
+      "description": "Combined filters — category and inStock applied together",
+      "passed": true,
+      "evidence": "Test 'category=electronics&inStock=true returns 3 products (AND logic)' in describe('GET /products') asserts res.body.total === 3, all items have category === 'electronics', all items have inStock === true. pnpm vitest run: Test Files 1 passed (1), Tests 20 passed (20), exit 0."
+    }
+  ]
+}
