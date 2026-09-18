@@ -1,0 +1,94 @@
+{
+  "investigations": {
+    "techStack": [
+      "Vitest v4.1.5 with globals:true — describe/it/expect available without import",
+      "vi must be explicitly imported from 'vitest' for vi.mock and vi.hoisted",
+      "Supertest v7.2.2 for HTTP integration testing against Express v5 app",
+      "setupFiles: ['./tests/setup.ts'] stubs global.fetch per test (beforeEach/afterEach via vi.stubGlobal/vi.unstubAllGlobals)",
+      "Test command: pnpm vitest run inside src/benchmark-backend",
+      "ESM module system (type: module), TypeScript ~6.0.2; moduleResolution: bundler",
+      "vitest/globals in tsconfig types — no explicit describe/it/expect imports needed"
+    ],
+    "features": [
+      "GET /health — open (no auth), returns { status: 'ok' }",
+      "GET /products — protected by requireAuth, returns { data, total, page, limit, totalPages }",
+      "productService.getAllProducts: applies search → category → inStock → sort → paginate in that exact order",
+      "queryParser.parseProductQuery: clamps limit to max 50, parses inStock only for 'true'/'false', validates sort values against allowlist",
+      "auth middleware: extracts token after 'Bearer '; sums digit characters; even sum → passes; odd or absent → 401",
+      "fetchAllProducts in dataFetcher is the mock target — vi.mock('../../services/dataFetcher') from test file",
+      "Test skeleton has 3 describe blocks: 'GET /products', 'Pagination', 'Auth middleware'; vi.hoisted + vi.mock + beforeAll already wired",
+      "15-product fixture: 11 inStock=true, 4 inStock=false; categories: electronics(4), clothing(3), furniture(3), sports(3), books(2)"
+    ],
+    "architecture": [
+      "Only file to modify: src/benchmark-backend/src/tests/visible/products.test.ts",
+      "Request chain: supertest → Express app → requireAuth middleware → productRoutes → productController.getProducts → parseProductQuery + getAllProducts → res.json(result)",
+      "Mock target import path from test file: '../../services/dataFetcher' (replaces fetchAllProducts)",
+      "App import path from test file: '../../app' (default export)",
+      "Fixture import path from test file: '../../data/products' (named export: products, aliased as MOCK_PRODUCTS)",
+      "Response envelope shape: { data: Product[], total: number, page: number, limit: number, totalPages: number }",
+      "vi.hoisted() creates mock fn before module graph resolution; vi.mock() replaces fetchAllProducts module-wide before any test runs"
+    ],
+    "edgeCases": [
+      "limit=100 clamped to 50 by queryParser; response envelope must reflect limit:50 not 100 (req 16)",
+      "limit=0 or negative: parser skips (> 0 check fails), service defaults to limit=10",
+      "page out of range (e.g. 99): data:[], but total still reflects full filtered count",
+      "Unknown category (e.g. 'nonexistent'): filter returns [], total:0, totalPages:0 (req 3)",
+      "Empty search string: query.search is falsy → filter skipped entirely → all 15 products returned",
+      "Auth — no Authorization header: token is null → 401; empty token 'Bearer ': slice gives '' (falsy) → 401; token with no digits: sum=0 (even) → 200",
+      "inStock values other than 'true'/'false' (e.g. '1', 'yes'): parser ignores them, no inStock filter applied",
+      "Price tie at $149 (Wireless Headphones id=3 and Bookshelf id=10): JS stable sort preserves original array order",
+      "Reconciled inStock counts: 11 products inStock=true (ids 1,2,4,5,6,8,10,11,12,14,15), 4 inStock=false (ids 3,7,9,13)",
+      "Jump Rope (id=13) is inStock=false and cheapest at $19 — first item under price_asc sort"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Req 23 — vi.mock on fetchAllProducts from dataFetcher wired via vi.hoisted; mockFetchAllProducts.mockResolvedValue([...MOCK_PRODUCTS]) set in beforeAll",
+      "description": "Confirm the existing mock boilerplate in products.test.ts is complete: vi.hoisted mock creation, vi.mock('../../services/dataFetcher', ...) factory, AUTH constant ({ Authorization: 'Bearer benchmark-token-2024' }), and beforeAll setting mockFetchAllProducts.mockResolvedValue([...MOCK_PRODUCTS]). Add anything missing. This must be in place before any test case is written.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Reqs 1–5 — filtering by category (exact, case-insensitive, unknown) and inStock (true/false counts)",
+      "description": "Inside the 'GET /products' describe block add it() cases: (1) ?category=electronics → status 200, body.total===4, body.data.length===4, every item category==='electronics'; (2) ?category=Electronics → body.total===4; (3) ?category=nonexistent → body.data is empty array, body.total===0; (4) ?inStock=true → body.total===11, every item inStock===true; (5) ?inStock=false → body.total===4, every item inStock===false. All use AUTH header.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Reqs 6–8 — search: case-insensitive, partial name match, leading/trailing whitespace trimmed",
+      "description": "Inside 'GET /products' describe block add it() cases: (6) ?search=laptop → body.total===1, body.data[0].name==='Laptop'; (7) ?search=wire → body.total===1, body.data[0].name==='Wireless Headphones'; (8) ?search=%20laptop%20 (URL-encoded spaces) → body.total===1, body.data[0].name==='Laptop'. All use AUTH header.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Reqs 9–12 — all four sort orders (price_asc, price_desc, name_asc, name_desc)",
+      "description": "Inside 'GET /products' describe block add it() cases: (9) ?sort=price_asc → body.data[0].name==='Jump Rope', body.data[0].price===19; (10) ?sort=price_desc → body.data[0].name==='Laptop', body.data[0].price===999; (11) ?sort=name_asc → body.data[0].name==='Bookshelf'; (12) ?sort=name_desc → body.data[0].name==='Yoga Mat'. All use AUTH header.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Reqs 13–16 — pagination: default envelope shape, page 2 contents, disjoint pages, limit clamped to 50",
+      "description": "Inside the 'Pagination' describe block add it() cases: (13) GET /products → body.total===15, body.page===1, body.limit===10, body.totalPages===2, body.data.length===10; (14) ?page=2 → body.page===2, body.data.length===5, body.total===15; (15) IDs from page=1 and page=2 are completely disjoint (collect .map(p=>p.id) from both, assert intersection is empty); (16) ?limit=100 → body.limit===50, body.data.length===15. All use AUTH header.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-6",
+      "requirement": "Reqs 17–18 — combined filters (category+inStock; search+sort applied together)",
+      "description": "Inside 'GET /products' describe block add it() cases: (17) ?category=electronics&inStock=true → body.total===3, body.data has 3 items each satisfying item.category==='electronics' && item.inStock===true (Laptop, Smartphone, Mechanical Keyboard); (18) ?search=chair&sort=price_desc → body.total===1, body.data[0].name==='Ergonomic Chair'. All use AUTH header.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-7",
+      "requirement": "Reqs 19–22 — authentication: missing header → 401, invalid token (odd digit sum) → 401, valid token (even digit sum) → 200, /health exempt",
+      "description": "Inside 'Auth middleware' describe block add it() cases: (19) GET /products with no Authorization header → status 401, body.error==='Unauthorized'; (20) Authorization: Bearer benchmark-token-2023 (digit sum 2+0+2+3=7, odd) → status 401, body.error==='Unauthorized'; (21) Authorization: Bearer benchmark-token-2024 (digit sum 8, even) → status 200; (22) GET /health with no Authorization header → status 200, body.status==='ok'.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    },
+    {
+      "id": "task-8",
+      "requirement": "Req 24 — all tests use supertest against app, assert specific field values, are self-contained and produce deterministic results",
+      "description": "After all cases are added, review the complete file: every it() must use supertest request(app), assert specific named-field values (not just status codes), and the beforeAll mock reset must cover all test cases uniformly. Verify pnpm vitest run inside src/benchmark-backend passes cleanly. No test may mutate MOCK_PRODUCTS or share state.",
+      "files": ["src/benchmark-backend/src/tests/visible/products.test.ts"]
+    }
+  ]
+}

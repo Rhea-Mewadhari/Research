@@ -1,0 +1,149 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products?category=electronics with valid auth returns HTTP 200 with total: 4, and data containing exactly the four electronics products.",
+      "passed": true,
+      "evidence": "Test 'category=electronics returns 4 electronics products' (products.test.ts:41-47) passed. Assertions: res.status===200, res.body.total===4, res.body.data.length===4, every item category==='electronics'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "2",
+      "description": "Category filter is case-insensitive: GET /products?category=Electronics returns same result as ?category=electronics — total: 4, data length 4.",
+      "passed": true,
+      "evidence": "Test 'category=Electronics (uppercase) returns same 4 results as lowercase' (products.test.ts:49-54) passed. Assertions: res.status===200, res.body.total===4, res.body.data.length===4. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "3",
+      "description": "Unknown category (e.g. ?category=nonexistent) returns HTTP 200 with data: [] and total: 0.",
+      "passed": true,
+      "evidence": "Test 'category=nonexistent returns empty data and total 0' (products.test.ts:56-61) passed. Assertions: res.body.data===[], res.body.total===0. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "4",
+      "description": "GET /products?inStock=true returns HTTP 200 with total: 11 and every item having inStock === true.",
+      "passed": true,
+      "evidence": "Test 'inStock=true returns 11 products all with inStock true' (products.test.ts:63-68) passed. Assertions: res.body.total===11, every item inStock===true. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "GET /products?inStock=false returns HTTP 200 with total: 4 and every item having inStock === false.",
+      "passed": true,
+      "evidence": "Test 'inStock=false returns 4 products all with inStock false' (products.test.ts:70-75) passed. Assertions: res.body.total===4, every item inStock===false. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "6",
+      "description": "GET /products?search=laptop (lowercase) returns HTTP 200 with total: 1 and data[0].name === 'Laptop'.",
+      "passed": true,
+      "evidence": "Test 'search=laptop (case-insensitive) returns 1 result matching Laptop' (products.test.ts:20-25) passed. Assertions: res.status===200, res.body.total===1, res.body.data[0].name==='Laptop'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "7",
+      "description": "GET /products?search=wire returns HTTP 200 with total: 1 and data[0].name === 'Wireless Headphones'.",
+      "passed": true,
+      "evidence": "Test 'search=wire (partial match) returns 1 result matching Wireless Headphones' (products.test.ts:27-32) passed. Assertions: res.body.total===1, res.body.data[0].name==='Wireless Headphones'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "8",
+      "description": "GET /products?search=%20laptop%20 (URL-encoded leading and trailing spaces) returns total: 1, data[0].name === 'Laptop', confirming whitespace is trimmed before matching.",
+      "passed": true,
+      "evidence": "Test 'search=%20laptop%20 (URL-encoded spaces trimmed) returns 1 result matching Laptop' (products.test.ts:34-39) passed. Assertions: res.body.total===1, res.body.data[0].name==='Laptop'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "9",
+      "description": "GET /products?sort=price_asc returns HTTP 200 with data[0].name === 'Jump Rope' and data[0].price === 19.",
+      "passed": true,
+      "evidence": "Test 'sort=price_asc returns Jump Rope first at price 19' (products.test.ts:77-82) passed. Assertions: res.body.data[0].name==='Jump Rope', res.body.data[0].price===19. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "10",
+      "description": "GET /products?sort=price_desc returns HTTP 200 with data[0].name === 'Laptop' and data[0].price === 999.",
+      "passed": true,
+      "evidence": "Test 'sort=price_desc returns Laptop first at price 999' (products.test.ts:84-89) passed. Assertions: res.body.data[0].name==='Laptop', res.body.data[0].price===999. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "11",
+      "description": "GET /products?sort=name_asc returns HTTP 200 with data[0].name === 'Bookshelf' (alphabetically first across all 15 products).",
+      "passed": true,
+      "evidence": "Test 'sort=name_asc returns Bookshelf first' (products.test.ts:91-95) passed. Assertions: res.body.data[0].name==='Bookshelf'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "12",
+      "description": "GET /products?sort=name_desc returns HTTP 200 with data[0].name === 'Yoga Mat' (alphabetically last across all 15 products).",
+      "passed": true,
+      "evidence": "Test 'sort=name_desc returns Yoga Mat first' (products.test.ts:97-101) passed. Assertions: res.body.data[0].name==='Yoga Mat'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "13",
+      "description": "Default GET /products returns HTTP 200 with envelope { data, total: 15, page: 1, limit: 10, totalPages: 2 } and data containing exactly 10 items.",
+      "passed": true,
+      "evidence": "Test 'default GET /products returns total 15, page 1, limit 10, totalPages 2, data length 10' (products.test.ts:120-128) passed. Assertions: res.body.total===15, res.body.page===1, res.body.limit===10, res.body.totalPages===2, res.body.data.length===10. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "14",
+      "description": "GET /products?page=2 returns HTTP 200 with page: 2, data containing exactly 5 items, and total: 15.",
+      "passed": true,
+      "evidence": "Test 'page=2 returns page 2 with 5 items and total 15' (products.test.ts:130-136) passed. Assertions: res.body.page===2, res.body.data.length===5, res.body.total===15. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "15",
+      "description": "Product IDs returned by ?page=1 and ?page=2 (default limit=10) are completely disjoint — no product appears on both pages.",
+      "passed": true,
+      "evidence": "Test 'page 1 and page 2 product IDs are completely disjoint' (products.test.ts:138-145) passed. Assertions: intersection of ids1 and ids2 has length 0. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "16",
+      "description": "GET /products?limit=100 returns HTTP 200 with limit: 50 (clamped) and all 15 products in data.",
+      "passed": true,
+      "evidence": "Test 'limit=100 is clamped to 50 and returns all 15 products' (products.test.ts:147-152) passed. Assertions: res.body.limit===50, res.body.data.length===15. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "17",
+      "description": "GET /products?category=electronics&inStock=true returns HTTP 200 with total: 3 and data containing exactly Laptop, Smartphone, and Mechanical Keyboard.",
+      "passed": true,
+      "evidence": "Test 'category=electronics&inStock=true returns 3 in-stock electronics' (products.test.ts:103-109) passed. Assertions: res.body.total===3, res.body.data.length===3, every item satisfies category==='electronics' && inStock===true. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "18",
+      "description": "GET /products?search=chair&sort=price_desc returns HTTP 200 with total: 1 and data[0].name === 'Ergonomic Chair'.",
+      "passed": true,
+      "evidence": "Test 'search=chair&sort=price_desc returns Ergonomic Chair' (products.test.ts:111-116) passed. Assertions: res.body.total===1, res.body.data[0].name==='Ergonomic Chair'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "19",
+      "description": "GET /products with no Authorization header returns HTTP 401 with body { error: 'Unauthorized' }.",
+      "passed": true,
+      "evidence": "Test 'no Authorization header returns 401 Unauthorized' (products.test.ts:156-160) passed. Assertions: res.status===401, res.body.error==='Unauthorized'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "20",
+      "description": "GET /products with Authorization: Bearer benchmark-token-2023 (digit sum 7, odd → invalid) returns HTTP 401 with body { error: 'Unauthorized' }.",
+      "passed": true,
+      "evidence": "Test 'invalid token benchmark-token-2023 (digit sum 7, odd) returns 401 Unauthorized' (products.test.ts:162-166) passed. Assertions: res.status===401, res.body.error==='Unauthorized'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "21",
+      "description": "GET /products with Authorization: Bearer benchmark-token-2024 (digit sum 8, even → valid) returns HTTP 200.",
+      "passed": true,
+      "evidence": "Test 'valid token benchmark-token-2024 (digit sum 8, even) returns 200' (products.test.ts:168-171) passed. Assertions: res.status===200. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "22",
+      "description": "GET /health with no Authorization header returns HTTP 200 with body { status: 'ok' } — health endpoint is exempt from auth.",
+      "passed": true,
+      "evidence": "Test 'GET /health with no Authorization header returns 200 with status ok' (products.test.ts:173-177) passed. Assertions: res.status===200, res.body.status==='ok'. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "23",
+      "description": "mockFetchAllProducts wired via vi.mock in products.test.ts, mockResolvedValue set in beforeAll, no application source files modified. pnpm vitest run completes with all tests passing.",
+      "passed": true,
+      "evidence": "vi.mock('../../services/dataFetcher', ...) present at products.test.ts:5; mockFetchAllProducts.mockResolvedValue([...MOCK_PRODUCTS]) in beforeAll at products.test.ts:15-17. `git diff --name-only` at repo root returned empty output — zero files modified outside products.test.ts. pnpm vitest run: 22/22 tests passed."
+    },
+    {
+      "id": "24",
+      "description": "Running pnpm vitest run twice in succession produces identical pass/fail output — tests are deterministic.",
+      "passed": true,
+      "evidence": "Run 1 (17:52:01): Test Files 1 passed (1), Tests 22 passed (22). Run 2 (17:52:29): Test Files 1 passed (1), Tests 22 passed (22). Identical pass/fail output both times."
+    }
+  ]
+}
