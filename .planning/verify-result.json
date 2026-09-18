@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "A `filterProducts` helper function exists in `src/services/productService.ts` that accepts the full product array and the `ProductQuery` object, applies search, category, and inStock filtering, and returns the filtered array without mutating its input.",
+      "passed": true,
+      "evidence": "`grep -n 'function filterProducts' src/benchmark-backend/src/services/productService.ts` returned exactly one hit: line 4. `pnpm test` (19/19 passed, exit 0) includes: 'filters by category', 'returns empty array for unknown category', 'filters in-stock products', 'filters out-of-stock products', 'filters by search term', 'returns empty data array when search matches nothing'. Input is not mutated: `getAllProducts` passes `[...products]` (spread copy) to `filterProducts`."
+    },
+    {
+      "id": "2",
+      "description": "A `sortProducts` helper function exists in `src/services/productService.ts` that accepts the filtered product array and the `sort` query value, applies the correct comparator for `price_asc`, `price_desc`, `name_asc`, and `name_desc`, returns a new sorted array, and does not mutate its input.",
+      "passed": true,
+      "evidence": "`grep -n 'function sortProducts' src/benchmark-backend/src/services/productService.ts` returned exactly one hit: line 25. `pnpm test` (19/19 passed, exit 0) includes: 'sorts by price ascending', 'sorts by price descending', 'sorts by name ascending', 'sorts by name descending'. Each branch uses `[...products].sort(...)` — spread ensures no mutation of the input array."
+    },
+    {
+      "id": "3",
+      "description": "`getAllProducts` contains no inlined filtering or sorting logic — it only calls `filterProducts` and `sortProducts` (plus the fetch and pagination steps).",
+      "passed": true,
+      "evidence": "`grep -n 'filterProducts\\|sortProducts' src/benchmark-backend/src/services/productService.ts` shows both calls inside `getAllProducts` at lines 43 and 44. `grep -n 'result\\.filter\\|result\\.sort'` shows `.filter(` calls only at lines 9, 13, 19 — all inside `filterProducts` (lines 4–23). `getAllProducts` body (lines 41–53) contains no direct `.filter(` or `.sort(` calls."
+    },
+    {
+      "id": "4",
+      "description": "The `sanitizeSearch` export is removed entirely from `productService.ts`.",
+      "passed": true,
+      "evidence": "`grep -n 'sanitizeSearch' src/benchmark-backend/src/services/productService.ts` produced no output (exit code 1 / empty). No reference to `sanitizeSearch` anywhere in the file."
+    },
+    {
+      "id": "5",
+      "description": "The `DEFAULT_LIMIT` constant is removed entirely from `productService.ts`.",
+      "passed": true,
+      "evidence": "`grep -n 'DEFAULT_LIMIT' src/benchmark-backend/src/services/productService.ts` produced no output (exit code 1 / empty). The constant is not present in the file — `limit` is inlined as `query.limit ?? 10` at line 48."
+    },
+    {
+      "id": "6",
+      "description": "No `=== true`, `=== false`, or redundant `!== undefined` boolean checks remain in `productService.ts`. The inStock filter uses a single idiomatic comparison after the undefined guard.",
+      "passed": true,
+      "evidence": "`grep -n '=== true\\|=== false' src/benchmark-backend/src/services/productService.ts` produced no output (exit code 1 / empty). inStock filter at line 19 reads `result.filter((p) => p.inStock === query.inStock)` — idiomatic direct comparison with no `=== true` / `=== false` pattern."
+    },
+    {
+      "id": "7",
+      "description": "All existing backend tests pass without modification to any test file.",
+      "passed": true,
+      "evidence": "`pnpm test` (from src/benchmark-backend) exited with code 0. Output: 'Test Files  1 passed (1)', 'Tests  19 passed (19)'. All three describe blocks present: `GET /products` (12 tests), `Pagination` (3 tests), `Auth middleware` (4 tests). Zero failures."
+    },
+    {
+      "id": "8",
+      "description": "The response envelope shape returned by `getAllProducts` is unchanged: an object with exactly the fields `data`, `total`, `page`, `limit`, and `totalPages`.",
+      "passed": true,
+      "evidence": "`getAllProducts` at line 52 returns `{ data, total, page, limit, totalPages }` — all five fields. `pnpm test` (19/19 passed) includes 'returns correct envelope shape for first page' (Pagination describe block, line 97) which asserts `res.body.data.length === 5`, `res.body.total === 15`, `res.body.page === 1`, `res.body.limit === 5`, `res.body.totalPages === 3`."
+    }
+  ]
+}

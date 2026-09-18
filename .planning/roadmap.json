@@ -1,0 +1,66 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript ~6.0.2, ESM (type: module), Vitest v4, Express v5, pnpm workspace",
+      "noUnusedLocals and noUnusedParameters are enabled — removing DEFAULT_LIMIT (unused local) and sanitizeSearch (unused export) directly satisfies compiler flags",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type'; existing imports in productService.ts already use 'import type' correctly",
+      "No strict mode flag, but noFallthroughCasesInSwitch is on — if extracting sortProducts uses a switch, a default: break/return is required",
+      "Test runner: pnpm --filter benchmark-backend test (vitest run); hidden test files are injected externally at test time and exercise the same interface as visible tests",
+      "No linter/formatter beyond tsc — TypeScript compiler flags are the only code-quality enforcement"
+    ],
+    "features": [
+      "sanitizeSearch is defined in productService.ts but imported nowhere — safe to delete entirely",
+      "DEFAULT_LIMIT is declared as an unexported const on line 4 but never referenced even inside the same file (line 49 uses literal 10 instead) — safe to delete",
+      "queryParser.ts parses inStock strictly: 'true' string → boolean true, 'false' string → boolean false; any other value leaves inStock undefined — filterProducts must handle all three states",
+      "productController.ts imports only getAllProducts from productService; it calls res.json(result) directly with no transformation — the PaginatedResponse envelope must remain unchanged",
+      "Hidden test suite exists (referenced in tests/setup.ts comments); it tests the same HTTP interface and explicitly asserts that sanitizeSearch is NOT exported after the refactor"
+    ],
+    "architecture": [
+      "Layer order: server.ts → app.ts → routes/productRoutes.ts → controllers/productController.ts → services/productService.ts → services/dataFetcher.ts → data/products.ts",
+      "Pure stateless helpers (e.g. parseProductQuery) live in utils/; however, filterProducts and sortProducts are internal to the service and have no cross-module callers — they belong in productService.ts as unexported functions",
+      "filterProducts and sortProducts must NOT be exported — they are implementation details of getAllProducts; only getAllProducts is part of the public service API",
+      "Naming convention is camelCase for functions; extracted helpers follow: filterProducts, sortProducts",
+      "All changes are confined to a single file: src/benchmark-backend/src/services/productService.ts"
+    ],
+    "edgeCases": [
+      "inStock === false: collapsing to p.inStock === query.inStock is fully equivalent — Product.inStock is typed boolean (not nullable), so both true and false branches are handled correctly by a single comparison after the undefined guard",
+      "sort with undefined/unknown value: all 4 independent if-blocks fail and the array is returned untouched — sortProducts must replicate this; using if/else-if or switch with a default return produces the same observable result",
+      "filterProducts must not mutate input: Array.prototype.filter returns a new array; no mutation risk as long as the helper does not sort or splice in place",
+      "sortProducts MUST spread before sorting: current code does [...result].sort(...) — the helper must replicate the spread (e.g. return [...products].sort(...)) or tests exercising shared mock data will accumulate mutations across test runs",
+      "DEFAULT_LIMIT removal: the literal 10 on line 49 already handles the default limit; removing DEFAULT_LIMIT has zero functional effect",
+      "sanitizeSearch removal: no imports elsewhere; hidden tests assert it is absent post-refactor — removal is both safe and required"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Req 5 — Remove the DEFAULT_LIMIT constant entirely from productService.ts",
+      "description": "Delete the line `const DEFAULT_LIMIT = 10;` (line 4) from src/services/productService.ts. The pagination logic already uses the literal 10 inline and is unaffected.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Req 4 — Remove the sanitizeSearch export entirely from productService.ts",
+      "description": "Delete the exported sanitizeSearch function (lines 7–9) including its JSDoc comment from src/services/productService.ts. No other file imports it; hidden tests assert its absence.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Req 1 and Req 6 — Add filterProducts helper with idiomatic boolean check",
+      "description": "Add an unexported function `function filterProducts(products: Product[], query: ProductQuery): Product[]` above getAllProducts in productService.ts. It should apply search (case-insensitive includes), category (case-insensitive equality), and inStock filtering in sequence. The inStock branch must use `p.inStock === query.inStock` (single comparison, no === true / === false). The function must not mutate its input — Array.filter returns a new array so no spread is needed for filter itself.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Req 2 — Add sortProducts helper",
+      "description": "Add an unexported function `function sortProducts(products: Product[], sort?: SortOption): Product[]` above getAllProducts in productService.ts. It must handle price_asc, price_desc, name_asc, name_desc, and return the input unchanged for any other value (including undefined). It must NOT mutate the input — spread before sorting: `[...products].sort(...)`. Import SortOption type if not already imported.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Req 3 — Refactor getAllProducts body to call filterProducts and sortProducts",
+      "description": "Replace all inlined filter and sort logic in getAllProducts with calls to the two helpers. The body becomes: fetch → filterProducts(result, query) → sortProducts(filtered, query.sort) → paginate → return. No direct result.filter() or result.sort() calls may remain in getAllProducts. The pagination block (total, page, limit, totalPages, data) and return shape are unchanged.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}
