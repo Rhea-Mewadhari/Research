@@ -1,0 +1,30 @@
+{
+  "taskId": "task2",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Extract filterProducts helper from getAllProducts",
+      "status": "done",
+      "notes": "Extracted filterProducts(products, query) helper containing search/category/inStock filter logic. getAllProducts now calls filterProducts. All 19 tests pass. Build fails on pre-existing unused DEFAULT_LIMIT constant — not introduced by this phase; addressed in phase-3."
+    },
+    {
+      "id": "phase-2",
+      "title": "Extract sortProducts helper from getAllProducts",
+      "status": "done",
+      "notes": "Extracted sortProducts(products, sort) helper. getAllProducts now calls filterProducts then sortProducts. All 19 tests pass. Build still fails on pre-existing DEFAULT_LIMIT unused constant — addressed in phase-3."
+    },
+    {
+      "id": "phase-3",
+      "title": "Remove dead code and fix redundant boolean checks",
+      "status": "done",
+      "notes": "Removed unused DEFAULT_LIMIT constant and dead sanitizeSearch export. Simplified redundant inStock boolean check from if/else to single filter. All 19 tests pass. Build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests to verify no regressions",
+      "status": "done",
+      "notes": "All 19 tests pass. Build succeeds with no errors."
+    }
+  ]
+}
