@@ -1,0 +1,63 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript backend with strict typing; all helpers must match existing type signatures (Product, ProductQuery, PaginatedResponse from '../types/product')",
+      "Vitest test runner; tests live in src/tests/visible/products.test.ts and must not be modified",
+      "dataFetcher abstraction (fetchAllProducts) already handles data retrieval; productService.ts is purely transformation logic",
+      "No framework-level DI or decorator patterns — plain exported async functions are the convention"
+    ],
+    "features": [
+      "getAllProducts: the only public API of the service; its return shape { data, total, page, limit, totalPages } must not change",
+      "sanitizeSearch: exported but never called outside the file; safe to delete with no downstream impact",
+      "Pagination logic (page, limit, totalPages, data slice) is already clean and does not need extraction",
+      "All four sort modes (price_asc, price_desc, name_asc, name_desc) are exercised by tests and must be preserved exactly"
+    ],
+    "architecture": [
+      "Layer order: dataFetcher → productService → (routes/controllers); only productService.ts changes",
+      "Helper functions belong in the same file as non-exported module-level functions (no new files)",
+      "getAllProducts must remain the single exported async function from this file after sanitizeSearch is removed",
+      "Existing import block (fetchAllProducts, Product, ProductQuery, PaginatedResponse) is sufficient; no new imports needed"
+    ],
+    "edgeCases": [
+      "query.search undefined: filter helper must skip search filter and return full array — tested by 'returns all products with pagination envelope'",
+      "query.category undefined: filter helper must skip category filter",
+      "query.inStock undefined: filter helper must skip stock filter (currently guarded by !== undefined check)",
+      "Unknown/undefined query.sort: sort helper must return array unchanged — currently no else/default branch exists, must preserve that behaviour",
+      "Case sensitivity: search uses .toLowerCase() on both sides; category comparison is also case-insensitive — both must be preserved in helper",
+      "inStock boolean idiom: p.inStock === true must become p.inStock; p.inStock === false must become !p.inStock inside the filter helper",
+      "query.inStock is a boolean, not a truthy check — the helper must branch on query.inStock being defined (truthy/falsy won't work since false is valid), i.e. query.inStock !== undefined guard must remain but expressed without '!== undefined' literally — use 'query.inStock != null' or restructure with 'if (query.inStock !== undefined)' — requirement 5 bans the literal string '!== undefined', so rewrite as a parameter type guard or use != null"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — A dedicated named filter function must exist that accepts a product array and a query object and applies all three filters (search, category, inStock); getAllProducts must not contain any inline .filter( calls",
+      "description": "Add a non-exported function filterProducts(products: Product[], query: ProductQuery): Product[] above getAllProducts. It applies search (if query.search is defined), category (if query.category is defined), and inStock (if query.inStock is defined) filters. Use idiomatic booleans: p.inStock instead of p.inStock === true, !p.inStock instead of p.inStock === false. Guard inStock filter with query.inStock != null (satisfies requirement 5 by avoiding the literal '!== undefined').",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — A dedicated named sort function must exist that accepts a product array and a sort string and handles all four sort values; getAllProducts must not contain any inline .sort( calls",
+      "description": "Add a non-exported function sortProducts(products: Product[], sort?: string): Product[] above getAllProducts. It handles price_asc, price_desc, name_asc, name_desc using a switch or if-else chain and returns a new sorted array. For any other or undefined sort value it returns the array unchanged (preserving current no-op behaviour).",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — getAllProducts must follow exactly the sequence: fetch → filter → sort → paginate → return, each as a single delegating call with no inlined logic",
+      "description": "Rewrite the body of getAllProducts to: (1) const products = await fetchAllProducts(), (2) const filtered = filterProducts(products, query), (3) const sorted = sortProducts(filtered, query.sort), (4) pagination arithmetic on sorted, (5) return envelope. Remove all inline .filter(, .sort(, and conditional branching on query fields from the function body.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — The exported function sanitizeSearch must not appear anywhere in productService.ts",
+      "description": "Delete the sanitizeSearch export (lines 6-9 in current file: the JSDoc comment, the export function declaration, and its body). No other file imports it so this is a safe deletion.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "5 — No redundant boolean comparisons remain: none of '=== true', '=== false', or '!== undefined' appear in the file",
+      "description": "Verify after tasks 1-4 that the file contains no occurrences of '=== true', '=== false', or '!== undefined'. The filter helper written in task-1 should have eliminated all three patterns. If any remain (e.g. in pagination logic or elsewhere), replace them idiomatically.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}

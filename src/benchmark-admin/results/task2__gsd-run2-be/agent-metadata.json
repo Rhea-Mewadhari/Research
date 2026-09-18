@@ -1,0 +1,126 @@
+{
+  "framework": "gsd",
+  "target": "backend",
+  "taskId": "task2",
+  "wall_duration_ms": 1219905,
+  "cost_usd": 3.07593,
+  "num_turns": 116,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "74759226-acf0-4df4-b184-3d6659d54cd9",
+  "gsd": {
+    "phases": [
+      {
+        "name": "new-project",
+        "treeHash": "eefeef77518be59145041a3e6587300804930d5c",
+        "label": "new-project",
+        "exit_code": 0,
+        "wall_duration_ms": 44622,
+        "cost_usd": 0.2602965,
+        "num_turns": 11,
+        "session_id": "a1ac9e34-5c84-4d1c-a3f9-c083c271adbd",
+        "is_error": false
+      },
+      {
+        "name": "discuss-phase",
+        "treeHash": "1fdcd820c72264a51048034bae7a164f0eaec9e6",
+        "label": "discuss-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 61456,
+        "cost_usd": 0.2423454,
+        "num_turns": 8,
+        "session_id": "eb52561f-8a19-42f7-b721-0fc5bcc3a514",
+        "is_error": false
+      },
+      {
+        "name": "plan-phase",
+        "treeHash": "f12f2095063eba0e46e82852167d1246645dabb9",
+        "label": "plan-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 76087,
+        "cost_usd": 0.2329977,
+        "num_turns": 6,
+        "session_id": "d46859c2-e56b-471b-99f7-b79b60808587",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "a0264104f4e37c3a7d90125b23ca0678a81f2b9c",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 83520,
+        "cost_usd": 0.3122988,
+        "num_turns": 11,
+        "session_id": "4d7a3b5e-fff7-49fb-b8ca-f794bb5a8909",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "5eed7fc24aecba76aae86b546b9766be2b92ce23",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 107106,
+        "cost_usd": 0.2962464,
+        "num_turns": 12,
+        "session_id": "353907c3-ff03-4965-bd07-528761889b68",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "1700ba2d51acf708738dae92cd7b8bf565c59fe4",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 75082,
+        "cost_usd": 0.30026579999999997,
+        "num_turns": 8,
+        "session_id": "2c96cdca-d7be-4123-b6e7-5d0e5a3aab2f",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "fce31552e53c0c6ab0ca3b35364357ecece40c33",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 222308,
+        "cost_usd": 0.4449591,
+        "num_turns": 20,
+        "session_id": "39f0fd39-ac00-4d55-8ed8-8a7dba628d9d",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "44d0d9719edd19caa428e360f91d0de541903635",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 337455,
+        "cost_usd": 0.5262603,
+        "num_turns": 22,
+        "session_id": "b505b69d-dbaf-4f43-a11a-5cd0c086ef5d",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "e1653e4e4faed655934722933c40618a0a094a69",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 186495,
+        "cost_usd": 0.46026,
+        "num_turns": 18,
+        "session_id": "74759226-acf0-4df4-b184-3d6659d54cd9",
+        "is_error": false
+      }
+    ],
+    "passedFirstAttempt": false,
+    "reworkAttempts": 2,
+    "completed": false,
+    "failedAtPhase": "verify-work",
+    "failedCriteria": [
+      {
+        "id": "7",
+        "description": "Only productService.ts is modified — no other source file changes.",
+        "passed": false,
+        "evidence": "git diff --name-only returned empty output (working tree is clean). The verification method requires the command to list only src/benchmark-backend/src/services/productService.ts, but it lists nothing. git log --oneline shows a single commit (606abd0 'sandbox: after execute-phase') containing 152 files with no parent commit, so no baseline exists to confirm that only productService.ts was changed during execute-phase. Requirement is unverifiable as written."
+      }
+    ]
+  }
+}
