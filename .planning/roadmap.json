@@ -1,0 +1,68 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript v6.0, Node.js, ESM modules (package.json: \"type\": \"module\")",
+      "Vitest v4 with globals enabled; run tests with `npm run test` (vitest run) inside src/benchmark-backend",
+      "TypeScript strict mode is OFF; but noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch are on — unused symbols cause compile errors",
+      "verbatimModuleSyntax is set — type-only imports must use `import type`",
+      "No linting or formatting tooling (no ESLint, no Prettier)",
+      "Express v5, no database — data is fetched from dummyjson.com and cached in memory by dataFetcher.ts",
+      "noEmit: true — tsc used only for type-checking; tsx handles transpilation for dev/test"
+    ],
+    "features": [
+      "getAllProducts: fetches all products, copies to mutable array, applies search/category/inStock filters sequentially, applies sort, computes pagination, returns envelope",
+      "sanitizeSearch: trims and lowercases a string — exported but never called inside productService.ts (inline logic is used instead) and never imported anywhere else; dead code",
+      "Filter — search: `query.search !== undefined` guard, then inline `trim().toLowerCase()`, filters on `p.name.toLowerCase().includes(term)`",
+      "Filter — category: `query.category !== undefined` guard, case-insensitive equality `p.category.toLowerCase() === query.category!.toLowerCase()`",
+      "Filter — inStock: `query.inStock !== undefined` outer guard (required — preserves `false` semantics), then inner `if (query.inStock === true)` / `else` with explicit `=== false` (redundant — replaceable with `p.inStock === query.inStock`)",
+      "Sort: four independent `if` blocks (all evaluated even after a match), each spreads result before sorting — price_asc, price_desc, name_asc, name_desc",
+      "Pagination: page defaults to `query.page ?? 1`, limit to `query.limit ?? 10`; total = filtered length; totalPages = Math.ceil(total/limit); data = result.slice((page-1)*limit, page*limit)",
+      "Envelope: `{ data, total, page, limit, totalPages }` typed as PaginatedResponse<Product>",
+      "DEFAULT_LIMIT = 10 constant is declared at module scope but never referenced (literal 10 used inline)"
+    ],
+    "architecture": [
+      "Layer order: routes → middleware (requireAuth) → controller (productController.ts) → service (productService.ts) → data (dataFetcher.ts)",
+      "productController.ts calls parseProductQuery then delegates to getAllProducts; does not touch filtering/sorting logic",
+      "dataFetcher.ts exports a single function `fetchAllProducts(): Promise<Product[]>` with module-level cache",
+      "Types imported from ../types/product: Product, ProductQuery, PaginatedResponse<T>",
+      "Convention: module-scope helpers are placed BEFORE the main exported function — new filterProducts and sortProducts must go above getAllProducts",
+      "sanitizeSearch is not imported in any other source or test file — safe to delete without touching any other file",
+      "Only src/benchmark-backend/src/services/productService.ts is in scope; all other files are read-only references"
+    ],
+    "edgeCases": [
+      "inStock === false: the `query.inStock !== undefined` outer guard must be preserved — if replaced with `if (query.inStock)`, the false case would be silently skipped, breaking the 'filters out-of-stock products' test",
+      "Removing inner `=== true`/`=== false` checks: safe — replacing with `p.inStock === query.inStock` is semantically identical when inStock is typed as boolean | undefined",
+      "Unknown sort value: all four conditions fail, result is returned in current order — else-if chain reproduces this exactly (at most one branch matches)",
+      "Converting 4 independent ifs to else-if: no fall-through risk — each branch checks a distinct string literal; semantics are identical",
+      "sanitizeSearch removal: no external callers; a hidden test (`hidden.structure.test.ts`) explicitly asserts the export does NOT exist — removal is required",
+      "query.search !== undefined guard: keep as-is — switching to `if (query.search)` would silently skip filtering for an empty string (behavioral change, even if no test covers it)",
+      "Pagination arithmetic and envelope shape must be byte-for-byte identical in getAllProducts after refactor — filterProducts and sortProducts must not alter total or data semantics"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "4 — The `sanitizeSearch` export is removed from `productService.ts`",
+      "description": "Delete the `sanitizeSearch` function (lines 6-9 of productService.ts) including its comment. No other file references it.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "1, 5 — filterProducts exists at module scope handling all three filter dimensions; no redundant boolean comparisons remain",
+      "description": "Add a module-scope function `filterProducts(products: Product[], query: ProductQuery): Product[]` before `getAllProducts`. It must handle all three filter dimensions in order: (1) search — keep `query.search !== undefined` guard, inline trim/lowercase; (2) category — keep `query.category !== undefined` guard, case-insensitive equality; (3) inStock — keep `query.inStock !== undefined` outer guard, replace the inner `if (query.inStock === true) … else …` with a single `filter(p => p.inStock === query.inStock)` (eliminates `=== true` and `=== false`).",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "2, 6 — sortProducts exists at module scope handling all four sort variants; sort logic uses a single if/else-if chain",
+      "description": "Add a module-scope function `sortProducts(products: Product[], sort: ProductQuery['sort']): Product[]` before `getAllProducts`. It must handle all four sort variants using a single `if / else if / else if / else if` chain (not four independent ifs): price_asc, price_desc, name_asc, name_desc — each spreading the array before sorting. An unrecognised sort value must fall through without sorting, matching current behaviour.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "1, 2, 3, 9 — getAllProducts follows exact orchestration order fetch → filter → sort → paginate → return; no filter or sort logic inlined; envelope shape preserved",
+      "description": "Rewrite the body of `getAllProducts` to be a thin orchestrator: (1) `const products = await fetchAllProducts()`, (2) `const filtered = filterProducts(products, query)`, (3) `const sorted = sortProducts(filtered, query.sort)`, (4) pagination arithmetic on `sorted` (total, page, limit, totalPages, data slice) — identical to current formulas, (5) return `{ data, total, page, limit, totalPages }`. No `.filter(` or `.sort(` calls may remain inside `getAllProducts`.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}
