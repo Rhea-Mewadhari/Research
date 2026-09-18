@@ -1,0 +1,82 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript ~6.0.2, ESM modules ('type': 'module', module: 'esnext')",
+      "Vitest ^4.1.5 for unit/integration tests; supertest ^7.2.2 for HTTP layer",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type'",
+      "noUnusedLocals + noUnusedParameters enforced — removing sanitizeSearch export requires deleting the function body too, not just the export keyword",
+      "No explicit strict mode, but erasableSyntaxOnly and noFallthroughCasesInSwitch are set",
+      "Named exports throughout services (no default exports from service files)",
+      "Module-level constants in SCREAMING_SNAKE_CASE (e.g. DEFAULT_LIMIT)"
+    ],
+    "features": [
+      "getAllProducts: fetch → inline filter (search, category, inStock) → inline sort (price_asc, price_desc, name_asc, name_desc) → paginate → return PaginatedResponse",
+      "sanitizeSearch: exported named function that trims+lowercases; has zero internal callers — safe to delete entirely",
+      "18 test cases: all products, category filter, unknown category, inStock true/false, all 4 sort modes, search match/no-match, auth reject/accept, pagination envelope, page 2, limit clamp",
+      "Limit clamping to 50 happens in route/controller layer — productService.ts has no clamping logic and must not add any",
+      "Both getAllProducts and sanitizeSearch are currently exported from productService.ts"
+    ],
+    "architecture": [
+      "Call chain: productRoutes.ts → productController.ts (parseProductQuery + getAllProducts) → productService.ts → dataFetcher.ts (fetchAllProducts, cached)",
+      "fetchAllProducts(): Promise<Product[]> — no arguments, returns full cached product array",
+      "Product type: { id, name, category, price, inStock: boolean, rating, reviewCount, description, tags, discountPct? }",
+      "ProductQuery type: { search?, category?, inStock?: boolean, sort?: SortOption, page?, limit? } — all optional",
+      "PaginatedResponse<T>: { data: T[], total: number, page: number, limit: number, totalPages: number }",
+      "SortOption: 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc'",
+      "New filter and sort helpers belong in productService.ts (same file — tightly coupled, no cross-service reuse needed)",
+      "Named export pattern: new helpers should be unexported (module-private) since they are implementation details of getAllProducts"
+    ],
+    "edgeCases": [
+      "sort undefined → sort helper must return the input array (spread copy) unchanged — no comparator runs",
+      "inStock outer guard must use '!== undefined', NOT truthiness ('if (query.inStock)') — false is falsy and would silently skip the inStock=false filter path",
+      "Inner p.inStock === true / p.inStock === false → safe to replace with p.inStock / !p.inStock since Product.inStock is boolean (never undefined)",
+      "search guard must stay as '!== undefined', NOT truthiness — empty string '' passes the undefined check and produces a no-op filter (all products match ''.includes('')); changing to truthiness would silently alter this behavior",
+      "Sort helper must spread before calling .sort() (e.g. [...products].sort(...)) — current code already does this via 'let result = [...products]' then reassignment; helper must not sort in place",
+      "Filter helper must use only .filter() chains — no in-place mutation of the input array",
+      "category guard: the non-null assertion query.category! inside the filter is only safe because it is inside the !== undefined guard — helper must keep this guard",
+      "sanitizeSearch has no internal callers — function body and export keyword must both be deleted to satisfy noUnusedLocals"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1. A named filter helper function exists in productService.ts whose body contains the search, category, and inStock filtering logic. getAllProducts calls this function.",
+      "description": "Add a non-exported function filterProducts(products: Product[], query: ProductQuery): Product[] to productService.ts. Its body must contain: (a) the search branch using query.search !== undefined guard with .trim().toLowerCase() and .includes(term), (b) the category branch using query.category !== undefined guard with case-insensitive equality, (c) the inStock branch using query.inStock !== undefined guard with p.inStock / !p.inStock (replacing === true / === false). Uses only .filter() — no mutation. Returns the filtered array.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2. A named sort helper function exists in productService.ts whose body contains all four sort comparators. getAllProducts calls this function.",
+      "description": "Add a non-exported function sortProducts(products: Product[], sort: SortOption | undefined): Product[] to productService.ts. Its body must: (a) return a spread copy ([...products]) unchanged when sort is undefined, (b) contain all four comparator branches for price_asc, price_desc, name_asc, name_desc, (c) always spread before calling .sort() to avoid mutating the input array.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3. getAllProducts is a thin orchestrator: its body contains only the call to fetchAllProducts, the call to the filter helper, the call to the sort helper, pagination math, and the return statement.",
+      "description": "Rewrite the body of getAllProducts to delegate to filterProducts and sortProducts. The resulting body must contain: (1) await fetchAllProducts(), (2) filterProducts(products, query), (3) sortProducts(filtered, query.sort), (4) pagination math (total, page, limit, totalPages, slice), (5) return statement. No .includes(, p.category, p.inStock, localeCompare, a.price, or b.price may appear directly in getAllProducts's body.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4. sanitizeSearch is not exported from productService.ts — the function and its export keyword are both removed.",
+      "description": "Delete the sanitizeSearch function declaration (including its export keyword and entire body) from productService.ts. It has no internal callers so no call sites need updating. Deletion is required (not just removing export) to satisfy the noUnusedLocals TypeScript compiler option.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "5 & 6. No verbose boolean comparisons of the form === true or === false remain, and no !== undefined checks remain in productService.ts.",
+      "description": "After tasks 1–3 are complete, grep productService.ts for any remaining '=== true', '=== false', and '!== undefined' expressions and remove them. The filter helper (task-1) should have already replaced the inner boolean comparisons; this task is a final sweep to confirm none leaked into getAllProducts or other locations. Note: the outer inStock/search/category guards use !== undefined intentionally — these were moved into filterProducts and must not reappear in getAllProducts.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}

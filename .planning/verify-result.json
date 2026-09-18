@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "A named filter helper function exists in productService.ts whose body contains the search, category, and inStock filtering logic. getAllProducts calls this function — it does not inline those conditions in its own body.",
+      "passed": true,
+      "evidence": "Read productService.ts: `filterProducts` function at lines 6-25 contains `p.name.toLowerCase().includes(term)` (line 11), `p.category.toLowerCase() === query.category!.toLowerCase()` (line 16), and `query.inStock ? p.inStock : !p.inStock` (line 21). `getAllProducts` at line 45 calls `filterProducts(products, query)` with no inline filter conditions."
+    },
+    {
+      "id": "2",
+      "description": "A named sort helper function exists in productService.ts whose body contains all four sort comparators (price_asc, price_desc, name_asc, name_desc). getAllProducts calls this function — it does not inline sort logic in its own body.",
+      "passed": true,
+      "evidence": "Read productService.ts: `sortProducts` function at lines 27-41 contains `a.price - b.price` (price_asc, line 32), `b.price - a.price` (price_desc, line 34), `a.name.localeCompare(b.name)` (name_asc, line 37), `b.name.localeCompare(a.name)` (name_desc, line 40). `getAllProducts` calls `sortProducts(filtered, query.sort)` at line 46; no `localeCompare` or `a.price`/`b.price` expressions appear in `getAllProducts` body."
+    },
+    {
+      "id": "3",
+      "description": "getAllProducts is a thin orchestrator: its body contains only the call to fetchAllProducts, the call to the filter helper, the call to the sort helper, pagination math (total, page, limit, totalPages, slice), and the return statement. No filter conditions or sort comparators appear inside getAllProducts itself.",
+      "passed": true,
+      "evidence": "Read productService.ts lines 43-55: body contains only `fetchAllProducts()` (line 44), `filterProducts(products, query)` (line 45), `sortProducts(filtered, query.sort)` (line 46), pagination math (lines 48-52: total, page, limit, totalPages, data via slice), and return (line 54). Confirmed absence of `.includes(`, `p.category`, `p.inStock`, `localeCompare`, `a.price`, `b.price` in that body."
+    },
+    {
+      "id": "4",
+      "description": "sanitizeSearch is not exported from productService.ts — the function and its export keyword are both removed.",
+      "passed": true,
+      "evidence": "`grep -n 'sanitizeSearch' .../productService.ts` returned no output (exit code 1). The term does not appear anywhere in the file."
+    },
+    {
+      "id": "5",
+      "description": "No verbose boolean comparisons of the form === true or === false remain on boolean-typed fields in productService.ts.",
+      "passed": true,
+      "evidence": "`grep -n '=== true\\|=== false' .../productService.ts` returned no output (exit code 1). No such comparisons exist in the file."
+    },
+    {
+      "id": "6",
+      "description": "No !== undefined checks remain in productService.ts.",
+      "passed": true,
+      "evidence": "`grep -n '!== undefined' .../productService.ts` returned no output (exit code 1). No such checks exist in the file."
+    },
+    {
+      "id": "7",
+      "description": "The sort helper does not mutate its input; it returns a new sorted array.",
+      "passed": true,
+      "evidence": "Read productService.ts `sortProducts` (lines 27-41): every return path spreads into a new array — `[...products]` (line 29), `[...products].sort(...)` (lines 32, 34, 37, 40). The original `products` argument is never sorted in place."
+    },
+    {
+      "id": "8",
+      "description": "The filter helper does not mutate its input; it returns new arrays produced by .filter() chaining, never by in-place modification.",
+      "passed": true,
+      "evidence": "Read productService.ts `filterProducts` (lines 6-25): initialises `let result = products` then reassigns `result` via `.filter()` calls (lines 11, 15-17, 21). `.filter()` always returns a new array; the original `products` argument is never modified."
+    },
+    {
+      "id": "9",
+      "description": "All existing tests pass without any modification to test files.",
+      "passed": true,
+      "evidence": "`pnpm test` in src/benchmark-backend exited with code 0. Output: 'Test Files  1 passed (1)', 'Tests  19 passed (19)', Duration 1.99s. All 19 test cases in products.test.ts reported as passing."
+    },
+    {
+      "id": "10",
+      "description": "The response envelope shape is unchanged: getAllProducts still returns a PaginatedResponse<Product> with exactly the fields data, total, page, limit, totalPages, computed identically to the original implementation.",
+      "passed": true,
+      "evidence": "Read productService.ts line 54: `return { data, total, page, limit, totalPages }` with all five fields. Pagination describe block (including 'returns correct envelope shape for first page') passed as part of 19/19 tests with `pnpm test` exit code 0."
+    }
+  ]
+}
