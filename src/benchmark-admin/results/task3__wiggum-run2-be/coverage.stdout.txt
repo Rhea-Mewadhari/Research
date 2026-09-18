@@ -1,0 +1,34 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.8 [39m[90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [31m❯[39m src/tests/visible/products.test.ts [2m([22m[2m22 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 35[2mms[22m[39m
+       [32m✓[39m filters by category (exact match)[32m 9[2mms[22m[39m
+       [32m✓[39m filters by category (case-insensitive)[32m 1[2mms[22m[39m
+       [32m✓[39m filters by inStock=true[32m 1[2mms[22m[39m
+       [32m✓[39m filters by inStock=false[32m 1[2mms[22m[39m
+       [32m✓[39m returns empty data array for unknown category[32m 1[2mms[22m[39m
+       [32m✓[39m matches by name case-insensitively[32m 1[2mms[22m[39m
+       [32m✓[39m matches partial name[32m 1[2mms[22m[39m
+       [32m✓[39m trims whitespace from search term[32m 1[2mms[22m[39m
+       [32m✓[39m sorts by price ascending (price_asc)[32m 1[2mms[22m[39m
+       [32m✓[39m sorts by price descending (price_desc)[32m 1[2mms[22m[39m
+       [32m✓[39m sorts by name ascending (name_asc)[32m 5[2mms[22m[39m
+       [32m✓[39m sorts by name descending (name_desc)[32m 1[2mms[22m[39m
+       [32m✓[39m applies category and inStock filters together[32m 1[2mms[22m[39m
+       [32m✓[39m applies category and sort filters together[32m 1[2mms[22m[39m
+       [32m✓[39m applies search and inStock filters together[32m 1[2mms[22m[39m
+     [32m✓[39m returns correct envelope shape[32m 1[2mms[22m[39m
+     [32m✓[39m different pages return different products[32m 1[2mms[22m[39m
+     [32m✓[39m clamps limit to a maximum of 50[32m 1[2mms[22m[39m
+     [32m✓[39m returns 401 when Authorization header is missing[32m 1[2mms[22m[39m
+[31m     [31m×[31m returns 401 when token has an odd digit sum (invalid token)[39m[32m 4[2mms[22m[39m
+     [32m✓[39m returns 200 when token has an even digit sum (valid token)[32m 2[2mms[22m[39m
+     [32m✓[39m /health does not require authentication[32m 1[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m21 passed[39m[22m[90m (22)[39m
+[2m   Start at [22m 19:13:40
+[2m   Duration [22m 266ms[2m (transform 38ms, setup 27ms, import 108ms, tests 35ms, environment 0ms)[22m
+
+[ELIFECYCLE] Command failed with exit code 1.

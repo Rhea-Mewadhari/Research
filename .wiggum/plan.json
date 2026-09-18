@@ -1,0 +1,48 @@
+{
+  "taskId": "task3",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Write authentication tests (missing header, invalid token, valid token, /health bypass)",
+      "status": "done",
+      "notes": "4 auth tests written and passing: missing header → 401, odd-digit-sum token → 401, even-digit-sum token → 200, /health → 200 without auth. Empty describe blocks for GET /products and Pagination cause suite-level failures but no test assertions fail; these will be resolved by later phases."
+    },
+    {
+      "id": "phase-2",
+      "title": "Write filtering tests (category exact+case-insensitive, inStock true/false, unknown category)",
+      "status": "done",
+      "notes": "5 filtering tests written and passing: category exact match, category case-insensitive (ELECTRONICS), inStock=true, inStock=false, unknown category → empty data + total:0. Also added it.todo placeholder to empty Pagination block to prevent suite-level failure; actual pagination tests deferred to phase-5."
+    },
+    {
+      "id": "phase-3",
+      "title": "Write search tests (case-insensitive, partial match, whitespace trimming)",
+      "status": "done",
+      "notes": "3 search tests added inside describe('GET /products') > describe('Search'): uppercase query matches case-insensitively, partial 'phone' matches 'Smartphone', URL-encoded whitespace '  laptop  ' trims to 'laptop'. All 12 tests pass (1 todo for pagination)."
+    },
+    {
+      "id": "phase-4",
+      "title": "Write sorting tests (price_asc, price_desc, name_asc, name_desc)",
+      "status": "done",
+      "notes": "4 sorting tests added inside describe('GET /products') > describe('Sorting'): price_asc verifies ascending order + cheapest first (Jump Rope, $19), price_desc verifies descending + most expensive first (Laptop, $999), name_asc verifies localeCompare ordering + first name 'Bookshelf', name_desc verifies reverse ordering + first name 'Yoga Mat'. All 16 tests pass, 1 todo remains."
+    },
+    {
+      "id": "phase-5",
+      "title": "Write pagination tests (envelope shape, different pages, limit clamped to 50)",
+      "status": "done",
+      "notes": "3 pagination tests added: envelope shape (data, total=15, page=1, limit=10, totalPages=2, data.length=10), different pages return non-overlapping product IDs (page 1: 10 items, page 2: 5 items), limit clamped to 50 (sending limit=100 returns limit:50 in envelope). All 19 tests pass."
+    },
+    {
+      "id": "phase-6",
+      "title": "Write combined-filter tests (multiple query params applied together)",
+      "status": "done",
+      "notes": "3 combined-filter tests added inside describe('GET /products') > describe('Combined Filters'): category+inStock (electronics&inStock=true → 3 items, no Wireless Headphones), category+sort (sports&price_asc → Jump Rope first at $19), search+inStock (shirt&inStock=true → only Linen Shirt). All 22 tests pass."
+    },
+    {
+      "id": "phase-7",
+      "title": "Run vitest and verify all tests pass",
+      "status": "done",
+      "notes": "All 22 tests pass (vitest run: 1 file, 22 tests, 0 failures). Build also succeeds (tsc -p tsconfig.build.json exits cleanly)."
+    }
+  ]
+}
