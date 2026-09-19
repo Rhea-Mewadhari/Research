@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "vitest.config.ts include pattern must be src/tests/visible/**/*.test.ts (replacing src/**/*.spec.ts)",
+      "passed": true,
+      "evidence": "vitest.config.ts line 7: include: ['src/tests/visible/**/*.test.ts']. Test run output: '✓ src/tests/visible/products.test.ts' — 1 file collected from src/tests/visible/, Test Files 1 passed (1), exit code 0."
+    },
+    {
+      "id": "2",
+      "description": "vitest.config.ts globals option must be set to true",
+      "passed": true,
+      "evidence": "vitest.config.ts line 5: globals: true. Test run (19 tests) completed with exit code 0 and no ReferenceError: describe/it/expect/beforeAll/afterEach is not defined in output."
+    },
+    {
+      "id": "3",
+      "description": "vitest.config.ts setupFiles must point to ./tests/setup.ts (not ./src/tests/setup.ts)",
+      "passed": true,
+      "evidence": "vitest.config.ts line 6: setupFiles: ['./tests/setup.ts']. Test run completed with exit code 0 and no 'Failed to load' or 'Cannot find module' error in output."
+    },
+    {
+      "id": "4",
+      "description": "tsconfig.json moduleResolution must be changed to bundler (from node), resolving TS5095 error",
+      "passed": true,
+      "evidence": "tsconfig.json line 10: \"moduleResolution\": \"bundler\". Build command 'pnpm run build' (tsc -p tsconfig.build.json) exited 0 with no TypeScript errors in stderr."
+    },
+    {
+      "id": "5",
+      "description": "src/server.ts must default the port to 3001 when process.env.PORT is absent using || 3001 or equivalent",
+      "passed": true,
+      "evidence": "src/server.ts line 3: const PORT = Number(process.env.PORT || 3001); — uses || 3001 fallback which handles both undefined (NaN) and empty string ('') cases correctly, evaluating to 3001 when PORT is unset."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+$ vitest run src/tests/hidden/hidden.search.test.ts src/tests/hidden/hidden.combined.test.ts src/tests/hidden/hidden.integrity.test.ts src/tests/hidden/hidden.sorting.test.ts src/tests/hidden/hidden.auth.test.ts
+[31mNo test files found, exiting with code 1
+[39m
+[2mfilter: [22m[33msrc/tests/hidden/hidden.search.test.ts[2m, [22msrc/tests/hidden/hidden.combined.test.ts[2m, [22msrc/tests/hidden/hidden.integrity.test.ts[2m, [22msrc/tests/hidden/hidden.sorting.test.ts[2m, [22msrc/tests/hidden/hidden.auth.test.ts[39m
+[2minclude: [22m[33msrc/tests/visible/**/*.test.ts[39m
+[2mexclude:  [22m[33m**/node_modules/**[2m, [22m**/.git/**[39m
+

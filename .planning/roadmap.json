@@ -1,0 +1,55 @@
+{
+  "investigations": {
+    "techStack": [
+      "Vitest 4.x via 'vitest/config' defineConfig — test runner config lives in vitest.config.ts at package root",
+      "TypeScript 6.x with bundler-mode companion options (allowImportingTsExtensions, verbatimModuleSyntax, moduleDetection:force) — these require moduleResolution:'bundler', not 'node'",
+      "Express 5.x HTTP server entry point at src/server.ts, started with tsx in dev and compiled via tsconfig.build.json",
+      "pnpm workspaces — tests run via 'pnpm --filter benchmark-backend test', build via 'pnpm --filter benchmark-backend build'",
+      "ESM-first project ('type':'module' in package.json) — no CommonJS interop concerns"
+    ],
+    "features": [
+      "Test suite at src/tests/visible/products.test.ts uses describe/it/expect globals and supertest — no per-file vitest imports",
+      "Setup file exists at tests/setup.ts (package root-relative), NOT at src/tests/setup.ts (which does not exist)",
+      "Business logic (app.ts, controllers, routes, services, data) must not change — only config and entry-point files",
+      "dist/ contains pre-built output including dist/tests/visible/products.test.js — confirms test file path is src/tests/visible/**/*.test.ts relative to the vitest.config.ts"
+    ],
+    "architecture": [
+      "Three files to edit: vitest.config.ts, tsconfig.json, src/server.ts — all at or directly under the package root",
+      "vitest.config.ts controls: test glob (include), global availability (globals), and setup hook (setupFiles)",
+      "tsconfig.json 'include': ['src'] means only src/ is type-checked; moduleResolution is the only broken option",
+      "src/server.ts is a thin entry point: imports app, reads PORT, calls app.listen — no business logic"
+    ],
+    "edgeCases": [
+      "PORT='' (empty string): Number('') === 0, which is falsy — '|| 3001' handles this correctly; '?? 3001' does NOT (only guards null/undefined)",
+      "*.spec.ts files: new glob 'src/tests/visible/**/*.test.ts' must not match any .spec.ts file — extension-specific pattern ensures exclusion",
+      "src/tests/setup.ts (non-existent path): removing it from setupFiles and pointing to ./tests/setup.ts eliminates the 'Cannot find module' error",
+      "globals:true makes describe/it/expect/beforeAll/afterEach available without imports — tests already rely on this convention so toggling false → true is safe"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3 — fix vitest.config.ts include pattern, enable globals, and correct setupFiles path",
+      "description": "In vitest.config.ts: change 'include' from ['src/**/*.spec.ts'] to ['src/tests/visible/**/*.test.ts']; change 'globals' from false to true; change 'setupFiles' from ['./src/tests/setup.ts'] to ['./tests/setup.ts']",
+      "files": [
+        "src/benchmark-backend/vitest.config.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 4 — fix tsconfig.json moduleResolution to unblock TypeScript build",
+      "description": "In tsconfig.json: change 'moduleResolution' from 'node' to 'bundler' under compilerOptions, resolving the TS5095 incompatibility with allowImportingTsExtensions and verbatimModuleSyntax",
+      "files": [
+        "src/benchmark-backend/tsconfig.json"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5 — add numeric fallback to server port so NaN never occurs",
+      "description": "In src/server.ts: change 'const PORT = Number(process.env.PORT)' to 'const PORT = Number(process.env.PORT || 3001)' so that absent or empty PORT resolves to 3001",
+      "files": [
+        "src/benchmark-backend/src/server.ts"
+      ]
+    }
+  ]
+}
