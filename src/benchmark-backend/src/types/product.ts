@@ -1,4 +1,4 @@
-export type SortOption = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc';
+export type SortOption = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc' | 'rating_desc';
 
 export interface Product {
   id: number;
@@ -11,12 +11,14 @@ export interface Product {
   description: string;
   tags: string[];
   discountPct?: number;
+  featured?: boolean;
 }
 
 export interface ProductQuery {
   search?: string;
   category?: string;
   inStock?: boolean;
+  featured?: boolean;
   sort?: SortOption;
   page?: number;
   limit?: number;

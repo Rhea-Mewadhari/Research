@@ -1,0 +1,90 @@
+{
+  "investigations": {
+    "techStack": [
+      "Node.js + TypeScript 6.0.2, ESM modules, ES2023 target",
+      "Express 5.2.1 as web framework",
+      "Vitest 4.1.5 + Supertest 7.2.2 for tests; vitest globals enabled",
+      "SortOption union type already includes 'rating_desc' (product.ts:1)",
+      "Product interface already declares optional 'featured?: boolean' field",
+      "ProductQuery interface already declares optional 'featured?: boolean' field",
+      "Strict TypeScript: noUnusedLocals, noUnusedParameters, erasableSyntaxOnly — no dead code allowed",
+      "queryParser.ts has TODO markers at lines 23 and 4 for featured param and rating_desc sort option",
+      "productService.ts has TODO markers at lines 23 and 34 for featured filter and rating_desc sort"
+    ],
+    "features": [
+      "Currently supported query params: search, category, inStock, sort (price_asc/price_desc/name_asc/name_desc), page, limit",
+      "VALID_SORT_OPTIONS currently contains: ['price_asc', 'price_desc', 'name_asc', 'name_desc'] — rating_desc missing",
+      "inStock boolean parsing already implemented as the pattern to follow for featured",
+      "15 total products across 5 categories; none currently have the featured field set",
+      "Products requiring featured: true — id 1 (Laptop, electronics), id 8 (Ergonomic Chair, furniture), id 11 (Yoga Mat, sports), id 14 (Clean Code, books)",
+      "Remaining 11 products will have featured undefined (treated as false via ?? false)",
+      "Existing filters: search (substring match), category (case-insensitive equality), inStock (boolean match)",
+      "Existing sorts: price_asc, price_desc, name_asc, name_desc — all use spread copy to avoid mutation",
+      "Test file covers: GET /products (6 tests), Auth middleware (4 tests), Pagination (3 tests), Featured filter (3 tests), Rating sort (1 test)"
+    ],
+    "architecture": [
+      "Flow: GET /products route → productController.ts → parseProductQuery() + getAllProducts(query) → JSON response",
+      "queryParser.ts: parseProductQuery() transforms raw req.query into typed ProductQuery; called in controller, not as middleware",
+      "productService.ts: single exported function getAllProducts(query: ProductQuery): Promise<PaginatedResponse<Product>>",
+      "Filter execution order: spread all products → search filter → category filter → inStock filter → [featured filter goes here] → sort → paginate",
+      "Sort logic uses [...result].sort(...) spread copy pattern consistently — rating_desc must follow same pattern",
+      "New featured filter belongs after inStock block in productService.ts (after line ~21)",
+      "New rating_desc sort belongs as additional else-if branch in the existing sort chain in productService.ts (after line ~33)",
+      "featured param parsing belongs after inStock parsing block in queryParser.ts (after line ~27)",
+      "rating_desc belongs added to VALID_SORT_OPTIONS array in queryParser.ts (line 3)"
+    ],
+    "edgeCases": [
+      "featured=undefined (param absent): must NOT filter — use 'if (query.featured !== undefined)' guard, consistent with inStock pattern",
+      "featured=maybe or any non-true/false value: queryParser leaves query.featured undefined, so no filter applied",
+      "Products without featured field: (p.featured ?? false) handles them — evaluates to false, so they appear in featured=false results and are excluded from featured=true results",
+      "featured filter is conjunctive (AND) with all other filters — featured=true&category=electronics returns only id 1",
+      "rating_desc sort must use spread copy [...result].sort(...) not result.sort(...) to avoid mutating the filtered array",
+      "rating_desc combined with featured filter: filter runs before sort, so sort operates on already-filtered subset — no special handling needed",
+      "Exactly 4 products must have featured: true (ids 1, 8, 11, 14); all others must NOT have featured: true (field absent or false)",
+      "featured=false must return exactly 11 products (15 total minus 4 featured)",
+      "rating_desc ratings in descending order: 4.9 (id 14) → 4.8 (id 11) → ... → 3.8 (id 5)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: src/data/products.ts must set featured: true on exactly the products with ids 1 (Laptop), 8 (Ergonomic Chair), 11 (Yoga Mat), and 14 (Clean Code). All other product entries must not have featured: true.",
+      "description": "Add 'featured: true' to the four product objects with ids 1, 8, 11, and 14 in the products array. Do not add the field to any other product.",
+      "files": [
+        "src/benchmark-backend/src/data/products.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 3: src/utils/queryParser.ts must include 'rating_desc' in its VALID_SORT_OPTIONS array so that sort=rating_desc is accepted and forwarded to the service rather than silently dropped.",
+      "description": "Add 'rating_desc' to the VALID_SORT_OPTIONS array in queryParser.ts (currently line 3). The type already declares it; this makes the runtime validator accept it.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 2: src/utils/queryParser.ts must parse the featured query param: the string 'true' maps to query.featured = true, the string 'false' maps to query.featured = false, and any other value (including absence) leaves query.featured undefined.",
+      "description": "Add featured param parsing block in parseProductQuery() in queryParser.ts, modelled after the existing inStock parsing. Only the exact strings 'true' and 'false' should set query.featured; all other values (including absence) leave it undefined.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 4: src/services/productService.ts must apply a featured filter when query.featured !== undefined: keep only products where (p.featured ?? false) === query.featured. The filter must compose with existing filters (search, category, inStock).",
+      "description": "Add featured filter block in getAllProducts() in productService.ts, after the inStock filter block. Use pattern: if (query.featured !== undefined) { result = result.filter(p => (p.featured ?? false) === query.featured); }",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirement 5: src/services/productService.ts must sort by rating descending (highest first) when query.sort === 'rating_desc', without mutating the source array.",
+      "description": "Add 'rating_desc' sort branch in the sort chain of getAllProducts() in productService.ts. Use spread copy: result = [...result].sort((a, b) => b.rating - a.rating); consistent with the existing sort branches.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}
