@@ -35,7 +35,12 @@ describe('Hidden: service separation of concerns', () => {
   });
 
   it('sanitizeSearch is not exported from productService (dead export removed)', () => {
-    expect((productService as any).sanitizeSearch).toBeUndefined();
+    // Vitest's vi.mock() guard throws on access to any property not present
+    // in the mock factory's returned shape — including one that was
+    // correctly removed — so probing via property access (`.sanitizeSearch`)
+    // can never pass here regardless of the module's real content.
+    // Object.keys() enumerates without triggering that guard.
+    expect(Object.keys(productService)).not.toContain('sanitizeSearch');
   });
 
   it('filtering still works correctly after refactor', async () => {

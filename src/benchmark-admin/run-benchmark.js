@@ -57,6 +57,14 @@ const hiddenTestsRoot  = path.resolve(__dirname, `hidden-tests/${target}`);
 const visibleManifest  = path.resolve(__dirname, `visible-tests-manifest/${target}.json`);
 const resultsRoot      = path.resolve(__dirname, 'results');
 
+// Backend visible tests live at src/tests/visible/; frontend's live at
+// top-level tests/. Hidden tests land next to each target's own visible
+// tests (not always top-level tests/) so they stay covered by any
+// `include` pattern scoped to a target's own test location — see
+// helpers/hidden-tests.js for why this matters.
+const hiddenTestsRelDir = target === 'backend' ? 'src/tests/hidden' : 'tests';
+const hiddenTestsDir    = path.join(repoRoot, hiddenTestsRelDir);
+
 ensureDir(resultsRoot);
 
 // Tasks whose visible tests don't stand alone in the tests/ directory — e.g.
@@ -122,7 +130,7 @@ function main() {
   // in computeScore (visible 30% + hidden 50%).
   let hiddenFiles = [];
   try {
-    hiddenFiles = copyHiddenTests(hiddenTestsRoot, repoRoot, taskId);
+    hiddenFiles = copyHiddenTests(hiddenTestsRoot, hiddenTestsDir, taskId, target);
 
     let hidden;
     if (hiddenFiles.length > 0) {
@@ -130,7 +138,7 @@ function main() {
       // `--` to the `vitest run` script silently fail to reach vitest at all
       // (verified — even a bogus filter runs the full suite unfiltered
       // through `pnpm test -- <filter>`); passed directly, they work.
-      const hiddenPaths = hiddenFiles.map(f => `"tests/${f}"`).join(' ');
+      const hiddenPaths = hiddenFiles.map(f => `"${hiddenTestsRelDir}/${f}"`).join(' ');
       hidden = runCommand(`pnpm test ${hiddenPaths}`, repoRoot);
     } else {
       hidden = { success: true, stdout: '', stderr: '', durationMs: 0 };
@@ -162,7 +170,7 @@ function main() {
       crashed,
     };
   } finally {
-    removeHiddenTests(hiddenFiles, repoRoot);
+    removeHiddenTests(hiddenFiles, hiddenTestsDir);
   }
 
   // Build
