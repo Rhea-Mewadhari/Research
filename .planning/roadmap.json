@@ -1,0 +1,78 @@
+{
+  "investigations": {
+    "techStack": [
+      "Runtime: Node.js + TypeScript (~6.0.2), ES2023 target, ESNext modules",
+      "HTTP framework: Express 5 with CORS middleware",
+      "Dev runtime: tsx with hot reload; build output to dist/ via tsconfig.build.json",
+      "Test runner: Vitest 4 (globals: true) + Supertest; pnpm test runs vitest run",
+      "TypeScript strict: noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch, erasableSyntaxOnly — all enabled; verbatimModuleSyntax enabled",
+      "Package manager: pnpm; no ESLint or Prettier configs present"
+    ],
+    "features": [
+      "GET /products currently supports: search, category, inStock, sort (price_asc, price_desc, name_asc, name_desc), page, limit",
+      "VALID_SORT_OPTIONS currently contains only: price_asc, price_desc, name_asc, name_desc — rating_desc is absent (marked TODO in queryParser.ts)",
+      "Product interface already declares featured?: boolean and rating: number; ProductQuery already declares featured?: boolean; SortOption already includes 'rating_desc'",
+      "15 products in products.ts across 5 categories; no product currently has the featured field set",
+      "Product ids by category: electronics (1 Laptop, 2 Smartphone, 3 Wireless Headphones, 4 Mechanical Keyboard), clothing (5, 6, 7), furniture (8 Ergonomic Chair, 9, 10), sports (11 Yoga Mat, 12, 13), books (14 Clean Code, 15)",
+      "Test file already has 'Featured filter' suite (3 tests) and 'Rating sort' suite (1 test) — these are the new passing targets"
+    ],
+    "architecture": [
+      "Layer flow: Routes (productRoutes.ts) → Controller (productController.ts) → Utils (queryParser.ts) + Service (productService.ts) → Data (products.ts) + Types (product.ts)",
+      "Query parsing: controller calls parseProductQuery(req.query), which validates and converts strings to typed ProductQuery; inStock already parsed as boolean via === 'true' / === 'false' pattern — featured must follow same pattern",
+      "Service filtering: getAllProducts applies search → category → inStock filters in sequence by reassigning result; featured filter slots after inStock (line 21 TODO in productService.ts)",
+      "Service sorting: if/else chain with explicit sort cases; each creates fresh copy via [...result].sort(); rating_desc slots as final else-if after name_desc (line 34 TODO in productService.ts)",
+      "Return shape: PaginatedResponse<Product> with data, total, page, limit, totalPages fields"
+    ],
+    "edgeCases": [
+      "featured field absent on a product: expression (p.featured ?? false) === query.featured correctly treats undefined as false — absent-field products appear in featured=false results and are excluded from featured=true results",
+      "featured param absent: query.featured remains undefined; guard (query.featured !== undefined) before filter ensures no filtering applied — all 15 products returned unfiltered (requirement 8)",
+      "featured param values other than 'true'/'false' (e.g. '1', 'yes', absent): must leave query.featured unset — mirror exact inStock parsing logic, strict string equality only",
+      "featured=true + category=electronics must return exactly 1 product (id 1, Laptop) — only 1 of the 4 featured products is in the electronics category",
+      "Array mutation risk: all existing sorts use [...result].sort(); rating_desc must follow the same copy pattern — in-place sort would cause non-deterministic failures across test runs (requirement 9)",
+      "Total product count invariant: exactly 4 products must have featured: true; remaining 11 must not — test asserts both counts precisely",
+      "Products sharing the same rating: test only checks non-increasing property, not strict order between ties — stable sort between equals is not required"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — Products id 1 (Laptop), 8 (Ergonomic Chair), 11 (Yoga Mat), 14 (Clean Code) must have featured: true; all other 11 must not",
+      "description": "Add featured: true to the four product objects in the products array. Do not modify any other product objects.",
+      "files": [
+        "src/benchmark-backend/src/data/products.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "6 — 'rating_desc' must be added to VALID_SORT_OPTIONS so sort=rating_desc reaches the service layer",
+      "description": "Add 'rating_desc' as a string literal to the VALID_SORT_OPTIONS array in queryParser.ts. No other changes to the sort allowlist.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "7 — featured=true and featured=false must be parsed into query.featured boolean; any other value or absence leaves it unset (requirement 8)",
+      "description": "In parseProductQuery, add featured param parsing after the inStock block: if raw.featured === 'true' set query.featured = true; if raw.featured === 'false' set query.featured = false; otherwise leave unset. Mirror the exact inStock pattern.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "2, 3, 4, 8 — GET /products?featured=true returns 4 products; featured=false returns 11; featured=true&category=electronics returns 1; absent featured param returns all",
+      "description": "In getAllProducts in productService.ts, add featured filter after the inStock filter block: if (query.featured !== undefined) { result = result.filter(p => (p.featured ?? false) === query.featured); }",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "5, 9 — GET /products?sort=rating_desc returns products in non-increasing rating order; sort must not mutate the result array",
+      "description": "In the sort chain in getAllProducts, add an else-if case after name_desc: else if (query.sort === 'rating_desc') { result = [...result].sort((a, b) => b.rating - a.rating); }",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}

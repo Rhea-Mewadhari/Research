@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Products with id 1 (Laptop), 8 (Ergonomic Chair), 11 (Yoga Mat), and 14 (Clean Code) must have `featured: true` set in `src/data/products.ts`. All other 11 products must not have `featured: true` (field omitted or explicitly `false`).",
+      "passed": true,
+      "evidence": "File inspection of src/data/products.ts confirms: id 1 has featured:true (line 10), id 8 has featured:true (line 88), id 11 has featured:true (line 122), id 14 has featured:true (line 158). All other 11 products (ids 2,3,4,5,6,7,9,10,12,13,15) omit the featured field. Confirmed by 'Featured filter > returns only featured products when featured=true' (✓) asserting length===4, and 'Featured filter > returns only non-featured products when featured=false' (✓) asserting length===11."
+    },
+    {
+      "id": "2",
+      "description": "`GET /products?featured=true` returns HTTP 200 with exactly 4 products, each having `featured === true`.",
+      "passed": true,
+      "evidence": "Test 'Featured filter > returns only featured products when featured=true' passed (✓) in the verbose test run. 23/23 tests passed."
+    },
+    {
+      "id": "3",
+      "description": "`GET /products?featured=false` returns HTTP 200 with exactly 11 products, none having `featured === true`.",
+      "passed": true,
+      "evidence": "Test 'Featured filter > returns only non-featured products when featured=false' passed (✓) in the verbose test run. 23/23 tests passed."
+    },
+    {
+      "id": "4",
+      "description": "`GET /products?featured=true&category=electronics` returns HTTP 200 with exactly 1 product whose `id` is 1.",
+      "passed": true,
+      "evidence": "Test 'Featured filter > featured=true combined with category filter returns intersection' passed (✓) in the verbose test run. 23/23 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "`GET /products?sort=rating_desc` returns HTTP 200 with products ordered so that the `rating` values form a non-increasing sequence (each rating ≥ the next).",
+      "passed": true,
+      "evidence": "Test 'Rating sort > sorts by rating descending when sort=rating_desc' passed (✓) in the verbose test run. 23/23 tests passed."
+    },
+    {
+      "id": "6",
+      "description": "`'rating_desc'` must be added to `VALID_SORT_OPTIONS` in `src/utils/queryParser.ts` so that a request with `sort=rating_desc` sets `query.sort` to `'rating_desc'` instead of silently dropping it.",
+      "passed": true,
+      "evidence": "File inspection of src/utils/queryParser.ts line 3 shows: `const VALID_SORT_OPTIONS: SortOption[] = ['price_asc', 'price_desc', 'name_asc', 'name_desc', 'rating_desc'];` — 'rating_desc' is present. The rating_desc sort test passed (✓), confirming the value is not silently dropped."
+    },
+    {
+      "id": "7",
+      "description": "`featured=true` and `featured=false` in the query string must be parsed into `query.featured = true` and `query.featured = false` respectively in `src/utils/queryParser.ts`. Any other value (or absence of the param) must leave `query.featured` unset.",
+      "passed": true,
+      "evidence": "File inspection of src/utils/queryParser.ts lines 22–26 shows the conditional: `if (raw.featured === 'true') { query.featured = true; } else if (raw.featured === 'false') { query.featured = false; }` — any other value or absence leaves query.featured unset. All three Featured filter tests passed (✓), confirming correct parsing."
+    },
+    {
+      "id": "8",
+      "description": "When `query.featured` is undefined (no `featured` param supplied), no featured filtering is applied and all products matching other active filters are returned.",
+      "passed": true,
+      "evidence": "Test 'GET /products > returns all products with pagination envelope' passed (✓), which uses ?limit=50 with no featured param and expects 15 total products. 23/23 tests passed."
+    },
+    {
+      "id": "9",
+      "description": "The sort logic in `src/services/productService.ts` must not mutate the `result` array in place; it must derive a new sorted array (e.g., `[...result].sort(...)`).",
+      "passed": true,
+      "evidence": "File inspection of src/services/productService.ts lines 28–37 shows every sort branch uses spread: `result = [...result].sort(...)` for all five sort options (price_asc, price_desc, name_asc, name_desc, rating_desc). No in-place mutation. All sort tests passed (✓) across all 23 tests."
+    },
+    {
+      "id": "10",
+      "description": "All pre-existing tests (GET /products baseline, category filter, inStock filter, search filter, pagination envelope, all existing sort options, and all auth middleware tests) continue to pass after the changes.",
+      "passed": true,
+      "evidence": "Full test suite: 23 passed, 0 failed. Verbose output confirms all pre-existing tests passed: 'returns all products with pagination envelope' (✓), 'filters by category' (✓), 'filters in-stock products' (✓), 'filters out-of-stock products' (✓), 'sorts by price ascending' (✓), 'sorts by price descending' (✓), 'sorts by name ascending' (✓), 'sorts by name descending' (✓), 'filters by search term' (✓), all pagination tests (✓), all auth middleware tests (✓)."
+    }
+  ]
+}
