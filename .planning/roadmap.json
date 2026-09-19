@@ -1,0 +1,64 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript ~6.0.2, Vitest ^4.1.5, Vite ^8.0.10, Express ^5.2.1",
+      "pnpm workspace (per-project, not root-level monorepo)",
+      "Scripts: dev=tsx watch, test=vitest run, build=tsc -p tsconfig.build.json",
+      "tsconfig.build.json extends tsconfig.json and overrides allowImportingTsExtensions:false — bundler moduleResolution change in tsconfig.json does not affect build config",
+      "types:[\"vitest/globals\"] is already in tsconfig.json but has no effect while globals:false in vitest config"
+    ],
+    "features": [
+      "One test file exists: src/tests/visible/products.test.ts (15 tests across 3 describe blocks: GET /products, pagination, auth middleware)",
+      "Zero .spec.ts files exist anywhere in the project — current include glob matches nothing",
+      "tests/setup.ts EXISTS at the correct root-relative path (benchmark-backend/tests/setup.ts); current vitest config points to the non-existent ./src/tests/setup.ts",
+      "src/server.ts: const PORT = Number(process.env.PORT); — resolves to NaN when PORT is unset",
+      "setup.ts stubs global fetch() with mocked DummyJSON responses and restores after each test"
+    ],
+    "architecture": [
+      "Config files (vitest.config.ts, tsconfig.json) live at benchmark-backend root; all paths in them are relative to that root",
+      "Source layout: src/ contains app.ts, server.ts, controllers/, middleware/, routes/, services/, data/, types/, utils/, tests/",
+      "Test layout: src/tests/visible/products.test.ts (visible suite); tests/setup.ts (setup file at root level, NOT under src/)",
+      "tsconfig.json include:[\"src\"] — only compiles src/ directory; tests/ at root is outside its scope",
+      "vitest.config.ts include paths are relative to benchmark-backend root, same as setupFiles paths"
+    ],
+    "edgeCases": [
+      "include glob must not accidentally re-include .spec.ts files — using src/**/*.test.ts exclusively avoids this",
+      "PORT=0 edge case: Number('0') || 3001 evaluates to 3001 (0 is falsy) — acceptable per spec, port 0 is not a valid production port",
+      "moduleResolution bundler is compatible with verbatimModuleSyntax:true, moduleDetection:force, and allowImportingTsExtensions:true already present in tsconfig.json",
+      "tsconfig.build.json overrides allowImportingTsExtensions:false independently — no side effects from changing base tsconfig moduleResolution",
+      "setupFiles must only reference ./tests/setup.ts — not supplement it; the non-existent path must be replaced, not appended"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: vitest.config.ts include glob must match *.test.ts files under src/tests/visible/",
+      "description": "Change include from ['src/**/*.spec.ts'] to ['src/**/*.test.ts'] in vitest.config.ts",
+      "files": ["src/benchmark-backend/vitest.config.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2: vitest.config.ts must have globals: true",
+      "description": "Change globals from false to true in vitest.config.ts",
+      "files": ["src/benchmark-backend/vitest.config.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 3: vitest.config.ts setupFiles must point to ./tests/setup.ts",
+      "description": "Change setupFiles from ['./src/tests/setup.ts'] to ['./tests/setup.ts'] in vitest.config.ts",
+      "files": ["src/benchmark-backend/vitest.config.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 4: tsconfig.json must use moduleResolution: bundler to fix TS5095",
+      "description": "Change \"moduleResolution\": \"node\" to \"moduleResolution\": \"bundler\" in tsconfig.json",
+      "files": ["src/benchmark-backend/tsconfig.json"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirement 5: src/server.ts must default port to 3001 when PORT is unset",
+      "description": "Change Number(process.env.PORT) to Number(process.env.PORT) || 3001 in src/server.ts",
+      "files": ["src/benchmark-backend/src/server.ts"]
+    }
+  ]
+}

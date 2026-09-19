@@ -1,0 +1,150 @@
+{
+  "taskId": "task4",
+  "runId": "gsd-run2-be",
+  "timestamp": "2026-09-19T07:11:42.032Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 19,
+    "failed": 0,
+    "total": 19
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 13,
+    "failed": 0,
+    "total": 13,
+    "expectedFiles": 5,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 771,
+    "hiddenMs": 653,
+    "buildMs": 568,
+    "totalMs": 2042
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "gsd",
+    "target": "backend",
+    "taskId": "task4",
+    "wall_duration_ms": 523084,
+    "cost_usd": 2.3926492999999995,
+    "num_turns": 91,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "c68074dd-791b-4aee-a419-1bf0a086928d",
+    "gsd": {
+      "phases": [
+        {
+          "name": "new-project",
+          "treeHash": "79392a4b3eaadbf0f06284a67a57686008cfec75",
+          "label": "new-project",
+          "exit_code": 0,
+          "wall_duration_ms": 75481,
+          "cost_usd": 0.3519381,
+          "num_turns": 16,
+          "session_id": "d906d36e-513d-4aab-8cdf-f35de805418c",
+          "is_error": false
+        },
+        {
+          "name": "discuss-phase",
+          "treeHash": "07938d65c860ade4c3219cf234107b0e94052db6",
+          "label": "discuss-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 51251,
+          "cost_usd": 0.213303,
+          "num_turns": 6,
+          "session_id": "d7007102-7670-435c-8d20-f36602fc7e28",
+          "is_error": false
+        },
+        {
+          "name": "plan-phase",
+          "treeHash": "300cd73177b8203666e37ee8967730500a1b719f",
+          "label": "plan-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 110852,
+          "cost_usd": 0.4456385,
+          "num_turns": 9,
+          "session_id": "9be87170-95fb-489c-aa11-4cd4de68af48",
+          "is_error": false
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "a8a18ea7ff6a8bafdf66547bfd5d600e9671e597",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 32768,
+          "cost_usd": 0.2046237,
+          "num_turns": 7,
+          "session_id": "d077b1a4-4a5a-4e0d-a903-a2a2c9159b60",
+          "is_error": false
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "75cab130d462c36ee127b01c782db1659dae9305",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 69260,
+          "cost_usd": 0.29813579999999995,
+          "num_turns": 15,
+          "session_id": "bbc205b9-bff9-4b28-a409-83767013c927",
+          "is_error": false
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "c393a66ea2ce29abeb6a9092f30b3196b5de709c",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 29184,
+          "cost_usd": 0.2169495,
+          "num_turns": 9,
+          "session_id": "9d373b25-143f-4420-b156-dd6be9a7d455",
+          "is_error": false
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "de8bda5017d121ad5e7f36ef03f5b6372122f846",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 90246,
+          "cost_usd": 0.41888400000000003,
+          "num_turns": 17,
+          "session_id": "e3a45f06-19a8-41b2-9c8f-8025cb02e770",
+          "is_error": false
+        },
+        {
+          "name": "complete-milestone",
+          "treeHash": "bc75d88d68d8b056abb266f46384be3a74e69c36",
+          "label": "complete-milestone",
+          "exit_code": 0,
+          "wall_duration_ms": 39826,
+          "cost_usd": 0.24317670000000002,
+          "num_turns": 12,
+          "session_id": "c68074dd-791b-4aee-a419-1bf0a086928d",
+          "is_error": false
+        }
+      ],
+      "passedFirstAttempt": false,
+      "reworkAttempts": 1,
+      "completed": true,
+      "failedAtPhase": null,
+      "failedCriteria": []
+    }
+  }
+}

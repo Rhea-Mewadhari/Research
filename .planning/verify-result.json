@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "vitest.config.ts include glob must match *.test.ts files under src/tests/visible/",
+      "passed": true,
+      "evidence": "vitest.config.ts line 7: include: ['src/**/*.test.ts']. Verbose test run output shows 1 file collected: src/tests/visible/products.test.ts (19 tests, all passed). Exit 0."
+    },
+    {
+      "id": "2",
+      "description": "vitest.config.ts must have globals: true so that describe, it, expect, etc. are available without per-file imports",
+      "passed": true,
+      "evidence": "vitest.config.ts line 5: globals: true. Test run exits 0 with no 'ReferenceError: describe is not defined' or similar error in output. All 19 tests using describe/it/expect/beforeAll/afterEach passed."
+    },
+    {
+      "id": "3",
+      "description": "vitest.config.ts setupFiles must point to ./tests/setup.ts (not ./src/tests/setup.ts)",
+      "passed": true,
+      "evidence": "vitest.config.ts line 6: setupFiles: ['./tests/setup.ts']. File confirmed to exist at src/benchmark-backend/tests/setup.ts. Test run exits 0 with no module-not-found error during setup."
+    },
+    {
+      "id": "4",
+      "description": "tsconfig.json must use moduleResolution: bundler instead of node to fix TS5095",
+      "passed": true,
+      "evidence": "tsconfig.json line 10: \"moduleResolution\": \"bundler\". Build command (pnpm run build → tsc -p tsconfig.build.json) exits 0 with no output and no TS5095 error."
+    },
+    {
+      "id": "5",
+      "description": "src/server.ts must default the port to 3001 when process.env.PORT is unset",
+      "passed": true,
+      "evidence": "src/server.ts line 3: const PORT = Number(process.env.PORT) || 3001; — the literal 3001 fallback is present. Server will log 'Server running on port 3001' when PORT is unset."
+    }
+  ]
+}
