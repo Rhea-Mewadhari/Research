@@ -1,0 +1,80 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express v5, TypeScript ~6.0, pure ESM (`\"type\": \"module\"`)",
+      "`verbatimModuleSyntax: true` — type-only imports must use `import type`",
+      "`erasableSyntaxOnly: true` — no enums, no namespaces",
+      "`noUnusedLocals` and `noUnusedParameters` are compile errors",
+      "Vitest v4 with globals (describe/it/expect available without imports), Supertest for HTTP integration tests",
+      "Test setup stubs global fetch before each test — real network calls never happen",
+      "pnpm workspace; `pnpm test` runs Vitest"
+    ],
+    "features": [
+      "Currently parsed query params: `search`, `category`, `inStock`, `sort` (price_asc, price_desc, name_asc, name_desc), `page`, `limit`",
+      "`featured` param has a TODO comment in queryParser.ts line 23 — not parsed yet",
+      "`rating_desc` has TODO comments in queryParser.ts line 4 and productService.ts line 34 — not in VALID_SORT_OPTIONS and no sort branch",
+      "No product in products.ts has a `featured` field set (all 15 products lack the field entirely)",
+      "Passing test suites: 'GET /products', 'Pagination', 'Auth middleware'",
+      "Failing test suites: 'Featured filter' (3 tests) and 'Rating sort' (1 test)"
+    ],
+    "architecture": [
+      "Layer order: app.ts → routes/productRoutes.ts → controllers/productController.ts → services/productService.ts → services/dataFetcher.ts",
+      "Types centralised in src/types/product.ts — `SortOption` already includes `'rating_desc'`, `Product` already has `featured?: boolean`; no type changes needed",
+      "queryParser.ts is the sole place that converts raw req.query strings to typed ProductQuery; service never reads req.query",
+      "productService.ts applies all business logic: filters (search → category → inStock → [featured]) → sort → paginate",
+      "VALID_SORT_OPTIONS whitelist in queryParser.ts gates which sort values reach the service; adding a sort requires updating it there first",
+      "New `featured` filter must slot after inStock filter and before the sort block, applied to `result` (already filtered), not the original array",
+      "Sort branches use `[...result].sort(...)` spread — existing pattern to follow for rating_desc"
+    ],
+    "edgeCases": [
+      "`p.featured ?? false` is required (not `p.featured === false`) — 11 non-featured products have `featured: undefined`; strict false-check would return 0 for featured=false query",
+      "`rating_desc` sort must spread before sorting (`[...result].sort(...)`) to avoid mutating the in-scope array",
+      "Featured filter must operate on `result` (not the original products array) so it intersects correctly with all prior filters (search, category, inStock)",
+      "`featured` filter must be placed before `total = result.length` to ensure the pagination envelope reflects the filtered count",
+      "Parser must map string `'true'` → `true` and `'false'` → `false`; any other value (absent, empty, arbitrary string) must leave `query.featured` undefined so no filter is applied",
+      "`rating_desc` must be added to VALID_SORT_OPTIONS before the service branch is reachable — without it the parser silently drops the param and the sort is a no-op"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1 & 2 — products id 1, 8, 11, 14 must have `featured: true`; all other products must not",
+      "description": "Add `featured: true` to the product objects with id 1 (Laptop), id 8 (Ergonomic Chair), id 11 (Yoga Mat), and id 14 (Clean Code). No other product objects should receive a `featured` field.",
+      "files": [
+        "src/benchmark-backend/src/data/products.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 3 — `'rating_desc'` must be in VALID_SORT_OPTIONS so it is not silently dropped by the parser",
+      "description": "Add `'rating_desc'` to the `VALID_SORT_OPTIONS` array in `parseProductQuery`. This must happen before the service sort branch (task-5) is reachable.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 4 — `parseProductQuery` must set `query.featured = true` for `featured=true`, `query.featured = false` for `featured=false`, and leave it undefined otherwise",
+      "description": "In `parseProductQuery`, read `raw.featured` (a string from req.query). If it equals `'true'` set `query.featured = true`; if it equals `'false'` set `query.featured = false`; any other value (absent, empty, arbitrary string) must leave `query.featured` unset. Fill in the existing TODO block at line 23.",
+      "files": [
+        "src/benchmark-backend/src/utils/queryParser.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 5 — `getAllProducts` must filter to `(p.featured ?? false) === query.featured` when `query.featured` is defined",
+      "description": "In `getAllProducts`, after the inStock filter and before the sort block, add: `if (query.featured !== undefined) result = result.filter(p => (p.featured ?? false) === query.featured)`. Must operate on `result` (not the original products array) and must precede `total = result.length`. Fill in the existing TODO block.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirement 6 — `getAllProducts` must sort by `rating` descending (`b.rating - a.rating`) when `query.sort === 'rating_desc'`, without mutating the source array",
+      "description": "In `getAllProducts`, add an `else if (query.sort === 'rating_desc')` branch to the existing sort block: `result = [...result].sort((a, b) => b.rating - a.rating)`. The spread is required to avoid mutating the array in place. Fill in the existing TODO block at line 34.",
+      "files": [
+        "src/benchmark-backend/src/services/productService.ts"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Products with id 1 (Laptop), 8 (Ergonomic Chair), 11 (Yoga Mat), and 14 (Clean Code) must have `featured: true` set in `src/data/products.ts`.",
+      "passed": true,
+      "evidence": "File inspection of src/benchmark-backend/src/data/products.ts: id 1 line 11 `featured: true`, id 8 line 89 `featured: true`, id 11 line 123 `featured: true`, id 14 line 159 `featured: true`. Test 'Featured filter > returns only featured products when featured=true' PASSED (vitest run: 23 passed (23), exit code 0)."
+    },
+    {
+      "id": "2",
+      "description": "All products not in the featured set (ids 2, 3, 4, 5, 6, 7, 9, 10, 12, 13, 15) must not have `featured: true` (field is omitted or `false`).",
+      "passed": true,
+      "evidence": "File inspection of src/benchmark-backend/src/data/products.ts: ids 2, 3, 4, 5, 6, 7, 9, 10, 12, 13, 15 have no `featured` field. Test 'Featured filter > returns only non-featured products when featured=false' PASSED (vitest run: 23 passed (23), exit code 0)."
+    },
+    {
+      "id": "3",
+      "description": "`'rating_desc'` must be added to the `VALID_SORT_OPTIONS` array in `src/utils/queryParser.ts` so it is not silently dropped by the parser's `includes` guard.",
+      "passed": true,
+      "evidence": "File inspection of src/benchmark-backend/src/utils/queryParser.ts line 3: `const VALID_SORT_OPTIONS: SortOption[] = ['price_asc', 'price_desc', 'name_asc', 'name_desc', 'rating_desc'];` — 'rating_desc' is present. Test 'Rating sort > sorts by rating descending when sort=rating_desc' PASSED (vitest run: 23 passed (23), exit code 0)."
+    },
+    {
+      "id": "4",
+      "description": "`parseProductQuery` in `src/utils/queryParser.ts` must set `query.featured = true` when the raw query string contains `featured=true`, and `query.featured = false` when it contains `featured=false`. Any other value must leave `query.featured` undefined.",
+      "passed": true,
+      "evidence": "File inspection of src/benchmark-backend/src/utils/queryParser.ts lines 22-26: `if (raw.featured === 'true') { query.featured = true; } else if (raw.featured === 'false') { query.featured = false; }` — maps string 'true'/'false' to booleans; any other value (absent, etc.) leaves query.featured undefined. All three 'Featured filter' tests PASSED (vitest run: 23 passed (23), exit code 0)."
+    },
+    {
+      "id": "5",
+      "description": "`getAllProducts` in `src/services/productService.ts` must filter the result set to products where `(p.featured ?? false) === query.featured` when `query.featured` is defined.",
+      "passed": true,
+      "evidence": "File inspection of src/benchmark-backend/src/services/productService.ts lines 23-25: `if (query.featured !== undefined) { result = result.filter((p) => (p.featured ?? false) === query.featured); }` — exact expression matches requirement. Tests 'Featured filter > returns only featured products when featured=true', 'Featured filter > returns only non-featured products when featured=false', and 'Featured filter > featured=true combined with category filter returns intersection' all PASSED (vitest run: 23 passed (23), exit code 0)."
+    },
+    {
+      "id": "6",
+      "description": "`getAllProducts` in `src/services/productService.ts` must sort results by `rating` descending (`b.rating - a.rating`) when `query.sort === 'rating_desc'`. The sort must not mutate the source array (use a derived copy).",
+      "passed": true,
+      "evidence": "File inspection of src/benchmark-backend/src/services/productService.ts lines 35-37: `else if (query.sort === 'rating_desc') { result = [...result].sort((a, b) => b.rating - a.rating); }` — uses spread copy `[...result]` (non-mutating) and comparator `b.rating - a.rating` (descending). Test 'Rating sort > sorts by rating descending when sort=rating_desc' PASSED (vitest run: 23 passed (23), exit code 0)."
+    },
+    {
+      "id": "7",
+      "description": "All pre-existing tests must continue to pass without regression.",
+      "passed": true,
+      "evidence": "vitest run (verbose) output: all 23 tests passed including all cases in 'GET /products' (12 tests, including 'returns 401 without auth header'), 'Pagination' (3 tests), and 'Auth middleware' (4 tests). Build `tsc -p tsconfig.build.json` also succeeded with exit code 0. Tests: 1 file passed (1), 23 passed (23)."
+    }
+  ]
+}
