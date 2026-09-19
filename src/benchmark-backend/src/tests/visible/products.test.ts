@@ -148,3 +148,37 @@ describe('Auth middleware', () => {
     expect(res.body).toEqual({ status: 'ok' });
   });
 });
+
+describe('Featured filter', () => {
+  it('returns only featured products when featured=true', async () => {
+    const res = await request(app).get('/products?featured=true&limit=50').set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(4);
+    expect(res.body.data.every((p: any) => p.featured === true)).toBe(true);
+  });
+
+  it('returns only non-featured products when featured=false', async () => {
+    const res = await request(app).get('/products?featured=false&limit=50').set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(11);
+    expect(res.body.data.every((p: any) => !p.featured)).toBe(true);
+  });
+
+  it('featured=true combined with category filter returns intersection', async () => {
+    const res = await request(app)
+      .get('/products?featured=true&category=electronics&limit=50')
+      .set(AUTH);
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(1);
+    expect(res.body.data[0].id).toBe(1);
+  });
+});
+
+describe('Rating sort', () => {
+  it('sorts by rating descending when sort=rating_desc', async () => {
+    const res = await request(app).get('/products?sort=rating_desc&limit=50').set(AUTH);
+    expect(res.status).toBe(200);
+    const ratings = res.body.data.map((p: any) => p.rating);
+    expect(ratings).toEqual([...ratings].sort((a, b) => b - a));
+  });
+});
