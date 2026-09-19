@@ -1,0 +1,30 @@
+{
+  "taskId": "task4",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix vitest.config.ts: enable globals, correct include pattern, fix setupFiles path",
+      "status": "done",
+      "notes": "Set globals:true, include:'tests/**/*.test.ts', setupFiles:'./tests/setup.ts'"
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix tsconfig.json: remove invalid option combination causing TS5095",
+      "status": "done",
+      "notes": "Changed moduleResolution from 'node' (deprecated node10, TS5107) to 'bundler' to match the bundler-mode settings. pnpm build now completes without errors."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix src/server.ts: add numeric fallback port 3001 when PORT env var is absent",
+      "status": "done",
+      "notes": "Changed `Number(process.env.PORT)` to `Number(process.env.PORT) || 3001`. Also corrected vitest include path from 'tests/**/*.test.ts' to 'src/tests/**/*.test.ts' (actual test file is at src/tests/visible/products.test.ts). pnpm test: 19 passed, pnpm build: success."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: pnpm test passes, pnpm build succeeds, server uses port 3001 by default",
+      "status": "done",
+      "notes": "pnpm test: 19 passed (1 file). pnpm build: no errors. server.ts:3 uses `Number(process.env.PORT) || 3001` as the default port fallback."
+    }
+  ]
+}
