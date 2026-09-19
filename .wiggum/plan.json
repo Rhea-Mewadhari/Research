@@ -1,0 +1,30 @@
+{
+  "taskId": "task4",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix vitest.config.ts: enable globals, correct include pattern, fix setupFiles path",
+      "status": "done",
+      "notes": "Set globals:true, fixed setupFiles to ./tests/setup.ts, fixed include to src/**/*.test.ts. All 19 tests pass."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix tsconfig.json: change moduleResolution from 'node' to 'bundler' to fix TS5095",
+      "status": "done",
+      "notes": "Changed moduleResolution from 'node' to 'bundler' in tsconfig.json. All 19 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix src/server.ts: add fallback port 3001 when PORT env var is absent",
+      "status": "done",
+      "notes": "Changed `Number(process.env.PORT)` to `Number(process.env.PORT) || 3001`. All 19 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run pnpm test and pnpm build to confirm all fixes pass",
+      "status": "done",
+      "notes": "All 19 tests pass and build succeeds (tsc -p tsconfig.build.json exits cleanly)."
+    }
+  ]
+}
