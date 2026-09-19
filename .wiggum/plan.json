@@ -1,0 +1,30 @@
+{
+  "taskId": "task5",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Mark four products as featured in src/data/products.ts",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Parse featured query param and add rating_desc to valid sort options in src/utils/queryParser.ts",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Apply featured filter and rating_desc sort in src/services/productService.ts",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Run pnpm test and verify all suites pass",
+      "status": "done",
+      "notes": "All 23 tests passed. Build succeeded with no errors."
+    }
+  ]
+}
