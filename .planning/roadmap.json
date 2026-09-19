@@ -1,0 +1,72 @@
+{
+  "investigations": {
+    "techStack": [
+      "Package manager: pnpm (requirements.md specifies 'pnpm test'; agent detected vitest/tsx scripts)",
+      "Test framework: Vitest v4 with supertest for HTTP integration tests",
+      "HTTP framework: Express v5",
+      "TypeScript: ESM ('type': 'module'), verbatimModuleSyntax=true — type-only imports must use 'import type'",
+      "Module resolution: bundler mode, no file extensions in relative imports",
+      "Strict TS: noUnusedLocals, noUnusedParameters — no dead code allowed",
+      "Named exports only; no default exports in existing codebase"
+    ],
+    "features": [
+      "VALID_SORT_OPTIONS currently: ['price_asc', 'price_desc', 'name_asc', 'name_desc'] — 'rating_desc' missing",
+      "queryParser.ts parsed fields: search, category, inStock, sort, page, limit — 'featured' not parsed (TODO comment at line 23)",
+      "productService.ts filter branches: search, category, inStock — 'featured' branch absent (TODO comment at line 23)",
+      "productService.ts sort branches: price_asc, price_desc, name_asc, name_desc — 'rating_desc' branch absent (TODO comment)",
+      "data/products.ts: 15 products, none have 'featured' field set — all need backfill (true for ids 1, 8, 11, 14; omit or false for rest)",
+      "types/product.ts: already correct — Product has 'featured?: boolean', ProductQuery has 'featured?: boolean', SortOption includes 'rating_desc' — DO NOT MODIFY"
+    ],
+    "architecture": [
+      "Layering: Route (productRoutes.ts) → Controller (productController.ts) → Service (productService.ts) → Data (dataFetcher.ts + data/products.ts)",
+      "queryParser.ts is a controller-level utility: called from productController.ts, result passed directly to getAllProducts",
+      "getAllProducts signature: getAllProducts(query: ProductQuery): Promise<PaginatedResponse<Product>>",
+      "ProductQuery already has 'featured?: boolean' — no type changes needed",
+      "New featured filter belongs in productService.ts alongside search/category/inStock blocks (after existing filter chain)",
+      "New rating_desc sort belongs in productService.ts switch/if block alongside existing sort branches",
+      "Existing sort branches operate on a spread copy ([...result].sort(...)) — rating_desc must follow the same pattern to avoid mutating source array"
+    ],
+    "edgeCases": [
+      "featured=true → exactly 4 products returned, all with featured === true (ids 1, 8, 11, 14)",
+      "featured=false → exactly 11 products returned, all with falsy featured (omitted or false); filter uses '(p.featured ?? false) === false'",
+      "featured=true&category=electronics → exactly 1 product (id 1, Laptop); featured filter and category filter must compose",
+      "featured param absent → no filter applied; all 15 products pass through (query.featured is undefined)",
+      "featured param invalid (e.g. 'yes', '1', 'maybe') → query.featured not set; only exact strings 'true'/'false' accepted",
+      "sort=rating_desc applied after filters, on a derived copy — must not mutate source products array",
+      "Products without 'featured' field must be treated as false via nullish coalescing (?? false) in filter expression",
+      "Pre-existing suites must not regress: 'GET /products' (11 tests), 'Pagination' (3 tests), 'Auth middleware' (4 tests)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: Products with id 1 (Laptop), 8 (Ergonomic Chair), 11 (Yoga Mat), and 14 (Clean Code) have featured: true set. The remaining 11 products either omit the field or have featured: false.",
+      "description": "Add 'featured: true' to the product objects with id 1, 8, 11, and 14 in the products array. Do not add 'featured' to the other 11 products (omission is equivalent to false per the nullish coalescing in the filter).",
+      "files": ["src/benchmark-backend/src/data/products.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2: 'rating_desc' is added to VALID_SORT_OPTIONS so that parseProductQuery({ sort: 'rating_desc' }) produces a ProductQuery with sort === 'rating_desc'.",
+      "description": "Add 'rating_desc' to the VALID_SORT_OPTIONS array in queryParser.ts. This allows the sort value to pass validation and appear on the returned ProductQuery object instead of being silently dropped.",
+      "files": ["src/benchmark-backend/src/utils/queryParser.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 3: parseProductQuery sets query.featured = true when the raw param is 'true', sets query.featured = false when the raw param is 'false', and leaves query.featured undefined for any other value (including absent).",
+      "description": "In queryParser.ts, parse the 'featured' query parameter: if rawFeatured === 'true' set query.featured = true; if rawFeatured === 'false' set query.featured = false; otherwise leave query.featured undefined. Replace the TODO comment at line 23.",
+      "files": ["src/benchmark-backend/src/utils/queryParser.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 4: getAllProducts applies a featured filter when query.featured is defined: keeps only products where (p.featured ?? false) === query.featured. When query.featured is undefined, no featured filter is applied.",
+      "description": "In productService.ts, add a featured filter branch after the existing inStock filter: if query.featured !== undefined, filter result to only products where (p.featured ?? false) === query.featured. Replace the TODO comment at line 23.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirement 5: getAllProducts sorts results by rating descending when query.sort === 'rating_desc', without mutating the source array (sort is applied on a derived copy).",
+      "description": "In productService.ts, add a 'rating_desc' sort branch in the sort logic: sort by b.rating - a.rating descending. Use the same spread-copy pattern as existing sort branches ([...result].sort(...)) to avoid mutating the source array.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}

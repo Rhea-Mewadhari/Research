@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Products with id 1 (Laptop), 8 (Ergonomic Chair), 11 (Yoga Mat), and 14 (Clean Code) have featured: true; the remaining 11 products omit the field or have featured: false.",
+      "passed": true,
+      "evidence": "products.ts confirmed: id 1 line 12, id 8 line 90, id 11 line 124, id 14 line 160 each have 'featured: true'. All other 11 products omit the field. pnpm test: 'Featured filter' suite — 'returns only featured products when featured=true' asserted res.body.data.length === 4 and all p.featured === true — PASSED (23/23 tests passed)."
+    },
+    {
+      "id": "2",
+      "description": "'rating_desc' is added to VALID_SORT_OPTIONS in queryParser.ts so parseProductQuery({ sort: 'rating_desc' }) produces a ProductQuery with sort === 'rating_desc'.",
+      "passed": true,
+      "evidence": "queryParser.ts line 3: VALID_SORT_OPTIONS = ['price_asc', 'price_desc', 'name_asc', 'name_desc', 'rating_desc']. pnpm test: 'Rating sort' suite test at line 178 sent GET /products?sort=rating_desc&limit=50 and received 200 with correctly sorted ratings — PASSED (23/23 tests passed)."
+    },
+    {
+      "id": "3",
+      "description": "parseProductQuery sets query.featured = true for raw 'true', query.featured = false for raw 'false', and leaves it undefined for any other value.",
+      "passed": true,
+      "evidence": "queryParser.ts lines 22-26: 'if (raw.featured === \"true\") { query.featured = true; } else if (raw.featured === \"false\") { query.featured = false; }' — no else branch, so absent/invalid values leave query.featured undefined. 'Featured filter' HTTP tests (lines 153-175) all PASSED (23/23 tests passed)."
+    },
+    {
+      "id": "4",
+      "description": "getAllProducts applies a featured filter when query.featured is defined using (p.featured ?? false) === query.featured; no filter when query.featured is undefined.",
+      "passed": true,
+      "evidence": "productService.ts lines 23-25: 'if (query.featured !== undefined) { result = result.filter((p) => (p.featured ?? false) === query.featured); }'. Three 'Featured filter' scenarios tested: featured=true → 4 products, featured=false → 11 products, featured=true&category=electronics → 1 product (id 1) — all PASSED (23/23 tests passed)."
+    },
+    {
+      "id": "5",
+      "description": "getAllProducts sorts by rating descending when query.sort === 'rating_desc', without mutating the source array.",
+      "passed": true,
+      "evidence": "productService.ts lines 35-37: 'else if (query.sort === \"rating_desc\") { result = [...result].sort((a, b) => b.rating - a.rating); }' — uses spread copy, sorts descending. 'Rating sort' test (line 178-183) asserted ratings equals [...ratings].sort((a,b) => b-a) across all 15 products — PASSED (23/23 tests passed)."
+    },
+    {
+      "id": "6",
+      "description": "All pre-existing test suites ('GET /products', 'Pagination', 'Auth middleware') pass without modification.",
+      "passed": true,
+      "evidence": "pnpm test output: 'Tests 23 passed (23)' with 0 failures across all suites including 'GET /products', 'Pagination', and 'Auth middleware'. Exit code 0."
+    }
+  ]
+}
