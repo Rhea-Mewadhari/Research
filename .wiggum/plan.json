@@ -1,0 +1,30 @@
+{
+  "taskId": "task6",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix auth middleware: restore Bearer prefix and replace eval() with safe isValidToken",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Add token length validation (>200 chars → 401) in auth middleware",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Remove child_process.exec() command injection from productController.ts",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify all success criteria",
+      "status": "done",
+      "notes": "All 19 tests pass, build succeeds. No eval() or child_process in src/. Bearer prefix enforced, token length >200 → 401, digit-sum validation safe."
+    }
+  ]
+}
