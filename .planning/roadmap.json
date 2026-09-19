@@ -1,0 +1,70 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript (v6.0.2) + Express v5, Node.js ESM — no compile step in dev (tsx), tsc for build",
+      "Vitest v4 + supertest v7 for integration tests; run via `pnpm --filter benchmark-backend test`",
+      "Strict TypeScript: noUnusedLocals + noUnusedParameters — removing exec() call REQUIRES removing the import too or TS compile fails",
+      "No auth library; requireAuth is a fully custom middleware in src/middleware/auth.ts",
+      "Only production deps are express + cors; no validation library available"
+    ],
+    "features": [
+      "21 visible tests in src/tests/visible/products.test.ts covering: products list, filter, sort, pagination, auth rejection, auth acceptance, health route",
+      "Test at line 138 ('rejects a request with no Bearer prefix') currently FAILS — the Bearer prefix fix resolves it",
+      "productService.getAllProducts does in-memory filter/sort/paginate — must not be changed",
+      "productController.getProducts: exec audit-log (shell injection) → parseProductQuery → productService → return response; exec is fire-and-forget with no return value used",
+      "isValidToken is unexported, called only from requireAuth; eval() encodes: (token.match(/\\d/g) ?? []).reduce((s,n) => s + parseInt(n,10), 0) % 2 === 0",
+      "requireAuth currently passes the raw Authorization header value (including 'Bearer ' prefix) to isValidToken — since 'Bearer ' has no digits, digit sums of currently-passing tests are unaffected by stripping the prefix"
+    ],
+    "architecture": [
+      "src/middleware/auth.ts — contains requireAuth (exported) and isValidToken (internal); all 3 auth fixes land here",
+      "src/controllers/productController.ts — contains getProducts; exec removal lands here",
+      "app.ts wires: cors, express.json, health route, then requireAuth + productRoutes at /products — no changes needed here",
+      "productService.ts and queryParser.ts are not touched",
+      "No new files needed — all changes are in-place edits to 2 existing files"
+    ],
+    "edgeCases": [
+      "Bearer prefix check is case-sensitive ('Bearer ' with capital B and trailing space) — requirements specify this; tests only test the uppercase form",
+      "Token exactly 200 chars: length check passes (> 200 is rejected, <= 200 proceeds) — requirement says reject >200, accept 200",
+      "Token exactly 201 chars: rejected with 401 before digit-sum runs",
+      "Empty token after stripping 'Bearer ' prefix: length=0 (passes length gate), digit sum=0 (even) → accepted; no requirement to reject empty",
+      "Token containing special chars (\", ), backtick): safe once eval() replaced — plain match/reduce cannot be injected into",
+      "Missing Authorization header: still rejected 401 — existing guard in requireAuth remains unchanged",
+      "Shell metacharacters in req.query.search (e.g. ; rm -rf /): safe once exec() removed — productService receives the raw string and does in-memory substring match only",
+      "TypeScript noUnusedLocals: child_process import becomes unused after exec() call is removed — must delete both import and call atomically"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — requireAuth must enforce the Bearer prefix: header not starting with 'Bearer ' (case-sensitive, trailing space) returns 401",
+      "description": "In requireAuth, check that req.headers.authorization starts with 'Bearer '; if not (or if header is absent) return 401. Extract the token as the substring after 'Bearer ' before passing it to isValidToken.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "3 — requireAuth must reject tokens longer than 200 characters with 401, before any digit-sum validation",
+      "description": "After extracting the token (post-Bearer strip), check token.length > 200; if so return 401. This guard must execute before the isValidToken call.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "2 — isValidToken must not use eval(); rewrite using plain string/array operations that reproduce the digit-sum parity logic",
+      "description": "Replace the eval()-based implementation with: (token.match(/\\d/g) ?? []).reduce((s, n) => s + parseInt(n, 10), 0) % 2 === 0. The function signature and return type remain the same.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — productController must not import or call child_process.exec()",
+      "description": "Remove the `import { exec } from 'child_process'` line and the exec(...) audit-log call from getProducts. The handler should only call parseProductQuery, productService.getAllProducts, and return the response.",
+      "files": [
+        "src/benchmark-backend/src/controllers/productController.ts"
+      ]
+    }
+  ]
+}

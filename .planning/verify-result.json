@@ -1,0 +1,35 @@
+{
+  "passed": false,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "requireAuth must enforce the `Bearer ` prefix: an Authorization header that does not begin with the literal string `Bearer ` (case-sensitive, with trailing space) returns HTTP 401 with body {\"error\":\"Unauthorized\"}.",
+      "passed": true,
+      "evidence": "src/middleware/auth.ts line 9: `if (!authHeader || !authHeader.startsWith('Bearer '))` returns 401 with {error:'Unauthorized'}. Test suite run (19 passed, exit 0): 'returns 401 without auth header' (line 90, no header → 401 PASSED); 'rejects a request with no Bearer prefix' (line 138, Authorization: 'benchmark-token-2024' → 401 PASSED); 'accepts any token whose digits sum to an even number' (line 131, Bearer custom-token-22 → 200 PASSED)."
+    },
+    {
+      "id": "2",
+      "description": "isValidToken in src/middleware/auth.ts must not use eval(). Must use plain string/array operations (split/match/filter/reduce) to extract digits, sum them, return true if even.",
+      "passed": true,
+      "evidence": "`grep -r 'eval(' src/benchmark-backend/src/` returned exit code 1 — no matches anywhere in src. auth.ts line 4: `return (token.match(/\\d/g) ?? []).reduce((s, n) => s + parseInt(n, 10), 0) % 2 === 0;` — uses only match/reduce/parseInt. Test suite (19 passed, exit 0): 'rejects a token whose digits sum to an odd number' (Bearer invalid-111 → 401 PASSED); 'accepts any token whose digits sum to an even number' (Bearer custom-token-22 → 200 PASSED)."
+    },
+    {
+      "id": "3",
+      "description": "requireAuth must reject tokens longer than 200 characters with HTTP 401 before digit-sum validation runs. A 201-char token returns 401; a 200-char token with even digit sum returns 200.",
+      "passed": true,
+      "evidence": "auth.ts lines 14-17: `if (token.length > 200) { res.status(401).json({ error: 'Unauthorized' }); return; }` — appears before isValidToken call at line 18. Verified with temporary vitest test (2 files, 21 tests total, all passed, exit 0, temp file removed afterward): 'rejects a 201-char token with 401' (Bearer + 'a'.repeat(201) → status 401 PASSED); 'accepts a 200-char token with even digit sum' (Bearer + 'a'.repeat(200), digit-sum=0 even → status 200 PASSED)."
+    },
+    {
+      "id": "4",
+      "description": "src/controllers/productController.ts must not import or call child_process.exec(). The exec line and child_process import must both be removed.",
+      "passed": true,
+      "evidence": "`grep -r 'child_process' src/benchmark-backend/src/` returned exit code 1 (no matches). `grep -rn 'exec(' src/benchmark-backend/src/` returned exit code 1 (no matches). productController.ts is 9 lines total with only three imports: Request/Response from express, getAllProducts from productService, parseProductQuery from queryParser — no child_process. All GET /products tests pass in the 19-test suite run."
+    },
+    {
+      "id": "5",
+      "description": "All 21 existing visible tests in src/benchmark-backend/src/tests/visible/products.test.ts must pass with no modifications to that file. Verified by: pnpm --filter benchmark-backend test exits with code 0 and reports 21 passed tests.",
+      "passed": false,
+      "evidence": "Test suite run output: `Tests  19 passed (19)`, exit code 0. The file products.test.ts contains exactly 19 `it()` blocks: 12 in 'GET /products' describe, 3 in 'Pagination' describe, 4 in 'Auth middleware' describe. This is the only test file found under src/benchmark-backend. The verification method requires the suite to report '21 passed tests' but it reports 19 — the criterion is not satisfied."
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "framework": "gsd",
+  "target": "backend",
+  "taskId": "task6",
+  "wall_duration_ms": 2063210,
+  "cost_usd": 5.1849702,
+  "num_turns": 201,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "41103f88-0cc7-45ce-918e-f3d3828c8ac0",
+  "gsd": {
+    "phases": [
+      {
+        "name": "new-project",
+        "treeHash": "85d2822003f6bb92d0e9c202defb639e34e98a7c",
+        "label": "new-project",
+        "exit_code": 0,
+        "wall_duration_ms": 45998,
+        "cost_usd": 0.24850470000000002,
+        "num_turns": 12,
+        "session_id": "61bba6dd-2e78-44cc-a8cd-93510f9d4bca",
+        "is_error": false
+      },
+      {
+        "name": "discuss-phase",
+        "treeHash": "0119bc07691939a417c1c45ebe78efdb0d59a356",
+        "label": "discuss-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 62373,
+        "cost_usd": 0.2482527,
+        "num_turns": 9,
+        "session_id": "b59d6e35-6326-424e-a927-36999dffe736",
+        "is_error": false
+      },
+      {
+        "name": "plan-phase",
+        "treeHash": "8c71571561540cb7eca7ffa1a77610453c0f3ac7",
+        "label": "plan-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 127534,
+        "cost_usd": 0.7271436000000001,
+        "num_turns": 8,
+        "session_id": "a50c2012-f2de-466f-b77c-9c679c25b3d7",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "98aa06434ff39c8ea67a7e668c2ddb739dc34911",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 112649,
+        "cost_usd": 0.42110459999999994,
+        "num_turns": 18,
+        "session_id": "22130fd4-1799-4bfd-a630-9bd5188a98b2",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "ed486590a682100e5705d6b86b501ee18820ad3f",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 250881,
+        "cost_usd": 0.7413348000000001,
+        "num_turns": 34,
+        "session_id": "20616010-5874-49bc-bbc3-ba24dd16afad",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "ed486590a682100e5705d6b86b501ee18820ad3f",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 302617,
+        "cost_usd": 0.6408732,
+        "num_turns": 22,
+        "session_id": "f7620ef1-f7fe-48c3-913a-b8fd452037ac",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "f111cacb46d8d479ccba514b573cfa9ba9deb6cc",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 474557,
+        "cost_usd": 0.8182548000000001,
+        "num_turns": 40,
+        "session_id": "24198534-4c20-460e-8e2d-97d1249959d6",
+        "is_error": false
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "f111cacb46d8d479ccba514b573cfa9ba9deb6cc",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 356252,
+        "cost_usd": 0.6584121,
+        "num_turns": 28,
+        "session_id": "14631eb3-3a0f-456e-8f8c-3591ba085d7f",
+        "is_error": false
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "29a5a9beb5575ffe84da74c44a0e9abc0686a47f",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 307984,
+        "cost_usd": 0.6810897,
+        "num_turns": 30,
+        "session_id": "41103f88-0cc7-45ce-918e-f3d3828c8ac0",
+        "is_error": false
+      }
+    ],
+    "passedFirstAttempt": false,
+    "reworkAttempts": 2,
+    "completed": false,
+    "failedAtPhase": "verify-work",
+    "failedCriteria": [
+      {
+        "id": "5",
+        "description": "All 21 existing visible tests in src/benchmark-backend/src/tests/visible/products.test.ts must pass with no modifications to that file. Verified by: pnpm --filter benchmark-backend test exits with code 0 and reports 21 passed tests.",
+        "passed": false,
+        "evidence": "Test suite run output: `Tests  19 passed (19)`, exit code 0. The file products.test.ts contains exactly 19 `it()` blocks: 12 in 'GET /products' describe, 3 in 'Pagination' describe, 4 in 'Auth middleware' describe. This is the only test file found under src/benchmark-backend. The verification method requires the suite to report '21 passed tests' but it reports 19 — the criterion is not satisfied."
+      }
+    ]
+  }
+}
