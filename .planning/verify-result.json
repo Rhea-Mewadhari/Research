@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "vitest.config.ts `include` glob is `src/**/*.test.ts` and matches the actual test file",
+      "passed": true,
+      "evidence": "vitest.config.ts line 7: `include: ['src/**/*.test.ts']`. Test run output: `src/tests/visible/products.test.ts` listed and passed (Test Files: 1 passed (1), Tests: 19 passed (19)). No 'No test files found' message."
+    },
+    {
+      "id": "2",
+      "description": "vitest.config.ts sets `globals: true` so describe/it/expect/beforeAll etc. are available without imports",
+      "passed": true,
+      "evidence": "vitest.config.ts line 5: `globals: true`. All 19 tests in products.test.ts (which uses describe/it/expect without imports) passed with exit 0. No `ReferenceError: describe is not defined` or similar in output."
+    },
+    {
+      "id": "3",
+      "description": "vitest.config.ts `setupFiles` resolves to `./tests/setup.ts` which exists at `src/benchmark-backend/tests/setup.ts`",
+      "passed": true,
+      "evidence": "vitest.config.ts line 6: `setupFiles: ['./tests/setup.ts']`. File confirmed present at `src/benchmark-backend/tests/setup.ts` (ls output). All 19 tests passed including fetch-stub-dependent tests (e.g. 'returns all products with pagination envelope'), confirming setup ran successfully with no missing-file error."
+    },
+    {
+      "id": "4",
+      "description": "tsconfig.json uses `moduleResolution: \"bundler\"` (compatible with `allowImportingTsExtensions: true`), no TS5095 error",
+      "passed": true,
+      "evidence": "tsconfig.json line 10: `\"moduleResolution\": \"bundler\"`. `pnpm --dir src/benchmark-backend build` exited 0 with no output — no TypeScript diagnostics, no TS5095 in stdout or stderr."
+    },
+    {
+      "id": "5",
+      "description": "src/server.ts uses `Number(process.env.PORT) || 3001` so port falls back to 3001 when PORT is unset",
+      "passed": true,
+      "evidence": "src/server.ts line 3: `const PORT = Number(process.env.PORT) || 3001;`. Node.js evaluation without PORT set (`node -e \"const PORT = Number(process.env.PORT) || 3001; console.log('Port:', PORT);\"`) printed `Port: 3001`. Built dist/server.js contains identical expression."
+    }
+  ]
+}
