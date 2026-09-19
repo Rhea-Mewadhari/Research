@@ -1,0 +1,52 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express 5 + TypeScript 6 with ES module imports only (verbatimModuleSyntax: true) — no require() allowed",
+      "noUnusedLocals: true — removing exec() call requires also removing the 'child_process' import or TypeScript compilation fails",
+      "Vitest 4 for tests (run via pnpm --filter benchmark-backend test), supertest for HTTP integration tests",
+      "Controllers use async (req: Request, res: Response): Promise<void>; middleware uses (req: Request, res: Response, next: NextFunction): void",
+      "Error response convention: res.status(N).json({ error: '...' }) then return — no next(err)"
+    ],
+    "features": [
+      "requireAuth: currently passes raw Authorization header value directly to isValidToken — no Bearer prefix extraction or enforcement",
+      "isValidToken: uses eval() to execute a dynamically constructed string with the token interpolated — crashes on special chars like '\"' or ')', enables code injection",
+      "productController.getProducts: fires exec('echo ... + search + ...') as fire-and-forget shell command for logging — actual search logic is in productService.ts and is unaffected by removing exec",
+      "18 tests in products.test.ts (GET /products x11, Pagination x3, Auth middleware x4, /health x1) — all must pass; default auth token is 'Bearer benchmark-token-2024' (digits 2+0+2+4=8, even)",
+      "requireAuth is applied per-route: app.use('/products', requireAuth, productRoutes) — /health is unprotected"
+    ],
+    "architecture": [
+      "Two files require changes: src/middleware/auth.ts (Bearer enforcement + eval replacement + length cap) and src/controllers/productController.ts (remove exec + import)",
+      "auth.ts exports requireAuth (middleware) and isValidToken (helper) — both must be modified together so Bearer stripping happens before isValidToken receives the token",
+      "productController.ts exports getProducts — remove import { exec } from 'child_process' and the exec() call; search still works via parseProductQuery + productService.getAllProducts",
+      "No route files, service files, or test files require changes"
+    ],
+    "edgeCases": [
+      "Bearer prefix: split Authorization header on first space, check [0] === 'Bearer', extract [1] as token; reject missing header, empty header, wrong prefix (e.g. 'Token ...'), 'Bearer' with no trailing token",
+      "Length cap must be the FIRST guard in isValidToken, applied to the extracted token (not the full header) — a 201-char token must be rejected before digit-sum runs",
+      "Exactly 200 chars: must pass if digit-sum is even; only 201+ chars are rejected — boundary is exclusive at 200",
+      "Token with no digits (e.g. 'abc'): digit-sum is 0 (even) — must pass; pure char-iteration rewrite reproduces this correctly",
+      "Special chars in token (double-quote, parens, semicolons): structurally safe after eval removal — they are ignored by isNaN(parseInt(ch, 10)) and return 401 if digit-sum is odd",
+      "Removing exec() does not affect search results — exec was a fire-and-forget log write; the search filtering path (parseProductQuery → getAllProducts) is entirely independent"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: requireAuth must enforce the Bearer prefix — only Authorization headers of the form 'Bearer <token>' are accepted; any other format returns HTTP 401 with { \"error\": \"Unauthorized\" }",
+      "description": "In requireAuth, parse req.headers.authorization by splitting on the first space, verify the first part is exactly 'Bearer', and extract the second part as the token. If the header is missing, the prefix is wrong, or there is no token part, return res.status(401).json({ error: 'Unauthorized' }) and return. Pass only the extracted token string to isValidToken.",
+      "files": ["src/benchmark-backend/src/middleware/auth.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 2, 3, 4: isValidToken must not use eval(); must use pure string/array operations; tokens longer than 200 characters must be rejected before digit-sum validation",
+      "description": "Rewrite isValidToken to: (1) as the first guard, return false if token.length > 200; (2) iterate the token characters using spread or a loop, accumulate the sum of digit characters using parseInt(ch, 10) / isNaN, and return digitSum % 2 === 0. Remove all eval() usage. This makes the function immune to special characters and satisfies the length cap ordering requirement.",
+      "files": ["src/benchmark-backend/src/middleware/auth.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5: productController.ts must not import or invoke child_process in any form; the exec call piping req.query.search into a shell command must be removed entirely along with the import statement",
+      "description": "In productController.ts, remove the line 'import { exec } from \"child_process\"' and remove the exec() call that logs the search query. The search functionality itself (parseProductQuery + getAllProducts) is unaffected and must be left intact. No replacement logging is needed — removing the exec call entirely satisfies the requirement and avoids the noUnusedLocals TypeScript error from a leftover import.",
+      "files": ["src/benchmark-backend/src/controllers/productController.ts"]
+    }
+  ]
+}

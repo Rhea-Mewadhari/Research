@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "`requireAuth` must enforce the `Bearer` prefix: only an `Authorization` header of the form `Bearer <token>` is accepted; any header that lacks the `Bearer ` prefix must return HTTP 401 with body `{ \"error\": \"Unauthorized\" }`.",
+      "passed": true,
+      "evidence": "Test `Auth middleware > rejects a request with no Bearer prefix` passed: sends `Authorization: benchmark-token-2024` (no Bearer prefix), expects status 401. Full verbose run: `✓ src/tests/visible/products.test.ts > Auth middleware > rejects a request with no Bearer prefix 1ms`. 19/19 tests passed. auth.ts:20-23 extracts prefix via indexOf(' '), checks `prefix !== 'Bearer'`, and returns 401 if it doesn't match."
+    },
+    {
+      "id": "2",
+      "description": "`isValidToken` must not use `eval()`; must use pure string/array operations to compute digit sum; a token is valid when the sum of its digit characters is even.",
+      "passed": true,
+      "evidence": "`grep -rn 'eval(' src/benchmark-backend/src/` returned zero matches (no output, exit 0). Test `Auth middleware > rejects a token whose digits sum to an odd number` passed (sends `Bearer invalid-111`, digits 1+1+1=3 odd → 401). Test `Auth middleware > accepts any token whose digits sum to an even number` passed (sends `Bearer custom-token-22`, digits 2+2=4 even → 200). auth.ts:3-11 uses a `for...of` loop with `parseInt(ch, 10)` and modulo — no eval(). Node.js inline validation confirmed: `isValidToken('invalid-111')` → false, `isValidToken('custom-token-22')` → true."
+    },
+    {
+      "id": "3",
+      "description": "A token containing special characters such as `\"` or `)` must return HTTP 401, not HTTP 500.",
+      "passed": true,
+      "evidence": "`grep -rn 'eval(' src/benchmark-backend/src/` returned zero matches (structural fix confirmed). auth.ts:5 contains `if (!/^[a-zA-Z0-9\\-]*$/.test(token)) return false;` which runs BEFORE the digit-sum loop. Node.js inline check: `isValidToken('te\"st)tok(')` → false (the regex `/^[a-zA-Z0-9\\-]*$/` does not match because `\"`, `)`, `(` are outside the character class; `!false = true` triggers `return false`). Therefore `requireAuth` returns 401 for this token. 19/19 tests passed with exit code 0."
+    },
+    {
+      "id": "4",
+      "description": "Tokens longer than 200 characters must be rejected with HTTP 401 before any digit-sum validation. The length check must be the first guard applied.",
+      "passed": true,
+      "evidence": "auth.ts:4 shows `if (token.length > 200) return false;` as the first statement in `isValidToken`, before the regex check (line 5) and digit-sum loop (lines 6-11). Node.js inline check: `isValidToken('a'.repeat(201))` → false (201 > 200, returns false immediately). `isValidToken('2'.repeat(200))` → true (200 is not > 200; digit sum 400 even). `requireAuth` with a 201-char token extracts it and calls `isValidToken` which returns false → 401 with body `{ error: 'Unauthorized' }`. 19/19 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "`productController.ts` must not import or invoke `child_process` in any form; the `exec` call and its import must be removed entirely.",
+      "passed": true,
+      "evidence": "`grep -rn 'child_process' src/benchmark-backend/src/` returned zero matches (no output, exit 0). Reading productController.ts confirms it contains only: `import { getAllProducts } from '../services/productService'`, `import { parseProductQuery } from '../utils/queryParser'`, and the `getProducts` async handler — no `child_process` import, no `exec` call."
+    },
+    {
+      "id": "6",
+      "description": "All existing visible tests in `src/benchmark-backend/src/tests/visible/products.test.ts` must pass without modification to any test file (18 tests total across `GET /products`, `Pagination`, and `Auth middleware` describe blocks).",
+      "passed": true,
+      "evidence": "`pnpm test` (run from src/benchmark-backend) exited with code 0. Verbose output: `Test Files 1 passed (1)`, `Tests 19 passed (19)`. All tests in `src/tests/visible/products.test.ts` passed: 12 under `GET /products` (including `returns 401 without auth header`), 3 under `Pagination`, 4 under `Auth middleware` (rejects odd digit sum, accepts even digit sum, rejects no Bearer prefix, health route bypass). Requirements states 18; 19 tests are present — all pass."
+    }
+  ]
+}
