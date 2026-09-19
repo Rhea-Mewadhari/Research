@@ -1,0 +1,78 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript (v6.0.2) with ESM modules ('type': 'module'), run via tsx",
+      "Express v5 HTTP framework",
+      "Vitest v4 + supertest v7 for integration tests; globals:true so no explicit imports needed",
+      "noUnusedLocals and noUnusedParameters are enabled — removing the child_process import is required to avoid TS compile errors",
+      "erasableSyntaxOnly:true — no enums or namespaces allowed",
+      "Hand-rolled auth middleware; no JWT or session libraries",
+      "Test setup stubs global.fetch; tests mock '../../services/dataFetcher' — that import path must not change"
+    ],
+    "features": [
+      "auth.ts: reads raw Authorization header with no Bearer prefix stripping — full header value (e.g. 'Bearer abc') is passed as the token into isValidToken",
+      "auth.ts isValidToken: uses eval() to compute digit-sum parity — any special char in the token can break out of the template literal and inject code",
+      "productController.ts: imports exec from child_process; calls exec() with unsanitized req.query.search concatenated into a shell string (fire-and-forget, no callback)",
+      "productController.ts: also calls parseProductQuery(req.query) and getAllProducts(query) — these must remain untouched",
+      "Routes: GET /health (no auth), GET /products (requireAuth middleware then productRoutes router)",
+      "19 visible tests: products list/filter/sort/search, pagination envelope, auth middleware (odd-sum reject, even-sum accept, no-Bearer-prefix reject, health no-auth)"
+    ],
+    "architecture": [
+      "Layer flow: HTTP request → app.ts middleware stack → requireAuth (auth.ts) → productRoutes → getProducts (productController.ts) → productService → dataFetcher",
+      "auth.ts line 3-6: isValidToken function using eval()",
+      "auth.ts line 9-10: const token = authHeader ?? null — full raw header used, no Bearer prefix logic",
+      "auth.ts line 11: if (!token || !isValidToken(token)) check — length guard must be inserted between line 10 and this check, operating on the extracted token (not the full header value)",
+      "productController.ts line 2: import { exec } from 'child_process'",
+      "productController.ts line 7: const search = (req.query.search as string) ?? ''",
+      "productController.ts line 9: exec('echo ...' + search + '...') — the injection sink; removing this line does not affect the response path",
+      "New Bearer extraction logic must use 'Bearer '.length slice (not split) to handle multiple spaces correctly"
+    ],
+    "edgeCases": [
+      "Missing/empty Authorization header: token is null/undefined → 401 (already handled, must remain)",
+      "'Bearer' with no trailing space: split gives undefined for part[1] — must treat extracted token as empty/missing → 401",
+      "'Bearer ' with empty token: extracted token is empty string (falsy) → must 401; empty string digit-sum is 0 (even) so an explicit falsy check is needed before isValidToken",
+      "Case sensitivity: tests send exactly 'Bearer ' — enforce strict case to match test expectations",
+      "Token with no digits (e.g. 'abc'): digit-sum = 0 (even) → must accept; reimplementation must handle null return from String.match() via '|| []' fallback or equivalent",
+      "Token with special chars (\", ), `, $): eval() crashes or injects; reimplemented pure string version is immune — no regex built from user input",
+      "Token exactly 200 chars: guard is '> 200' not '>= 200', so 200-char tokens proceed to digit-sum check",
+      "Token exactly 201 chars: must be rejected → 401 before digit-sum runs",
+      "Length guard must run on extracted token (after stripping 'Bearer '), not on the full Authorization header value",
+      "Removing exec() is safe — it is fire-and-forget with no effect on res.json(result); search variable must be retained for parseProductQuery",
+      "noUnusedLocals: child_process import must be removed alongside the exec() call or TypeScript will error"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1 — Authorization header missing or not starting with exactly 'Bearer ' must return 401",
+      "description": "In auth.ts, replace 'const token = authHeader ?? null' with logic that checks for the exact 'Bearer ' prefix (7 chars): if authHeader is absent or does not start with 'Bearer ', respond 401 immediately; otherwise extract the token via authHeader.slice(7). This fixes the auth bypass where any non-Bearer header value was treated as a token.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 4 and 6 — token with special characters must return 401 not 500; isValidToken must use only pure string/array operations with no eval()",
+      "description": "Replace the eval()-based isValidToken implementation in auth.ts with a pure string/array implementation that extracts digit characters and sums them. Use token.split('').filter(c => c >= '0' && c <= '9').reduce((s, c) => s + Number(c), 0) % 2 === 0 (or equivalent). The digit-sum parity logic (even = valid, odd = invalid) must be preserved exactly. The eval() call and its surrounding template literal must be completely removed.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5 — token longer than 200 characters must be rejected with 401 before digit-sum validation",
+      "description": "In auth.ts, after extracting the token (post-task-1) and before calling isValidToken, add a guard: if (token.length > 200) { res.status(401).json({ error: 'Unauthorized' }); return; }. The guard must operate on the extracted token string, not the full Authorization header value.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 7 — productController.ts must not import or call child_process.exec() or any child_process function",
+      "description": "In productController.ts, remove the 'import { exec } from child_process' statement (line 2) and remove the exec() call that concatenates req.query.search into a shell command (line 9). The search variable and the rest of the controller (parseProductQuery, getAllProducts, res.json) must remain unchanged.",
+      "files": [
+        "src/benchmark-backend/src/controllers/productController.ts"
+      ]
+    }
+  ]
+}
