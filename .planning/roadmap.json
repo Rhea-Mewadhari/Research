@@ -1,0 +1,78 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript 6.0.2, Node.js ESM modules, Express 5.2.1",
+      "Strict TypeScript: noUnusedLocals + noUnusedParameters — unused imports cause build failure",
+      "Vitest 4.1.5 with supertest for HTTP integration tests; run via `pnpm --filter benchmark-backend test`",
+      "Middleware composed via app.use() — order-dependent; requireAuth applied before productRoutes at app.ts:15",
+      "Auth middleware signature: (req: Request, res: Response, next: NextFunction) => void; must call next() to pass control",
+      "No eval() equivalent is safe — replace with Array methods (split/filter/reduce)"
+    ],
+    "features": [
+      "requireAuth in auth.ts: currently takes raw authHeader without Bearer prefix extraction, passes full header to isValidToken",
+      "isValidToken in auth.ts: uses eval() with token embedded in template literal — injectable via `\"` or `)` characters",
+      "No token length cap exists — any length token passes to eval()",
+      "getProducts in productController.ts: imports exec from child_process (line 2), calls exec() at line 9 to log search to /tmp/product-searches.log with unsanitized req.query.search",
+      "Actual product filtering/sorting/pagination in productService.ts is safe and must not regress",
+      "18 visible tests cover: auth (401 without header, 401 odd digit-sum, 200 even digit-sum, 401 no Bearer prefix), products (search, filter, sort, pagination)",
+      "Health endpoint /health is unprotected — must remain unprotected after changes"
+    ],
+    "architecture": [
+      "app.ts:15 applies requireAuth before productRoutes: app.use('/products', requireAuth, productRoutes)",
+      "auth.ts exports requireAuth — only imported by app.ts (low blast radius)",
+      "productController.ts exports getProducts — only imported by productRoutes.ts (low blast radius)",
+      "child_process.exec import is at productController.ts:2; exec() call is at productController.ts:9",
+      "eval() is inside isValidToken() in auth.ts — the entire function body must be replaced",
+      "queryParser.ts handles search/filter/sort query parsing safely — no changes needed there",
+      "productService.ts handles filtering logic safely — no changes needed there",
+      "No new files required: fixes are surgical edits to the two identified files only"
+    ],
+    "edgeCases": [
+      "Missing Authorization header: token=null → isValidToken(null) returns false → 401; already works, must stay working",
+      "'Bearer' with no trailing space/token: does not start with 'Bearer ' → 401 (requirement 1)",
+      "'Bearer ' with no token (empty string after split): empty string → length 0 → passes length check → digit sum 0 (even) → 200; acceptable per requirements",
+      "Token exactly 200 chars: length <= 200 → not rejected by length check → proceeds to digit-sum (requirement 2 says only > 200 is rejected)",
+      "Token 201+ chars: length > 200 → 401 before digit-sum runs (requirement 2)",
+      "Token with no digits (e.g. 'Bearer abc'): digit sum = 0 (even) → 200; correct per requirement 4",
+      "Token containing '\"' or ')': with eval removed these are inert strings; digit-sum check runs safely → returns 401 if sum is odd (requirement 5)",
+      "Check order must be: (1) Bearer prefix check → (2) length check → (3) digit-sum check",
+      "search=undefined in controller: coerced to empty string before exec() is called; after removing exec() this path is safe",
+      "search containing shell metacharacters (';', '$(...)', backticks): with exec() removed, no shell execution path exists (requirements 6, 7)",
+      "TypeScript strict noUnusedLocals: child_process import MUST be deleted along with exec() call or build fails"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: A request whose Authorization header does not begin with 'Bearer ' returns HTTP 401 with JSON body {\"error\": \"Unauthorized\"}",
+      "description": "In requireAuth (auth.ts), add a check that the Authorization header starts with the literal string 'Bearer ' (word + exactly one space). If it does not, return res.status(401).json({ error: 'Unauthorized' }) immediately. Extract the token as the substring after 'Bearer ' for use in subsequent checks.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2: A request whose token (portion after 'Bearer ') is longer than 200 characters returns HTTP 401 before any digit-sum validation runs",
+      "description": "In requireAuth (auth.ts), after extracting the token in task-1, add a length check: if token.length > 200, return res.status(401).json({ error: 'Unauthorized' }) immediately. This check must run before isValidToken is called.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 3, 4, 5: auth.ts contains no eval(); isValidToken implements digit-sum check using pure string/array operations; token containing '\"' or ')' returns 401, not 500",
+      "description": "Rewrite isValidToken in auth.ts to use pure string/array operations: split token into characters (or use a regex match), filter to digit characters, map to parseInt, reduce to sum, return sum % 2 === 0. Remove the eval() call entirely. The function signature and return type (boolean) stay the same.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirements 6, 7: productController.ts does not import child_process and contains no exec() call; child_process is not imported anywhere in the backend codebase",
+      "description": "In productController.ts, delete the import statement for child_process (line 2: `import { exec } from 'child_process'`) and delete the exec() call used for audit logging (line 9). Do not replace with any other logging mechanism — the requirements call for removal only. TypeScript strict mode requires the import be deleted (not just commented out) to avoid noUnusedLocals errors.",
+      "files": [
+        "src/benchmark-backend/src/controllers/productController.ts"
+      ]
+    }
+  ]
+}
