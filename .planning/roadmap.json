@@ -1,0 +1,62 @@
+{
+  "investigations": {
+    "techStack": [
+      "Vitest ^4.1.5 is the test runner; run via `vitest run` (pnpm test)",
+      "TypeScript ~6.0.2; build via `tsc -p tsconfig.build.json` (plain tsc, no bundler)",
+      "vitest.config.ts current state: globals:false, setupFiles:['./src/tests/setup.ts'], include:'src/**/*.spec.ts'",
+      "tsconfig.json current state: moduleResolution:'node', allowImportingTsExtensions:true (invalid pairing → TS5095), noEmit:true",
+      "tsconfig.build.json extends base; overrides allowImportingTsExtensions:false, noEmit:false, outDir:dist, rootDir:src — does NOT set moduleResolution (inherits from base)",
+      "tsconfig.json declares types:['vitest/globals'] — pairs correctly with globals:true in vitest config once fixed",
+      "Vite is a dev dependency but unused in any script; all build is plain tsc"
+    ],
+    "features": [
+      "src/server.ts line 3: `const PORT = Number(process.env.PORT);` — no numeric fallback; yields NaN when PORT is unset",
+      "tests/setup.ts EXISTS at package root — stubs global.fetch in beforeEach using local products data; restores in afterEach via vi.unstubAllGlobals()",
+      "src/tests/setup.ts does NOT exist — the path currently in vitest.config.ts setupFiles points to a non-existent file",
+      "Only one test file: src/tests/visible/products.test.ts",
+      "products.test.ts uses describe, it, expect, beforeAll as globals (no imports) — requires globals:true in vitest config to avoid ReferenceError",
+      "products.test.ts tests: GET /products filtering/sorting/pagination, pagination envelope shape, auth middleware (digit-sum rule)"
+    ],
+    "architecture": [
+      "Package root: vitest.config.ts, tsconfig.json, tsconfig.build.json, package.json",
+      "tests/ at package root contains tests/setup.ts (the correct setup file location)",
+      "src/tests/visible/products.test.ts is the only test file; src/tests/ directory exists but src/tests/setup.ts does not",
+      "tsconfig.build.json extends ./tsconfig.json; all three config fixes are isolated to their respective files",
+      "No new files need to be created; all changes are edits to existing files"
+    ],
+    "edgeCases": [
+      "Glob fix: src/**/*.test.ts correctly discovers src/tests/visible/products.test.ts; *.spec.ts pattern misses it entirely",
+      "PORT='0': Number('0') || 3001 → 3001 (port 0 is not meaningful; fallback is acceptable per requirements)",
+      "PORT='4000': Number('4000') || 3001 → 4000 (valid port conversion still works)",
+      "tsconfig.build.json after base fix: moduleResolution:'bundler' is compatible with its overrides (allowImportingTsExtensions:false + noEmit:false); no conflicts",
+      "module:'esnext' and verbatimModuleSyntax:true in tsconfig.json are both compatible with moduleResolution:'bundler'",
+      "globals:true + types:['vitest/globals'] in tsconfig.json is the correct complementary pair; no conflicts in vitest config"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3 — fix vitest.config.ts include glob, globals, and setupFiles",
+      "description": "In vitest.config.ts: change include from ['src/**/*.spec.ts'] to ['src/**/*.test.ts']; change globals from false to true; change setupFiles from ['./src/tests/setup.ts'] to ['./tests/setup.ts']",
+      "files": [
+        "src/benchmark-backend/vitest.config.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 4 — fix invalid moduleResolution + allowImportingTsExtensions pairing in tsconfig.json",
+      "description": "In tsconfig.json: change moduleResolution from 'node' to 'bundler'. No changes needed to tsconfig.build.json — it does not set moduleResolution and its overrides (allowImportingTsExtensions:false, noEmit:false) remain valid under 'bundler'",
+      "files": [
+        "src/benchmark-backend/tsconfig.json"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5 — provide numeric fallback of 3001 when PORT env var is absent",
+      "description": "In src/server.ts: change `const PORT = Number(process.env.PORT);` to `const PORT = Number(process.env.PORT) || 3001;`",
+      "files": [
+        "src/benchmark-backend/src/server.ts"
+      ]
+    }
+  ]
+}

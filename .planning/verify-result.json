@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "vitest.config.ts include glob must match *.test.ts files under src/tests/visible/",
+      "passed": true,
+      "evidence": "pnpm test --reporter=verbose lists '✓ src/tests/visible/products.test.ts' with 19 passing tests. vitest.config.ts include is ['src/**/*.test.ts'] which matches src/tests/visible/products.test.ts."
+    },
+    {
+      "id": "2",
+      "description": "vitest.config.ts globals must be true so describe, it, expect, beforeAll, afterEach etc. are injected without per-file imports",
+      "passed": true,
+      "evidence": "pnpm test ran 19 tests across 1 file with no ReferenceError or global-not-found errors. vitest.config.ts has globals: true."
+    },
+    {
+      "id": "3",
+      "description": "vitest.config.ts setupFiles path must be './tests/setup.ts' (not './src/tests/setup.ts')",
+      "passed": true,
+      "evidence": "pnpm test produced no 'Cannot find module' or 'ENOENT' error. vitest.config.ts has setupFiles: ['./tests/setup.ts'] and the file exists at tests/setup.ts. All 19 tests passed including auth middleware tests that require the fetch stub from setup."
+    },
+    {
+      "id": "4",
+      "description": "tsconfig.json must use moduleResolution: bundler (not node) to be compatible with allowImportingTsExtensions: true",
+      "passed": true,
+      "evidence": "pnpm build (tsc -p tsconfig.build.json) exited 0 with no output — no TS5095 or any other TypeScript error. tsconfig.json has \"moduleResolution\": \"bundler\"."
+    },
+    {
+      "id": "5",
+      "description": "src/server.ts must provide a numeric fallback of 3001 when process.env.PORT is absent",
+      "passed": true,
+      "evidence": "Running 'node_modules/.bin/tsx src/server.ts' with no PORT env var printed 'Server running on port 3001' to stdout. src/server.ts line 3: const PORT = Number(process.env.PORT) || 3001;"
+    }
+  ]
+}
