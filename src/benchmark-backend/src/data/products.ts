@@ -11,6 +11,7 @@ export const products: Product[] = [
     reviewCount: 234,
     description: '14-inch laptop with Intel Core i7, 16 GB RAM, and 512 GB NVMe SSD.',
     tags: ['portable', 'work', 'performance'],
+    featured: true,
   },
   {
     id: 2,
@@ -88,6 +89,7 @@ export const products: Product[] = [
     reviewCount: 98,
     description: 'Task chair with adjustable lumbar support, armrests, and seat height. 8-year warranty.',
     tags: ['ergonomic', 'lumbar', 'adjustable'],
+    featured: true,
   },
   {
     id: 9,
@@ -121,6 +123,7 @@ export const products: Product[] = [
     reviewCount: 341,
     description: '5 mm natural rubber mat with alignment guides and a moisture-wicking surface.',
     tags: ['yoga', 'non-slip', 'eco'],
+    featured: true,
   },
   {
     id: 12,
@@ -157,6 +160,7 @@ export const products: Product[] = [
     description: 'A handbook of agile software craftsmanship. Essential reading for working developers.',
     tags: ['programming', 'best-practices', 'refactoring'],
     discountPct: 15,
+    featured: true,
   },
   {
     id: 15,
