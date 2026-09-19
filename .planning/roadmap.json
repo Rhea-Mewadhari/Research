@@ -1,0 +1,71 @@
+{
+  "investigations": {
+    "techStack": [
+      "ESM package ('type': 'module'); TypeScript ~6.0.2; Express v5; Vitest ^4.1.5; build via tsc -p tsconfig.build.json",
+      "tsconfig.json: target es2023, module esnext, moduleResolution node, noEmit true, allowImportingTsExtensions true, verbatimModuleSyntax true, erasableSyntaxOnly true, types: ['vitest/globals']",
+      "tsconfig.build.json extends base and overrides: allowImportingTsExtensions false, noEmit false, outDir dist, rootDir src — correct as-is",
+      "vitest.config.ts (broken): globals false, include ['src/**/*.spec.ts'], setupFiles './src/tests/setup.ts'",
+      "No .ts-extension imports anywhere in src/ — removing allowImportingTsExtensions from base tsconfig is safe",
+      "tsconfig.build.json's explicit 'allowImportingTsExtensions: false' override becomes a harmless no-op after removal from base"
+    ],
+    "features": [
+      "GET /health — no auth, returns { status: 'ok' }",
+      "GET /products — requireAuth middleware; filtering (search, category, inStock), sorting (price_asc/desc, name_asc/desc), pagination (page/limit clamped to 50)",
+      "Auth middleware: digit-sum parity on Bearer token; even = accept, odd = reject",
+      "tests/setup.ts: stubs global fetch with local products data in beforeEach; tears down in afterEach via vi.unstubAllGlobals()",
+      "src/tests/visible/products.test.ts: uses describe/it/expect/beforeAll without per-file imports (requires globals:true at runtime); mocks dataFetcher module via vi.mock",
+      "Must not regress: auth logic, filtering, sorting, pagination, /health bypass, static product data (15 products), dataFetcher named export"
+    ],
+    "architecture": [
+      "src/ — application source (app.ts, server.ts, controllers/, routes/, middleware/, services/, data/, types/, utils/)",
+      "src/tests/visible/ — visible test file: products.test.ts (must be discovered by Vitest)",
+      "src/tests/hidden/ — exists but empty; hidden tests injected at evaluation time",
+      "tests/ — root-level; contains setup.ts (correct setup file, currently misreferenced in vitest config)",
+      "dist/ — compiled JS output from tsconfig.build.json; must not be modified",
+      "Files to modify: vitest.config.ts, tsconfig.json, src/server.ts",
+      "Files to leave untouched: tsconfig.build.json, src/tests/visible/products.test.ts, tests/setup.ts, dist/"
+    ],
+    "edgeCases": [
+      "PORT unset: Number(undefined) = NaN; app.listen(NaN) silently binds to random port and logs 'Server running on port NaN' — fixed by || 3001 fallback",
+      "PORT='': Number('') = 0; falls through to 3001 with || 3001 — acceptable behaviour",
+      "PORT=0: also falls through to 3001 — acceptable; requirements specify 3001 as the fallback value",
+      "Removing allowImportingTsExtensions from tsconfig.json does not change tsconfig.build.json effective value (it already explicitly overrides to false)",
+      "Changing moduleResolution (alternative fix) would be inherited by tsconfig.build.json and could break production build resolution — do NOT change moduleResolution, only remove allowImportingTsExtensions",
+      "globals:true is strictly required at runtime; 'types: [vitest/globals]' in tsconfig only adds TypeScript declarations, not runtime injection",
+      "setupFiles path fix is critical for hidden tests that exercise dataFetcher.ts directly (they rely on the fetch stub installed by tests/setup.ts)",
+      "include pattern src/**/*.spec.ts matches zero files currently; src/**/*.test.ts correctly matches src/tests/visible/products.test.ts and any hidden .test.ts files injected under src/"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: vitest.config.ts must set globals: true",
+      "description": "In vitest.config.ts, change globals from false to true so Vitest injects describe, it, expect, beforeAll, and other globals at runtime without per-file imports",
+      "files": ["src/benchmark-backend/vitest.config.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2: vitest.config.ts must set include to a pattern that matches src/tests/visible/products.test.ts",
+      "description": "In vitest.config.ts, change include from ['src/**/*.spec.ts'] to ['src/**/*.test.ts'] so Vitest discovers products.test.ts (and any hidden .test.ts files injected under src/)",
+      "files": ["src/benchmark-backend/vitest.config.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 3: vitest.config.ts must set setupFiles to ['./tests/setup.ts']",
+      "description": "In vitest.config.ts, change setupFiles from './src/tests/setup.ts' (non-existent path) to './tests/setup.ts' (the actual location of the setup file at the project root)",
+      "files": ["src/benchmark-backend/vitest.config.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 4: tsconfig.json must not contain an option combination that causes TS5095 during pnpm build",
+      "description": "In tsconfig.json, remove the 'allowImportingTsExtensions': true entry. This option is incompatible with moduleResolution 'node' and causes TS5095/TS5096. No source files use .ts-extension imports so removal is safe. tsconfig.build.json already overrides this to false, so its behaviour is unchanged.",
+      "files": ["src/benchmark-backend/tsconfig.json"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirement 5: src/server.ts must fall back to port 3001 when process.env.PORT is absent or empty",
+      "description": "In src/server.ts, change 'const PORT = Number(process.env.PORT)' to 'const PORT = Number(process.env.PORT) || 3001' so the server does not bind to NaN when PORT is unset",
+      "files": ["src/benchmark-backend/src/server.ts"]
+    }
+  ]
+}

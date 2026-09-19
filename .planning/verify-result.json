@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "vitest.config.ts must set globals: true so that describe, it, expect, beforeAll, afterEach, and other Vitest globals are injected without per-file imports.",
+      "passed": true,
+      "evidence": "vitest.config.ts line 5 reads `globals: true`. pnpm test ran all 19 tests in src/tests/visible/products.test.ts with 0 failures and no ReferenceError for any Vitest global (verbose output shows each test passing individually)."
+    },
+    {
+      "id": "2",
+      "description": "vitest.config.ts must set include to a pattern that matches src/tests/visible/products.test.ts.",
+      "passed": true,
+      "evidence": "vitest.config.ts line 7 reads `include: ['src/**/*.test.ts']`. pnpm test --reporter=verbose explicitly names `src/tests/visible/products.test.ts` as the collected suite (1 test file passed, 19 tests passed). 'No test files found' was not printed."
+    },
+    {
+      "id": "3",
+      "description": "vitest.config.ts must set setupFiles to ['./tests/setup.ts']. The previous value './src/tests/setup.ts' referenced a path that does not exist.",
+      "passed": true,
+      "evidence": "vitest.config.ts line 6 reads `setupFiles: ['./tests/setup.ts']`. pnpm test emitted no error about a missing or unresolvable setup file, and all 19 tests passed (confirming the fetch stub installed by tests/setup.ts was active during the run)."
+    },
+    {
+      "id": "4",
+      "description": "tsconfig.json must not contain an option combination that causes TS5095 during pnpm build. Specifically, allowImportingTsExtensions combined with moduleResolution: 'node' must not be present.",
+      "passed": true,
+      "evidence": "tsconfig.json does not contain allowImportingTsExtensions at all (observed keys: target, module, lib, types, skipLibCheck, moduleResolution, ignoreDeprecations, verbatimModuleSyntax, moduleDetection, noEmit, plus linting options). pnpm build exited with code 0 via `tsc -p tsconfig.build.json`, emitting JS files under dist/ (app.js, server.js, controllers/, data/, middleware/, routes/, services/, tests/, types/, utils/). No TS5095 diagnostic was produced."
+    },
+    {
+      "id": "5",
+      "description": "src/server.ts must fall back to port 3001 when process.env.PORT is absent or empty, so that Number(process.env.PORT) does not resolve to NaN.",
+      "passed": true,
+      "evidence": "src/server.ts line 3 reads `const PORT = Number(process.env.PORT) || 3001;`. When PORT is unset, Number(undefined) is NaN (falsy), so PORT resolves to 3001 and the server logs 'Server running on port 3001'. The required `|| 3001` fallback is present."
+    }
+  ]
+}
