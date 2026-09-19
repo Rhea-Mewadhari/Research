@@ -1,0 +1,30 @@
+{
+  "taskId": "task5",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Mark 4 featured products in src/data/products.ts (ids 1, 8, 11, 14)",
+      "status": "done",
+      "notes": "Added featured: true to products with ids 1 (Laptop), 8 (Ergonomic Chair), 11 (Yoga Mat), and 14 (Clean Code)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Update src/utils/queryParser.ts: add rating_desc to VALID_SORT_OPTIONS and parse featured param",
+      "status": "done",
+      "notes": "Added 'rating_desc' to VALID_SORT_OPTIONS and added featured=true/false parsing (same pattern as inStock). Build passes. 4 tests still failing — all are phase-3 service logic."
+    },
+    {
+      "id": "phase-3",
+      "title": "Update src/services/productService.ts: apply featured filter and rating_desc sort",
+      "status": "done",
+      "notes": "Applied featured filter (p.featured ?? false) === query.featured and rating_desc sort by descending rating. All 23 tests pass."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run pnpm test and verify all suites pass",
+      "status": "done",
+      "notes": "All 23 tests pass and build succeeds (tsc -p tsconfig.build.json exits cleanly)."
+    }
+  ]
+}
