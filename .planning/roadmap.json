@@ -1,0 +1,73 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript 6.0.2 with ESM modules, Node.js runtime",
+      "Express 5.2.1 for HTTP routing",
+      "Vitest 4.1.5 + Supertest 7.2.2 for testing; run via `npm test` from src/benchmark-backend/",
+      "tsconfig enforces noUnusedLocals and noUnusedParameters — removing exec() without removing the import would be a compile error",
+      "No ESLint/Prettier; TypeScript compiler is the only linter"
+    ],
+    "features": [
+      "auth.ts: isValidToken() currently uses eval() on a template literal containing the token — BROKEN (code injection, crashes on special chars)",
+      "auth.ts: requireAuth() does NOT strip 'Bearer ' prefix; passes full Authorization header value directly to isValidToken() — BROKEN",
+      "productController.ts: imports exec from 'child_process' and calls exec() with unsanitized req.query.search in a shell command — BROKEN",
+      "productController.ts: all other logic (parseProductQuery, getAllProducts, JSON response) is correct and must be preserved",
+      "productService.ts: filtering, sorting, pagination are correct; must not regress",
+      "/health route has no auth requirement; /products route has requireAuth applied globally via app.ts",
+      "Visible tests cover: all-products, category filter, inStock filter, sort options, search filter, pagination, auth (401 without header, 401 without Bearer prefix, 401 for odd digit sum, 200 for even digit sum)"
+    ],
+    "architecture": [
+      "Request flow: HTTP → app.ts → requireAuth middleware → productRoutes.ts → productController.ts → productService.ts → dataFetcher.ts",
+      "auth.ts lives at src/middleware/auth.ts; wired in app.ts: app.use('/products', requireAuth, productRoutes)",
+      "productController.ts lives at src/controllers/productController.ts; only exports getProducts()",
+      "Only two files need changes: src/middleware/auth.ts and src/controllers/productController.ts",
+      "Shared types in src/types/product.ts are not affected",
+      "No route or service changes needed"
+    ],
+    "edgeCases": [
+      "Validation order in requireAuth must be: (1) Bearer prefix check → (2) token length > 200 check → (3) digit-sum check; any other order violates requirements",
+      "Token exactly 200 chars after stripping 'Bearer ': must be accepted (≤200 is allowed)",
+      "Token exactly 201 chars after stripping 'Bearer ': must return 401 (>200 is rejected)",
+      "Token containing '\"' or ')': must return 401, not 500 — eval removal eliminates the crash; digit-sum logic handles them as non-digit chars",
+      "Token with no digit characters (e.g. 'Bearer aaa-xxx'): digit sum = 0, 0 % 2 === 0 → must return 200 OK",
+      "Authorization header absent entirely: no 'Bearer ' prefix → must return 401",
+      "Authorization header present but no Bearer prefix (e.g. raw token): must return 401 before isValidToken is called",
+      "Removing exec() without removing the child_process import causes a TypeScript compile error due to noUnusedLocals — import must also be removed",
+      "Search query with shell metacharacters (e.g. '; rm -rf /'): safe only once exec() is fully removed — no sanitization approach is acceptable"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: requireAuth must enforce 'Bearer ' prefix; reject without it → 401",
+      "description": "In requireAuth() in src/middleware/auth.ts: after reading the Authorization header, check that it starts with 'Bearer ' (the 7-character string 'Bearer' + space). If the header is missing or does not start with 'Bearer ', return 401 with { error: 'Unauthorized' } immediately, before any token extraction or validation. Extract the token as authHeader.slice(7) only after the prefix check passes.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 4: reject tokens whose length (after stripping 'Bearer ') exceeds 200 characters → 401; check must occur before digit-sum validation",
+      "description": "In requireAuth() in src/middleware/auth.ts: after extracting the token (authHeader.slice(7)) and before calling isValidToken(), check if token.length > 200. If so, return 401 with { error: 'Unauthorized' }. This must be the second check — after the Bearer prefix check (task-1) and before the digit-sum check (task-3).",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 2 and 3: rewrite isValidToken without eval(); use pure string/array operations for digit-sum; special chars must not cause 500",
+      "description": "Rewrite isValidToken() in src/middleware/auth.ts to replace the eval()-based implementation with pure string operations: extract digit characters from the token string (filter chars where c >= '0' && c <= '9'), convert each to a number, sum them, and return true if and only if sum % 2 === 0. This eliminates all eval() usage and means tokens with special characters like '\"' or ')' are handled gracefully (non-digit chars are simply skipped), satisfying requirement 3.",
+      "files": [
+        "src/benchmark-backend/src/middleware/auth.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 5: child_process must not be imported anywhere in src/; exec() call piping req.query.search into a shell command must be removed",
+      "description": "In src/benchmark-backend/src/controllers/productController.ts: remove the 'import { exec } from child_process' line and remove the exec() call that logs search queries to /tmp/product-searches.log. The controller body should contain only: parseProductQuery(req.query), getAllProducts(query), and res.json(result). The child_process import must also be deleted (not just unused) to satisfy the TypeScript noUnusedLocals compiler rule.",
+      "files": [
+        "src/benchmark-backend/src/controllers/productController.ts"
+      ]
+    }
+  ]
+}
