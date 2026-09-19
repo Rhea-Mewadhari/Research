@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Exactly four products have `featured: true`: id 1 (Laptop), id 8 (Ergonomic Chair), id 11 (Yoga Mat), id 14 (Clean Code). All remaining 11 products omit `featured` or set it to `false`.",
+      "passed": true,
+      "evidence": "npx tsx confirmed: Featured products: [{id:1,name:'Laptop'},{id:8,name:'Ergonomic Chair'},{id:11,name:'Yoga Mat'},{id:14,name:'Clean Code'}], Total products: 15, Featured count: 4. `grep 'featured: true' products.ts` returns exactly 4 lines at lines 11, 89, 123, 159. Test 'Featured filter > returns only featured products when featured=true' passed; 'returns only non-featured products when featured=false' passed."
+    },
+    {
+      "id": "2",
+      "description": "In queryParser.ts, `featured=true` is parsed into `query.featured = true` (boolean), `featured=false` into `query.featured = false` (boolean). When absent, the field is not set.",
+      "passed": true,
+      "evidence": "Featured filter tests all pass: 'returns only featured products when featured=true' ✓, 'returns only non-featured products when featured=false' ✓. If the parser failed to convert the string to boolean, these tests would return all 15 products instead of 4 or 11."
+    },
+    {
+      "id": "3",
+      "description": "In queryParser.ts, `'rating_desc'` is accepted as a valid sort option (not silently dropped).",
+      "passed": true,
+      "evidence": "Test 'Rating sort > sorts by rating descending when sort=rating_desc' passed ✓. If the parser dropped the value, the sort order assertion would have failed."
+    },
+    {
+      "id": "4",
+      "description": "In productService.ts, when `query.featured` is defined, products are filtered using `(p.featured ?? false) === query.featured`.",
+      "passed": true,
+      "evidence": "Three featured filter tests all passed: 'returns only featured products when featured=true' ✓ (4 items), 'returns only non-featured products when featured=false' ✓ (11 items), 'featured=true combined with category filter returns intersection' ✓ (returns 1 item with id===1, intersection of featured and electronics)."
+    },
+    {
+      "id": "5",
+      "description": "In productService.ts, when `query.sort === 'rating_desc'`, products are sorted by `rating` field highest-first.",
+      "passed": true,
+      "evidence": "Test 'Rating sort > sorts by rating descending when sort=rating_desc' passed ✓ — verifies `ratings` array equals `[...ratings].sort((a, b) => b - a)`."
+    },
+    {
+      "id": "6",
+      "description": "`src/benchmark-backend/src/types/product.ts` is not modified.",
+      "passed": true,
+      "evidence": "`git diff HEAD -- src/benchmark-backend/src/types/product.ts` produced no output — the file is unchanged from HEAD."
+    },
+    {
+      "id": "7",
+      "description": "All pre-existing test suites (`GET /products`, `Pagination`, `Auth middleware`) continue to pass unchanged.",
+      "passed": true,
+      "evidence": "`pnpm test` exited 0 with 23 tests passed (1 test file). All suites passed: GET /products (11 tests) ✓, Pagination (3 tests) ✓, Auth middleware (4 tests) ✓, Featured filter (3 tests) ✓, Rating sort (1 test) ✓. No failures."
+    }
+  ]
+}
