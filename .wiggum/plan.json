@@ -1,0 +1,18 @@
+{
+  "taskId": "task8",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix debounce wiring in FilterContext.tsx: change delay from 0 to 300ms and add instant-clear bypass",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Run tests and verify build passes",
+      "status": "done",
+      "notes": "All 22 tests passed; production build succeeded (255.75 kB JS, 10.27 kB CSS)."
+    }
+  ]
+}

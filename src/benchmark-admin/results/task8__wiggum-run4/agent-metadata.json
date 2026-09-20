@@ -1,0 +1,54 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task8",
+  "wall_duration_ms": 192598,
+  "cost_usd": 0.8226075,
+  "num_turns": 37,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "fde2a7a1-b97b-4889-b43c-cd95829652c7",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix debounce wiring in FilterContext.tsx: change delay from 0 to 300ms and add instant-clear bypass",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-2",
+        "title": "Run tests and verify build passes",
+        "status": "done",
+        "notes": "All 22 tests passed; production build succeeded (255.75 kB JS, 10.27 kB CSS)."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 68963,
+        "cost_usd": 0.30106920000000004,
+        "num_turns": 15,
+        "session_id": "6484eb30-c83a-4abd-ae56-bf1492504c86",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 45574,
+        "cost_usd": 0.2592978,
+        "num_turns": 12,
+        "session_id": "fde2a7a1-b97b-4889-b43c-cd95829652c7",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 2,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}
