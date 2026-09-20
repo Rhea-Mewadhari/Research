@@ -53,9 +53,8 @@ export default function ProductListPage() {
       setSearch(next.search);
       setCategory(next.category);
       setInStockOnly(next.inStockOnly);
-      setSortBy(next.sortBy);
     },
-    [setSearch, setCategory, setInStockOnly, setSortBy],
+    [setSearch, setCategory, setInStockOnly],
   );
 
   const { filteredProducts, resultCount } = useFilteredProducts();
@@ -87,7 +86,10 @@ export default function ProductListPage() {
             Showing {resultCount} products (page {page} of {totalPages})
           </p>
           <ProductErrorBoundary>
-            <ProductList products={filteredProducts} onSelect={setDetailProductId} />
+            <ProductList
+              products={filteredProducts}
+              onSelect={setDetailProductId}
+            />
           </ProductErrorBoundary>
           <div className="pagination">
             <button type="button" onClick={() => setPage(page - 1)} disabled={page <= 1}>

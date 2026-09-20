@@ -1,0 +1,30 @@
+{
+  "taskId": "task7",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix SortSelect: wire it to FilterContext.sortBy / setSortBy, remove localSortBy state from ProductListPage",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix category click: have ProductCard call FilterContext.setCategory directly, removing onCategoryClick prop from ProductCard and ProductList",
+      "status": "done",
+      "notes": "Also removed the onCategoryClick={() => {}} from ProductListPage (phase-3 work) because leaving it caused a TypeScript build error — tsc -b rejects extra props not in the component's Props type."
+    },
+    {
+      "id": "phase-3",
+      "title": "Clean up ProductListPage: remove the no-op onCategoryClick prop passed to ProductList",
+      "status": "done",
+      "notes": "Completed as part of phase-2 to keep the TypeScript build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run the test suite and confirm all contextMigration tests and existing tests pass",
+      "status": "done",
+      "notes": "All 21 tests pass (7 test files, including all 4 contextMigration tests). TypeScript build and vite production build both succeed cleanly."
+    }
+  ]
+}
