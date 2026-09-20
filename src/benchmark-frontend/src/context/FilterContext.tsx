@@ -46,7 +46,9 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const [sortBy, setSortByState] = useState<SortOption>('default');
   const [savedFilters, setSavedFilters] = useState<SavedFilter[]>(loadSavedFilters);
 
-  const debouncedSearch = useDebounce(search, 300);
+  const _rawDebouncedSearch = useDebounce(search, 300);
+  // Bypass the debounce delay when the field is cleared so the list restores immediately.
+  const debouncedSearch = search === '' ? '' : _rawDebouncedSearch;
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedFilters));

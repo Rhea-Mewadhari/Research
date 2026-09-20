@@ -1,0 +1,54 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task8",
+  "wall_duration_ms": 199901,
+  "cost_usd": 0.921357,
+  "num_turns": 41,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "14a2c4a7-03c4-4b9e-a772-23e7184617e5",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix debounce delay: change useDebounce call in FilterContext from 0ms to 300ms, and add immediate-clear bypass",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-2",
+        "title": "Verify: run the test suite and confirm all tests pass including debounceSearch.test.tsx",
+        "status": "done",
+        "notes": "All 22 tests pass (7 test files), including all 5 debounceSearch.test.tsx tests. Build succeeds."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 71450,
+        "cost_usd": 0.3180456,
+        "num_turns": 13,
+        "session_id": "fbceecb2-881b-4bb7-8dce-bd845003e1c2",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 48575,
+        "cost_usd": 0.2625783,
+        "num_turns": 13,
+        "session_id": "14a2c4a7-03c4-4b9e-a772-23e7184617e5",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 2,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}

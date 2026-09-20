@@ -1,0 +1,17 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.debounce.search.test.tsx (5 tests) 14ms
+ ✓ tests/hidden.combined.behavior.test.tsx (2 tests) 481ms
+   ✓ Hidden: combined filter behavior > combines category + inStockOnly + search correctly  408ms
+ ✓ tests/hidden.filtering.edgecases.test.tsx (5 tests) 1460ms
+   ✓ Hidden: filtering edge cases > search is case-insensitive  388ms
+   ✓ Hidden: filtering edge cases > search trims leading and trailing whitespace  357ms
+   ✓ Hidden: filtering edge cases > search only matches product name, not category text  363ms
+   ✓ Hidden: filtering edge cases > shows empty state when no results match  333ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  17:09:07
+   Duration  2.14s (transform 79ms, setup 195ms, collect 532ms, tests 1.96s, environment 672ms, prepare 146ms)
+

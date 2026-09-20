@@ -1,0 +1,18 @@
+{
+  "taskId": "task8",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix debounce delay: change useDebounce call in FilterContext from 0ms to 300ms, and add immediate-clear bypass",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Verify: run the test suite and confirm all tests pass including debounceSearch.test.tsx",
+      "status": "done",
+      "notes": "All 22 tests pass (7 test files), including all 5 debounceSearch.test.tsx tests. Build succeeds."
+    }
+  ]
+}
