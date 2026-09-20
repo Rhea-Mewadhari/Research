@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "SortSelect must be wired to FilterContext.sortBy / FilterContext.setSortBy. After selecting any sort option, the visible product list re-orders immediately to reflect the chosen sort.",
+      "passed": true,
+      "evidence": "contextMigration.test.tsx: '✓ Context migration — SortSelect > selecting a sort option re-orders the product list' and '✓ Context migration — SortSelect > selecting price-desc puts the most expensive product first' both passed. sorting.test.tsx: '✓ sorts by price ascending', '✓ sorts by price descending', '✓ sorts by rating descending' all passed. 21/21 tests passed."
+    },
+    {
+      "id": "2",
+      "description": "The local sort state variable (localSortBy) must be removed from ProductListPage. No useState in ProductListPage holds a copy of the sort value that already lives in FilterContext.",
+      "passed": true,
+      "evidence": "grep -n 'localSortBy|useState' ProductListPage.tsx found only: line 1 (import statement) and line 28 'const [detailProductId, setDetailProductId] = useState<string | null>(null)' — no useState with a SortOption literal (e.g. 'default') and no 'localSortBy' identifier present. TypeScript build exited with code 0."
+    },
+    {
+      "id": "3",
+      "description": "Clicking a product's category button (aria-label 'Filter by [category]') must call FilterContext.setCategory with that product's category string, causing useFilteredProducts to re-filter the list immediately.",
+      "passed": true,
+      "evidence": "contextMigration.test.tsx: '✓ Context migration — category click > clicking a product category button filters the list to that category' and '✓ Context migration — category click > clicking a category button hides products from other categories' both passed. 21/21 tests passed."
+    },
+    {
+      "id": "4",
+      "description": "The category <select> control in FilterPanel must reflect the updated category value after a card category button is clicked (it reads from FilterContext.category which setCategory updates).",
+      "passed": true,
+      "evidence": "contextMigration.test.tsx category-click tests passed (see criterion 3 evidence). filtering.test.tsx: '✓ Filtering behavior > filters products by category' passed — no regression on the <select> path. 21/21 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "The onCategoryClick prop must be removed from ProductCard. ProductCard must call useFilterContext().setCategory directly; it must not accept or reference onCategoryClick in its Props type or JSX.",
+      "passed": true,
+      "evidence": "grep -n 'onCategoryClick' src/components/ProductCard.tsx produced no output — identifier is absent. TypeScript build exited with code 0."
+    },
+    {
+      "id": "6",
+      "description": "The onCategoryClick prop must be removed from ProductList. ProductList must not accept, drill, or reference onCategoryClick in its Props type or JSX.",
+      "passed": true,
+      "evidence": "grep -n 'onCategoryClick' src/components/ProductList.tsx produced no output — identifier is absent. TypeScript build exited with code 0."
+    },
+    {
+      "id": "7",
+      "description": "The no-op onCategoryClick callback and its prop pass must be removed from ProductListPage. ProductList is rendered without an onCategoryClick prop.",
+      "passed": true,
+      "evidence": "grep -n 'onCategoryClick' src/pages/ProductListPage.tsx produced no output — identifier is absent. TypeScript build exited with code 0."
+    },
+    {
+      "id": "8",
+      "description": "All previously-working features remain unbroken: search, in-stock toggle, clear filters, and pagination.",
+      "passed": true,
+      "evidence": "filtering.test.tsx: '✓ filters products by search term', '✓ filters products by category', '✓ filters products by in-stock only' all passed. clearFilters.test.tsx: '✓ resets filters back to default values' passed. pagination.test.tsx: all 4 tests passed ('results-count includes page info', 'Prev button is disabled on the first page', 'Next button is disabled when there is only one page', 'Next button is enabled when more pages exist', 'clicking Next fetches the next page'). loadingError.test.tsx: all 4 tests passed. app.render.test.tsx: '✓ renders the page heading and initial product count' passed. Total: 21/21 tests passed, 7/7 test files passed."
+    },
+    {
+      "id": "9",
+      "description": "The TypeScript build must succeed with no type errors.",
+      "passed": true,
+      "evidence": "pnpm build ran 'tsc -b && vite build', produced '✓ 65 modules transformed' and '✓ built in 604ms', exited with code 0. No TypeScript diagnostic output was emitted."
+    }
+  ]
+}

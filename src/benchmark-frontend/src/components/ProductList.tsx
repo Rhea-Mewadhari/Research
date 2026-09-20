@@ -15,7 +15,11 @@ export default function ProductList({ products, onSelect }: Props) {
     <section aria-label="Product results">
       <div className="grid">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} onSelect={onSelect} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            onSelect={onSelect}
+          />
         ))}
       </div>
     </section>
