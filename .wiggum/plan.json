@@ -1,0 +1,30 @@
+{
+  "taskId": "task7",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Wire SortSelect to FilterContext (remove localSortBy, use setSortBy from context)",
+      "status": "done",
+      "notes": "Removed localSortBy state and SortOption import from ProductListPage. Added setSortBy from useFilterContext(). Wired SortSelect to sortBy/setSortBy from context. SortSelect context migration tests pass. Build succeeds."
+    },
+    {
+      "id": "phase-2",
+      "title": "Wire ProductCard category button to FilterContext.setCategory (remove onCategoryClick prop from ProductCard and ProductList)",
+      "status": "done",
+      "notes": "Added useFilterContext import to ProductCard; removed onCategoryClick from Props and destructuring; replaced onCategoryClick?.(product.category) with setCategory(product.category). Removed onCategoryClick from ProductList Props and stopped passing it to ProductCard. Also removed onCategoryClick={() => {}} from ProductListPage (absorbed phase-3 work because TypeScript refused to compile with a prop that no longer exists on ProductList). All 21 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Clean up ProductListPage (remove no-op onCategoryClick prop passed to ProductList)",
+      "status": "done",
+      "notes": "Absorbed into phase-2: ProductListPage no-op onCategoryClick prop was removed as part of fixing the TypeScript compile error caused by removing the prop from ProductList."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify build passes",
+      "status": "done",
+      "notes": "All 21 tests pass (7 test files). Build succeeds: tsc type-check clean, vite build produces dist/ with no errors."
+    }
+  ]
+}

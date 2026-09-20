@@ -2,6 +2,7 @@ import type { Product } from '../types/product';
 import { formatPrice, formatRating, truncate } from '../utils/formatters';
 import FavouriteButton from './FavouriteButton';
 import { useComparisonContext } from '../context/ComparisonContext';
+import { useFilterContext } from '../context/FilterContext';
 
 type Props = {
   product: Product;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export default function ProductCard({ product, onSelect }: Props) {
+  const { setCategory } = useFilterContext();
   const { isCompared, addToComparison, removeFromComparison } = useComparisonContext();
   const productId = String(product.id);
   const hasDiscount = product.discountPct != null;
@@ -38,7 +40,17 @@ export default function ProductCard({ product, onSelect }: Props) {
           <FavouriteButton productId={productId} />
         </div>
 
-        <p className="card-category">{product.category}</p>
+        <button
+          type="button"
+          className="card-category category-filter-btn"
+          aria-label={`Filter by ${product.category}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setCategory(product.category);
+          }}
+        >
+          {product.category}
+        </button>
 
         <p className="card-description">{truncate(product.description)}</p>
 
