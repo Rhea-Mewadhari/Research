@@ -5,11 +5,20 @@ import { runGsd } from './gsd-driver.js';
 import { runWiggum } from './wiggum-driver.js';
 import { createSandbox, syncBack, destroySandbox, scopeVisibleTests } from './sandbox.js';
 
-// One fresh, context-free `claude` process. Every phase/iteration of both
-// frameworks goes through this — neither driver ever reuses a session, since
-// external context reset between steps is the entire point of both designs.
-// `workDir` is the sandbox directory, never the real repo — see sandbox.js.
-export function invokeClaude(prompt, { workDir, maxTurns = 50, label, resultDir }) {
+// Generous relative to every legitimate phase duration observed in practice
+// (even the heaviest — verify-work with 40 turns, plan-phase's 4-way
+// investigation fan-out — complete well under 15 minutes). This exists to
+// bound the *failure* case: a degraded/hung invocation was observed running
+// 20-40 minutes before the CLI gave up on its own (no timeout of its own to
+// tune — there is no --timeout flag), which made even one retry attempt a
+// potential half-hour-plus wait. Killing it here is what actually makes a
+// bad attempt fail fast instead of just eventually failing.
+const ATTEMPT_TIMEOUT_MS = 15 * 60 * 1000;
+
+// A single `claude` process, no retry. Broken out so invokeClaude can call
+// it more than once per logical invocation without duplicating the
+// capture/parse logic.
+function runOnce(prompt, { workDir, maxTurns, label, resultDir }) {
   const start = Date.now();
   const claudeResult = capture('claude', [
     '--print',
@@ -17,7 +26,7 @@ export function invokeClaude(prompt, { workDir, maxTurns = 50, label, resultDir 
     '--max-turns', String(maxTurns),
     '--dangerously-skip-permissions',
     '-p', prompt,
-  ], workDir);
+  ], workDir, { timeoutMs: ATTEMPT_TIMEOUT_MS });
   const wallDurationMs = Date.now() - start;
 
   if (resultDir && label) {
@@ -37,6 +46,12 @@ export function invokeClaude(prompt, { workDir, maxTurns = 50, label, resultDir 
     is_error:         null,
   };
 
+  if (claudeResult.timedOut) {
+    record.is_error = true;
+    record.parse_error = `killed after exceeding ${ATTEMPT_TIMEOUT_MS / 60000}min timeout`;
+    return record;
+  }
+
   try {
     const parsed = JSON.parse((claudeResult.stdout || '').trim());
     record.cost_usd   = parsed.total_cost_usd ?? null;
@@ -47,9 +62,58 @@ export function invokeClaude(prompt, { workDir, maxTurns = 50, label, resultDir 
     record.parse_error = 'Could not parse claude JSON output — check agent-stdout file for this invocation';
   }
 
-  console.log(`  [${label ?? 'invoke'}] cost: $${record.cost_usd ?? 'unknown'}, turns: ${record.num_turns ?? 'unknown'}`);
-
   return record;
+}
+
+const MAX_ATTEMPTS = 3;
+
+// One fresh, context-free `claude` process. Every phase/iteration of both
+// frameworks goes through this — neither driver ever reuses a session, since
+// external context reset between steps is the entire point of both designs.
+// `workDir` is the sandbox directory, never the real repo — see sandbox.js.
+//
+// Retries automatically on is_error (the CLI reported a transient failure —
+// observed in practice as an outright "Request timed out" — not the agent
+// judging the task unsolvable). Since every invocation is already
+// stateless/fresh-context, a retry is just "try again from scratch"; no
+// special-casing needed. Without this, an errored phase would still get
+// checkpointed and the driver would plow ahead to the next phase (or, for
+// GSD's rework loop, burn one of its two rework attempts) on a call that
+// failed for reasons that had nothing to do with the task.
+export function invokeClaude(prompt, { workDir, maxTurns = 50, label, resultDir }) {
+  const costs  = [];
+  const turns  = [];
+  let last;
+  let attemptsUsed = 0;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    attemptsUsed = attempt;
+    last = runOnce(prompt, { workDir, maxTurns, label: `${label}-attempt${attempt}`, resultDir });
+    costs.push(last.cost_usd);
+    turns.push(last.num_turns);
+    if (!last.is_error) break;
+    if (attempt < MAX_ATTEMPTS) {
+      console.log(`  [${label}] attempt ${attempt} errored (${last.parse_error ?? 'is_error=true'}) — retrying (${MAX_ATTEMPTS - attempt} left)`);
+    }
+  }
+
+  // Promote the final attempt's raw output to the canonical filename so
+  // concatLogs (and anyone skimming resultDir) finds the attempt that
+  // actually matters without digging through retries — every attempt's own
+  // file still exists alongside it for the full audit trail.
+  if (resultDir && label) {
+    for (const ext of ['stdout', 'stderr']) {
+      const src = path.join(resultDir, `agent-${ext}-${label}-attempt${attemptsUsed}.txt`);
+      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(resultDir, `agent-${ext}-${label}.txt`));
+    }
+  }
+
+  const cost_usd  = costs.some(c => c != null) ? costs.reduce((s, c) => s + (c ?? 0), 0) : null;
+  const num_turns = turns.some(t => t != null) ? turns.reduce((s, t) => s + (t ?? 0), 0) : null;
+
+  console.log(`  [${label}] cost: $${cost_usd ?? 'unknown'}, turns: ${num_turns ?? 'unknown'}${attemptsUsed > 1 ? ` (${attemptsUsed} attempts)` : ''}`);
+
+  return { ...last, label, cost_usd, num_turns, attemptsUsed };
 }
 
 // Concatenates every invocation's captured stdout/stderr into the single

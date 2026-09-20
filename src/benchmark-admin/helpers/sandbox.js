@@ -136,6 +136,49 @@ export function syncBack(sandboxDir, repoRoot) {
   });
 }
 
+// Kills any process still running with its cwd inside the sandbox before
+// the directory gets removed — an agent that starts a background dev server
+// (`pnpm dev &`, `tsx watch`, ...) to check its own work leaves it running
+// after its own `claude` invocation exits; nothing else ever stops it.
+// Without this, deleting the directory just orphans the process: it keeps
+// running with a cwd pointing at nothing, indefinitely, silently holding
+// memory (found several days-old survivors from past runs during this
+// investigation, contributing to real swap pressure on the host machine).
+// Resolves the sandbox's realpath first — macOS routes os.tmpdir() through
+// /private (e.g. /var/folders/... -> /private/var/folders/...), and lsof
+// reports the resolved path, not the symlinked one, so an unresolved
+// comparison silently matches nothing.
+function killOrphans(sandboxDir) {
+  let real;
+  try {
+    real = fs.realpathSync(sandboxDir);
+  } catch {
+    return; // already gone
+  }
+
+  const result = spawnSync('lsof', ['+D', real], { encoding: 'utf8' });
+  if (!result.stdout) return;
+
+  const pids = new Set();
+  for (const line of result.stdout.trim().split('\n').slice(1)) { // skip header row
+    const pid = Number(line.trim().split(/\s+/)[1]);
+    if (pid && pid !== process.pid) pids.add(pid);
+  }
+  if (!pids.size) return;
+
+  for (const pid of pids) {
+    try { process.kill(pid, 'SIGTERM'); } catch { /* already gone */ }
+  }
+  spawnSync('sleep', ['1']); // brief grace period before force-killing stragglers
+  for (const pid of pids) {
+    try {
+      process.kill(pid, 0);       // still alive?
+      process.kill(pid, 'SIGKILL');
+    } catch { /* already exited from SIGTERM */ }
+  }
+}
+
 export function destroySandbox(sandboxDir) {
+  killOrphans(sandboxDir);
   fs.rmSync(sandboxDir, { recursive: true, force: true });
 }
