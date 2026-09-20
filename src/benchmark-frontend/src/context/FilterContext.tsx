@@ -46,7 +46,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const [sortBy, setSortByState] = useState<SortOption>('default');
   const [savedFilters, setSavedFilters] = useState<SavedFilter[]>(loadSavedFilters);
 
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(search, search === '' ? 0 : 300);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedFilters));

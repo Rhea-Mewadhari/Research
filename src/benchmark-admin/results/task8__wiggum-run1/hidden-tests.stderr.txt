@@ -1,0 +1,22 @@
+$ vitest run tests/hidden.debounce.search.test.tsx tests/hidden.combined.behavior.test.tsx tests/hidden.filtering.edgecases.test.tsx
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/hidden.debounce.search.test.tsx > Hidden: debounce — immediate clear > clearing search sets debouncedSearch to empty immediately
+AssertionError: expected 'wireless' to be '' // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[31m+ wireless[39m
+
+ ❯ tests/hidden.debounce.search.test.tsx:80:44
+     78|     // Clear — must resolve immediately without advancing timers
+     79|     act(() => { result.current.setSearch(''); });
+     80|     expect(result.current.debouncedSearch).toBe('');
+       |                                            ^
+     81|   });
+     82| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

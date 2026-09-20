@@ -1,0 +1,24 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ❯ tests/hidden.debounce.search.test.tsx (5 tests | 1 failed) 16ms
+   ✓ Hidden: debounce — 300 ms delay > debouncedSearch does not update until 300 ms after setSearch 9ms
+   ✓ Hidden: debounce — 300 ms delay > rapid keypresses reset the 300 ms window (coalesces to last value) 1ms
+   × Hidden: debounce — immediate clear > clearing search sets debouncedSearch to empty immediately 3ms
+     → expected 'wireless' to be '' // Object.is equality
+   ✓ Hidden: debounce — immediate clear > a pending debounce does not apply its value after a clear 1ms
+   ✓ Hidden: debounce — unmount cleanup > unmounting during a pending debounce produces no state-update warning 1ms
+ ✓ tests/hidden.combined.behavior.test.tsx (2 tests) 488ms
+   ✓ Hidden: combined filter behavior > combines category + inStockOnly + search correctly  412ms
+ ✓ tests/hidden.filtering.edgecases.test.tsx (5 tests) 1460ms
+   ✓ Hidden: filtering edge cases > search is case-insensitive  382ms
+   ✓ Hidden: filtering edge cases > search trims leading and trailing whitespace  362ms
+   ✓ Hidden: filtering edge cases > search only matches product name, not category text  363ms
+   ✓ Hidden: filtering edge cases > shows empty state when no results match  334ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 11 passed (12)
+   Start at  17:04:59
+   Duration  2.14s (transform 78ms, setup 189ms, collect 534ms, tests 1.96s, environment 658ms, prepare 175ms)
+
+[ELIFECYCLE] Test failed. See above for more details.
