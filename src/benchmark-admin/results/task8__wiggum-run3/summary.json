@@ -1,0 +1,160 @@
+{
+  "taskId": "task8",
+  "runId": "wiggum-run3",
+  "timestamp": "2026-09-20T15:12:40.021Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 22,
+    "failed": 0,
+    "total": 22
+  },
+  "hiddenTests": {
+    "success": false,
+    "passed": 11,
+    "failed": 1,
+    "total": 12,
+    "expectedFiles": 3,
+    "crashed": false
+  },
+  "overall": {
+    "success": false
+  },
+  "timing": {
+    "visibleMs": 2925,
+    "hiddenMs": 2605,
+    "buildMs": 910,
+    "totalMs": 6484
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 0.917,
+    "robustnessGap": 0.083,
+    "buildStability": 1,
+    "correctnessScore": 0.958,
+    "qualityScore": 0.93,
+    "overallScore": 0.947
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task8",
+    "wall_duration_ms": 169824,
+    "cost_usd": 0.7476617999999999,
+    "num_turns": 29,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "44d9ad7b-6c0c-4a6d-a53c-841809a039dc",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix debounce wiring in FilterContext: use 300ms delay with immediate clear",
+          "status": "done",
+          "notes": "In src/benchmark-frontend/src/context/FilterContext.tsx line 51, change `useDebounce(search, 0)` to `useDebounce(search, search === '' ? 0 : 300)`. This fixes both bugs: (1) real 300ms debounce on typing, (2) instant reset when search is cleared. No changes to useDebounce.ts or useFilteredProducts.ts are needed."
+        },
+        {
+          "id": "phase-2",
+          "title": "Run tests and verify build passes",
+          "status": "done",
+          "notes": "All 22 tests passed (7 test files). Build succeeded with no TypeScript errors — tsc + vite produced dist/assets correctly."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 41933,
+          "cost_usd": 0.23435309999999998,
+          "num_turns": 9,
+          "session_id": "46763c26-ab0f-40f2-9387-5502a8949676",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 45302,
+          "cost_usd": 0.2434809,
+          "num_turns": 10,
+          "session_id": "44d9ad7b-6c0c-4a6d-a53c-841809a039dc",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 2,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
