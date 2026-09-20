@@ -7,9 +7,14 @@ import { runCommand } from './benchmark-utils.js';
 
 const ADMIN_DIR = path.dirname(path.dirname(fileURLToPath(import.meta.url))); // helpers/ -> benchmark-admin/
 
+// Relative to the sandbox root, which mirrors the *full monorepo* (the
+// sandbox is built from run-experiment.js's repoRoot — Research/Research —
+// not from benchmark-<target> directly), so these need the
+// benchmark-<target> prefix, unlike the manifest's own repoRoot-relative
+// paths (which run-benchmark.js resolves against benchmark-<target> itself).
 const VISIBLE_TEST_DIR = {
-  frontend: 'tests',
-  backend:  'src/tests/visible',
+  frontend: 'src/benchmark-frontend/tests',
+  backend:  'src/benchmark-backend/src/tests/visible',
 };
 
 // setup.ts/tsx is vitest config (setupFiles), not a test — never remove it
