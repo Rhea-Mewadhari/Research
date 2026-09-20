@@ -1,0 +1,47 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7, Vite 6, Vitest 3 (not Jest) — test config lives inside vite.config.ts",
+      "useDebounce<T>(value: T, delayMs: number): T — generic hook; delay is a plain number parameter, no built-in conditional logic",
+      "noUnusedLocals / noUnusedParameters enforced in tsconfig.app.json — the fix must not introduce unused variables",
+      "No external debounce utility; the hand-rolled hook is the only debounce mechanism",
+      "Passing a computed expression (ternary) as delayMs is idiomatic — the hook's useEffect depends on [value, delayMs], so a delay change re-runs the effect automatically",
+      "No named-constant pattern for numeric literals in this codebase — inline literals 0 and 300 are consistent with project style"
+    ],
+    "features": [
+      "FilterContext.tsx exports FilterProvider and useFilterContext; their public interface (FilterContextValue type and exported symbols) must remain unchanged",
+      "Current bug site: line 51 — `const debouncedSearch = useDebounce(search, 0);` hardcodes 0 ms, defeating the debounce",
+      "useFilteredProducts.ts consumes debouncedSearch (not search) from context — must NOT be modified",
+      "Category, inStockOnly, and sortBy filters are not routed through useDebounce and must stay immediate (no debounce)",
+      "saveCurrentFilters snapshots the raw `search` value (not debouncedSearch) — must remain unchanged",
+      "Tests that must pass: debounceSearch.test.tsx, filtering.test.tsx, clearFilters.test.tsx, sorting.test.tsx, pagination.test.tsx, app.render.test.tsx, loadingError.test.tsx"
+    ],
+    "architecture": [
+      "Layer structure: src/api → src/context (FilterContext) → src/hooks (useDebounce, useFilteredProducts) → src/components → src/pages",
+      "FilterContext owns all filter state and computes debouncedSearch; components read via useFilterContext()",
+      "Exact fix location: src/context/FilterContext.tsx line 51",
+      "Fix is a single-file, single-line change — no other files need touching",
+      "useDebounce hook is already correct and must not be modified; the fix lives entirely at the call site"
+    ],
+    "edgeCases": [
+      "Initial render (search === ''): delay resolves to 0, debouncedSearch initialises to '' synchronously — no regression",
+      "Rapid typing (keystrokes < 300 ms apart): each keystroke cancels the previous 300 ms timer and schedules a new one; only the final value fires — correct standard debounce behaviour",
+      "Clear after partial typing: search goes from non-empty to ''; delayMs switches 300→0; useEffect cleanup cancels the pending 300 ms timer before scheduling a 0 ms one — debouncedSearch becomes '' immediately with no stale-filter flash",
+      "clearFilters() path: sets search to '' via setSearchState(''), same zero-delay path as manual clear — clearFilters.test.tsx asserts 'Showing 15 products' immediately",
+      "Category active during clear: category state is independent of debouncedSearch; clearing search (zero delay) leaves category untouched — 'clearing search while a category is active' test expects 5 products",
+      "TypeScript generics: T inferred as string at the call site; both ternary branches are number — call signature fully satisfied, no type error",
+      "Unmount with pending timer: useDebounce already returns () => clearTimeout(timer) in effect cleanup; the fix does not change this — no memory leak or stale-state warning",
+      "delayMs in effect dependency array: a delay change from 300 to 0 re-triggers the effect even if value is already ''; this guarantees the zero-delay timer is scheduled on clear, not residual 300 ms"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: The useDebounce call in FilterContext.tsx passes a delay of 300 when search is non-empty and 0 when search is '' — e.g. useDebounce(search, search === '' ? 0 : 300) or equivalent.",
+      "description": "In FilterContext.tsx line 51, change `useDebounce(search, 0)` to `useDebounce(search, search === '' ? 0 : 300)`. This single-line change satisfies requirements 1–5 (300 ms debounce for typing, immediate clear, stale-timer cancellation on clear, no memory leak) while leaving the hook, the public interface, useFilteredProducts, and all other filter state untouched (requirements 6–10).",
+      "files": [
+        "src/benchmark-frontend/src/context/FilterContext.tsx"
+      ]
+    }
+  ]
+}

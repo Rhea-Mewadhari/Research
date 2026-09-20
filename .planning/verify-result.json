@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "The `useDebounce` call in `FilterContext.tsx` passes a delay of `300` when `search` is non-empty and a delay of `0` when `search` is `''`.",
+      "passed": true,
+      "evidence": "FilterContext.tsx line 51: `const debouncedSearch = useDebounce(search, search === '' ? 0 : 300);` — delay is 0 for empty string and 300 for non-empty values."
+    },
+    {
+      "id": "2",
+      "description": "Typing into the search field does not trigger a filter update until 300 ms after the last keystroke.",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — all three tests passed: 'typing a search term eventually filters the product list' (419ms), 'search is case-insensitive' (357ms), 'search combines correctly with category filter' (337ms). All 22 tests passed with exit code 0."
+    },
+    {
+      "id": "3",
+      "description": "When the search field is cleared, `debouncedSearch` resets to `''` immediately with no timer delay.",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — both clear tests passed: 'clearing the search field restores all products' (68ms) and 'clearing search while a category is active keeps the category filter' (50ms). All 22 tests passed."
+    },
+    {
+      "id": "4",
+      "description": "Any pending debounce timeout for a non-empty search value is cancelled when the field is cleared.",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — 'clearing the search field restores all products' and 'clearing search while a category is active keeps the category filter' both passed without flaking, confirming stale timeouts are cancelled before the assertions resolve."
+    },
+    {
+      "id": "5",
+      "description": "Unmounting `FilterProvider` while a debounce timeout is pending does not produce a React state-update-on-unmounted-component warning; `clearTimeout` cleanup in `useDebounce`'s `useEffect` return must remain intact.",
+      "passed": true,
+      "evidence": "`git diff -- src/benchmark-frontend/src/hooks/useDebounce.ts` produced no output (file unmodified). useDebounce.ts line 8: `return () => clearTimeout(timer);` is intact inside the useEffect."
+    },
+    {
+      "id": "6",
+      "description": "The public interface of `FilterContext` — the `FilterContextValue` type shape and all exported symbols — is unchanged; TypeScript compilation succeeds.",
+      "passed": true,
+      "evidence": "`npx tsc --noEmit` exited with code 0 and no output. `npm run build` ran `tsc -b` successfully. FilterContext.tsx exports `FilterProvider` and `useFilterContext`, and `FilterContextValue` interface contains: search, debouncedSearch, category, inStockOnly, sortBy, savedFilters, setSearch, setCategory, setInStockOnly, setSortBy, saveCurrentFilters, restoreFilter, deleteFilter, clearFilters."
+    },
+    {
+      "id": "7",
+      "description": "`src/benchmark-frontend/src/hooks/useFilteredProducts.ts` is not modified.",
+      "passed": true,
+      "evidence": "`git diff -- src/benchmark-frontend/src/hooks/useFilteredProducts.ts` produced no output — file is unmodified."
+    },
+    {
+      "id": "8",
+      "description": "No new npm dependencies are added to `package.json`.",
+      "passed": true,
+      "evidence": "`git diff -- src/benchmark-frontend/package.json` produced no output — package.json is unmodified, no new dependencies added."
+    },
+    {
+      "id": "9",
+      "description": "Category filter, in-stock toggle, and sort filters continue to work correctly and independently of the search debounce fix.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx — 3 tests passed ('filters products by search term', 'filters products by category', 'filters products by in-stock only'). tests/sorting.test.tsx — 3 tests passed ('sorts by price ascending', 'sorts by price descending', 'sorts by rating descending'). tests/clearFilters.test.tsx — 1 test passed ('resets filters back to default values')."
+    },
+    {
+      "id": "10",
+      "description": "The full test suite passes and the project builds without errors.",
+      "passed": true,
+      "evidence": "`npm test` (vitest run): 7 test files passed, 22 tests passed, 0 failures, exit code 0. `npm run build` (tsc -b && vite build): 65 modules transformed, built in 621ms, exit code 0."
+    }
+  ]
+}
