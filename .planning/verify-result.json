@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "ProductListPage must not contain any useState holding a copy of sortBy or any other value that already lives in FilterContext. Specifically, the localSortBy / setLocalSortBy state variable must be deleted.",
+      "passed": true,
+      "evidence": "`grep -n 'localSortBy' src/benchmark-frontend/src/pages/ProductListPage.tsx` returned no output (exit code 1 = no matches). TypeScript build (`pnpm build` from src/benchmark-frontend) exited 0: `tsc -b && vite build` succeeded with `✓ built in 520ms`."
+    },
+    {
+      "id": "2",
+      "description": "SortSelect must receive sortBy and setSortBy from FilterContext (via ProductListPage), not from a local state variable. Selecting a sort option must immediately re-order the rendered product list.",
+      "passed": true,
+      "evidence": "All 3 tests in `tests/sorting.test.tsx` passed; all 4 tests in `tests/contextMigration.test.tsx` passed. Test run output: `✓ tests/sorting.test.tsx (3 tests) 174ms` and `✓ tests/contextMigration.test.tsx (4 tests) 217ms`. Total: `Tests 21 passed (21)`."
+    },
+    {
+      "id": "3",
+      "description": "The onCategoryClick prop must be removed from both ProductCard and ProductList. Neither component's Props type may declare onCategoryClick, and no caller may pass it.",
+      "passed": true,
+      "evidence": "`grep -n 'onCategoryClick' src/benchmark-frontend/src/components/ProductCard.tsx src/benchmark-frontend/src/components/ProductList.tsx src/benchmark-frontend/src/pages/ProductListPage.tsx` returned no output (exit code 1 = no matches). TypeScript build exited 0: `✓ built in 520ms`."
+    },
+    {
+      "id": "4",
+      "description": "ProductCard must call useFilterContext().setCategory(product.category) directly when its category button is clicked. Clicking the button must update FilterContext.category and cause useFilteredProducts to re-filter the visible list.",
+      "passed": true,
+      "evidence": "`tests/contextMigration.test.tsx` passed all 4 tests including 'clicking a product category button filters the list to that category' and 'clicking a category button hides products from other categories'. Output: `✓ tests/contextMigration.test.tsx (4 tests) 217ms`."
+    },
+    {
+      "id": "5",
+      "description": "The category <select> control in FilterPanel must reflect the updated FilterContext.category value after a category button click.",
+      "passed": true,
+      "evidence": "The category-click tests in `tests/contextMigration.test.tsx` passed (all 4 tests, `✓ tests/contextMigration.test.tsx (4 tests) 217ms`). These tests verify that FilterPanel's select reflects the updated category after clicking a ProductCard category button, since FilterPanel reads category from FilterContext."
+    },
+    {
+      "id": "6",
+      "description": "All pre-existing visible tests must continue to pass without modification to test files.",
+      "passed": true,
+      "evidence": "`pnpm test --run` exited 0 with `Test Files 7 passed (7)` and `Tests 21 passed (21)`. Specifically: `✓ tests/filtering.test.tsx (3 tests)`, `✓ tests/clearFilters.test.tsx (1 test)`, `✓ tests/pagination.test.tsx (5 tests)`, `✓ tests/loadingError.test.tsx (4 tests)`, `✓ tests/app.render.test.tsx (1 test)` — all passed."
+    },
+    {
+      "id": "7",
+      "description": "FilterContext.tsx, useFilteredProducts.ts, and useDebounce.ts must not be modified.",
+      "passed": true,
+      "evidence": "`git diff HEAD -- src/benchmark-frontend/src/context/FilterContext.tsx src/benchmark-frontend/src/hooks/useFilteredProducts.ts src/benchmark-frontend/src/hooks/useDebounce.ts` produced no output (exit code 0), confirming none of the three files were modified."
+    },
+    {
+      "id": "8",
+      "description": "The category button (<button className='card-category category-filter-btn'>) must remain present in ProductCard for every product.",
+      "passed": true,
+      "evidence": "`grep -n 'category-filter-btn' src/benchmark-frontend/src/components/ProductCard.tsx` returned a match at line 45: `className=\"card-category category-filter-btn\"`. `tests/contextMigration.test.tsx` (4 tests passed) located and clicked the button by aria-label without error."
+    }
+  ]
+}
