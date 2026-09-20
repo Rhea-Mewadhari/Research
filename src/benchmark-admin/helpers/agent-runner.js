@@ -3,7 +3,7 @@ import path from 'path';
 import { capture } from './spawn-utils.js';
 import { runGsd } from './gsd-driver.js';
 import { runWiggum } from './wiggum-driver.js';
-import { createSandbox, syncBack, destroySandbox } from './sandbox.js';
+import { createSandbox, syncBack, destroySandbox, scopeVisibleTests } from './sandbox.js';
 
 // One fresh, context-free `claude` process. Every phase/iteration of both
 // frameworks goes through this — neither driver ever reuses a session, since
@@ -81,6 +81,7 @@ export function runAgent({ repoRoot, resultDir, framework, target, taskId }) {
   // `git stash` to recover the pre-bug code or a previous run's solved code.
   // See sandbox.js for what "isolated" means here and its known limits.
   const sandbox = createSandbox(repoRoot);
+  scopeVisibleTests(sandbox.sandboxDir, target, taskId);
   let driverResult;
   try {
     driverResult = framework === 'gsd'
