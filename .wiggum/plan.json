@@ -1,0 +1,18 @@
+{
+  "taskId": "task9",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix FavouritesContext: add isPending tracking and revert-on-failure",
+      "status": "done",
+      "notes": "Added setPendingIds before fetch and removed in finally block. Added revert logic in catch block using wasAdded flag and functional state updater. All 21 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-2",
+      "title": "Verify: run test suite and confirm all tests pass",
+      "status": "done",
+      "notes": "All 21 tests pass across 7 test files. Build succeeds (tsc + vite build, 65 modules transformed)."
+    }
+  ]
+}
