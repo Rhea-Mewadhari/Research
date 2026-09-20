@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "When productId changes from null to a non-null value (panel opens), document.activeElement must be the close button by the time the first paint completes.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx line 57-65: useLayoutEffect with [isOpen] dependency. When isOpen is true, executes panelRef.current?.querySelector<HTMLElement>('.detail-close-btn')?.focus(). The button at line 127-134 has className='detail-close-btn' and aria-label='Close panel'. useLayoutEffect fires synchronously after DOM mutation before paint."
+    },
+    {
+      "id": "2",
+      "description": "While the panel is open, pressing Tab when the last focusable element has focus must move focus to the first focusable element and not allow focus to leave the panel.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 68-96: document.addEventListener('keydown', handler). Handler at lines 74-88: checks event.key === 'Tab' && !event.shiftKey && document.activeElement === last, then calls event.preventDefault() and first.focus(). FOCUSABLE_SELECTOR (line 12-13) matches the required selector exactly."
+    },
+    {
+      "id": "3",
+      "description": "While the panel is open, pressing Shift+Tab when the first focusable element has focus must move focus to the last focusable element inside the panel.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 85-88: same keydown handler checks event.shiftKey && document.activeElement === first, then calls event.preventDefault() and last.focus()."
+    },
+    {
+      "id": "4",
+      "description": "Pressing Escape at any time while the panel is open must call onClose, regardless of which element on the page currently has focus.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx line 92: document.addEventListener('keydown', handler) — attached to document (not a JSX onKeyDown). Handler lines 72-73: checks event.key === 'Escape' and calls onClose()."
+    },
+    {
+      "id": "5",
+      "description": "The element that held focus immediately before the panel opened must receive focus again when the panel closes. The previous-focus element must be captured at open time, not close time.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 57-65: useLayoutEffect with [isOpen] dependency. When isOpen becomes true (line 58): reads document.activeElement and stores in previousFocusRef.current. Cleanup function (lines 63-65) runs when isOpen becomes false and calls (previousFocusRef.current as HTMLElement | null)?.focus(). Capture is in the if(isOpen) branch (open time), not the cleanup."
+    },
+    {
+      "id": "6",
+      "description": "The document keydown listener added for the Escape handler must be removed when the panel closes and when the component unmounts.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 92-95: document.addEventListener('keydown', handler) followed by return () => { document.removeEventListener('keydown', handler); }. The handler variable is defined in the same effect closure, so the same reference is used for both add and remove."
+    },
+    {
+      "id": "7",
+      "description": "No new npm dependencies are introduced.",
+      "passed": true,
+      "evidence": "src/benchmark-frontend/package.json dependencies: {react, react-dom, react-router-dom}. devDependencies: {@testing-library/jest-dom, @testing-library/react, @testing-library/user-event, @types/react, @types/react-dom, @vitejs/plugin-react, @vitest/coverage-v8, jsdom, typescript, vite, vitest}. No focus-trap or other new packages present. git show HEAD:src/benchmark-frontend/package.json confirms this is the complete current state."
+    },
+    {
+      "id": "8",
+      "description": "ProductDetailPanel.tsx continues to render the panel via ReactDOM.createPortal into document.body.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx line 100: return ReactDOM.createPortal(<>...</>, document.body); — ReactDOM.createPortal is present in the return value, mounting into document.body."
+    },
+    {
+      "id": "9",
+      "description": "The scroll-lock behaviour (document.body.style.overflow = 'hidden' while open, reset to '' on close) is preserved unchanged.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 48-54: useEffect with [isOpen] dependency. Sets document.body.style.overflow = 'hidden' when isOpen is true. Cleanup resets document.body.style.overflow = ''."
+    },
+    {
+      "id": "10",
+      "description": "All tests in src/benchmark-frontend/tests/productDetailFocus.test.tsx pass without modifying that file.",
+      "passed": true,
+      "evidence": "pnpm test --run output: '✓ tests/productDetailFocus.test.tsx (5 tests) 229ms'. Overall: 'Test Files  7 passed (7), Tests  22 passed (22)'. Exit code 0."
+    },
+    {
+      "id": "11",
+      "description": "The TypeScript build completes without type errors.",
+      "passed": true,
+      "evidence": "pnpm build output: 'tsc -b && vite build' ran successfully. '✓ 65 modules transformed. ✓ built in 528ms'. Process exited with code 0, no type errors reported."
+    }
+  ]
+}
