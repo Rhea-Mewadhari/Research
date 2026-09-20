@@ -1,0 +1,24 @@
+{
+  "taskId": "task9",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix isPending tracking: add setPendingIds before fetch and remove in finally",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix optimistic revert on failure: undo state change in catch block using wasAdded",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Run test suite and verify all tests pass",
+      "status": "done",
+      "notes": "21 tests passed across 7 test files; build succeeded."
+    }
+  ]
+}
