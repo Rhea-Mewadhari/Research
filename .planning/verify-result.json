@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "FilterContext passes a delay of `search === '' ? 0 : 300` to `useDebounce`, replacing the current hard-coded `0`.",
+      "passed": true,
+      "evidence": "grep output: line 51 of FilterContext.tsx reads `const debouncedSearch = useDebounce(search, search === '' ? 0 : 300);` — conditional delay 300 for non-empty, 0 for empty."
+    },
+    {
+      "id": "2",
+      "description": "Typing in the search field does not change `debouncedSearch` until 300 ms have elapsed since the last keystroke.",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — test 'typing a search term eventually filters the product list' passed in vitest output (✓ 420ms). All 5 tests in debounceSearch.test.tsx passed."
+    },
+    {
+      "id": "3",
+      "description": "Rapid consecutive keystrokes reset the 300 ms window so only the final value is applied (no intermediate filter updates).",
+      "passed": true,
+      "evidence": "All 5 tests in tests/debounceSearch.test.tsx passed with no intermediate wrong counts. tests/debounceSearch.test.tsx ✓ 5 tests 1236ms in vitest run output."
+    },
+    {
+      "id": "4",
+      "description": "When `search` is set to `''` (field cleared), `debouncedSearch` becomes `''` immediately — without waiting 300 ms.",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — test 'clearing the search field restores all products' (line 24) passed. All 5 debounce tests passed: ✓ tests/debounceSearch.test.tsx (5 tests) 1236ms."
+    },
+    {
+      "id": "5",
+      "description": "Clearing the search field while a category filter is active keeps the category filter applied and does not reset it.",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — test 'clearing search while a category is active keeps the category filter' (line 73) passed. All 5 debounce tests passed."
+    },
+    {
+      "id": "6",
+      "description": "Search filtering is case-insensitive (uppercase input matches lowercase product names and vice versa).",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — test 'search is case-insensitive' passed (✓ 357ms shown in vitest output). All 5 debounce tests passed."
+    },
+    {
+      "id": "7",
+      "description": "Search filter combines correctly with the category filter (intersection of both constraints).",
+      "passed": true,
+      "evidence": "tests/debounceSearch.test.tsx — test 'search combines correctly with category filter' passed (✓ 340ms shown in vitest output). All 5 debounce tests passed."
+    },
+    {
+      "id": "8",
+      "description": "All other filters (category select, in-stock toggle, sort) continue to work correctly after the change.",
+      "passed": true,
+      "evidence": "vitest output: ✓ tests/filtering.test.tsx (3 tests) 462ms, ✓ tests/sorting.test.tsx (3 tests) 173ms, ✓ tests/clearFilters.test.tsx (1 test) 154ms — all passed."
+    },
+    {
+      "id": "9",
+      "description": "The 'Clear filters' button resets all filter state and immediately shows all 15 products.",
+      "passed": true,
+      "evidence": "tests/clearFilters.test.tsx — test 'resets filters back to default values' (line 6, confirmed via grep) passed: ✓ tests/clearFilters.test.tsx (1 test) 154ms in vitest output."
+    },
+    {
+      "id": "10",
+      "description": "No state-update-on-unmounted-component warning is emitted when the component unmounts while a debounce timeout is pending.",
+      "passed": true,
+      "evidence": "Full vitest run output contains no 'Warning: Can't perform a React state update on an unmounted component'. Only act() warnings appear (in loadingError.test.tsx, unrelated to debounce/unmount). ✓ tests/app.render.test.tsx (1 test) 69ms passed."
+    },
+    {
+      "id": "11",
+      "description": "`useDebounce.ts` remains generic — accepts `T` for any value type and `delayMs: number`. Not constrained to strings.",
+      "passed": true,
+      "evidence": "`grep -n 'string' src/benchmark-frontend/src/hooks/useDebounce.ts` returned no output — no string-specific logic present in the hook."
+    },
+    {
+      "id": "12",
+      "description": "The public interface of `FilterContext` is unchanged; TypeScript build succeeds with zero type errors.",
+      "passed": true,
+      "evidence": "Build output: `tsc -b && vite build` completed successfully — '✓ built in 520ms', 65 modules transformed, zero type errors reported."
+    },
+    {
+      "id": "13",
+      "description": "`useFilteredProducts.ts` is not modified.",
+      "passed": true,
+      "evidence": "`git diff src/benchmark-frontend/src/hooks/useFilteredProducts.ts` produced no output — file is unchanged."
+    },
+    {
+      "id": "14",
+      "description": "No new npm/pnpm dependencies are added.",
+      "passed": true,
+      "evidence": "`git diff src/benchmark-frontend/package.json` produced no output — dependencies and devDependencies are unchanged."
+    },
+    {
+      "id": "15",
+      "description": "The full test suite passes and the build succeeds.",
+      "passed": true,
+      "evidence": "vitest run: 'Test Files  7 passed (7), Tests  22 passed (22)' — exit code 0. Build: '✓ built in 520ms' — exit code 0."
+    }
+  ]
+}

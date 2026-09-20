@@ -1,0 +1,20 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/app.render.test.tsx (1 test) 69ms
+ ✓ tests/loadingError.test.tsx (4 tests) 93ms
+ ✓ tests/clearFilters.test.tsx (1 test) 168ms
+ ✓ tests/sorting.test.tsx (3 tests) 181ms
+ ✓ tests/pagination.test.tsx (5 tests) 191ms
+ ✓ tests/filtering.test.tsx (3 tests) 470ms
+   ✓ Filtering behavior > filters products by search term  413ms
+ ✓ tests/debounceSearch.test.tsx (5 tests) 1256ms
+   ✓ Debounce — search filtering > typing a search term eventually filters the product list  433ms
+   ✓ Debounce — search filtering > search is case-insensitive  362ms
+   ✓ Debounce — search filtering > search combines correctly with category filter  339ms
+
+ Test Files  7 passed (7)
+      Tests  22 passed (22)
+   Start at  15:16:29
+   Duration  2.37s (transform 128ms, setup 839ms, collect 2.28s, tests 2.43s, environment 2.75s, prepare 402ms)
+

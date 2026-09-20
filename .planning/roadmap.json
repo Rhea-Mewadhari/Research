@@ -1,0 +1,41 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0, TypeScript 5.7.2, Vite 6.2.0 — no external debounce library; custom useDebounce hook is the only debounce mechanism",
+      "Vitest 3.2.4 + @testing-library/react 16 + @testing-library/user-event 14 + jsdom 26 — test environment uses fake timers (vi.useFakeTimers) to control setTimeout in debounce tests",
+      "pnpm workspace; ESLint with eslint-plugin-react-hooks enforces Rules of Hooks — conditional hook calls would fail both lint and runtime",
+      "TypeScript strict mode (noUnusedLocals, noUnusedParameters); build target ES2023 — conditional delay expression `search === '' ? 0 : 300` is type-safe as number"
+    ],
+    "features": [
+      "FilterContext.tsx: manages search (raw input), debouncedSearch (debounced output), category, inStockOnly, sortBy, savedFilters; exports FilterProvider and useFilterContext",
+      "useDebounce.ts: generic useDebounce<T>(value: T, delayMs: number): T — uses setTimeout/clearTimeout in useEffect; cleanup runs on every [value, delayMs] change, preventing stale timers",
+      "useFilteredProducts.ts: consumes debouncedSearch (not search) + category + inStockOnly + sortBy via useMemo to compute filteredProducts; must not be modified",
+      "Tests that must pass unchanged: debounceSearch.test.tsx (5 tests), filtering.test.tsx (3), sorting.test.tsx (3), clearFilters.test.tsx, app.render.test.tsx, loadingError.test.tsx (4), pagination.test.tsx (5)"
+    ],
+    "architecture": [
+      "Provider hierarchy in App.tsx: ProductProvider > FilterProvider > FavouritesProvider > ComparisonProvider — FilterContext is second-outermost",
+      "FilterContext.tsx line 51 is the only call site of useDebounce: `const debouncedSearch = useDebounce(search, 0);` — the `0` is the bug",
+      "debouncedSearch is consumed exclusively in useFilteredProducts.ts (line 14/17/18) and exposed on the context value; no other consumer reads it directly",
+      "Fix location: FilterContext.tsx line 51 only — change delay argument from `0` to `search === '' ? 0 : 300`; no other file needs modification"
+    ],
+    "edgeCases": [
+      "Initial render (search = ''): delay=0 means debouncedSearch initialises synchronously to '' — no 300ms wait before first render; correct behaviour preserved by conditional",
+      "Mid-debounce clear (pending 300ms timer when user clears field): useEffect cleanup calls clearTimeout on the in-flight timer before scheduling new 0ms timer for '' — timer is reliably cancelled",
+      "Rapid typing then clear: each keystroke cancels the previous timer via cleanup; the clear then collapses any pending non-empty debounce immediately because delay becomes 0",
+      "Category + search cleared: category state is independent of debouncedSearch; clearing search re-filters on category alone — test expects 5 Fitness products, not a full reset",
+      "Case sensitivity: handled in productFilters.ts (toLowerCase on both sides), not inside useDebounce — the hook is value-transparent and must not add string-specific logic",
+      "TypeScript type safety: `search === '' ? 0 : 300` is type `number`; useDebounce<string> infers T=string from first arg; no cast needed; build must pass with zero type errors",
+      "Conditional hook call anti-pattern must be avoided: the delay must be a conditional expression passed as an argument, not a conditional that wraps the hook call itself"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: FilterContext passes a delay of `search === '' ? 0 : 300` to useDebounce, replacing the current hard-coded `0`",
+      "description": "In src/context/FilterContext.tsx at line 51, change the second argument of useDebounce from `0` to `search === '' ? 0 : 300`. This single change fixes both bugs: the 300ms debounce for non-empty input (requirements 2, 3) and the immediate reset when the field is cleared (requirement 4). All other requirements (5–15) are satisfied by existing correct code that must not be touched.",
+      "files": [
+        "src/benchmark-frontend/src/context/FilterContext.tsx"
+      ]
+    }
+  ]
+}

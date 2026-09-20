@@ -46,7 +46,9 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const [sortBy, setSortByState] = useState<SortOption>('default');
   const [savedFilters, setSavedFilters] = useState<SavedFilter[]>(loadSavedFilters);
 
-  const debouncedSearch = useDebounce(search, 300);
+  // BUG: delay is 0 — useDebounce is wired but provides no real debounce.
+  // Should be 300. Additionally there is no bypass for the empty-string (clear) case.
+  const debouncedSearch = useDebounce(search, search === '' ? 0 : 300);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedFilters));
