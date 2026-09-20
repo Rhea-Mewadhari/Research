@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Selecting the 'price-asc' option in the Sort By dropdown re-orders the displayed product list so that the cheapest product ('Jump Rope') appears first and the most expensive ('Noise-Cancelling Headphones') appears last.",
+      "passed": true,
+      "evidence": "tests/contextMigration.test.tsx > Context migration — SortSelect > selecting a sort option re-orders the product list: PASS. tests/sorting.test.tsx > Sorting behavior > sorts by price ascending: PASS. (21/21 tests, all 7 test files passed, vitest run exit 0)"
+    },
+    {
+      "id": "2",
+      "description": "Selecting the 'price-desc' option places 'Noise-Cancelling Headphones' first and 'Jump Rope' last.",
+      "passed": true,
+      "evidence": "tests/contextMigration.test.tsx > Context migration — SortSelect > selecting price-desc puts the most expensive product first: PASS. tests/sorting.test.tsx > Sorting behavior > sorts by price descending: PASS. (21/21 tests passed)"
+    },
+    {
+      "id": "3",
+      "description": "Clicking the 'Filter by [category]' button on any ProductCard updates FilterContext.category and immediately re-filters the product list, changing [data-testid='results-count'] to reflect only products in that category.",
+      "passed": true,
+      "evidence": "tests/contextMigration.test.tsx > Context migration — category click > clicking a product category button filters the list to that category: PASS. (21/21 tests passed)"
+    },
+    {
+      "id": "4",
+      "description": "Clicking a category button hides products from other categories and keeps products from the clicked category visible in the DOM.",
+      "passed": true,
+      "evidence": "tests/contextMigration.test.tsx > Context migration — category click > clicking a category button hides products from other categories: PASS. (21/21 tests passed)"
+    },
+    {
+      "id": "5",
+      "description": "ProductListPage.tsx contains no useState call holding a localSortBy state variable. SortSelect receives value={sortBy} and onChange={setSortBy} from useFilterContext().",
+      "passed": true,
+      "evidence": "Build succeeded (pnpm run build exit 0, tsc -b && vite build completed with no errors). grep 'localSortBy' src/benchmark-frontend/src/pages/ProductListPage.tsx returned no matches (exit 1)."
+    },
+    {
+      "id": "6",
+      "description": "ProductCard.tsx accepts no onCategoryClick prop. Its Props type has no onCategoryClick field. The category button's onClick calls setCategory(product.category) from useFilterContext().",
+      "passed": true,
+      "evidence": "Build succeeded (pnpm run build exit 0). grep 'onCategoryClick' src/benchmark-frontend/src/components/ProductCard.tsx returned no matches (exit 1)."
+    },
+    {
+      "id": "7",
+      "description": "ProductList.tsx accepts no onCategoryClick prop. Its Props type has no onCategoryClick field and it does not pass any such prop to ProductCard.",
+      "passed": true,
+      "evidence": "Build succeeded (pnpm run build exit 0). grep 'onCategoryClick' src/benchmark-frontend/src/components/ProductList.tsx returned no matches (exit 1)."
+    },
+    {
+      "id": "8",
+      "description": "ProductListPage.tsx does not pass an onCategoryClick prop to ProductList.",
+      "passed": true,
+      "evidence": "Build succeeded (pnpm run build exit 0). grep 'onCategoryClick' src/benchmark-frontend/src/pages/ProductListPage.tsx returned no matches (exit 1)."
+    },
+    {
+      "id": "9",
+      "description": "The files src/context/FilterContext.tsx, src/hooks/useFilteredProducts.ts, and src/hooks/useDebounce.ts are not modified.",
+      "passed": true,
+      "evidence": "git diff -- src/benchmark-frontend/src/context/FilterContext.tsx src/benchmark-frontend/src/hooks/useFilteredProducts.ts src/benchmark-frontend/src/hooks/useDebounce.ts produced no output (exit 0)."
+    },
+    {
+      "id": "10",
+      "description": "No new packages are added to package.json or pnpm-lock.yaml.",
+      "passed": true,
+      "evidence": "git diff -- src/benchmark-frontend/package.json produced no output (exit 0)."
+    },
+    {
+      "id": "11",
+      "description": "All previously passing visible tests continue to pass: search filtering, in-stock toggle, clear filters, pagination, loading/error states, and app render.",
+      "passed": true,
+      "evidence": "pnpm run test exit 0. All 7 test files passed: tests/app.render.test.tsx (1 test), tests/loadingError.test.tsx (4 tests), tests/clearFilters.test.tsx (1 test), tests/sorting.test.tsx (3 tests), tests/pagination.test.tsx (5 tests), tests/contextMigration.test.tsx (4 tests), tests/filtering.test.tsx (3 tests). Total: 21/21 tests passed."
+    },
+    {
+      "id": "12",
+      "description": "The TypeScript build produces no type errors.",
+      "passed": true,
+      "evidence": "pnpm run build exit 0. Output: 'tsc -b && vite build', '✓ 65 modules transformed.', 'dist/assets/index-DwWH1szA.js 255.87 kB', '✓ built in 529ms'. No diagnostic output."
+    }
+  ]
+}

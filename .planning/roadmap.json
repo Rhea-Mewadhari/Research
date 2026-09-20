@@ -1,0 +1,61 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript ~5.7.2, Vite 6.2.0, Vitest 3.2.4 + React Testing Library",
+      "noUnusedLocals and noUnusedParameters are enabled — every removed import/param must be fully cleaned up or tsc build fails",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type { ... }'",
+      "useFilterContext is a named export from src/context/FilterContext.tsx (the FilterContext object itself is not exported)",
+      "FilterProvider and useFilterContext are the only public exports from FilterContext module",
+      "SortOption type is defined in both src/types/product.ts and src/utils/productFilters.ts — structurally identical; FilterContext imports from types/product"
+    ],
+    "features": [
+      "localSortBy is declared at ProductListPage.tsx:31 (useState<SortOption>('default')); wired to SortSelect at line 80 — disconnected from FilterContext so sort is currently broken",
+      "onCategoryClick={() => {}} no-op is passed from ProductListPage to ProductList at line 97, passed through to ProductCard at ProductList.tsx:23, called at ProductCard.tsx:46-49 — category button clicks do nothing",
+      "Features that must not regress: text search (debounced), category dropdown filter, in-stock toggle, clear filters (resets all including sortBy), pagination, loading spinner, error state, product detail panel, favourites, comparison toggle, discount badge, stock label, scroll restoration",
+      "Test suites: app.render, clearFilters, contextMigration (sort + category click — these tests currently fail and will pass after the fix), filtering, loadingError, pagination, sorting",
+      "clearFilters.test.tsx:19 asserts SortSelect shows 'default' after clearing — currently fails because localSortBy is independent of FilterContext; will pass once SortSelect is wired to context"
+    ],
+    "architecture": [
+      "Component hierarchy: ProductListPage → ProductList → ProductCard (ProductList is rendered only by ProductListPage — no other callers of onCategoryClick)",
+      "FilterContextValue exposes: sortBy, setSortBy, category, setCategory, search, setSearch, inStockOnly, setInStockOnly, debouncedSearch, clearFilters, savedFilters, saveCurrentFilters, restoreFilter, deleteFilter",
+      "localSortBy declared: ProductListPage.tsx:31; consumed: ProductListPage.tsx:80 (SortSelect value/onChange)",
+      "onCategoryClick prop declared: ProductList.tsx:7 (Props type), ProductCard.tsx:9 (Props type); passed at ProductListPage.tsx:97; passed through ProductList.tsx:23; called at ProductCard.tsx:46-49",
+      "Import pattern for useFilterContext in ProductListPage: import { useFilterContext } from '../context/FilterContext' (already present, no new import needed)",
+      "ProductCard is not yet importing useFilterContext — it will need: import { useFilterContext } from '../context/FilterContext'"
+    ],
+    "edgeCases": [
+      "e.stopPropagation() at ProductCard.tsx:47 MUST be preserved — the <article> card element has its own onClick for the product detail panel; without stopPropagation, clicking the category button would also open the detail panel",
+      "setCategory is idempotent — React bails out on same-value setState; clicking a category button on an already-active category is safe",
+      "SortSelect.onChange casts e.target.value as FilterState['sortBy'] internally — this is structurally identical to FilterContext's setSortBy parameter type (SortOption), so no type changes needed in SortSelect.tsx",
+      "handleFiltersChange in ProductListPage drops sortBy from its spread — benign after the fix since SortSelect will call setSortBy directly from context, not through FilterPanel",
+      "Bottom-up removal order (ProductCard → ProductList → ProductListPage) avoids intermediate TypeScript errors because onCategoryClick is optional (?:) on all Props types",
+      "After removing localSortBy from ProductListPage, the import of useState may become unused if no other state remains — check and remove if so (noUnusedLocals will fail the build otherwise)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "6 — ProductCard.tsx accepts no onCategoryClick prop; category button's onClick calls setCategory(product.category) from useFilterContext() directly",
+      "description": "In src/components/ProductCard.tsx: (1) remove onCategoryClick from the Props type, (2) remove the onCategoryClick parameter from the function signature, (3) add 'import { useFilterContext } from \"../context/FilterContext\"', (4) destructure setCategory from useFilterContext() inside the component body, (5) in the category button's onClick handler replace 'onCategoryClick?.(product.category)' with 'setCategory(product.category)' while keeping e.stopPropagation()",
+      "files": [
+        "src/benchmark-frontend/src/components/ProductCard.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "7 — ProductList.tsx accepts no onCategoryClick prop; Props type has no onCategoryClick field and it does not pass any such prop to ProductCard",
+      "description": "In src/components/ProductList.tsx: (1) remove onCategoryClick from the Props type, (2) remove the onCategoryClick parameter from the function signature, (3) remove onCategoryClick={onCategoryClick} from the ProductCard render call",
+      "files": [
+        "src/benchmark-frontend/src/components/ProductList.tsx"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "5 — ProductListPage.tsx contains no useState for sortBy/SortOption (localSortBy removed); SortSelect receives value={sortBy} and onChange={setSortBy} from useFilterContext(). Also satisfies requirement 8 — ProductListPage.tsx does not pass onCategoryClick to ProductList",
+      "description": "In src/pages/ProductListPage.tsx: (1) remove the localSortBy useState declaration (line 31) and setLocalSortBy — add setSortBy to the useFilterContext() destructure at line 22 (sortBy is already destructured), (2) change SortSelect props from value={localSortBy} onChange={setLocalSortBy} to value={sortBy} onChange={setSortBy} (line 80), (3) remove the onCategoryClick={() => {}} prop from the ProductList render (line 97), (4) if useState is now unused after removing localSortBy, remove the useState import",
+      "files": [
+        "src/benchmark-frontend/src/pages/ProductListPage.tsx"
+      ]
+    }
+  ]
+}
