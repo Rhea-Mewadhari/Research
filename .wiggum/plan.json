@@ -1,0 +1,30 @@
+{
+  "taskId": "task7",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix SortSelect: remove local sort state and wire SortSelect to FilterContext",
+      "status": "done",
+      "notes": "Removed localSortBy useState, added setSortBy from useFilterContext, wired SortSelect to sortBy/setSortBy from context. Build passes; 2 remaining test failures are category-click (phase-2)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix ProductCard: consume FilterContext.setCategory directly instead of onCategoryClick prop",
+      "status": "done",
+      "notes": "Imported useFilterContext in ProductCard, removed onCategoryClick prop, wired category button to setCategory from context. Also had to remove onCategoryClick forwarding from ProductList (and the unused prop from its type) and remove the no-op onCategoryClick from ProductListPage, as TypeScript strict mode rejected unused declarations — effectively completing phase-3 work to make the build pass. All 21 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Remove onCategoryClick prop drilling from ProductList and ProductListPage",
+      "status": "done",
+      "notes": "Done as part of phase-2: removed onCategoryClick from ProductList Props type and destructuring, removed onCategoryClick={...} from ProductCard usage in ProductList, removed no-op onCategoryClick from ProductListPage."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run tests and confirm build passes",
+      "status": "done",
+      "notes": "All 21 tests pass (7 test files). Build succeeds with no TypeScript or Vite errors."
+    }
+  ]
+}
