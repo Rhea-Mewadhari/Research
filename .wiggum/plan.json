@@ -1,0 +1,18 @@
+{
+  "taskId": "task9",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix toggleFavourite: add pendingIds tracking and revert-on-failure",
+      "status": "done",
+      "notes": "Edit src/benchmark-frontend/src/context/FavouritesContext.tsx only. Three changes needed in toggleFavourite: (1) call setPendingIds to add productId before the fetch call; (2) in the catch block, revert the optimistic update using a functional updater — if wasAdded===true remove productId, if wasAdded===false re-add it; (3) add a finally block that calls setPendingIds to remove productId. Do not modify FavouriteButton.tsx, FavouritesPage.tsx, or any other file."
+    },
+    {
+      "id": "phase-2",
+      "title": "Run tests and confirm build passes",
+      "status": "done",
+      "notes": "All 21 tests passed (7 test files including favouriteRevert.test.tsx). TypeScript build check (npx tsc --noEmit) exited with code 0 — no type errors."
+    }
+  ]
+}
