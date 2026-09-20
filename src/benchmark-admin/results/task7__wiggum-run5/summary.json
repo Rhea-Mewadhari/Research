@@ -1,0 +1,194 @@
+{
+  "taskId": "task7",
+  "runId": "wiggum-run5",
+  "timestamp": "2026-09-20T13:07:45.485Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 21,
+    "failed": 0,
+    "total": 21
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 14,
+    "failed": 0,
+    "total": 14,
+    "expectedFiles": 4,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 2020,
+    "hiddenMs": 2635,
+    "buildMs": 908,
+    "totalMs": 5640
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task7",
+    "wall_duration_ms": 371512,
+    "cost_usd": 1.7457233999999997,
+    "num_turns": 76,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "d610775a-f0a3-4179-87f0-7849db34256c",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix ProductListPage: remove localSortBy, wire SortSelect to FilterContext, drop no-op onCategoryClick from ProductList",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Fix ProductList: remove onCategoryClick prop from type and stop passing it to ProductCard",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Fix ProductCard: remove onCategoryClick prop, import useFilterContext, call setCategory directly on category button click",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-4",
+          "title": "Verify: run build and tests to confirm all pass",
+          "status": "done",
+          "notes": "21/21 tests passed, build succeeded cleanly (tsc + vite)."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 119855,
+          "cost_usd": 0.4889720999999999,
+          "num_turns": 25,
+          "session_id": "92ab021e-a34d-42e0-a957-6a5607716e51",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 55621,
+          "cost_usd": 0.3494378999999999,
+          "num_turns": 11,
+          "session_id": "3811b9d5-7faf-4437-ad4e-a600a40befc8",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 63456,
+          "cost_usd": 0.31988429999999995,
+          "num_turns": 16,
+          "session_id": "27448d62-dbcf-4892-a41e-961c3710dac4",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 35466,
+          "cost_usd": 0.207573,
+          "num_turns": 8,
+          "session_id": "d610775a-f0a3-4179-87f0-7849db34256c",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}

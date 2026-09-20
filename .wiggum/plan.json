@@ -1,0 +1,30 @@
+{
+  "taskId": "task7",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix ProductListPage: remove localSortBy, wire SortSelect to FilterContext, drop no-op onCategoryClick from ProductList",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix ProductList: remove onCategoryClick prop from type and stop passing it to ProductCard",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix ProductCard: remove onCategoryClick prop, import useFilterContext, call setCategory directly on category button click",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run build and tests to confirm all pass",
+      "status": "done",
+      "notes": "21/21 tests passed, build succeeded cleanly (tsc + vite)."
+    }
+  ]
+}
