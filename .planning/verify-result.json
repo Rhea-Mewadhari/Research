@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "When productId changes from null to a non-null value, document.activeElement must be the close button (button[aria-label=\"Close panel\"]) by the time the browser paints the panel.",
+      "passed": true,
+      "evidence": "Test 'focus moves to the close button when the panel opens (req 1)' in tests/productDetailFocus.test.tsx PASSED (vitest verbose run, Tests 29 passed). Implementation: ProductDetailPanel.tsx:56-68 uses useLayoutEffect to call closeButton?.focus() synchronously before paint."
+    },
+    {
+      "id": "2",
+      "description": "While the panel is open, pressing Tab on the last focusable element inside the panel wraps focus to the first focusable element inside the panel (focus never escapes to elements behind the panel).",
+      "passed": true,
+      "evidence": "Test 'Tab on the last focusable element wraps focus to the first inside the panel (req 2)' in tests/productDetailFocus.test.tsx PASSED (vitest verbose run, Tests 29 passed). Focus trap at ProductDetailPanel.tsx:72-101 handles Tab wrap via panel-level keydown listener."
+    },
+    {
+      "id": "3",
+      "description": "While the panel is open, pressing Shift+Tab on the first focusable element inside the panel wraps focus to the last focusable element inside the panel.",
+      "passed": true,
+      "evidence": "Test 'Shift+Tab on the first focusable element wraps focus to the last inside the panel (req 3)' in tests/productDetailFocus.test.tsx PASSED (vitest verbose run, Tests 29 passed). Shift+Tab branch at ProductDetailPanel.tsx:85-89."
+    },
+    {
+      "id": "4",
+      "description": "Pressing Escape at any time while the panel is open calls onClose, regardless of which element on the page has focus. The keydown listener is attached to document (not to a React element via onKeyDown).",
+      "passed": true,
+      "evidence": "Test 'Escape key closes the panel even when focus is outside the panel (req 4)' in tests/productDetailFocus.test.tsx PASSED (vitest verbose run, Tests 29 passed). Listener attached via document.addEventListener at ProductDetailPanel.tsx:109."
+    },
+    {
+      "id": "5",
+      "description": "When the panel closes, focus returns to the element that had focus immediately before the panel opened (captured at open time, not at close time).",
+      "passed": true,
+      "evidence": "Test 'focus returns to the previously-focused element when the panel closes (req 5)' in tests/productDetailFocus.test.tsx PASSED (vitest verbose run, Tests 29 passed). previouslyFocused.current captured at open time in useLayoutEffect cleanup at ProductDetailPanel.tsx:63-68."
+    },
+    {
+      "id": "6",
+      "description": "The document keydown listener added for Escape handling is removed when the panel closes or unmounts (no listener leak).",
+      "passed": true,
+      "evidence": "Test 'Escape listener is removed when the panel closes — no listener leak (req 6)' in tests/productDetailFocus.test.tsx PASSED (vitest verbose run, Tests 29 passed). document.removeEventListener called in useEffect cleanup at ProductDetailPanel.tsx:111."
+    },
+    {
+      "id": "7",
+      "description": "The focusable elements query inside the trap uses exactly this selector: button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])",
+      "passed": true,
+      "evidence": "File inspection of ProductDetailPanel.tsx:12 shows verbatim match: const FOCUSABLE_SELECTOR = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])'; Tab-wrap test (req 2) also passed confirming correct cycling."
+    },
+    {
+      "id": "8",
+      "description": "No new entries are added to benchmark-frontend/package.json dependencies or devDependencies (focus management must use native DOM APIs only).",
+      "passed": true,
+      "evidence": "'git diff HEAD -- src/benchmark-frontend/package.json' produced no output (exit code 0), confirming no dependency changes."
+    },
+    {
+      "id": "9",
+      "description": "The panel continues to render via ReactDOM.createPortal into document.body (mounting mechanism is unchanged).",
+      "passed": true,
+      "evidence": "All four required tests PASSED: 'clicking a product card opens the detail panel' ✓, 'panel contains a close button' ✓, 'clicking the close button closes the panel' ✓, 'clicking the backdrop closes the panel' ✓ (vitest verbose run, Tests 29 passed). ProductDetailPanel.tsx:117 confirmed: return ReactDOM.createPortal(..., document.body)."
+    },
+    {
+      "id": "10",
+      "description": "The scroll lock (document.body.style.overflow = 'hidden') remains active while the panel is open and is cleared when the panel closes.",
+      "passed": true,
+      "evidence": "Test 'scroll lock is applied while the panel is open and cleared when it closes (req 10)' in tests/productDetailFocus.test.tsx PASSED (vitest verbose run, Tests 29 passed). Implementation at ProductDetailPanel.tsx:47-53: document.body.style.overflow = 'hidden' on open, cleared to '' in cleanup."
+    },
+    {
+      "id": "11",
+      "description": "All visible tests pass and the TypeScript build succeeds with no errors.",
+      "passed": true,
+      "evidence": "Test run: 'Tests 29 passed (29), Test Files 7 passed (7)' — exit code 0. Build: 'tsc -b && vite build ... ✓ built in 410ms' — exit code 0. No TypeScript errors reported."
+    }
+  ]
+}

@@ -9,15 +9,7 @@ type Props = {
 };
 
 const BASE_URL = 'http://localhost:3001';
-
-function getFocusable(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),' +
-        'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
-    ),
-  );
-}
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function ProductDetailPanel({ productId, onClose }: Props) {
   const [product, setProduct] = useState<Product | null>(null);
@@ -25,8 +17,7 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const panelRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const previouslyFocused = useRef<Element | null>(null);
 
   const isOpen = productId !== null;
 
@@ -61,46 +52,64 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
     };
   }, [isOpen]);
 
-  // Focus management: save trigger element on open; restore on close
+  // Focus-on-open and focus-restore
   useLayoutEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
-      closeButtonRef.current?.focus();
-    } else {
-      const trigger = previousFocusRef.current;
-      previousFocusRef.current = null;
-      trigger?.focus();
+    if (!isOpen) return;
+    previouslyFocused.current = document.activeElement;
+    if (panelRef.current) {
+      const closeButton = panelRef.current.querySelector<HTMLElement>('button[aria-label="Close panel"]');
+      closeButton?.focus();
     }
+    return () => {
+      const prev = previouslyFocused.current;
+      if (prev && typeof (prev as HTMLElement).focus === 'function' && document.body.contains(prev)) {
+        (prev as HTMLElement).focus();
+      }
+    };
   }, [isOpen]);
 
-  // Keyboard: Escape + focus trap
+  // Focus trap
   useEffect(() => {
     if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
+    const panel = panelRef.current;
+    if (!panel) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (focusable.length === 0) {
+        event.preventDefault();
         return;
       }
-
-      if (e.key === 'Tab' && panelRef.current) {
-        const focusable = getFocusable(panelRef.current);
-        if (!focusable.length) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey) {
+        if (document.activeElement === first) {
+          event.preventDefault();
           last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === last) {
+          event.preventDefault();
           first.focus();
         }
       }
     };
+    panel.addEventListener('keydown', handleKeyDown);
+    return () => {
+      panel.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
+  // Escape handler on document
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -133,7 +142,6 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
         }}
       >
         <button
-          ref={closeButtonRef}
           type="button"
           aria-label="Close panel"
           className="detail-close-btn"
