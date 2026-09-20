@@ -1,0 +1,54 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task8",
+  "wall_duration_ms": 227709,
+  "cost_usd": 0.9213657000000001,
+  "num_turns": 42,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "4085a8fc-0a4c-4f4d-b497-a722e5fcc463",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix debounce delay: change useDebounce call in FilterContext from 0 to 300 ms with instant-clear bypass",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-2",
+        "title": "Restore deleted test files and verify all tests pass",
+        "status": "done",
+        "notes": "All 7 task8 test files present; 22 tests pass; build succeeds. No files needed restoration."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 67751,
+        "cost_usd": 0.2833932,
+        "num_turns": 15,
+        "session_id": "278dbb91-34e9-4a92-be43-df807350265e",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 92112,
+        "cost_usd": 0.38650530000000005,
+        "num_turns": 18,
+        "session_id": "4085a8fc-0a4c-4f4d-b497-a722e5fcc463",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 2,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}

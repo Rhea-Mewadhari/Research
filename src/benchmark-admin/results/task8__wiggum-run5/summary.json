@@ -1,0 +1,160 @@
+{
+  "taskId": "task8",
+  "runId": "wiggum-run5",
+  "timestamp": "2026-09-20T15:21:22.294Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 22,
+    "failed": 0,
+    "total": 22
+  },
+  "hiddenTests": {
+    "success": false,
+    "passed": 11,
+    "failed": 1,
+    "total": 12,
+    "expectedFiles": 3,
+    "crashed": false
+  },
+  "overall": {
+    "success": false
+  },
+  "timing": {
+    "visibleMs": 7338,
+    "hiddenMs": 2577,
+    "buildMs": 1810,
+    "totalMs": 11789
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 0.917,
+    "robustnessGap": 0.083,
+    "buildStability": 1,
+    "correctnessScore": 0.958,
+    "qualityScore": 0.93,
+    "overallScore": 0.947
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task8",
+    "wall_duration_ms": 227709,
+    "cost_usd": 0.9213657000000001,
+    "num_turns": 42,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "4085a8fc-0a4c-4f4d-b497-a722e5fcc463",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix debounce delay: change useDebounce call in FilterContext from 0 to 300 ms with instant-clear bypass",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Restore deleted test files and verify all tests pass",
+          "status": "done",
+          "notes": "All 7 task8 test files present; 22 tests pass; build succeeds. No files needed restoration."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 67751,
+          "cost_usd": 0.2833932,
+          "num_turns": 15,
+          "session_id": "278dbb91-34e9-4a92-be43-df807350265e",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 92112,
+          "cost_usd": 0.38650530000000005,
+          "num_turns": 18,
+          "session_id": "4085a8fc-0a4c-4f4d-b497-a722e5fcc463",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 2,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
