@@ -1,0 +1,24 @@
+{
+  "taskId": "task9",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix isPending tracking: add productId to pendingIds before fetch, remove in finally",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix optimistic UI revert: undo favourite state change in catch block using wasAdded flag",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Restore deleted test files and verify all tests pass",
+      "status": "done",
+      "notes": "All 7 test files present, 21/21 tests passing, build succeeds. Test files were already in place from prior iterations."
+    }
+  ]
+}

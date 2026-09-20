@@ -1,0 +1,177 @@
+{
+  "taskId": "task9",
+  "runId": "wiggum-run5",
+  "timestamp": "2026-09-20T16:51:11.492Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 21,
+    "failed": 0,
+    "total": 21
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1946,
+    "hiddenMs": 956,
+    "buildMs": 892,
+    "totalMs": 3839
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.88,
+    "overallScore": 0.952
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task9",
+    "wall_duration_ms": 256482,
+    "cost_usd": 1.2034401,
+    "num_turns": 54,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "36157d17-0f93-4eba-8a04-1242437cc261",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix isPending tracking: add productId to pendingIds before fetch, remove in finally",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Fix optimistic UI revert: undo favourite state change in catch block using wasAdded flag",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Restore deleted test files and verify all tests pass",
+          "status": "done",
+          "notes": "All 7 test files present, 21/21 tests passing, build succeeds. Test files were already in place from prior iterations."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 64922,
+          "cost_usd": 0.3118734,
+          "num_turns": 15,
+          "session_id": "08431d1c-5454-49b3-a9ff-1a5b88e366f3",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 60000,
+          "cost_usd": 0.31294500000000003,
+          "num_turns": 16,
+          "session_id": "32771b8e-790d-42dc-b879-29d8b595450f",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 57499,
+          "cost_usd": 0.32740350000000007,
+          "num_turns": 14,
+          "session_id": "36157d17-0f93-4eba-8a04-1242437cc261",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 3,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
