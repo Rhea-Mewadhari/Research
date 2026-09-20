@@ -1,0 +1,54 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task9",
+  "wall_duration_ms": 193326,
+  "cost_usd": 0.8435817000000001,
+  "num_turns": 36,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "34f193d2-5dbd-454b-8bca-da76ec5c313f",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix toggleFavourite: add setPendingIds calls and revert on failure",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-2",
+        "title": "Verify tests pass and build succeeds",
+        "status": "done",
+        "notes": "All 21 tests passed (7 test files). Build completed successfully with tsc + vite."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 88903,
+        "cost_usd": 0.3754815000000001,
+        "num_turns": 19,
+        "session_id": "9b087af5-9493-4b4e-bdff-75ee796eff8c",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 37926,
+        "cost_usd": 0.1971135,
+        "num_turns": 7,
+        "session_id": "34f193d2-5dbd-454b-8bca-da76ec5c313f",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 2,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}
