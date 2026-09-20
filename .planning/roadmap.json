@@ -1,0 +1,60 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0, TypeScript 5.7.2, Vite 6.2, Vitest 3.2.4 with jsdom",
+      "State management: useState + useContext + useCallback — no external state library",
+      "favouriteIds and pendingIds are both Set<string> held in useState; always create a new Set to trigger re-render",
+      "Functional updater pattern already established: setFavouriteIds(prev => { const next = new Set(prev); ...; return next; })",
+      "Strict TS flags: noUnusedLocals, noUnusedParameters — introduced symbols must actually be used",
+      "verbatimModuleSyntax: true — type-only imports need the 'type' keyword",
+      "Tests stub global fetch via vi.stubGlobal; implementation must use window.fetch (not an injected dep)",
+      "Build command: tsc -b && vite build; test command: vitest run"
+    ],
+    "features": [
+      "toggleFavourite (current): reads favouriteIds → computes wasAdded → optimistic setFavouriteIds update → try/catch fetch → on success: setError(null) → on failure: setError(msg) only — no revert",
+      "setPendingIds is defined (line 27) but never called anywhere in the file; pendingIds is always an empty Set",
+      "isPending(productId) reads pendingIds.has(productId) — always returns false because pendingIds is never populated",
+      "FavouriteButton already fully wired: disabled={pending}, aria-label swap, Loading span — just needs isPending to return true during in-flight requests",
+      "What must not regress: localStorage hydration (useLayoutEffect), localStorage sync (useEffect), isFavourite, FavouritesPage results-count, all 4 happy-path tests in favouriteRevert.test.tsx",
+      "Bug 1: no setPendingIds calls — isPending always false, FavouriteButton never disabled",
+      "Bug 2: catch block does not call setFavouriteIds — optimistic update never reverted on fetch rejection"
+    ],
+    "architecture": [
+      "FavouritesContext.tsx: Provider + useFavouritesContext hook; toggleFavourite is useCallback with [favouriteIds] dep array",
+      "toggleFavourite uses async/await with try/catch — no finally block currently exists; one must be added",
+      "Functional updater already used for setFavouriteIds optimistic update (lines 51–59) — same pattern required in catch revert",
+      "Fix location: all changes are within toggleFavourite in FavouritesContext.tsx (lines ~46–83)",
+      "Order of operations in fixed version: setPendingIds(add) → optimistic setFavouriteIds → try fetch → catch: setFavouriteIds(revert) + setError → finally: setPendingIds(remove)",
+      "Only src/benchmark-frontend/src/context/FavouritesContext.tsx may be modified; FavouriteButton.tsx, FavouritesPage.tsx, and tests/ are read-only"
+    ],
+    "edgeCases": [
+      "Concurrent toggles on different products: catch revert must use functional updater (prev => ...) not a snapshot Set captured before the toggle — prevents overwriting a concurrent successful toggle on another product",
+      "Add-failure revert: catch must call setFavouriteIds(prev => { const next = new Set(prev); next.delete(productId); return next; }) when wasAdded is true",
+      "Remove-failure revert: catch must call setFavouriteIds(prev => new Set(prev).add(productId)) when wasAdded is false",
+      "finally ordering: catch reverts favouriteIds first, then finally removes from pendingIds — both execute on failure path; correct because finally always runs after catch",
+      "Double-toggle guard: button is disabled while isPending(productId) is true — a second call cannot reach toggleFavourite for the same productId; if it somehow did, adding an already-present id to a Set is a no-op and the finally cleanup correctly removes it once",
+      "Non-2xx responses where fetch does not reject: out of scope per requirements — do not add response.ok checks",
+      "Happy-path tests (favouriteRevert.test.tsx × 4) use a global fetch stub that always resolves — the fix must not break these; setPendingIds adds/removes around each fetch call so pendingIds is always empty after test completes"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 4: toggleFavourite must call setPendingIds to add productId before the fetch call so isPending(productId) returns true while the request is in flight",
+      "description": "In toggleFavourite in FavouritesContext.tsx, add `setPendingIds(prev => new Set(prev).add(productId))` immediately before the try/fetch block (after the optimistic setFavouriteIds call)",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 1 and 2: when fetch rejects, revert favouriteIds to pre-toggle state; Requirement 3: revert must use a functional updater not a stale snapshot",
+      "description": "In the catch block of toggleFavourite in FavouritesContext.tsx, add a setFavouriteIds functional updater that reverts the optimistic update: if wasAdded is true, delete productId from the new Set; if wasAdded is false, add productId to the new Set",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5: toggleFavourite must call setPendingIds to remove productId in a finally block after both success and failure paths; Requirement 6: FavouriteButton must be disabled while in-flight (satisfied automatically once requirements 4 and 5 are met)",
+      "description": "Add a finally block after the try/catch in toggleFavourite in FavouritesContext.tsx containing `setPendingIds(prev => { const next = new Set(prev); next.delete(productId); return next; })` — do not duplicate this in the catch branch",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    }
+  ]
+}
