@@ -27,7 +27,6 @@ export function FavouritesProvider({ children }: { children: ReactNode }) {
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
 
-  // Hydrate before first paint so favourites are visible without a flash
   useLayoutEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -48,7 +47,7 @@ export function FavouritesProvider({ children }: { children: ReactNode }) {
     async (productId: string) => {
       const wasAdded = !favouriteIds.has(productId);
 
-      // 1. Optimistic update
+      // 1. Optimistic update — immediate UI change
       setFavouriteIds((prev) => {
         const next = new Set(prev);
         if (wasAdded) {
@@ -59,11 +58,14 @@ export function FavouritesProvider({ children }: { children: ReactNode }) {
         return next;
       });
 
-      // 2. Mark in-flight
-      setPendingIds((prev) => new Set(prev).add(productId));
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.add(productId);
+        return next;
+      });
 
       try {
-        // 3. Persist to server
+        // 2. Persist to server
         if (wasAdded) {
           await fetch(`${BASE_URL}/api/favourites`, {
             method: 'POST',
@@ -73,10 +75,8 @@ export function FavouritesProvider({ children }: { children: ReactNode }) {
         } else {
           await fetch(`${BASE_URL}/api/favourites/${productId}`, { method: 'DELETE' });
         }
-        // 4. Success
         setError(null);
       } catch (err) {
-        // 5. Revert optimistic update
         setFavouriteIds((prev) => {
           const next = new Set(prev);
           if (wasAdded) {

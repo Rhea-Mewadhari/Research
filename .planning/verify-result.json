@@ -1,0 +1,53 @@
+{
+  "passed": false,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "When fetch rejects inside toggleFavourite, the catch block must call setFavouriteIds with a functional updater that undoes the optimistic change: if wasAdded === true, removes productId; if wasAdded === false, adds productId back.",
+      "passed": true,
+      "evidence": "Code inspection of FavouritesContext.tsx lines 79-88: catch block contains `setFavouriteIds((prev) => { const next = new Set(prev); if (wasAdded) { next.delete(productId); } else { next.add(productId); } return next; });` — exactly matches the required functional-updater revert pattern using wasAdded."
+    },
+    {
+      "id": "2",
+      "description": "The revert in the catch block must use a functional state updater (setFavouriteIds(prev => ...)) rather than closing over the pre-toggle favouriteIds snapshot.",
+      "passed": true,
+      "evidence": "Code inspection of FavouritesContext.tsx line 80: catch block calls `setFavouriteIds((prev) => { ... })` — a callback/functional updater, not a captured Set literal. Only `wasAdded` (a boolean captured synchronously) is closed over; the `favouriteIds` Set itself is never captured."
+    },
+    {
+      "id": "3",
+      "description": "Before the fetch call, setPendingIds must be called to add productId to pendingIds, making isPending(productId) return true during the request.",
+      "passed": true,
+      "evidence": "Code inspection of FavouritesContext.tsx lines 61-65: `setPendingIds((prev) => { const next = new Set(prev); next.add(productId); return next; });` appears before the `try` block at line 67 (which contains the await fetch calls) — outside any try block, before fetch is called."
+    },
+    {
+      "id": "4",
+      "description": "After the fetch settles (success or failure), setPendingIds must be called in a finally block to remove productId from pendingIds.",
+      "passed": true,
+      "evidence": "Code inspection of FavouritesContext.tsx lines 90-95: `finally { setPendingIds((prev) => { const next = new Set(prev); next.delete(productId); return next; }); }` — cleanup is exclusively in a finally block, not duplicated in try or catch."
+    },
+    {
+      "id": "5",
+      "description": "On a successful API call, the optimistic update is preserved — the product's favourite state remains in the toggled position after fetch resolves.",
+      "passed": true,
+      "evidence": "pnpm test output from src/benchmark-frontend: `✓ tests/favouriteRevert.test.tsx (4 tests) 260ms` — all four tests in favouriteRevert.test.tsx passed. Full suite: Test Files 7 passed (7), Tests 21 passed (21), exit code 0."
+    },
+    {
+      "id": "6",
+      "description": "No test file is modified and no file outside src/benchmark-frontend/src/context/FavouritesContext.tsx is changed.",
+      "passed": false,
+      "evidence": "`git diff --name-only` produced no output (working tree is clean). The stated verification method requires the output to show exactly one changed file (src/benchmark-frontend/src/context/FavouritesContext.tsx), but it shows zero files. This is because the entire codebase was committed in a single initial commit ('030c517 sandbox: after execute-phase') — there is no uncommitted diff to inspect and no prior commit to compare against (HEAD~1 does not exist). The verification method as written is unverifiable in this single-commit repository setup."
+    },
+    {
+      "id": "7",
+      "description": "All visible tests across the frontend suite pass.",
+      "passed": true,
+      "evidence": "pnpm test output from src/benchmark-frontend: Test Files 7 passed (7), Tests 21 passed (21), exit code 0. Zero failing tests across all test files: app.render.test.tsx, loadingError.test.tsx, clearFilters.test.tsx, sorting.test.tsx, pagination.test.tsx, favouriteRevert.test.tsx, filtering.test.tsx."
+    },
+    {
+      "id": "8",
+      "description": "The TypeScript build produces no type errors.",
+      "passed": true,
+      "evidence": "pnpm run build output from src/benchmark-frontend: `tsc -b` succeeded with no type errors, vite build completed — `✓ built in 389ms`, dist/assets/index-Bf0GXNfq.js 255.76 kB produced. Exit code 0."
+    }
+  ]
+}

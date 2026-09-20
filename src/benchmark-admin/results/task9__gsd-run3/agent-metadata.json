@@ -1,0 +1,135 @@
+{
+  "framework": "gsd",
+  "target": "frontend",
+  "taskId": "task9",
+  "wall_duration_ms": 1147890,
+  "cost_usd": 3.3987521999999997,
+  "num_turns": 110,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "efee40ae-610f-42e7-8e02-6c293f4f133a",
+  "gsd": {
+    "phases": [
+      {
+        "name": "new-project",
+        "treeHash": "5e598e3dec3f15e08bcdc7201047ec4e5cf830c0",
+        "label": "new-project",
+        "exit_code": 0,
+        "wall_duration_ms": 49513,
+        "cost_usd": 0.2160888,
+        "num_turns": 8,
+        "session_id": "a603d9d6-4489-464e-8451-c155d5767924",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "discuss-phase",
+        "treeHash": "630e76793048934ac170f625ecf80e620c7d0110",
+        "label": "discuss-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 76935,
+        "cost_usd": 0.29354099999999994,
+        "num_turns": 9,
+        "session_id": "73b07efb-1c8d-414f-8098-ce02dfb56527",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "plan-phase",
+        "treeHash": "1d8f194af118e0bcc44dbc9e56636cc032afd4cc",
+        "label": "plan-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 67851,
+        "cost_usd": 0.23695650000000001,
+        "num_turns": 6,
+        "session_id": "3cdebb75-d906-4619-aee6-44ba265e6d86",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "133b16630fe7fdbe88a9cac7e5d46d07ef737f4f",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 57808,
+        "cost_usd": 0.25983,
+        "num_turns": 9,
+        "session_id": "d7eb98f2-b599-4381-834d-3e3ef53f54fc",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "681653afa5a76e2420caa2580e3dc21ec5bc04fa",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 275291,
+        "cost_usd": 0.6512922,
+        "num_turns": 23,
+        "session_id": "079ca854-5d17-4d67-8539-edd13997a0e0",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "681653afa5a76e2420caa2580e3dc21ec5bc04fa",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 228386,
+        "cost_usd": 0.6235125,
+        "num_turns": 16,
+        "session_id": "e6363112-aaee-48c2-b2cf-d96add6f7275",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "cb65d33b1c51014118df54c79dfc2c441983def9",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 117763,
+        "cost_usd": 0.3762873,
+        "num_turns": 14,
+        "session_id": "209e5e89-2152-4fe5-a3f8-e7bbc36b56e7",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "cb65d33b1c51014118df54c79dfc2c441983def9",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 103769,
+        "cost_usd": 0.32018009999999997,
+        "num_turns": 9,
+        "session_id": "9cc6ab78-2dde-41c8-be30-668645f87dfb",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "9adb7aeb222d7c51d153e04868b8cc25dc1e2dec",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 143589,
+        "cost_usd": 0.4210638,
+        "num_turns": 16,
+        "session_id": "efee40ae-610f-42e7-8e02-6c293f4f133a",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "passedFirstAttempt": false,
+    "reworkAttempts": 2,
+    "completed": false,
+    "failedAtPhase": "verify-work",
+    "failedCriteria": [
+      {
+        "id": "6",
+        "description": "No test file is modified and no file outside src/benchmark-frontend/src/context/FavouritesContext.tsx is changed.",
+        "passed": false,
+        "evidence": "`git diff --name-only` produced no output (working tree is clean). The stated verification method requires the output to show exactly one changed file (src/benchmark-frontend/src/context/FavouritesContext.tsx), but it shows zero files. This is because the entire codebase was committed in a single initial commit ('030c517 sandbox: after execute-phase') — there is no uncommitted diff to inspect and no prior commit to compare against (HEAD~1 does not exist). The verification method as written is unverifiable in this single-commit repository setup."
+      }
+    ]
+  }
+}

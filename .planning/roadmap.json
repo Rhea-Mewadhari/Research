@@ -1,0 +1,51 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 18+ with TypeScript; all necessary hooks (useState, useCallback, useContext, createContext, useEffect, useLayoutEffect) are already imported in FavouritesContext.tsx",
+      "Functional state updater pattern (setX(prev => ...)) is already in use for the optimistic update — the same pattern is required for both the revert and pendingIds mutations",
+      "No new dependencies are needed; no imports need to change",
+      "pnpm workspace: test command is `pnpm --filter benchmark-frontend test`, build is `pnpm --filter benchmark-frontend build`"
+    ],
+    "features": [
+      "FavouritesContext exposes: favouriteIds (Set<string>), pendingIds (Set<string>), error (string|null), toggleFavourite, isFavourite, isPending — public interface must not change",
+      "Optimistic update for favouriteIds is already correctly implemented with a functional updater before the fetch",
+      "wasAdded is already captured synchronously before the optimistic update — correct placement for per-call revert data",
+      "pendingIds state exists and is threaded through to isPending/FavouriteButton, but setPendingIds is never called — isPending always returns false",
+      "FavouriteButton.tsx and FavouritesPage.tsx must not be modified; they already consume isPending correctly",
+      "Tests live in src/benchmark-frontend/tests/favouriteRevert.test.tsx — must not be modified and must all pass"
+    ],
+    "architecture": [
+      "Single file change: src/benchmark-frontend/src/context/FavouritesContext.tsx",
+      "All changes are inside the toggleFavourite useCallback body — no new functions, no new state, no interface changes",
+      "Fix structure: (1) setPendingIds add before await fetch, (2) try/catch/finally wrapping the fetch, (3) setFavouriteIds functional revert inside catch",
+      "The useCallback dependency array [favouriteIds] is unchanged — wasAdded already closes over favouriteIds correctly",
+      "localStorage sync (useEffect on favouriteIds) is unaffected — it runs after any setFavouriteIds call including the revert"
+    ],
+    "edgeCases": [
+      "Concurrent toggle on a different product while product A is in-flight: functional updater reads from prev (latest state), so product B's toggle is not clobbered when product A reverts — covered by using setFavouriteIds(prev => ...) not a stale Set literal",
+      "Concurrent toggle on same product: each call captures its own wasAdded and reverts its own change independently; button disabled via isPending reduces likelihood but is not the only guard",
+      "Fetch rejects after another successful toggle on the same product in a prior call: wasAdded is per-call-scoped, so the revert direction is always correct for this specific call",
+      "Success path: catch block does not run, optimistic state is preserved; finally still runs and cleans up pendingIds",
+      "Failure path: catch reverts favouriteIds, then finally runs and cleans up pendingIds — ordering is correct",
+      "setPendingIds add must appear before await fetch (not after) so isPending returns true during the entire request lifetime"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 3 & 4 — setPendingIds must add productId before fetch and remove it in a finally block",
+      "description": "In toggleFavourite, add `setPendingIds(prev => { const next = new Set(prev); next.add(productId); return next; })` immediately before the try block (or at the start of the try, before await fetch). Wrap the existing try/catch in a try/catch/finally and add `setPendingIds(prev => { const next = new Set(prev); next.delete(productId); return next; })` inside the finally block.",
+      "files": [
+        "src/benchmark-frontend/src/context/FavouritesContext.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 1 & 2 — catch block must revert the optimistic update using a functional state updater that reads wasAdded",
+      "description": "In the catch block of toggleFavourite, add `setFavouriteIds(prev => { const next = new Set(prev); if (wasAdded) next.delete(productId); else next.add(productId); return next; })` before the existing setError call. The updater must take a callback (not a Set literal) so concurrent toggles on other products are not clobbered.",
+      "files": [
+        "src/benchmark-frontend/src/context/FavouritesContext.tsx"
+      ]
+    }
+  ]
+}
