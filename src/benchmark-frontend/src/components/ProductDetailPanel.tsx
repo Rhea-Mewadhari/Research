@@ -10,14 +10,8 @@ type Props = {
 
 const BASE_URL = 'http://localhost:3001';
 
-function getFocusable(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),' +
-        'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
-    ),
-  );
-}
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function ProductDetailPanel({ productId, onClose }: Props) {
   const [product, setProduct] = useState<Product | null>(null);
@@ -26,7 +20,7 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
 
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const prevFocusRef = useRef<Element | null>(null);
 
   const isOpen = productId !== null;
 
@@ -61,49 +55,55 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
     };
   }, [isOpen]);
 
-  // Focus management: save trigger element on open; restore on close
+  // Focus on open: capture previous focus target, move focus to close button; restore on close
   useLayoutEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
+    if (productId !== null) {
+      prevFocusRef.current = document.activeElement;
       closeButtonRef.current?.focus();
-    } else {
-      const trigger = previousFocusRef.current;
-      previousFocusRef.current = null;
-      trigger?.focus();
     }
-  }, [isOpen]);
+    return () => {
+      const prev = prevFocusRef.current;
+      if (prev && prev.isConnected) {
+        (prev as HTMLElement).focus();
+      }
+      prevFocusRef.current = null;
+    };
+  }, [productId]);
 
-  // Keyboard: Escape + focus trap
+  // Escape key: document-level listener so it fires regardless of focus location
   useEffect(() => {
     if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-        return;
-      }
-
-      if (e.key === 'Tab' && panelRef.current) {
-        const focusable = getFocusable(panelRef.current);
-        if (!focusable.length) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
     };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handler);
+    return () => {
+      document.removeEventListener('keydown', handler);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(
+      panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? [],
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  };
 
   return ReactDOM.createPortal(
     <>
@@ -119,6 +119,7 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
         aria-modal="true"
         aria-labelledby="detail-panel-title"
         className="detail-panel"
+        onKeyDown={handleKeyDown}
         style={{
           position: 'fixed',
           top: 0,

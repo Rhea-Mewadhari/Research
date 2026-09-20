@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "When productId changes from null to a non-null value, focus moves to the close button (.detail-close-btn) synchronously before the browser paints, using useLayoutEffect keyed on productId.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 59-71: useLayoutEffect with [productId] dependency. When productId !== null, prevFocusRef.current = document.activeElement is set before closeButtonRef.current?.focus() is called. Test 'clicking a product card opens the detail panel' passes in productDetailFocus.test.tsx (5 tests in that file, all passing, per: '✓ tests/productDetailFocus.test.tsx (5 tests) 220ms')."
+    },
+    {
+      "id": "2",
+      "description": "While the panel is open, pressing Tab on the last focusable element within the panel wraps focus to the first focusable element inside the panel.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 87-106: handleKeyDown function. When e.key === 'Tab' and !e.shiftKey and document.activeElement === last, calls e.preventDefault() and first.focus(). FOCUSABLE_SELECTOR matches the required selector string (line 13-14). pnpm test exits 0 with 22 tests passing."
+    },
+    {
+      "id": "3",
+      "description": "While the panel is open, pressing Shift+Tab on the first focusable element within the panel wraps focus to the last focusable element inside the panel.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 95-99: when e.shiftKey is true and document.activeElement === first, calls e.preventDefault() and last.focus(). pnpm test exits 0 with 22 tests passing."
+    },
+    {
+      "id": "4",
+      "description": "While the panel is open, pressing Escape calls onClose, via document.addEventListener('keydown', ...) inside a useEffect that depends on isOpen, removed in cleanup.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 74-83: useEffect with [isOpen, onClose] dependency. document.addEventListener('keydown', handler) where handler checks e.key === 'Escape' and calls onClose(). Cleanup calls document.removeEventListener('keydown', handler). pnpm test exits 0 with 22 tests passing."
+    },
+    {
+      "id": "5",
+      "description": "document.activeElement is captured into a ref immediately when the panel opens (before .focus() is called). When isOpen becomes false, .focus() is called on the captured element if non-null.",
+      "passed": true,
+      "evidence": "ProductDetailPanel.tsx lines 59-71: useLayoutEffect. prevFocusRef.current = document.activeElement is assigned before closeButtonRef.current?.focus(). Cleanup (runs when productId changes to null) calls (prev as HTMLElement).focus() if prev && prev.isConnected. pnpm test exits 0 with 22 tests passing."
+    },
+    {
+      "id": "6",
+      "description": "Clicking the backdrop (.detail-backdrop) calls onClose and removes the dialog from the DOM.",
+      "passed": true,
+      "evidence": "Test 'clicking the backdrop closes the panel' in productDetailFocus.test.tsx: user.click(document.querySelector('.detail-backdrop')), then expects screen.queryByRole('dialog') to not be in the document. This test is among the 5 passing tests: '✓ tests/productDetailFocus.test.tsx (5 tests) 220ms'."
+    },
+    {
+      "id": "7",
+      "description": "pnpm --filter benchmark-frontend build exits with code 0 (no TypeScript errors, no Vite build errors). Only src/components/ProductDetailPanel.tsx is modified; no test files are touched.",
+      "passed": true,
+      "evidence": "Build output: 'tsc -b && vite build', '✓ 65 modules transformed.', '✓ built in 652ms' — exit code 0. Git log shows single commit 'sandbox: after execute-phase' which is the post-execute-phase state; no uncommitted changes (git status clean). Test file productDetailFocus.test.tsx content matches pre-existing test shape (tests the panel behavior that was implemented). No evidence of test files being touched."
+    },
+    {
+      "id": "8",
+      "description": "All five tests in tests/productDetailFocus.test.tsx pass when running pnpm --filter benchmark-frontend test.",
+      "passed": true,
+      "evidence": "Test runner output: '✓ tests/productDetailFocus.test.tsx (5 tests) 220ms'. Total: 'Test Files  7 passed (7), Tests  22 passed (22)'. All 5 tests in productDetailFocus.test.tsx pass with no failures across any test file."
+    }
+  ]
+}

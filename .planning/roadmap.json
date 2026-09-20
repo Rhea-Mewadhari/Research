@@ -1,0 +1,70 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7.2, Vite 6.2, Vitest 3.2 + jsdom + @testing-library/react 16",
+      "noUnusedLocals and noUnusedParameters enforced — every new ref must be used in JSX or logic or the build fails",
+      "eslint-plugin-react-hooks active with exhaustive-deps — dependency arrays must be correct",
+      "useLayoutEffect is safe (pure client-side SPA, no SSR), fires synchronously before paint",
+      "jsdom supports element.focus() and document.activeElement; portal via document.body means elements are in the document and natively focusable",
+      "Build command: tsc -b && vite build — TypeScript errors block the build"
+    ],
+    "features": [
+      "ProductDetailPanel renders via ReactDOM.createPortal into document.body — panel DOM exists in document when useLayoutEffect fires",
+      "isOpen = productId !== null; early return null sits after all hooks",
+      "panelRef (HTMLDivElement) is already attached to the panel div but currently unused — can be used for querySelectorAll in Tab-trap",
+      "Close button (detail-close-btn, aria-label='Close panel') is the first interactive element in the panel; has no ref attached yet",
+      "Backdrop div.detail-backdrop onClick={onClose} already works — must not regress",
+      "Scroll-lock useEffect (depends on [isOpen]) already in place — new effects must not conflict",
+      "Data-fetch useEffect (depends on [productId]) resets product/isLoading/error — during loading only the close button is focusable",
+      "Tests in productDetailFocus.test.tsx render full <App />, stub fetch, and test open/close/backdrop — 5 tests must pass",
+      "ProductDetailPanel is only rendered in ProductListPage.tsx; onClose = () => setDetailProductId(null)"
+    ],
+    "architecture": [
+      "Hook order convention: state → refs → derived constants → useEffect blocks → early return → JSX",
+      "New refs (closeButtonRef, prevFocusRef) go immediately after panelRef declaration (currently line 18)",
+      "New useLayoutEffect (focus-on-open + prev-focus capture/restore) goes after the two existing useEffect blocks, before the if (!isOpen) return null guard",
+      "New useEffect for document-level Escape listener also goes in that same zone (after scroll-lock effect)",
+      "Tab-trap logic belongs as an onKeyDown prop on the panel div — requirements 2 and 3 explicitly specify 'the panel div's onKeyDown handler'",
+      "Escape must use document.addEventListener (not onKeyDown prop) — requirement 4 is explicit; document-level listener fires even when focus is outside the panel",
+      "No component currently uses useLayoutEffect — ProductDetailPanel will be the first",
+      "Prop types declared as local 'type Props = { ... }' above the function — existing pattern; no new props needed"
+    ],
+    "edgeCases": [
+      "Zero focusable elements: guard focusable list before calling [0].focus() or at(-1).focus() — close button always exists while open so list is never truly empty, but guard defensively",
+      "One focusable element (close button only, during loading/error states): Tab and Shift+Tab must wrap back to the same element (first === last); no-op movement is correct",
+      "document.activeElement is null or body at open time: capture it into prevFocusRef regardless; restore call must be guarded — if (prevFocusRef.current && prevFocusRef.current.isConnected) prevFocusRef.current.focus()",
+      "productId switches between two non-null values: useLayoutEffect depends on [productId] so it re-runs on each change — prev-focus is re-captured from the new document.activeElement on each product open",
+      "Escape key when focus is outside panel: document-level listener fires unconditionally — no contains() check should filter it",
+      "Escape listener must be removed in useEffect cleanup to prevent calling stale onClose on an already-closed panel",
+      "Backdrop and close-button both call onClose — both reach the same useLayoutEffect cleanup (productId → null) and restore focus correctly",
+      "Unmount while open: cleanup runs; check isConnected before restoring focus to avoid calling focus() on a detached node",
+      "useLayoutEffect keyed on productId: cleanup runs before the next effect run AND on unmount — both the restore path and the Escape cleanup must handle this"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1 and 5: useLayoutEffect keyed on productId; Requirement 7: noUnusedLocals means refs must be attached in JSX",
+      "description": "Add closeButtonRef (useRef<HTMLButtonElement>(null)) and prevFocusRef (useRef<Element | null>(null)) after the existing panelRef declaration. Attach closeButtonRef to the close button element in JSX (replacing or augmenting the existing button). These refs are prerequisites for the useLayoutEffect and Tab-trap logic.",
+      "files": ["src/benchmark-frontend/src/components/ProductDetailPanel.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 1: focus moves to close button on open using useLayoutEffect keyed on productId. Requirement 5: document.activeElement captured into ref before .focus(); restored when isOpen becomes false.",
+      "description": "Add a useLayoutEffect that depends on [productId]. When productId is non-null: capture document.activeElement into prevFocusRef.current before calling any .focus(), then call closeButtonRef.current?.focus(). In the effect cleanup: call prevFocusRef.current?.focus() if prevFocusRef.current is non-null and isConnected, then reset prevFocusRef.current to null. Place this effect after the existing scroll-lock useEffect, before the if (!isOpen) return null guard.",
+      "files": ["src/benchmark-frontend/src/components/ProductDetailPanel.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 2: Tab on last focusable wraps to first. Requirement 3: Shift+Tab on first focusable wraps to last.",
+      "description": "Add an onKeyDown handler function that: queries panelRef.current for all focusable elements matching 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])'; converts to array; identifies first and last; if Tab (no Shift) and activeElement is last, calls event.preventDefault() and firstFocusable.focus(); if Tab+Shift and activeElement is first, calls event.preventDefault() and lastFocusable.focus(). Attach this handler as onKeyDown on the panel div (the element with role='dialog').",
+      "files": ["src/benchmark-frontend/src/components/ProductDetailPanel.tsx"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 4: Escape calls onClose regardless of focus location. Listener attached via document.addEventListener inside a useEffect that depends on [isOpen], removed in cleanup.",
+      "description": "Add a useEffect that depends on [isOpen, onClose]. When isOpen is true: create a keydown handler that checks event.key === 'Escape' and calls onClose(); attach it via document.addEventListener('keydown', handler); return a cleanup that calls document.removeEventListener('keydown', handler). When isOpen is false the effect runs but registers no listener (early return or conditional inside). Place this effect after the useLayoutEffect added in task-2.",
+      "files": ["src/benchmark-frontend/src/components/ProductDetailPanel.tsx"]
+    }
+  ]
+}
