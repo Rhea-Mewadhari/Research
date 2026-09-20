@@ -1,0 +1,30 @@
+{
+  "taskId": "task7",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix ProductListPage.tsx: remove localSortBy state, wire SortSelect to FilterContext, remove no-op onCategoryClick prop",
+      "status": "done",
+      "notes": "Removed localSortBy state, added setSortBy to useFilterContext destructure, wired SortSelect to sortBy/setSortBy from context, removed onCategoryClick prop from ProductList usage. Sort tests now pass; 2 category-click tests still fail (require phases 2 & 3). Build succeeds."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix ProductList.tsx: remove onCategoryClick from props and stop passing it to ProductCard",
+      "status": "done",
+      "notes": "Removed onCategoryClick from Props type and destructuring; removed it from ProductCard usage. Build succeeds. 2 category-click tests still fail (require phase 3 to fix ProductCard.tsx)."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix ProductCard.tsx: remove onCategoryClick prop, use useFilterContext().setCategory directly on category button click",
+      "status": "done",
+      "notes": "Removed onCategoryClick from Props type and destructuring; imported useFilterContext and destructured setCategory; wired category button onClick to call setCategory(product.category) directly. All 21 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run vitest and confirm all tests pass and build succeeds",
+      "status": "done",
+      "notes": "All 21 tests pass (7 test files). Build succeeds: TypeScript type-check clean, Vite produces dist/ with no errors."
+    }
+  ]
+}
