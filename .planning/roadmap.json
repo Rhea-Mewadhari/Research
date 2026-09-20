@@ -1,0 +1,66 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0, TypeScript 5.7.2, Vite 6.2.0",
+      "Test framework: Vitest 3.2.4 with jsdom environment, @testing-library/react 16.3.2, @testing-library/user-event 14.6.1",
+      "Test command: vitest run; build command: tsc -b && vite build",
+      "Strict TypeScript: noUnusedLocals, noUnusedParameters — any unused introduced variable will cause a build error",
+      "JSX mode: react-jsx (automatic pragma, no React import needed)",
+      "ES modules: package.json has type:module; module resolution: bundler"
+    ],
+    "features": [
+      "FilterContext.tsx line 51: `const debouncedSearch = useDebounce(search, 0)` — BUG: delay is 0, no real debounce",
+      "FilterContext exports: FilterProvider, useFilterContext(); context value shape includes search, debouncedSearch, category, inStockOnly, sortBy, savedFilters plus all setters — must not change",
+      "useDebounce<T>(value: T, delayMs: number): T — signature and cleanup (clearTimeout in useEffect return) are correct; hook itself is not broken",
+      "useDebounce effect dependency array: [value, delayMs] — changing delayMs triggers effect re-run and cancels the previous timer",
+      "useFilteredProducts.ts reads debouncedSearch from context and passes it to filterProducts() in a useMemo — must not be modified",
+      "clearFilters() (FilterContext line ~95) calls setSearchState('') directly, so any fix that makes '' bypass the debounce automatically covers this case",
+      "restoreFilter() sets state fields directly — restoring a saved non-empty search goes through setSearch, so 300ms debounce applies"
+    ],
+    "architecture": [
+      "Layer order: context (FilterContext, ProductContext) → custom hooks (useFilteredProducts) → pages (ProductListPage) → presentational components (FilterPanel, ProductList)",
+      "FilterContext is consumed by: App.tsx (provider mount), ProductListPage.tsx (reads/sets filters), SavedFiltersPanel.tsx (saved filter actions), useFilteredProducts.ts (reads debouncedSearch)",
+      "Fix lives entirely in context/FilterContext.tsx — no new files, no architectural change",
+      "useDebounce.ts is in hooks/ and is self-contained; optional to modify but not required for the simplest fix",
+      "No new types needed; FilterContextValue interface shape must remain identical"
+    ],
+    "edgeCases": [
+      "Clearing an already-empty field: search was already '', conditional delay is 0, debouncedSearch stays '' — covered by requirement 2",
+      "clearFilters() resets search to '': calls setSearchState('') internally, which triggers the conditional delay=0 path — debouncedSearch clears immediately",
+      "Typing then clearing before 300ms: changing delayMs from 300→0 causes useDebounce's effect cleanup to clearTimeout the pending timer before it fires — stale value never applies",
+      "Restoring a saved filter with non-empty search: goes through setSearch → delayMs=300 → 300ms debounce applies — no special case needed",
+      "Unmount with pending timeout: useDebounce's useEffect return function calls clearTimeout — unchanged by the fix, must not be disturbed",
+      "Case-insensitive search: handled in filterProducts util, unrelated to debounce fix",
+      "Search + category/inStock/sort combined: other filter state fields are set via direct setState and don't go through useDebounce — unaffected by this fix",
+      "waitFor in tests: tests use waitFor with the debounce window; fake timers may be used — the fix must produce the correct settled value after 300ms",
+      "Results count assertion: tests assert 'Showing 15 products' immediately after clear with no extra waitFor — the 0ms delay path must make debouncedSearch update synchronously within the same event loop tick"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3, 4 — 300ms debounce on typing; immediate update on clear; pending timeout cancelled on clear; rapid keystrokes reset the window",
+      "description": "In `FilterContext.tsx` line 51, change the `useDebounce` call from `useDebounce(search, 0)` to `useDebounce(search, search === '' ? 0 : 300)`. This single change: (a) passes 300ms delay for all non-empty search values, satisfying the typing debounce; (b) passes 0ms delay when search is '', so debouncedSearch updates to '' effectively immediately; (c) changing delayMs triggers useDebounce's effect cleanup (clearTimeout) before the new effect runs, cancelling any pending stale timer; (d) preserves useDebounce's generic signature and clearTimeout unmount cleanup without any hook modification.",
+      "files": [
+        "src/benchmark-frontend/src/context/FilterContext.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 5, 8 — no memory leak on unmount; useDebounce stays generic with clearTimeout cleanup preserved",
+      "description": "Verify that `useDebounce.ts` is left unmodified (or, if the chosen approach requires touching it, confirm the `clearTimeout` call in the useEffect return function is still present and the signature `useDebounce<T>(value: T, delayMs: number): T` is unchanged). This is a read-and-confirm step, not a code change, unless task-1's approach required hook modification.",
+      "files": [
+        "src/benchmark-frontend/src/hooks/useDebounce.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 6, 7, 9, 10, 11 — public interface unchanged; useFilteredProducts not modified; combined filters work; all tests pass; TypeScript build succeeds",
+      "description": "After task-1, confirm: (a) `FilterContextValue` type and all exported function signatures in `FilterContext.tsx` are unchanged; (b) `useFilteredProducts.ts` has no modifications (git diff produces no output); (c) run `npm run build` (tsc -b && vite build) exits with code 0; (d) run `npx vitest run` and confirm all tests in tests/ pass with 0 failures.",
+      "files": [
+        "src/benchmark-frontend/src/context/FilterContext.tsx",
+        "src/benchmark-frontend/src/hooks/useFilteredProducts.ts"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "FilterContext passes 300 (not 0) as the delayMs argument to useDebounce for non-empty search values.",
+      "passed": true,
+      "evidence": "FilterContext.tsx line 49: `useDebounce(search, search === '' ? 0 : 300)` — non-empty search uses 300. Tests 'typing a search term eventually filters the product list' (420ms) and 'search is case-insensitive' (365ms) both PASSED in debounceSearch.test.tsx."
+    },
+    {
+      "id": "2",
+      "description": "When search is set to '' (field cleared), debouncedSearch becomes '' immediately with no 300ms wait.",
+      "passed": true,
+      "evidence": "FilterContext.tsx line 49: `search === '' ? 0 : 300` — delayMs is 0 when search is '', so useEffect fires synchronously via a 0ms setTimeout. 'clearing the search field restores all products' PASSED in debounceSearch.test.tsx (70ms)."
+    },
+    {
+      "id": "3",
+      "description": "Any pending debounce timeout for a stale non-empty value is cancelled when search is set to ''.",
+      "passed": true,
+      "evidence": "useDebounce.ts lines 6-9: useEffect returns `() => clearTimeout(timer)` — cleanup cancels the previous timer on every value/delay change. 'clearing the search field restores all products' PASSED and count = 15 (not a filtered subset)."
+    },
+    {
+      "id": "4",
+      "description": "Rapid successive keystrokes reset the 300ms window on each keystroke — only the final value applies.",
+      "passed": true,
+      "evidence": "'typing a search term eventually filters the product list' PASSED (420ms) in debounceSearch.test.tsx — types 'wireless', waits, count settles to 1. The clearTimeout cleanup in useDebounce ensures intermediate values never fire."
+    },
+    {
+      "id": "5",
+      "description": "If FilterProvider unmounts while a debounce is pending, the timeout is cancelled and no state update occurs on an unmounted component.",
+      "passed": true,
+      "evidence": "useDebounce.ts line 8: `return () => clearTimeout(timer)` is present. Full test run of 22 tests across 7 files produced no console output matching 'Can't perform a React state update on an unmounted component'. All 22 tests PASSED."
+    },
+    {
+      "id": "6",
+      "description": "The public interface of FilterContext is unchanged: FilterContextValue retains all fields and exported functions with the same signatures.",
+      "passed": true,
+      "evidence": "FilterContext.tsx lines 12-27: interface FilterContextValue includes search, debouncedSearch, category, inStockOnly, sortBy, savedFilters, setSearch, setCategory, setInStockOnly, setSortBy, saveCurrentFilters, restoreFilter, deleteFilter, clearFilters — all present. Build exits code 0: 'tsc -b && vite build ✓ built in 622ms'."
+    },
+    {
+      "id": "7",
+      "description": "src/hooks/useFilteredProducts.ts is not modified.",
+      "passed": true,
+      "evidence": "`git diff HEAD -- src/benchmark-frontend/src/hooks/useFilteredProducts.ts` produced no output — file is unchanged."
+    },
+    {
+      "id": "8",
+      "description": "useDebounce remains generic with signature useDebounce<T>(value: T, delayMs: number): T and clearTimeout cleanup is preserved.",
+      "passed": true,
+      "evidence": "useDebounce.ts line 3: `export function useDebounce<T>(value: T, delayMs: number): T` — generic signature intact. Line 8: `return () => clearTimeout(timer)` — cleanup preserved. Build exits code 0."
+    },
+    {
+      "id": "9",
+      "description": "Combining search with other filters continues to produce correct results.",
+      "passed": true,
+      "evidence": "'search combines correctly with category filter' PASSED; 'clearing search while a category is active keeps the category filter' PASSED — both in debounceSearch.test.tsx. filtering.test.tsx (3 tests) PASSED; sorting.test.tsx (3 tests) PASSED; clearFilters.test.tsx (1 test) PASSED."
+    },
+    {
+      "id": "10",
+      "description": "The full test suite passes with no failures or skipped tests.",
+      "passed": true,
+      "evidence": "vitest run output: 'Test Files  7 passed (7), Tests  22 passed (22), 0 failed, 0 skipped'. Exit code 0."
+    },
+    {
+      "id": "11",
+      "description": "The TypeScript build succeeds with no compilation errors.",
+      "passed": true,
+      "evidence": "pnpm run build output: 'tsc -b && vite build — ✓ 65 modules transformed — ✓ built in 622ms'. Exit code 0."
+    }
+  ]
+}
