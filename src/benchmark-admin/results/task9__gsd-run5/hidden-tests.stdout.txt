@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.favourite.revert.test.tsx (9 tests) 14ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  18:28:53
+   Duration  490ms (transform 23ms, setup 54ms, collect 78ms, tests 14ms, environment 189ms, prepare 44ms)
+

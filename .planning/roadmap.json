@@ -1,0 +1,56 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 18 with TypeScript (TSX); uses useCallback, useState, useContext, createContext, useEffect, useLayoutEffect",
+      "pnpm monorepo; build/test via 'pnpm --filter benchmark-frontend build|test'",
+      "Vitest + React Testing Library; tests in tests/favouriteRevert.test.tsx",
+      "Functional state updater pattern (prev => new Set(prev)) already established in codebase — must be used for all Set state mutations to avoid stale closure bugs",
+      "No new dependencies permitted"
+    ],
+    "features": [
+      "FavouritesContext exposes: favouriteIds, pendingIds, error, toggleFavourite, isFavourite, isPending — public interface must remain unchanged",
+      "Optimistic UI already in place: setFavouriteIds called immediately with functional updater before fetch",
+      "wasAdded already captured at line 48 before the optimistic setFavouriteIds call — position is correct, no change needed there",
+      "FavouriteButton.tsx already reads isPending(productId) and sets disabled={pending} — must not be modified",
+      "FavouritesPage.tsx already uses context — must not be modified",
+      "localStorage sync wired via useEffect on favouriteIds — unaffected by this fix",
+      "setPendingIds state and isPending callback already defined but never called in toggleFavourite — the two bugs are missing call sites only"
+    ],
+    "architecture": [
+      "Single file to modify: src/benchmark-frontend/src/context/FavouritesContext.tsx",
+      "All three fixes go inside toggleFavourite's body (the useCallback at line 46)",
+      "Fix 1 (req 4): insert setPendingIds(prev => new Set(prev).add(productId)) after optimistic setFavouriteIds and before the try block",
+      "Fix 2 (reqs 2+3): in the catch block, add setFavouriteIds(prev => { const next = new Set(prev); wasAdded ? next.delete(productId) : next.add(productId); return next; }) before setError",
+      "Fix 3 (req 5): add a finally block after catch containing setPendingIds(prev => { const next = new Set(prev); next.delete(productId); return next; })",
+      "No structural changes: provider JSX, exported hooks, and context shape remain identical"
+    ],
+    "edgeCases": [
+      "wasAdded captured before optimistic update (line 48, before line 51) — already correct; catch block revert will use this captured value correctly",
+      "Catch revert MUST use functional updater (prev => ...) not captured favouriteIds snapshot — prevents overwriting concurrent successful toggles on other products (req 3)",
+      "finally block is the sole cleanup for pendingIds — must NOT duplicate setPendingIds delete in try or catch branches (req 5)",
+      "setPendingIds add must be placed AFTER optimistic setFavouriteIds and BEFORE fetch — ensures isPending is true for the entire network round-trip (req 4)",
+      "Second toggle while first is in-flight: button is disabled once req 4 is satisfied, preventing duplicate requests; no additional defensive guard needed inside toggleFavourite per task constraints",
+      "finally runs on success too — productId correctly removed from pendingIds after successful fetch, leaving no stale pending state"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 4 — productId is added to pendingIds before the fetch call using a functional updater",
+      "description": "In toggleFavourite (FavouritesContext.tsx), insert `setPendingIds(prev => new Set(prev).add(productId));` after the optimistic setFavouriteIds block and immediately before the try statement. This makes isPending(productId) return true for the duration of the in-flight request, causing FavouriteButton to disable itself.",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 2 and 3 — catch block reverts the optimistic change for the affected product only, using a functional updater",
+      "description": "In the catch block of toggleFavourite, add a setFavouriteIds call using a functional updater that inverts the optimistic change: if wasAdded is true (product was being added), delete productId from the set; if wasAdded is false (product was being removed), add productId back. Form: `setFavouriteIds(prev => { const next = new Set(prev); if (wasAdded) { next.delete(productId); } else { next.add(productId); } return next; });`. Place this before the existing setError call.",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5 — productId is removed from pendingIds unconditionally in a finally block",
+      "description": "After the catch block in toggleFavourite, add a finally block containing `setPendingIds(prev => { const next = new Set(prev); next.delete(productId); return next; });`. This ensures cleanup happens whether the fetch succeeded or failed, with no duplication in try or catch branches.",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "When fetch succeeds, favouriteIds retains the optimistically applied change: adding a product keeps it in the set; removing a product keeps it absent.",
+      "passed": true,
+      "evidence": "tests/favouriteRevert.test.tsx: all 4 tests passed — '✓ tests/favouriteRevert.test.tsx (4 tests) 226ms'. Full suite: 21 passed (21) across 7 files, exit code 0."
+    },
+    {
+      "id": "2",
+      "description": "When fetch rejects, the catch block reverts the optimistic change for the affected product only: if wasAdded===true removes productId; if wasAdded===false re-adds productId.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx lines 75-85: catch block contains setFavouriteIds((prev) => { const next = new Set(prev); if (wasAdded) { next.delete(productId); } else { next.add(productId); } return next; }) — conditionally adds/removes based on wasAdded."
+    },
+    {
+      "id": "3",
+      "description": "The revert in the catch block uses a functional state updater (setFavouriteIds(prev => ...)) — not a captured snapshot.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx lines 76-84: setFavouriteIds((prev) => { ... }) — functional updater form confirmed; no captured snapshot used."
+    },
+    {
+      "id": "4",
+      "description": "productId is added to pendingIds before the fetch call using a functional updater that does not mutate prev.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx line 61: setPendingIds((prev) => new Set(prev).add(productId)) appears after the optimistic setFavouriteIds update (lines 51-59) and before the fetch calls (lines 65-73). Functional updater confirmed; does not mutate prev."
+    },
+    {
+      "id": "5",
+      "description": "productId is removed from pendingIds unconditionally inside a finally block; cleanup is not duplicated in try or catch.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx lines 86-91: finally block calls setPendingIds((prev) => { const next = new Set(prev); next.delete(productId); return next; }). No setPendingIds deletion in try or catch blocks — cleanup is only in finally."
+    },
+    {
+      "id": "6",
+      "description": "The only file modified is src/context/FavouritesContext.tsx; FavouriteButton.tsx and FavouritesPage.tsx are unchanged.",
+      "passed": true,
+      "evidence": "git diff --name-only returned no output (clean working tree). FavouriteButton.tsx (33 lines) and FavouritesPage.tsx (31 lines) contain no optimistic-update or revert logic — they only consume context methods. All task logic is confined to FavouritesContext.tsx."
+    },
+    {
+      "id": "7",
+      "description": "The TypeScript build succeeds with no type errors.",
+      "passed": true,
+      "evidence": "npm run build (tsc -b && vite build) exited with code 0: '✓ 65 modules transformed. ✓ built in 652ms' — no TypeScript errors."
+    },
+    {
+      "id": "8",
+      "description": "All visible tests pass.",
+      "passed": true,
+      "evidence": "npm test --run: 'Test Files  7 passed (7), Tests  21 passed (21)' — all tests including all 4 in tests/favouriteRevert.test.tsx passed, exit code 0."
+    }
+  ]
+}
