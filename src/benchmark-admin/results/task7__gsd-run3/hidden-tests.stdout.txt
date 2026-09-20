@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.sorting.integrity.test.tsx (2 tests) 123ms
+ ✓ tests/hidden.context.migration.test.tsx (5 tests) 248ms
+ ✓ tests/hidden.combined.behavior.test.tsx (2 tests) 504ms
+   ✓ Hidden: combined filter behavior > combines category + inStockOnly + search correctly  420ms
+ ✓ tests/hidden.filtering.edgecases.test.tsx (5 tests) 1459ms
+   ✓ Hidden: filtering edge cases > search is case-insensitive  383ms
+   ✓ Hidden: filtering edge cases > search trims leading and trailing whitespace  359ms
+   ✓ Hidden: filtering edge cases > search only matches product name, not category text  365ms
+   ✓ Hidden: filtering edge cases > shows empty state when no results match  333ms
+
+ Test Files  4 passed (4)
+      Tests  14 passed (14)
+   Start at  14:10:49
+   Duration  2.16s (transform 85ms, setup 256ms, collect 951ms, tests 2.33s, environment 962ms, prepare 201ms)
+
