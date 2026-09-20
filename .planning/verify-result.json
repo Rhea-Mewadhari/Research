@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "SortSelect in ProductListPage must read its value from FilterContext.sortBy and call FilterContext.setSortBy on change — not from any local state variable.",
+      "passed": true,
+      "evidence": "ProductListPage.tsx line 76: `<SortSelect value={sortBy} onChange={setSortBy} />`. sortBy and setSortBy are destructured from useFilterContext() at lines 20–21. No local sort state exists."
+    },
+    {
+      "id": "2",
+      "description": "The local sort state variable (localSortBy / setLocalSortBy) must be removed from ProductListPage.",
+      "passed": true,
+      "evidence": "grep for 'localSortBy' in ProductListPage.tsx returned no output — the identifier does not appear anywhere in the file."
+    },
+    {
+      "id": "3",
+      "description": "Selecting price-asc from the SortSelect immediately re-orders the visible product list so that the cheapest product (Jump Rope) appears first.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx 'sorts by price ascending' passed (vitest run: 3 tests in sorting.test.tsx, all passed). tests/contextMigration.test.tsx 'selecting a sort option re-orders the product list' passed (4 tests in contextMigration.test.tsx, all passed). Overall: 21 passed."
+    },
+    {
+      "id": "4",
+      "description": "Selecting price-desc from the SortSelect immediately re-orders the visible product list so that Noise-Cancelling Headphones appears first and Jump Rope appears last.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx 'sorts by price descending' passed. tests/contextMigration.test.tsx 'selecting price-desc puts the most expensive product first' passed. Overall: 21/21 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "Selecting rating-desc from the SortSelect immediately re-orders the visible product list so that Yoga Mat appears first.",
+      "passed": true,
+      "evidence": "tests/sorting.test.tsx 'sorts by rating descending' passed (3 tests in sorting.test.tsx, all passed). Overall: 21/21 tests passed."
+    },
+    {
+      "id": "6",
+      "description": "Clicking a 'Filter by [category]' button on a ProductCard updates FilterContext.category to that product's category, causing the list to re-filter immediately.",
+      "passed": true,
+      "evidence": "tests/contextMigration.test.tsx 'clicking a product category button filters the list to that category' passed — test clicks 'Filter by Electronics' button and expects results-count to read 'Showing 5 products'. 4/4 tests in contextMigration.test.tsx passed."
+    },
+    {
+      "id": "7",
+      "description": "After clicking a category button, only products in that category remain visible; products from other categories are removed from the DOM.",
+      "passed": true,
+      "evidence": "tests/contextMigration.test.tsx 'clicking a category button hides products from other categories' passed — clicks 'Filter by Fitness', verifies Wireless Mouse absent and Yoga Mat present. 4/4 tests passed."
+    },
+    {
+      "id": "8",
+      "description": "ProductCard must call useFilterContext().setCategory(product.category) directly on the category button click — not via an onCategoryClick prop.",
+      "passed": true,
+      "evidence": "ProductCard.tsx line 4 imports useFilterContext; line 14 destructures setCategory from useFilterContext(); lines 47–50 onClick handler: e.stopPropagation(); setCategory(product.category). grep for 'onCategoryClick' in ProductCard.tsx returned no output."
+    },
+    {
+      "id": "9",
+      "description": "The onCategoryClick prop must be removed from ProductCard's Props type and from ProductList's Props type.",
+      "passed": true,
+      "evidence": "grep for 'onCategoryClick' in ProductCard.tsx and ProductList.tsx returned no output. ProductCard Props (lines 7–10): only product and onSelect. ProductList Props (lines 4–7): only products and onSelect."
+    },
+    {
+      "id": "10",
+      "description": "The no-op onCategoryClick={() => {}} must be removed from the <ProductList> usage in ProductListPage.tsx.",
+      "passed": true,
+      "evidence": "grep for 'onCategoryClick' in ProductListPage.tsx returned no output. ProductListPage.tsx line 89–93: <ProductList products={filteredProducts} onSelect={setDetailProductId} /> — no onCategoryClick prop."
+    },
+    {
+      "id": "11",
+      "description": "The 'Filter by [category]' button must remain rendered inside ProductCard and must remain accessible via aria-label='Filter by [category]'.",
+      "passed": true,
+      "evidence": "tests/contextMigration.test.tsx locates button via getByRole('button', { name: /filter by electronics/i }) and getAllByRole('button', { name: /filter by fitness/i }) — both tests pass (4/4). ProductCard.tsx line 46 confirms aria-label={`Filter by ${product.category}`}."
+    },
+    {
+      "id": "12",
+      "description": "The category button click must call e.stopPropagation() so that the card's own onClick is not triggered simultaneously.",
+      "passed": true,
+      "evidence": "ProductCard.tsx line 48: e.stopPropagation(); inside the category button onClick handler (lines 47–50)."
+    },
+    {
+      "id": "13",
+      "description": "ProductList must continue to accept and forward the onSelect prop to ProductCard unchanged.",
+      "passed": true,
+      "evidence": "ProductList.tsx line 6: onSelect?: (id: string) => void in Props type. Line 21: onSelect={onSelect} passed to each <ProductCard>."
+    },
+    {
+      "id": "14",
+      "description": "No useState holding a copy of sortBy or category may be introduced in ProductCard, ProductList, or ProductListPage as part of this change.",
+      "passed": true,
+      "evidence": "grep for 'useState' across all three files: ProductCard.tsx — no hits. ProductList.tsx — no hits. ProductListPage.tsx — only line 28: useState<string | null>(null) for detailProductId (not sortBy or category)."
+    },
+    {
+      "id": "15",
+      "description": "All visible tests pass and the TypeScript build succeeds.",
+      "passed": true,
+      "evidence": "vitest run (pnpm test): 7 test files, 21 tests, all passed, exit code 0. pnpm run build (tsc -b && vite build): 65 modules transformed, dist/assets/index-CbWX4Clh.js 255.87 kB, 'built in 728ms', exit code 0."
+    }
+  ]
+}
