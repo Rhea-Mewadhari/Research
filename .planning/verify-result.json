@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "The `useDebounce` call in `FilterContext.tsx` must pass a delay of `300` when `search` is non-empty.",
+      "passed": true,
+      "evidence": "FilterContext.tsx line 49: `const rawDebouncedSearch = useDebounce(search, search === '' ? 0 : 300);` — passes 300 when search is non-empty. Test 'typing a search term eventually filters the product list' PASSED in tests/debounceSearch.test.tsx (5 tests, 1228ms total)."
+    },
+    {
+      "id": "2",
+      "description": "When `search` is set to `''`, `debouncedSearch` must become `''` immediately — with zero delay.",
+      "passed": true,
+      "evidence": "FilterContext.tsx line 49-50: delay is 0 when search==='' and `const debouncedSearch = search === '' ? '' : rawDebouncedSearch;` forces immediate '' value. Tests 'clearing the search field restores all products' and 'clearing search while a category is active keeps the category filter' both PASSED in tests/debounceSearch.test.tsx."
+    },
+    {
+      "id": "3",
+      "description": "Any pending 300 ms timeout must be cancelled when `search` changes to `''`.",
+      "passed": true,
+      "evidence": "useDebounce.ts line 8: `return () => clearTimeout(timer);` cancels any in-flight timer on re-render. When search clears, delay becomes 0 and the effect re-runs, cancelling the prior 300ms timer. Test 'clearing the search field restores all products' (types 'wireless' then immediately clears) PASSED."
+    },
+    {
+      "id": "4",
+      "description": "If the component unmounts while a debounce timeout is pending, the timeout must be cancelled and no state update must occur after unmount.",
+      "passed": true,
+      "evidence": "useDebounce.ts line 8: `return () => clearTimeout(timer);` — cleanup present. Full test run of 22 tests across 7 files produced zero console errors/warnings related to unmounted component state updates (only pre-existing act() warnings from loadingError.test.tsx, unrelated to debounce). All 22 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "The public interface of `FilterContext` must remain unchanged: `FilterContextValue` shape and all exported functions must have identical signatures and behaviour.",
+      "passed": true,
+      "evidence": "TypeScript build succeeded: `tsc -b && vite build` exited 0 with no type errors. tests/app.render.test.tsx (1 PASSED), tests/clearFilters.test.tsx (1 PASSED), tests/filtering.test.tsx (3 PASSED) — all passed without modification."
+    },
+    {
+      "id": "6",
+      "description": "`useFilteredProducts.ts` must not be modified; the fix must be limited to `FilterContext.tsx` and optionally `useDebounce.ts`.",
+      "passed": true,
+      "evidence": "`git diff src/benchmark-frontend/src/hooks/useFilteredProducts.ts` produced no output — no changes to that file."
+    },
+    {
+      "id": "7",
+      "description": "`useDebounce` must remain generic — it must continue to accept any value type `T` and any numeric delay — not hardcode 300 or special-case strings internally.",
+      "passed": true,
+      "evidence": "useDebounce.ts line 3: signature is `export function useDebounce<T>(value: T, delayMs: number): T` — unchanged generic form. Hook body (lines 4-11) contains no string-specific or 300-specific logic; uses `value` and `delayMs` generically. TypeScript build passed."
+    },
+    {
+      "id": "8",
+      "description": "All other filters (category, in-stock toggle, sort order) must continue to work correctly and be unaffected by the debounce fix.",
+      "passed": true,
+      "evidence": "tests/filtering.test.tsx: 3 PASSED. tests/sorting.test.tsx: 3 PASSED. tests/debounceSearch.test.tsx: 'search combines correctly with category filter' PASSED, 'clearing search while a category is active keeps the category filter' PASSED."
+    },
+    {
+      "id": "9",
+      "description": "No new npm/pnpm dependencies may be introduced.",
+      "passed": true,
+      "evidence": "`git diff src/benchmark-frontend/package.json` produced no output — no changes to dependencies or devDependencies."
+    },
+    {
+      "id": "10",
+      "description": "The full visible test suite passes and the Vite build succeeds.",
+      "passed": true,
+      "evidence": "`pnpm test` output: 'Test Files  7 passed (7), Tests  22 passed (22)' — exit 0. `pnpm build` output: 'tsc -b && vite build ... ✓ built in 666ms' — exit 0 with no type errors."
+    }
+  ]
+}

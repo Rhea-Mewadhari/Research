@@ -1,0 +1,44 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7, Vite 6, Vitest 3 (jsdom env, globals: true)",
+      "@testing-library/react 16 + @testing-library/user-event 14 — real timers, no vi.useFakeTimers anywhere",
+      "useDebounce<T>(value: T, delayMs: number): T — generic, ~12 lines, useState + single useEffect with [value, delayMs] deps, clearTimeout cleanup",
+      "All hooks use named exports, explicit deps arrays, useCallback for stable setter references",
+      "verbatimModuleSyntax enforced — type-only imports must use import type",
+      "Test assertions use waitFor/findBy* for async (polling), direct getBy* only for synchronous assertions"
+    ],
+    "features": [
+      "Bug location: FilterContext.tsx line 51 — const debouncedSearch = useDebounce(search, 0) — delay hardcoded to 0",
+      "debouncedSearch is the sole search input to useFilteredProducts.ts (passed as search: debouncedSearch to filterProducts inside useMemo)",
+      "Other filter state that must not regress: category (string, default 'All'), inStockOnly (boolean), sortBy (SortOption), savedFilters (from localStorage)",
+      "clearFilters() resets search to '' — triggers the instant-clear path",
+      "Test files: debounceSearch.test.tsx, filtering.test.tsx, clearFilters.test.tsx, sorting.test.tsx, pagination.test.tsx, loadingError.test.tsx, app.render.test.tsx"
+    ],
+    "architecture": [
+      "Fix belongs solely at FilterContext.tsx line 51 — no other file needs changes",
+      "useDebounce.ts is already generic and correct — must remain untouched (requirement 7)",
+      "useFilteredProducts.ts must not be modified (requirement 6)",
+      "useDebounce deps array includes delayMs — changing the delay arg triggers cleanup of the old timer and schedules a new one, which is the correct cancellation mechanism for requirement 3",
+      "FilterContextValue interface and all exported functions (setSearch, setCategory, setInStockOnly, setSortBy, saveCurrentFilters, restoreFilter, deleteFilter, clearFilters) must remain signature-identical"
+    ],
+    "edgeCases": [
+      "clearFilters.test.tsx has a synchronous assertion after await user.click(clearButton) — setTimeout(fn, 0) is still async, so passing delay=0 alone leaves debouncedSearch stale for one tick; test would fail",
+      "Safe fix: two-line replacement — (1) const rawDebouncedSearch = useDebounce(search, search === '' ? 0 : 300); (2) const debouncedSearch = search === '' ? '' : rawDebouncedSearch; — line 2 makes clearing synchronous on the same render",
+      "Clearing while typing (before 300ms fires): useDebounce effect cleanup runs (clears in-flight timer) when search/delay change; rawDebouncedSearch lags but is overridden by line 2 — requirement 3 satisfied",
+      "Unmount with pending timer: useDebounce clearTimeout cleanup in useEffect is preserved — requirement 4 satisfied",
+      "Empty-string initial render: search starts as '' so delay evaluates to 0 and debouncedSearch is '' immediately — no regression",
+      "Rapid keystrokes: each new value resets the 300ms window via useDebounce's [value, delayMs] deps — requirement 1 satisfied"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3, 4, 5, 6, 7, 8, 9 — fix useDebounce call to debounce typing at 300ms, make clearing instant, cancel pending timers on clear, preserve unmount cleanup, keep public interface and useDebounce generic",
+      "description": "In FilterContext.tsx, replace the single line `const debouncedSearch = useDebounce(search, 0);` (line 51) with two lines: `const rawDebouncedSearch = useDebounce(search, search === '' ? 0 : 300);` and `const debouncedSearch = search === '' ? '' : rawDebouncedSearch;`. The first line passes a conditional delay so useDebounce's effect cleanup cancels any pending 300ms timer when search clears. The second line overrides the hook's output synchronously to '' when search is empty, making clearing instantaneous on the same render without waiting for any setTimeout — satisfying the synchronous assertions in clearFilters.test.tsx and debounceSearch.test.tsx.",
+      "files": [
+        "src/benchmark-frontend/src/context/FilterContext.tsx"
+      ]
+    }
+  ]
+}
