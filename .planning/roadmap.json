@@ -1,0 +1,42 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0, TypeScript 5.7.2, Vite 6.2",
+      "Test runner: Vitest 3.2.4 with jsdom; @testing-library/react 16, @testing-library/user-event 14",
+      "useDebounce<T>(value: T, delayMs: number): T — generic hook, both params are effect deps so changing delayMs cancels the in-flight timer",
+      "FilterContext uses plain React context + useState; no external state library",
+      "setTimeout(fn, 0) is macro-task async (not synchronous), but userEvent wraps events in act() so 0ms timers flush naturally in tests"
+    ],
+    "features": [
+      "FilterContext exposes: search, debouncedSearch, category, inStockOnly, sortBy, savedFilters, and all setters/helpers",
+      "debouncedSearch is consumed exclusively by useFilteredProducts.ts (must not be modified)",
+      "ProductListPage, NavBar, FilterPanel, SavedFiltersPanel all consume FilterContext — none read debouncedSearch directly",
+      "Bug: line 51 of FilterContext.tsx calls useDebounce(search, 0) — delay hardcoded to 0, so no real debounce occurs",
+      "Tests that must not regress: debounceSearch.test.tsx (5 cases), filtering.test.tsx (3), clearFilters.test.tsx (1), sorting.test.tsx, pagination.test.tsx, app.render.test.tsx, loadingError.test.tsx"
+    ],
+    "architecture": [
+      "Layers: src/context/ (state ownership) → src/hooks/ (derived state, utilities) → src/components/ + src/pages/ (UI consumers)",
+      "FilterContext.tsx owns all filter state and derives debouncedSearch via useDebounce",
+      "Data flow: user input → setSearch() → search state → useDebounce(search, delay) → debouncedSearch on context → useFilteredProducts useMemo → filtered product list",
+      "Fix must be applied at FilterContext.tsx line 51 only — one argument change to the useDebounce call",
+      "useDebounce.ts requires no changes; useFilteredProducts.ts must not be modified (Requirement 8)"
+    ],
+    "edgeCases": [
+      "Clear during typing (delay 300→0): useDebounce's [value, delayMs] deps cause the 300ms timer to be cancelled and a 0ms timer to fire — handled automatically by the conditional delay expression",
+      "Initial render (search=''): useState(value) initialises debouncedValue to '' immediately, so debouncedSearch='' with no async lag",
+      "Unmount during pending timeout: existing clearTimeout cleanup in useDebounce useEffect prevents stale state update — no change needed",
+      "clearFilters() sets search to '' synchronously; React batches state updates so useDebounce receives value='' once; conditional delay resolves to 0 so debouncedSearch clears immediately",
+      "Rapid typing: each keystroke cancels the previous 300ms timer; only the last value propagates after the debounce window — correct behaviour"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1. FilterContext.tsx calls useDebounce with a conditional delay: search === '' ? 0 : 300. The delay argument must not be the literal 0 for all cases, and must not be the literal 300 for all cases — it must vary based on whether search is empty.",
+      "description": "In FilterContext.tsx at line 51, change the useDebounce call from useDebounce(search, 0) to useDebounce(search, search === '' ? 0 : 300). This single change satisfies requirements 1, 2, and 3: it introduces the 300ms debounce for typing while preserving immediate updates when the search field is cleared.",
+      "files": [
+        "src/benchmark-frontend/src/context/FilterContext.tsx"
+      ]
+    }
+  ]
+}
