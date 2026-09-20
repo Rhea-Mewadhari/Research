@@ -1,8 +1,48 @@
 {
+  "task1": [
+    "src/tests/visible/products.test.ts"
+  ],
+  "task2": [
+    "src/tests/visible/products.test.ts"
+  ],
+  "task3": [
+    "src/tests/visible/products.test.ts"
+  ],
+  "task4": [
+    "src/tests/visible/products.test.ts"
+  ],
+  "task5": [
+    "src/tests/visible/products.test.ts"
+  ],
+  "task6": [
+    "src/tests/visible/products.test.ts"
+  ],
+  "task7": [
+    "src/tests/visible/products.test.ts",
+    "src/tests/visible/compare.test.ts"
+  ],
+  "task8": [
+    "src/tests/visible/products.test.ts",
+    "src/tests/visible/middleware.test.ts"
+  ],
+  "task9": [
+    "src/tests/visible/products.test.ts",
+    "src/tests/visible/favourites.test.ts"
+  ],
+  "task10": [
+    "src/tests/visible/products.test.ts",
+    "src/tests/visible/pagination.test.ts"
+  ],
+  "task11": [
+    "src/tests/visible/products.test.ts",
+    "src/tests/visible/rateLimiter.test.ts"
+  ],
   "task12": [
+    "src/tests/visible/products.test.ts",
     "src/tests/visible/auth.test.ts"
   ],
   "task13": [
+    "src/tests/visible/products.test.ts",
     "src/tests/visible/auth.test.ts",
     "src/tests/visible/userProfile.test.ts"
   ]

@@ -1,11 +1,116 @@
 {
+  "task1": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx"
+  ],
+  "task2": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx"
+  ],
+  "task3": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx"
+  ],
+  "task4": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx"
+  ],
+  "task5": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx"
+  ],
+  "task6": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx"
+  ],
+  "task7": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx",
+    "tests/contextMigration.test.tsx"
+  ],
+  "task8": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx",
+    "tests/debounceSearch.test.tsx"
+  ],
+  "task9": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx",
+    "tests/favouriteRevert.test.tsx"
+  ],
+  "task10": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx",
+    "tests/productDetailFocus.test.tsx"
+  ],
+  "task11": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx",
+    "tests/derivedStateCorrectness.test.tsx"
+  ],
   "task12": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx",
     "tests/authSignup.test.tsx",
     "tests/authLogin.test.tsx",
     "tests/authNavBar.test.tsx",
     "tests/authProductsApiToken.test.ts"
   ],
   "task13": [
+    "tests/app.render.test.tsx",
+    "tests/clearFilters.test.tsx",
+    "tests/filtering.test.tsx",
+    "tests/loadingError.test.tsx",
+    "tests/pagination.test.tsx",
+    "tests/sorting.test.tsx",
     "tests/authSignup.test.tsx",
     "tests/authLogin.test.tsx",
     "tests/authNavBar.test.tsx",
