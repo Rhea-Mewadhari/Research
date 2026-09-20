@@ -1,0 +1,53 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0, TypeScript ~5.7.2 (strict: noUnusedLocals, noUnusedParameters), Vite 6.2.0, pnpm",
+      "State management: React Context + hooks only — no Redux/Zustand; all four contexts follow the same pattern: createContext(null), Provider with useState/useCallback, typed hook that throws outside provider",
+      "Functional state updater form (setState(prev => ...)) is used consistently throughout all context files — the fix must follow the same convention",
+      "Tests: Vitest 3.2.4 + @testing-library/react 16 + jsdom, integration-style (renders full <App />), all tests in /tests/ directory",
+      "Build: tsc -b && vite build; TypeScript strict mode means unused variables/parameters cause build failure — any introduced but unused variable would break the build"
+    ],
+    "features": [
+      "Optimistic UI update in toggleFavourite already works correctly — immediate setFavouriteIds flip before the await; must not regress",
+      "localStorage hydration (useLayoutEffect) and persistence (useEffect) already work — no changes needed there",
+      "FavouriteButton already reads isPending(productId) and passes the result to disabled={pending} — no changes to that file are required; the fix only needs to make isPending return true during in-flight requests",
+      "NavBar reads favouriteIds.size for badge count — must not regress (functional updater in catch ensures only the toggled product is affected)",
+      "FavouritesPage filters products by favouriteIds — must not regress; correct revert behaviour will keep this accurate after a failed toggle",
+      "e.stopPropagation() in FavouriteButton prevents card-click from firing — untouched by this fix"
+    ],
+    "architecture": [
+      "Single file to modify: src/benchmark-frontend/src/context/FavouritesContext.tsx — all other files are read-only for this task",
+      "toggleFavourite (lines 46–83): captures wasAdded before await (correct), applies optimistic setFavouriteIds (correct), has no setPendingIds calls anywhere (bug), has no revert in catch block (bug)",
+      "pendingIds state is declared (line 27: useState<Set<string>>(new Set())) but setPendingIds is never called anywhere in the file",
+      "isPending is implemented as favouriteIds.has(id) — wait, actually it checks pendingIds.has(id) — but since pendingIds is always empty, it always returns false",
+      "The fix must: (1) call setPendingIds with a functional updater to add productId before await fetch, (2) add a finally block to remove productId from pendingIds, (3) add a functional-updater revert in the catch block — all within toggleFavourite"
+    ],
+    "edgeCases": [
+      "Concurrent toggles on different products: the revert in catch MUST use a functional updater (setFavouriteIds(prev => ...)) — a naive snapshot restore would wipe out concurrent state changes to other products; hidden tests verify this explicitly",
+      "Double-click prevention: setPendingIds must be called BEFORE the first await so the synchronous React render cycle sees isPending=true before the button can be clicked again",
+      "finally block is mandatory for pendingIds cleanup — placing cleanup only in try (skipped on throw) or only in catch (skipped on success) would leave the button permanently disabled or never disabled after failure; hidden tests verify isPending is false after both success and failure paths",
+      "wasAdded is already captured before the await at the top of toggleFavourite — the revert in catch inverts it correctly: if wasAdded is true (we added optimistically) then on failure delete productId; if wasAdded is false (we removed optimistically) then on failure re-add productId",
+      "Non-ok HTTP responses (4xx/5xx that resolve rather than reject) are not covered by the visible or hidden tests, and the requirements do not call for response.ok checking — do not add it; only handle fetch rejection (the catch path)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 4: setPendingIds is called to add productId to pendingIds before the fetch call begins, so isPending(productId) returns true while the request is in flight.",
+      "description": "In toggleFavourite in FavouritesContext.tsx, add `setPendingIds(prev => new Set(prev).add(productId))` immediately after the optimistic setFavouriteIds call and before the try/await fetch block. Must use a functional updater to avoid closing over a stale snapshot.",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 5: setPendingIds is called to remove productId from pendingIds after the request completes — whether it succeeds or fails — in a finally block.",
+      "description": "Add a `finally` block inside toggleFavourite that calls `setPendingIds(prev => { const next = new Set(prev); next.delete(productId); return next; })`. The finally block wraps the existing try/catch so cleanup runs on both success and failure paths. No equivalent cleanup should exist outside finally.",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 2: When the API call fails (fetch rejects), the optimistic state change is reverted. Requirement 3: A failed toggle on product A does not alter the favourite state of product B — the revert must use a functional updater.",
+      "description": "In the catch block of toggleFavourite, add `setFavouriteIds(prev => { const next = new Set(prev); if (wasAdded) { next.delete(productId); } else { next.add(productId); } return next; })` to invert only the optimistic change for this specific product. Must use a functional updater (prev => ...) not a closed-over snapshot, so concurrent updates to other products are preserved.",
+      "files": ["src/benchmark-frontend/src/context/FavouritesContext.tsx"]
+    }
+  ]
+}

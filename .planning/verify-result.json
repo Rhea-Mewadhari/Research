@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "When the API call succeeds, the optimistic favourite state change is kept — isFavourite(productId) returns true after a successful add and false after a successful remove.",
+      "passed": true,
+      "evidence": "favouriteRevert.test.tsx passed all 4 tests in 242ms. Tests 'clicking the favourite button marks a product as a favourite' and 'clicking a favourited button removes the favourite' both pass. Fetch is stubbed globally in tests/setup.ts with vi.fn().mockResolvedValue({ ok: true, ... }) confirming mocked-success fetch. Full test run: 7 test files, 21 tests, all passed, exit 0."
+    },
+    {
+      "id": "2",
+      "description": "When the API call fails (fetch rejects), the optimistic state change is reverted: if the product was being added it is removed from favouriteIds, and if it was being removed it is re-added.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx lines 75–85: catch block calls setFavouriteIds((prev) => { const next = new Set(prev); if (wasAdded) { next.delete(productId); } else { next.add(productId); } return next; }). When wasAdded===true the optimistic add is reverted (delete); when wasAdded===false the optimistic remove is reverted (add). TypeScript build exits 0: 'tsc -b && vite build' completed with 65 modules transformed, no type errors."
+    },
+    {
+      "id": "3",
+      "description": "A failed toggle on product A does not alter the favourite state of product B. The revert must use a functional state updater (prev => ...) rather than a closed-over snapshot of favouriteIds.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx lines 76–84: catch block calls setFavouriteIds((prev) => { ... return next; }) using a functional updater with the 'prev' parameter, not the 'favouriteIds' variable captured at call time. This ensures concurrent state from other products is preserved in 'prev' rather than being lost from a stale snapshot."
+    },
+    {
+      "id": "4",
+      "description": "setPendingIds is called to add productId to pendingIds before the fetch call begins, so isPending(productId) returns true while the request is in flight.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx line 61: setPendingIds((prev) => new Set(prev).add(productId)) appears before the try block at line 63, which contains the await fetch(...) calls. The pending id is set before any async operation begins."
+    },
+    {
+      "id": "5",
+      "description": "setPendingIds is called to remove productId from pendingIds after the request completes — whether it succeeds or fails — so isPending(productId) returns false once the request is done. This cleanup must be in a finally block, not duplicated in both try and catch branches.",
+      "passed": true,
+      "evidence": "FavouritesContext.tsx lines 86–91: finally block calls setPendingIds((prev) => { const next = new Set(prev); next.delete(productId); return next; }). No equivalent setPendingIds cleanup call exists in the try block (lines 63–74) or the catch block (lines 75–85)."
+    },
+    {
+      "id": "6",
+      "description": "FavouriteButton is rendered with disabled attribute while the request is in flight, preventing double-click. No change to FavouriteButton.tsx is required — it already reads isPending(productId) and passes the result to disabled.",
+      "passed": true,
+      "evidence": "FavouriteButton.tsx contains 'const pending = isPending(productId)' and 'disabled={pending}' — consistent with the expected unmodified baseline. git diff --name-only HEAD returns empty (working tree clean). Requirements 4 and 5 confirm isPending returns true during the request and false after, which flows to disabled={pending} in the existing button."
+    },
+    {
+      "id": "7",
+      "description": "All visible Vitest tests in src/benchmark-frontend/tests/ pass without modification.",
+      "passed": true,
+      "evidence": "pnpm test --run (run from src/benchmark-frontend) exited 0. Output: 'Test Files  7 passed (7), Tests  21 passed (21)'. Files: app.render.test.tsx (1), loadingError.test.tsx (4), clearFilters.test.tsx (1), pagination.test.tsx (5), sorting.test.tsx (3), favouriteRevert.test.tsx (4), filtering.test.tsx (3). Duration: 1.50s."
+    },
+    {
+      "id": "8",
+      "description": "The TypeScript build of benchmark-frontend completes without errors.",
+      "passed": true,
+      "evidence": "pnpm run build (run from src/benchmark-frontend) exited 0. Output: 'tsc -b && vite build — vite v6.4.2 building for production... 65 modules transformed. dist/index.html 0.47kB, dist/assets/index-D0Ia00T_.js 255.74kB. built in 652ms'."
+    },
+    {
+      "id": "9",
+      "description": "Only src/benchmark-frontend/src/context/FavouritesContext.tsx is modified; no test files, no other source files are changed.",
+      "passed": true,
+      "evidence": "git diff --name-only HEAD returns empty (working tree is clean — no uncommitted changes). The repository contains a single initialization commit ('sandbox: after execute-phase') which set up the entire project including the task implementation. FavouriteButton.tsx content matches the expected unmodified baseline (reads isPending, uses disabled={pending}, no task-related logic added). Code inspection of other source files (ComparisonContext.tsx, FilterContext.tsx, ProductContext.tsx) shows no task-related modifications. The task constraints specify only FavouritesContext.tsx should be modified, and all observed evidence is consistent with that constraint."
+    }
+  ]
+}
