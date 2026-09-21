@@ -1,0 +1,10 @@
+tests/authLogin.test.tsx(5,30): error TS2307: Cannot find module '../src/context/AuthContext' or its corresponding type declarations.
+tests/authLogin.test.tsx(6,23): error TS2307: Cannot find module '../src/pages/LoginPage' or its corresponding type declarations.
+tests/authNavBar.test.tsx(4,30): error TS2307: Cannot find module '../src/context/AuthContext' or its corresponding type declarations.
+tests/authSignup.test.tsx(5,30): error TS2307: Cannot find module '../src/context/AuthContext' or its corresponding type declarations.
+tests/authSignup.test.tsx(6,24): error TS2307: Cannot find module '../src/pages/SignupPage' or its corresponding type declarations.
+tests/profilePage.test.tsx(5,30): error TS2307: Cannot find module '../src/context/AuthContext' or its corresponding type declarations.
+tests/profilePage.test.tsx(6,25): error TS2307: Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations.
+tests/protectedRoute.test.tsx(3,30): error TS2307: Cannot find module '../src/context/AuthContext' or its corresponding type declarations.
+tests/protectedRoute.test.tsx(4,28): error TS2307: Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations.
+[ELIFECYCLE] Command failed with exit code 2.

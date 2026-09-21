@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Filtering must be applied before sorting: the hook processes search term → category → inStockOnly first, then sorts the resulting subset.",
+      "passed": true,
+      "evidence": "useFilteredProducts.ts lines 20-28 apply three filters (debouncedSearch, category, inStockOnly) before lines 30-36 apply sorting. All four tests in derivedStateCorrectness.test.tsx passed: 'price-asc sort within Fitness category produces correct order' — expected [Jump Rope, Foam Roller, Resistance Bands, Yoga Mat, Dumbbell Set] and got exactly that (only 5 Fitness products in price order, not all 15 sorted then filtered)."
+    },
+    {
+      "id": "2",
+      "description": "Sorting must not mutate the `products` array held by `ProductContext`: the hook must produce a new array via `[...products].sort(...)`, `products.slice().sort(...)`, or `.toSorted()` rather than calling `products.sort(...)` directly.",
+      "passed": true,
+      "evidence": "useFilteredProducts.ts lines 31, 33, 35 each use `[...result].sort(...)` (spread-then-sort), creating a new array. Grep confirms no bare `products.sort(` call exists in the file. All 21 tests passed, including those that change category after a sort, which would surface a mutated context array."
+    },
+    {
+      "id": "3",
+      "description": "`sortBy` must appear in the `useMemo` dependency array so that changing the sort dropdown alone triggers recomputation.",
+      "passed": true,
+      "evidence": "useFilteredProducts.ts line 39: `}, [products, debouncedSearch, category, inStockOnly, sortBy]);` — sortBy is present. Test 'changing sortBy alone — with no other filter changes — triggers recomputation' passed: after only setSortBy('price-asc'), filteredProducts[0].name === 'Jump Rope' (not 'Wireless Mouse' which is first in insertion order)."
+    },
+    {
+      "id": "4",
+      "description": "All five values — `products`, `debouncedSearch`, `category`, `inStockOnly`, and `sortBy` — must appear in the `useMemo` dependency array (no additions, no omissions from those five).",
+      "passed": true,
+      "evidence": "useFilteredProducts.ts line 39 reads exactly: `[products, debouncedSearch, category, inStockOnly, sortBy]` — all five required values, no extras."
+    },
+    {
+      "id": "5",
+      "description": "The hook's return type and public interface (`filteredProducts`, `resultCount`) must be unchanged.",
+      "passed": true,
+      "evidence": "`pnpm exec tsc --noEmit` completed with no output and exit code 0 (no type errors). All 21 tests passed including all four derivedStateCorrectness tests without any test file modifications. useFilteredProducts.ts line 41 returns `{ filteredProducts, resultCount: filteredProducts.length }` matching the original interface."
+    }
+  ]
+}

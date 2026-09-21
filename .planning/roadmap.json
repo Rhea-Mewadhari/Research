@@ -1,0 +1,58 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript ~5.7, Vite 6, Vitest 3 — all modern, ESM-only project",
+      "verbatimModuleSyntax: true — type-only imports must use `import type`; already correct in useFilteredProducts.ts",
+      "noUnusedLocals / noUnusedParameters enforced — no dead variables may be introduced",
+      "Target es2023 — Array spread ([...arr]) and .toSorted() are both available; spread is safest for compatibility",
+      "Vitest globals injected — no import needed for describe/it/expect in test files",
+      "tsc --noEmit used for type-checking (Requirement 5 verification)"
+    ],
+    "features": [
+      "useFilteredProducts.ts is the sole hook combining ProductContext (products array) and FilterContext (debouncedSearch, category, inStockOnly, sortBy)",
+      "Hook returns { filteredProducts: Product[], resultCount: number } — interface must stay unchanged (Requirement 5)",
+      "Only consumer of useFilteredProducts is ProductListPage.tsx",
+      "productFilters.ts provides filterProducts(products, filters) — a correct reference: filters first (search→category→inStock), then spreads and sorts ([...result].sort(...)); NOT currently imported by the hook",
+      "FilterContext sortBy default value is 'default' — the hook's sort block is an if/else if so default falls through with no sort applied",
+      "tests/derivedStateCorrectness.test.tsx has 4 tests: Tests 1/2/4 set a category then change sortBy in a separate act() — catching both Bug 1 (wrong order) and Bug 3 (missing dep); Test 3 changes sortBy alone with no prior filter change — the sharpest Bug 3 regression",
+      "No test explicitly asserts non-mutation (Bug 2), but shared ProductProvider across renderHook calls means Bug 2 can corrupt context state across tests"
+    ],
+    "architecture": [
+      "src/ layout: api/, assets/, components/, context/, data/, hooks/, pages/, styles/, types/, utils/ — all siblings",
+      "useFilteredProducts.ts lives in src/hooks/; imports from ../context/ProductContext and ../context/FilterContext and ../types/product",
+      "utils/productFilters.ts is NOT imported by useFilteredProducts.ts — the hook re-implements logic inline",
+      "All three bugs are co-located in a single useMemo callback in src/hooks/useFilteredProducts.ts",
+      "Current buggy dep array: [products, debouncedSearch, category, inStockOnly] — sortBy consumed inside callback but absent from array",
+      "No framework.md conventions doc exists; .planning/ is task-scoped only",
+      "All three fixes belong in useFilteredProducts.ts only — no other file requires modification per requirements"
+    ],
+    "edgeCases": [
+      "sortBy === 'default': no sort branch matches, result passes through as-is; after Bug 2 fix the spread still happens before filter runs — this is safe (spread of full products, then filters reduce it, no sort applied)",
+      "Empty filter result + sort: with Bug 1 fixed, sort only runs on the already-filtered subset — sorting an empty array is a no-op, safe",
+      "Mutation after sort then filter change: Bug 2 (mutation) permanently corrupts the ProductContext array for ALL consumers; must be fixed before Bug 3 fix (adding sortBy to deps), otherwise every sortBy change immediately re-sorts the already-mutated context array — making corruption visible and irreversible faster",
+      "sortBy is the only value missing from deps — products, debouncedSearch, category, inStockOnly are all already present; final dep array must be exactly [products, debouncedSearch, category, inStockOnly, sortBy] (no extras per Requirement 4)",
+      "Multiple active filters when sortBy changes: after fixes, sort is always last — filter chain (search→category→inStock) runs first producing a subset, then that subset is spread-copied and sorted; all three filters compose correctly",
+      "Test isolation: because Bug 2 can corrupt shared context state across test runs, fixing mutation (Bug 2) is prerequisite to reliable test outcomes"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 2 — sorting must not mutate the products array held by ProductContext",
+      "description": "In useFilteredProducts.ts, change the bare `products.sort(...)` call to operate on a spread copy. Replace with `[...products].sort(...)` (or `.slice().sort(...)`). This must be done before adding sortBy to the dep array (task-3) so that the newly-triggered recomputations do not repeatedly mutate the context array.",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 1 — filtering must be applied before sorting",
+      "description": "In useFilteredProducts.ts, restructure the useMemo callback so the three filter steps (debouncedSearch → category → inStockOnly) run first on `products`, producing a filtered subset, and the sort is applied last on that subset. The sort block (if/else if on sortBy) must move to after all filter blocks.",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 3 and 4 — sortBy must appear in the useMemo dependency array; all five values must be present with no additions or omissions",
+      "description": "In useFilteredProducts.ts, add `sortBy` to the useMemo dependency array. The final dep array must be exactly `[products, debouncedSearch, category, inStockOnly, sortBy]` — no more, no fewer. This is safe to do only after task-1 (mutation fix) is in place.",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    }
+  ]
+}
