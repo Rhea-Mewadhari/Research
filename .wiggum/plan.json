@@ -1,0 +1,18 @@
+{
+  "taskId": "task7",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix route registration order in apiProductRoutes.ts: move /compare before /:id",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Run pnpm test in benchmark-backend and confirm all visible tests pass",
+      "status": "done",
+      "notes": "All 22 tests passed (2 test files). Build also clean (tsc -p tsconfig.build.json produced no errors)."
+    }
+  ]
+}
