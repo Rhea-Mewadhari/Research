@@ -1,0 +1,36 @@
+{
+  "taskId": "task10",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Implement focus-on-open: capture previous focus element and move focus to close button when panel opens",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Implement focus trap: intercept Tab/Shift+Tab keydown to cycle within panel focusable elements only",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Implement Escape-to-close: attach document-level keydown listener that calls onClose when Escape is pressed",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Implement focus restore: return focus to the captured previous element when the panel closes",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-5",
+      "title": "Verify: run tests and confirm all pass with no build errors",
+      "status": "done",
+      "notes": "All 22 tests passed (7 test files). Build succeeded with no TypeScript or Vite errors."
+    }
+  ]
+}

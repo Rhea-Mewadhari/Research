@@ -1,0 +1,105 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task10",
+  "wall_duration_ms": 488646,
+  "cost_usd": 2.1150315,
+  "num_turns": 93,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "a930de1c-04ee-4297-becf-b8744228d6cf",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Implement focus-on-open: capture previous focus element and move focus to close button when panel opens",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-2",
+        "title": "Implement focus trap: intercept Tab/Shift+Tab keydown to cycle within panel focusable elements only",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-3",
+        "title": "Implement Escape-to-close: attach document-level keydown listener that calls onClose when Escape is pressed",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-4",
+        "title": "Implement focus restore: return focus to the captured previous element when the panel closes",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-5",
+        "title": "Verify: run tests and confirm all pass with no build errors",
+        "status": "done",
+        "notes": "All 22 tests passed (7 test files). Build succeeded with no TypeScript or Vite errors."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 97721,
+        "cost_usd": 0.4005969,
+        "num_turns": 20,
+        "session_id": "50aba1f8-43ca-4e02-9410-dfa100fd08cc",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 88871,
+        "cost_usd": 0.4322274,
+        "num_turns": 17,
+        "session_id": "fc4d8f5c-83ea-48b2-a64f-b638282da59a",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 3,
+        "label": "iter3",
+        "exit_code": 0,
+        "wall_duration_ms": 65000,
+        "cost_usd": 0.3417729,
+        "num_turns": 16,
+        "session_id": "42f0ec23-4b5f-4b9e-9888-1185978550e9",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 4,
+        "label": "iter4",
+        "exit_code": 0,
+        "wall_duration_ms": 97428,
+        "cost_usd": 0.42476279999999994,
+        "num_turns": 18,
+        "session_id": "371d93da-1ef9-4f15-9812-25fdf6a18f5c",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 5,
+        "label": "iter5",
+        "exit_code": 0,
+        "wall_duration_ms": 41461,
+        "cost_usd": 0.23267610000000002,
+        "num_turns": 10,
+        "session_id": "a930de1c-04ee-4297-becf-b8744228d6cf",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 5,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}
