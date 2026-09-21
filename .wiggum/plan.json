@@ -1,0 +1,36 @@
+{
+  "taskId": "task10",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Add close button ref and focus-on-open via useLayoutEffect",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Capture previous focus element and restore it on close",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Attach Escape key listener on document to call onClose",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Implement Tab/Shift+Tab focus trap within panel",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-5",
+      "title": "Run tests and verify build passes",
+      "status": "done",
+      "notes": "All 22 tests passed across 7 test files. Build succeeded with tsc + vite, producing dist/assets/index-qP9Xgv98.js (255.76 kB)."
+    }
+  ]
+}
