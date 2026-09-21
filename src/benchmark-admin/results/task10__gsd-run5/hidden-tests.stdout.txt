@@ -1,0 +1,23 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ❯ tests/hidden.detail.focus.test.tsx (10 tests | 2 failed) 367ms
+   ✓ Hidden: detail panel — focus on open > focus moves to the close button when the panel opens 85ms
+   ✓ Hidden: detail panel — focus on open > focus is NOT on the close button before the panel opens 20ms
+   ✓ Hidden: detail panel — focus trap > Tab keeps focus within the panel 36ms
+   ✓ Hidden: detail panel — focus trap > Shift+Tab keeps focus within the panel 28ms
+   ✓ Hidden: detail panel — focus trap > focus does not reach the search input while the panel is open 36ms
+   ✓ Hidden: detail panel — Escape key > Escape closes the panel when focus is on the close button 26ms
+   ✓ Hidden: detail panel — Escape key > Escape closes the panel even when focus has moved outside the panel 32ms
+   ✓ Hidden: detail panel — Escape key > Escape does not close the panel when it is already closed 14ms
+   × Hidden: detail panel — focus restore > focus returns to the previously focused element after closing with Escape 41ms
+     → expected <body style><div>…(2)</div></body> to be <input id="search" …(4)></input> // Object.is equality
+   × Hidden: detail panel — focus restore > focus returns to the previously focused element after closing with the close button 46ms
+     → expected <body style><div>…(2)</div></body> to be <input id="search" …(4)></input> // Object.is equality
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 passed (10)
+   Start at  08:08:54
+   Duration  996ms (transform 67ms, setup 54ms, collect 216ms, tests 367ms, environment 188ms, prepare 57ms)
+
+[ELIFECYCLE] Test failed. See above for more details.

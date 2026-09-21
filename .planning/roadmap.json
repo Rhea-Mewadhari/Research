@@ -1,0 +1,62 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, ReactDOM 19 — createPortal API stable, useLayoutEffect and useEffect both available",
+      "TypeScript 5.7 — NOT in strict mode; noUnusedLocals: true (every declared ref/variable must be used)",
+      "Vitest 3.x + @testing-library/react 16 + jsdom 26 — test environment simulates DOM",
+      "No CSS-in-JS; className strings used for element selection (e.g. '.detail-close-btn' for querySelector)",
+      "tsconfig lib includes DOM — HTMLElement, SVGElement, Element, document.activeElement all typed correctly",
+      "No existing useLayoutEffect in the component — must be added fresh"
+    ],
+    "features": [
+      "ProductDetailPanel renders: .detail-backdrop (div, aria-hidden), role=dialog .detail-panel (div), .detail-close-btn (button), conditional Spinner/error/product article",
+      "Props: productId (string | null), onClose (() => void)",
+      "Existing useEffect #1: fetches product data when productId changes — must not be touched",
+      "Existing useEffect #2: scroll lock (document.body.style.overflow) — must not be touched",
+      "isOpen derived as productId !== null (line 20) — this is the signal for all new hooks",
+      "panelRef (HTMLDivElement) already declared and attached to .detail-panel div",
+      "Test cases: panel opens on card click, close button closes, backdrop click closes, product data renders — all must continue passing",
+      "Bug placeholder block at lines 53-59 documents the four missing behaviours"
+    ],
+    "architecture": [
+      "ProductDetailPanel.tsx is the only file to modify (requirement 11)",
+      "Parent is ProductListPage — passes productId and onClose; no changes needed there",
+      "Portal: ReactDOM.createPortal(JSX, document.body) at line 63/134 — renders outside React tree root",
+      "Because of portal, React onKeyDown on the panel div will NOT catch keypresses when focus is elsewhere; document-level listener required for Escape",
+      "Tab trap can be handled via a document-level keydown listener (same pattern as Escape) or via onKeyDown on the panel div — document-level is safer given portal rendering",
+      "New refs needed: prevFocusRef (Element | null) to store pre-open focused element",
+      "New hooks needed: useLayoutEffect (focus-on-open + focus-restore), useEffect (Escape listener), and a tab-trap handler (useEffect on document or onKeyDown on panel div)"
+    ],
+    "edgeCases": [
+      "prevFocusRef.current may be null on first render — guard with instanceof check before calling .focus()",
+      "document.activeElement returns Element | null — need 'instanceof HTMLElement || instanceof SVGElement' guard before .focus()",
+      "Element captured in prevFocusRef may be removed from DOM by close time — instanceof guard is sufficient; .focus() on a detached element is a safe no-op",
+      "Panel has only ONE focusable element (close button) during loading — Tab must wrap to itself; Shift+Tab must also wrap to itself",
+      "Panel may have ZERO focusable elements if querySelectorAll returns empty NodeList — tab-trap handler must guard against empty list (early return)",
+      "FOCUSABLE_SELECTOR must be defined as a constant (not inline) to satisfy noUnusedLocals and for reuse in the trap handler",
+      "Escape listener cleanup: useEffect cleanup function must remove the same listener reference — store handler in a const inside useEffect before addEventListener",
+      "useLayoutEffect (not useEffect) required for focus-on-open so focus moves before paint, avoiding visible flash",
+      "When isOpen goes false (close), focus restore happens in the same useLayoutEffect cleanup/else branch — must check prevFocusRef.current instanceof HTMLElement before .focus()"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3 — focus-on-open, capture previous focus, restore focus on close",
+      "description": "Add prevFocusRef = useRef<Element | null>(null). Add a useLayoutEffect that depends on [isOpen]: when isOpen is true, assign document.activeElement to prevFocusRef.current, then call .focus() on panelRef.current?.querySelector('.detail-close-btn'); when isOpen is false, call .focus() on prevFocusRef.current if it instanceof HTMLElement or SVGElement.",
+      "files": ["src/benchmark-frontend/src/components/ProductDetailPanel.tsx"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 4, 5 — document-level Escape keydown listener with cleanup",
+      "description": "Add a useEffect that depends on [isOpen, onClose]: when isOpen is true, define a handler const that checks event.key === 'Escape' and calls onClose(), attach it via document.addEventListener('keydown', handler), and return a cleanup that calls document.removeEventListener('keydown', handler). When isOpen is false, register no listener (or guard with early return).",
+      "files": ["src/benchmark-frontend/src/components/ProductDetailPanel.tsx"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 6 — Tab/Shift+Tab focus trap cycling within the panel",
+      "description": "Define a FOCUSABLE_SELECTOR constant: 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])'. Add a useEffect that depends on [isOpen]: when isOpen is true, define a trap handler that on keydown Tab/Shift+Tab calls event.preventDefault(), queries panelRef.current?.querySelectorAll(FOCUSABLE_SELECTOR), and wraps focus (Tab on last → first; Shift+Tab on first → last). If the NodeList is empty, return early. Attach via document.addEventListener('keydown', trapHandler) with cleanup via removeEventListener.",
+      "files": ["src/benchmark-frontend/src/components/ProductDetailPanel.tsx"]
+    }
+  ]
+}

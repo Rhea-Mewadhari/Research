@@ -10,14 +10,8 @@ type Props = {
 
 const BASE_URL = 'http://localhost:3001';
 
-function getFocusable(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),' +
-        'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
-    ),
-  );
-}
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function ProductDetailPanel({ productId, onClose }: Props) {
   const [product, setProduct] = useState<Product | null>(null);
@@ -25,8 +19,7 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const panelRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const prevFocusRef = useRef<Element | null>(null);
 
   const isOpen = productId !== null;
 
@@ -61,47 +54,59 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
     };
   }, [isOpen]);
 
-  // Focus management: save trigger element on open; restore on close
+  // Focus management: capture previous focus, move to close button on open, restore on close
   useLayoutEffect(() => {
     if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
-      closeButtonRef.current?.focus();
+      prevFocusRef.current = document.activeElement;
+      panelRef.current?.querySelector<HTMLElement>('.detail-close-btn')?.focus();
     } else {
-      const trigger = previousFocusRef.current;
-      previousFocusRef.current = null;
-      trigger?.focus();
+      if (
+        prevFocusRef.current instanceof HTMLElement ||
+        prevFocusRef.current instanceof SVGElement
+      ) {
+        prevFocusRef.current.focus();
+      }
     }
   }, [isOpen]);
 
-  // Keyboard: Escape + focus trap
+  // Escape key closes the panel via document-level listener (required for portal rendering)
   useEffect(() => {
     if (!isOpen) return;
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handler);
+    return () => {
+      document.removeEventListener('keydown', handler);
+    };
+  }, [isOpen, onClose]);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-        return;
-      }
-
-      if (e.key === 'Tab' && panelRef.current) {
-        const focusable = getFocusable(panelRef.current);
-        if (!focusable.length) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
+  // Tab trap: keep focus within the panel while it is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const trapHandler = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (!focusable || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey) {
+        if (document.activeElement === first) {
+          event.preventDefault();
           last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === last) {
+          event.preventDefault();
           first.focus();
         }
       }
     };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+    document.addEventListener('keydown', trapHandler);
+    return () => {
+      document.removeEventListener('keydown', trapHandler);
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -133,7 +138,6 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
         }}
       >
         <button
-          ref={closeButtonRef}
           type="button"
           aria-label="Close panel"
           className="detail-close-btn"
