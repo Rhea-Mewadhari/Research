@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Filtering must be applied before sorting: the useMemo body in useFilteredProducts.ts must apply all three filters (search term, category, inStockOnly) to products first, and only then sort the filtered result.",
+      "passed": true,
+      "evidence": "src/hooks/useFilteredProducts.ts lines 19-28 apply all three filters (term, category, inStockOnly) to `result` before any sort. Sort occurs at lines 30-36. The 'price-asc sort within Fitness category produces correct order' test in derivedStateCorrectness.test.tsx passed: 'tests/derivedStateCorrectness.test.tsx (4 tests) 227ms' — all 4 tests passed. Full suite: 21 passed (21)."
+    },
+    {
+      "id": "2",
+      "description": "Sorting must not mutate the products array held in ProductContext. The implementation must create a copy of the array before sorting.",
+      "passed": true,
+      "evidence": "Line 18 of useFilteredProducts.ts: `let result: Product[] = [...products];` creates a spread copy. All subsequent `.sort()` calls (lines 31, 33, 35) operate on `result`, not on `products`. No bare `products.sort(...)` call exists in the file. Hidden mutation tests passed as part of the full test run: 21 passed (21)."
+    },
+    {
+      "id": "3",
+      "description": "All five values consumed inside the useMemo — products, debouncedSearch, category, inStockOnly, and sortBy — must appear in the dependency array.",
+      "passed": true,
+      "evidence": "Line 39 of useFilteredProducts.ts reads: `}, [products, debouncedSearch, category, inStockOnly, sortBy]);` — all five dependencies are present."
+    },
+    {
+      "id": "4",
+      "description": "Changing sortBy alone (with no change to any other filter) must cause useMemo to recompute and return a reordered product list immediately.",
+      "passed": true,
+      "evidence": "The 'changing sortBy alone — with no other filter changes — triggers recomputation' test in derivedStateCorrectness.test.tsx (line 76) passed as part of the 4-test suite: '✓ tests/derivedStateCorrectness.test.tsx (4 tests) 227ms'. sortBy is in the dependency array (line 39), guaranteeing recomputation on change. Full suite: 21 passed (21)."
+    }
+  ]
+}

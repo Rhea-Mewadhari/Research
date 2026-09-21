@@ -1,0 +1,57 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19 + Vite 6; TypeScript target es2023 (toSorted() is available)",
+      "eslint-plugin-react-hooks exhaustive-deps rule is active — will warn if useMemo dep array is incomplete after the fix",
+      "noUnusedLocals: true — any intermediate variable introduced must be used",
+      "Vitest 3 + @testing-library/react 16; tests run with: pnpm --filter benchmark-frontend test",
+      "No Redux/Zustand — only React Context API; filter and product state live in separate contexts"
+    ],
+    "features": [
+      "ProductContext exposes products: Product[] (current page only, server-side paginated); array reference must not be mutated",
+      "FilterContext exposes debouncedSearch: string, category: string, inStockOnly: boolean, sortBy: SortOption ('default'|'price-asc'|'price-desc'|'rating-desc')",
+      "src/utils/productFilters.ts already implements filterProducts() with correct filter-first-then-sort-copy order — not currently used by the hook but valid delegation target",
+      "Four visible tests in tests/derivedStateCorrectness.test.tsx — all change sortBy in a separate act() after other deps are stable, directly exposing Bug 3; must not be modified",
+      "useFilteredProducts is the sole derived-state hook; its output drives the product list shown in the UI"
+    ],
+    "architecture": [
+      "Pure filter/sort logic belongs in src/utils/productFilters.ts; derived computation (useMemo wiring) belongs in src/hooks/useFilteredProducts.ts",
+      "Hooks follow: useMemo for derived values, useCallback for setters, useState/useEffect for owned state",
+      "The fix can be applied inline in the hook or by delegating to filterProducts() — both valid per TASK11.MD decision surfaces",
+      "No other hooks or files need to change regardless of the approach chosen"
+    ],
+    "edgeCases": [
+      "Default sortBy ('default'): no sort branch runs, so result stays as a reference to the context array; taking the copy unconditionally at the top (let result = [...products]) before any branch covers this without special-casing",
+      "Empty products array: safe — [].sort() and [].filter() both return [] without throwing",
+      "Unknown/future sortBy value: falls through all branches the same as 'default'; copy-at-top strategy handles it identically",
+      "Bug 3 fixed without Bug 2: adding sortBy to dep array makes every sortBy change trigger a recompute; each recompute calls products.sort() on the live context array, permanently reordering it and silently corrupting state for all other consumers of ProductContext",
+      "Copy placement: spreading products at the very top of the memo body (before filter branches) is defensive and symmetric; spreading only inside sort branches leaves 'default' referencing the live array — avoid this"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "2 — Sorting must not mutate the products array held in ProductContext; use [...products].sort(...), products.slice().sort(...), or products.toSorted(...)",
+      "description": "In the useMemo body of useFilteredProducts.ts, replace the direct products.sort(...) calls with a non-mutating copy strategy. Take the copy unconditionally at the top of the memo body (let result = [...products]) so that the 'default' sortBy path — which currently skips all sort branches and leaves result as the live context reference — is also protected. Then apply sort to result in each branch rather than to products.",
+      "files": [
+        "src/benchmark-frontend/src/hooks/useFilteredProducts.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "1 — Filtering must be applied before sorting: apply all three filters (search term, category, inStockOnly) to products first, then sort the filtered result",
+      "description": "In the same useMemo body, move all three filter operations (search term, category, inStockOnly) to run before the sort branches. The sort step must receive the already-filtered array, not the full products list. This task is applied in the same atomic edit as task-1 and task-3 since all three bugs must land together to avoid the mutation-on-recompute trap.",
+      "files": [
+        "src/benchmark-frontend/src/hooks/useFilteredProducts.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 and 4 — All five values (products, debouncedSearch, category, inStockOnly, sortBy) must appear in the useMemo dependency array; changing sortBy alone must cause useMemo to recompute immediately",
+      "description": "Add sortBy to the dependency array of the useMemo call in useFilteredProducts.ts. This must be applied in the same atomic edit as task-1 (copy fix) and task-2 (order fix): adding sortBy to the dep array without fixing the mutation makes the mutation visible on every sort-triggered recompute, corrupting the ProductContext array.",
+      "files": [
+        "src/benchmark-frontend/src/hooks/useFilteredProducts.ts"
+      ]
+    }
+  ]
+}
