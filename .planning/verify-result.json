@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "POST /api/favourites with a non-existent productId must return HTTP 404 with { error, code, requestId } via centralised errorHandler",
+      "passed": true,
+      "evidence": "Test 'Error propagation > POST /api/favourites with a non-existent productId returns 404' PASSED in middleware.test.ts (22/22 tests passed). favouriteController.ts:add uses next(err) — confirmed by file read. errorHandler.ts produces { error, code, requestId } for AppError subtypes (instanceof AppError branch). Verbose test run shows log: 'ProductNotFoundError: Product with id 99999 not found' with statusCode: 404, code: 'PRODUCT_NOT_FOUND' routed through errorHandler."
+    },
+    {
+      "id": "2",
+      "description": "GET /api/products/compare with valid-format but non-existent ids must return HTTP 400 with { error, code, requestId } via errorHandler",
+      "passed": true,
+      "evidence": "Test 'Error propagation > GET /api/products/compare with valid format but non-existent ids returns 400' PASSED in middleware.test.ts (22/22 tests passed). compareController.ts catch block uses next(_err) — confirmed by file read. Verbose test run shows log: 'ValidationError: Product not found: 9999' with statusCode: 400, code: 'VALIDATION_ERROR' routed through errorHandler."
+    },
+    {
+      "id": "3",
+      "description": "GET /api/products/compare with fewer than two ids must return HTTP 400",
+      "passed": true,
+      "evidence": "Test 'Error propagation > GET /api/products/compare with fewer than two ids returns 400' PASSED in middleware.test.ts (22/22 tests passed). Validation middleware upstream unchanged — no modification to validation logic confirmed."
+    },
+    {
+      "id": "4",
+      "description": "Rate-limit violations (>100 req/60s from same IP) must return HTTP 429 with Retry-After header produced by errorHandler's RateLimitError branch",
+      "passed": true,
+      "evidence": "pnpm test exited 0 (22/22 tests passed). rateLimiter.ts confirmed by file read: imports RateLimitError from '../errors' and calls next(new RateLimitError(retryAfter)) with Math.max(1, ...) guard. errorHandler.ts confirmed by file read: instanceof RateLimitError branch sets res.setHeader('Retry-After', String(err.retryAfterSeconds)) before returning 429 JSON with { error, code, requestId }."
+    },
+    {
+      "id": "5",
+      "description": "All changes confined to favouriteController.ts, compareController.ts, and rateLimiter.ts only; errorHandler.ts, src/services/, and src/errors/index.ts must not be modified",
+      "passed": true,
+      "evidence": "git status shows clean working tree; git diff --name-only returns nothing (no uncommitted changes). The three permitted files contain the correct fixes (next(err) in favouriteController.ts:add, next(_err) in compareController.ts catch, RateLimitError import and usage in rateLimiter.ts — all confirmed by file reads). Protected files show expected unmodified content: errorHandler.ts has the full RateLimitError/AppError/generic branches intact; errors/index.ts contains all error class definitions unchanged; src/services/ not touched."
+    },
+    {
+      "id": "6",
+      "description": "pnpm test run from src/benchmark-backend/ exits with code 0 (all test suites pass, including pre-existing products.test.ts)",
+      "passed": true,
+      "evidence": "pnpm test output: 'Test Files 2 passed (2), Tests 22 passed (22)' — exit code 0. Both test suites passed: src/tests/visible/middleware.test.ts (3 tests) and src/tests/visible/products.test.ts (19 tests). No failing test lines in output."
+    }
+  ]
+}
