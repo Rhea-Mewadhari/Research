@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import request from 'supertest';
 import app from '../../../benchmark-backend/src/app';
+import { addFavourite, getFavourites } from '../../../benchmark-backend/src/services/favouritesService';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -38,19 +39,20 @@ describe('Hidden: DB integrity structural checks', () => {
   });
 
   it('favouritesService validates product existence before inserting', () => {
-    const content = fs.readFileSync(
-      path.resolve(__dirname, '../../services/favouritesService.ts'),
-      'utf8'
-    );
-    // Accept either an explicit app-level existence check (e.g. a
-    // `productExists` helper) or reliance on the DB's own foreign-key
-    // constraint — SQLite always enforces FK violations even under
-    // INSERT OR IGNORE, so catching that constraint error and converting
-    // it to a not-found error is an equally valid way to satisfy this.
-    const hasExplicitCheck = content.includes('productExists');
-    const hasForeignKeyEnforcement =
-      /FOREIGNKEY/i.test(content) && /ProductNotFoundError/.test(content);
-    expect(hasExplicitCheck || hasForeignKeyEnforcement).toBe(true);
+    // Behavioural, not structural: any implementation is valid (explicit
+    // SELECT-then-check, DB foreign-key constraint, etc.) as long as it
+    // (a) rejects a nonexistent product with a proper not-found error and
+    // (b) never leaves a favourite row behind when it does.
+    const before = getFavourites().length;
+    let caught: unknown;
+    try {
+      addFavourite('99999');
+    } catch (err) {
+      caught = err;
+    }
+    expect(caught).toBeInstanceOf(Error);
+    expect((caught as { statusCode?: number }).statusCode).toBe(404);
+    expect(getFavourites().length).toBe(before);
   });
 
   it('removeFavourite uses result.changes > 0 — not > -1', () => {
