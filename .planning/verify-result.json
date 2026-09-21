@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /api/products/compare?ids=1,2 returns HTTP 200 with a JSON body containing a products array of length 2 and a count field equal to 2.",
+      "passed": true,
+      "evidence": "compare.test.ts: '✓ GET /api/products/compare > returns 200 with matching products for two valid ids' passed in 8ms. Test asserts res.status === 200, res.body.products array length 2, res.body.count === 2. Full run: Tests 22 passed (22), exit code 0."
+    },
+    {
+      "id": "2",
+      "description": "GET /api/products/compare?ids=1 (fewer than two IDs) returns HTTP 400.",
+      "passed": true,
+      "evidence": "compare.test.ts: '✓ GET /api/products/compare > returns 400 when fewer than two ids are provided' passed in 1ms. Test asserts res.status === 400. Full run: Tests 22 passed (22), exit code 0."
+    },
+    {
+      "id": "3",
+      "description": "Each product object in the products array returned by GET /api/products/compare contains at least id and name fields with truthy values.",
+      "passed": true,
+      "evidence": "compare.test.ts: '✓ GET /api/products/compare > includes id and name in each returned product' passed in 1ms. Test asserts res.body.products.every(p => p.id && p.name) is true. Full run: Tests 22 passed (22), exit code 0."
+    },
+    {
+      "id": "4",
+      "description": "GET /api/products/:id with a valid numeric product ID continues to return HTTP 200 with the correct product data (pre-existing behaviour must not regress).",
+      "passed": true,
+      "evidence": "pnpm test exits code 0: Test Files 2 passed (2), Tests 22 passed (22). No test for the /:id path flipped to failing. The fix (moving /compare route before /:id in apiProductRoutes.ts) restores correct Express route matching so /:id still works for numeric IDs."
+    },
+    {
+      "id": "5",
+      "description": "GET /api/products/:id with a non-existent product ID continues to return HTTP 404 (pre-existing behaviour must not regress).",
+      "passed": true,
+      "evidence": "pnpm test exits code 0: Test Files 2 passed (2), Tests 22 passed (22). No test for the /:id 404 path flipped to failing. compareService.ts throws ValidationError for unknown IDs; productController.ts getById calls next(new ProductNotFoundError(id)) when product not found, preserving 404 behaviour."
+    },
+    {
+      "id": "6",
+      "description": "The fix is confined to src/routes/apiProductRoutes.ts — no other source file is modified.",
+      "passed": true,
+      "evidence": "inject-route-order-bugs.js (lines 17-31) confirms the injected bug wrote only to src/routes/apiProductRoutes.ts, swapping route order to /:id before /compare. Current apiProductRoutes.ts has /compare on line 9 and /:id on line 10 — correct order restored. compareController.ts (13 lines): no compensation logic, delegates to compareService only. productController.ts (55 lines): getCompareProducts is pre-existing dead code not referenced by any route, no route-order workaround added. compareService.ts (52 lines): clean DB query implementation. productSchema.ts (23 lines): clean Zod schemas. No route-compensation logic found in any of these files. Git history has a single commit so git diff is unavailable; cross-checked against injection script which confirms single-file scope."
+    },
+    {
+      "id": "7",
+      "description": "All visible tests pass without modification to any test file.",
+      "passed": true,
+      "evidence": "pnpm test output: Test Files 2 passed (2), Tests 22 passed (22), exit code 0. Both src/tests/visible/compare.test.ts (3 tests) and src/tests/visible/products.test.ts (19 tests) passed. Duration 450ms."
+    }
+  ]
+}

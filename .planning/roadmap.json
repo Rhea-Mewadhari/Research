@@ -1,0 +1,44 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express 5.2.1 (direct usage, no wrapper) mounted at /api/products prefix in app.ts",
+      "TypeScript 6.0.2, pnpm, tsx watch for dev, vitest 4.1.5 for tests (pnpm test runs vitest run)",
+      "Zod 4.4.3 for validation via custom validate() middleware factory applied per-route: router.get(path, validate(schema), handler)",
+      "validate() middleware calls schema.safeParse() on params+query, returns 400 with field errors on failure, attaches result to req.validated",
+      "Middleware stack order: requestId → rateLimiter → cors → express.json() → route-level requireAuth (not on /api/products routes) → error handler",
+      "No auth guard on apiProductRoutes — compare and getById routes are public"
+    ],
+    "features": [
+      "GET /api/products/:id → productController.getById, validated by productIdSchema (string, min 1, max 100 chars)",
+      "GET /api/products/compare → compareController.compare, validated by compareQuerySchema (ids: comma-separated, split into array, min 2 max 3 required)",
+      "compare response shape: { products: Product[], count: number } where count equals products.length",
+      "compareService throws ValidationError (400) for: fewer than 2 IDs, more than 3 IDs, duplicate IDs, or non-existent product ID",
+      "productController.getById throws ProductNotFoundError (404) when product not found",
+      "Must-not-regress: all 3 compare.test.ts assertions and all 16 products.test.ts assertions (products.test.ts tests /products with auth, not /api/products)"
+    ],
+    "architecture": [
+      "src/ layout: controllers/, routes/, services/, data/, db/, middleware/, schemas/, types/, errors/, utils/, app.ts, server.ts",
+      "Data flow: routes → controllers → services → db/data layer",
+      "BUG — current registration order in apiProductRoutes.ts: (1) router.get('/:id', ...) then (2) router.get('/compare', ...)",
+      "Express matches routes in registration order: /:id intercepts /compare requests (id='compare'), which then 404s because no product has id='compare'",
+      "Fix: swap the two router.get() calls so /compare is registered before /:id",
+      "No other files need changes — compareController, productController, compareService, and productSchema must remain unmodified per requirement 6"
+    ],
+    "edgeCases": [
+      "Zero or one ID in ?ids=: Zod schema .min(2) rejects before controller, returns 400 — already handled, no code change needed",
+      "Missing ?ids param entirely: schema field is required (no .optional()), returns 400 — already handled",
+      "Non-existent product ID in compare list: compareService throws ValidationError('Product not found: {id}') → 400",
+      "/:id with non-existent numeric product: productController passes ProductNotFoundError to error handler → 404 — must not regress after route swap",
+      "/:id with 'compare' as id (string): after fix, Express never reaches /:id for /compare path — degenerate case eliminated by correct route order",
+      "Hidden tests directory (src/tests/hidden/) exists but is currently empty — no additional hidden test constraints discovered"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3, 6, 7 — GET /api/products/compare must return 200/400 correctly, and fix must be confined to src/routes/apiProductRoutes.ts only",
+      "description": "In src/routes/apiProductRoutes.ts, swap the registration order of the two route handlers so that router.get('/compare', validate(compareQuerySchema), compare) appears before router.get('/:id', validate(productIdSchema), getById). This ensures Express matches the static /compare path before the dynamic /:id parameter, fixing the 404 bug without touching any controller, service, or schema file.",
+      "files": ["src/routes/apiProductRoutes.ts"]
+    }
+  ]
+}
