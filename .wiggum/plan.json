@@ -1,0 +1,30 @@
+{
+  "taskId": "task8",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix favouriteController: pass ProductNotFoundError to next(err) instead of inline 404 response",
+      "status": "done",
+      "notes": "Removed the inline 404 response for ProductNotFoundError and let it fall through to next(err). Also removed the now-unused ProductNotFoundError import. POST /api/favourites now returns proper { error, code, requestId } 404 shape."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix compareController: pass caught error to next(err) instead of calling next() with no argument",
+      "status": "done",
+      "notes": "Renamed _err to err and changed next() to next(err) in the catch block. All 22 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix rateLimiter: pass new RateLimitError(retryAfterSeconds) to next() instead of a plain Error",
+      "status": "done",
+      "notes": "Imported RateLimitError from errors/index.js and replaced new Error(...) with new RateLimitError(retryAfter). All 22 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run pnpm test and verify all visible tests pass",
+      "status": "done",
+      "notes": "All 22 tests pass (2 test files). Build succeeds with no TypeScript errors."
+    }
+  ]
+}
