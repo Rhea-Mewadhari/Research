@@ -1,0 +1,18 @@
+{
+  "taskId": "task11",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix all three bugs in useFilteredProducts.ts: reorder to filter-then-sort, sort a copy (no mutation), add sortBy to dep array",
+      "status": "done",
+      "notes": "Fixed all three bugs: reordered to filter-then-sort, sorted a copy using [...result].sort(), and added sortBy to the useMemo dependency array. All 21 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-2",
+      "title": "Verify tests pass: run derivedStateCorrectness.test.tsx and confirm all assertions green",
+      "status": "done",
+      "notes": "All 21 tests pass (7 test files, including derivedStateCorrectness.test.tsx with 4 tests). Build also succeeds."
+    }
+  ]
+}
