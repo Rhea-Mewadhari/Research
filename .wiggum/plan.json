@@ -1,0 +1,30 @@
+{
+  "taskId": "task8",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix favouriteController: stop inline 404 response, call next(err) instead",
+      "status": "done",
+      "notes": "Removed inline res.status(404).json() branch for ProductNotFoundError in add(); now calls next(err) unconditionally. Also removed unused ProductNotFoundError import. Build and tests pass (remaining failure is compare controller, handled in phase-2)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix compareController: pass error argument to next(err) instead of next()",
+      "status": "done",
+      "notes": "Changed catch (_err) { next() } to catch (err) { next(err) } so the error propagates to the error handler. All 22 tests pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix rateLimiter: throw RateLimitError instead of plain Error so errorHandler sets Retry-After header",
+      "status": "done",
+      "notes": "Imported RateLimitError from '../errors' and replaced next(new Error(...)) with next(new RateLimitError(retryAfter)). All 22 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify all success criteria pass",
+      "status": "done",
+      "notes": "All 22 tests pass across 2 test files. Build (tsc) exits cleanly with no errors. All three prior fixes (favouriteController next(err), compareController next(err), rateLimiter RateLimitError) are verified working."
+    }
+  ]
+}
