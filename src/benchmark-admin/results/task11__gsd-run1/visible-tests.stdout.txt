@@ -1,0 +1,17 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/derivedStateCorrectness.test.tsx (4 tests) 224ms
+ ✓ tests/app.render.test.tsx (1 test) 75ms
+ ✓ tests/loadingError.test.tsx (4 tests) 95ms
+ ✓ tests/clearFilters.test.tsx (1 test) 162ms
+ ✓ tests/sorting.test.tsx (3 tests) 175ms
+ ✓ tests/pagination.test.tsx (5 tests) 181ms
+ ✓ tests/filtering.test.tsx (3 tests) 468ms
+   ✓ Filtering behavior > filters products by search term  410ms
+
+ Test Files  7 passed (7)
+      Tests  21 passed (21)
+   Start at  09:53:05
+   Duration  5.61s (transform 480ms, setup 3.57s, collect 8.83s, tests 1.38s, environment 20.12s, prepare 1.58s)
+

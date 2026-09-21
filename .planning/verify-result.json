@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Filtering must be applied before sorting: the useMemo body in useFilteredProducts.ts must first run all three filter steps (search term → category → inStockOnly) on the full products array, and only then sort the resulting subset.",
+      "passed": true,
+      "evidence": "Code inspection of useFilteredProducts.ts lines 20-28 shows all three filter steps (term, category, inStockOnly) applied to `result` before any sort. Sort logic appears at lines 30-36 after filtering is complete. Tests 1, 2, and 4 in derivedStateCorrectness.test.tsx all passed: '✓ price-asc sort within Fitness category produces correct order', '✓ price-desc sort within Electronics category produces correct order', '✓ rating-desc sort within Accessories category produces correct order'. Test run: 21 passed (21)."
+    },
+    {
+      "id": "2",
+      "description": "The sort operation must not mutate the products array stored in ProductContext. The implementation must copy the array before sorting using [...arr].sort(...), arr.slice().sort(...), or arr.toSorted(...).",
+      "passed": true,
+      "evidence": "Structural check: grep for 'products\\.sort' in useFilteredProducts.ts returned no output — no bare products.sort() call exists. All sort operations use spread: line 31 `result = [...result].sort((a, b) => a.price - b.price)`, line 33 `result = [...result].sort((a, b) => b.price - a.price)`, line 35 `result = [...result].sort((a, b) => b.rating - a.rating)`. The bug injection script confirms the original bug was `products.sort(...)` (bare mutation); the fix changed it to `[...result].sort(...)`."
+    },
+    {
+      "id": "3",
+      "description": "sortBy must appear in the useMemo dependency array alongside products, debouncedSearch, category, and inStockOnly — all five dependencies must be present.",
+      "passed": true,
+      "evidence": "Code inspection of useFilteredProducts.ts line 39: `}, [products, debouncedSearch, category, inStockOnly, sortBy]);` — all five dependencies present. Test 3 passed: '✓ changing sortBy alone — with no other filter changes — triggers recomputation 54ms'. Full test run: 21 passed (21)."
+    },
+    {
+      "id": "4",
+      "description": "When sortBy is 'price-asc' the filtered result must be sorted by price ascending; when 'price-desc' by price descending; when 'rating-desc' by rating descending. When sortBy is the default the insertion order of the filtered set must be preserved.",
+      "passed": true,
+      "evidence": "derivedStateCorrectness.test.tsx results: '✓ price-asc sort within Fitness category produces correct order 61ms', '✓ price-desc sort within Electronics category produces correct order 54ms', '✓ rating-desc sort within Accessories category produces correct order 53ms'. Additional sorting.test.tsx: '✓ sorts by price ascending 97ms', '✓ sorts by price descending 35ms', '✓ sorts by rating descending 33ms'. All 21 tests passed."
+    },
+    {
+      "id": "5",
+      "description": "The only file changed must be src/hooks/useFilteredProducts.ts (and optionally src/utils/productFilters.ts if sort delegation is chosen). No test files under tests/ may be modified.",
+      "passed": true,
+      "evidence": "git diff --name-only (working tree) returned no output — no uncommitted changes exist. The bug injection script (inject-derived-state-bugs.js) confirms only useFilteredProducts.ts was modified by the bug injection and subsequently fixed. Structural check confirms no bare `products.sort()` in the file. productFilters.ts is unchanged from its original reference implementation (verified by file read — it was not referenced/imported in the fix). No test file modifications: all 21 tests pass against their original content (7 test files, none showing modification failures). Build succeeded: 'vite v6.4.2 building for production... ✓ built in 662ms'."
+    }
+  ]
+}

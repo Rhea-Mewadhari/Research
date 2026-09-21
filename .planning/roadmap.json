@@ -1,0 +1,68 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7, Vite 6, ESM-only project",
+      "Vitest 3.2.4 + jsdom + @testing-library/react for tests; globals:true so no explicit describe/it imports",
+      "useMemo is the conventional pattern for derived state inside hooks",
+      "Pure filter/sort logic lives in src/utils/ (no React), consumed by hooks in src/hooks/",
+      "Contexts are split by concern: ProductContext (products list), FilterContext (search/category/inStockOnly/sortBy/debouncedSearch)",
+      "Strict TypeScript: verbatimModuleSyntax, unused-locals/params errors enforced"
+    ],
+    "features": [
+      "useFilteredProducts.ts Bug 1: products.sort() runs before filter predicates; should filter first then sort",
+      "useFilteredProducts.ts Bug 2: products.sort() mutates the ProductContext array in place; must spread a copy before sorting",
+      "useFilteredProducts.ts Bug 3: sortBy is absent from the useMemo dependency array; changing sort option does not trigger recompute",
+      "productFilters.ts already implements the correct pattern: filterProducts(products, filters) filters first (search→category→inStock), then returns [...result].sort(...) — can be delegated to from the hook",
+      "Only ProductListPage consumes useFilteredProducts; no other consumers to update",
+      "Must not regress: search/category/inStockOnly filters, all sort options, saved filters (localStorage), pagination, results-count label, ProductDetailPanel, ProductErrorBoundary"
+    ],
+    "architecture": [
+      "Layer order: api/ → context/ → hooks/ → utils/ → types/ → components/ → pages/",
+      "Hooks consume context via named consumer hooks (useProductContext, useFilterContext); never access context directly",
+      "Utils are pure functions with no React; productFilters.ts exports filterProducts(products, filters) and FilterState type",
+      "Fix belongs entirely in src/hooks/useFilteredProducts.ts; optionally delegates to src/utils/productFilters.ts",
+      "Available imports in useFilteredProducts.ts: useMemo (react), useProductContext, useFilterContext, Product type, filterProducts/FilterState from productFilters"
+    ],
+    "edgeCases": [
+      "Spread copy must be applied to the FILTERED result, not to products — spreading products before the filter step fixes Bug 2 but leaves Bug 1 intact",
+      "Default sortBy ('default'): no sort branch; must return filtered array in insertion order without sorting or copying (or return a copy anyway for safety)",
+      "All filters active simultaneously: post-fix must filter all three predicates first, then sort the surviving subset only",
+      "Bug 2 + Bug 3 interaction: even when memo does not recompute (Bug 3), products.sort() already mutated context; fixing Bug 3 alone exposes corrupted context order",
+      "Returning to 'default' after a sort: without Bug 2 fix, ProductContext array is permanently reordered; with fix, original insertion order is preserved",
+      "Empty products array: no crash, but mutation of an empty array can suppress React re-renders if the reference identity does not change after setProducts",
+      "Fixing Bug 3 without Bug 1 can cause Bug 3 tests to fail for the wrong reason (wrong sort order), making it appear Bug 3 is still unfixed"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — Filtering must be applied before sorting: the useMemo body must first run all three filter steps (search term → category → inStockOnly) on the full products array, and only then sort the resulting subset.",
+      "description": "Reorder the useMemo body in useFilteredProducts.ts so all three filter predicates (debouncedSearch, category, inStockOnly) are applied to products first, producing a filtered subset. The sort operation must then be applied only to that filtered subset. Remove the sort block that currently precedes the filter steps.",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — The sort operation must not mutate the products array stored in ProductContext. The implementation must copy the array before sorting using [...arr].sort(...), arr.slice().sort(...), or arr.toSorted(...).",
+      "description": "In the sort step (which now runs after filtering per task-1), replace the bare .sort() call with a spread-copy-then-sort: assign result = [...result].sort(...) so the ProductContext reference is never mutated. This spread must operate on the already-filtered result, not on the original products array.",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — sortBy must appear in the useMemo dependency array alongside products, debouncedSearch, category, and inStockOnly — all five dependencies must be present.",
+      "description": "Add sortBy to the useMemo dependency array in useFilteredProducts.ts. The final array must contain exactly: [products, debouncedSearch, category, inStockOnly, sortBy].",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — When sortBy is 'price-asc' sort by price ascending; 'price-desc' by price descending; 'rating-desc' by rating descending; default preserves insertion order of the filtered set.",
+      "description": "Verify (do not change) that the sort comparators for price-asc, price-desc, and rating-desc are correct, and that the default branch returns the filtered array unsorted. If the existing comparator logic is correct, no change is needed beyond the reordering and copy fix from tasks 1–2. If delegation to filterProducts from productFilters.ts is chosen instead, ensure the FilterState passed to it includes all five fields.",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    },
+    {
+      "id": "task-5",
+      "requirement": "5 — The only file changed must be src/hooks/useFilteredProducts.ts (and optionally src/utils/productFilters.ts). No test files under tests/ may be modified.",
+      "description": "Confirm that git diff --name-only after all fixes shows only src/benchmark-frontend/src/hooks/useFilteredProducts.ts (and/or src/benchmark-frontend/src/utils/productFilters.ts). Do not touch any file under src/benchmark-frontend/tests/.",
+      "files": ["src/benchmark-frontend/src/hooks/useFilteredProducts.ts"]
+    }
+  ]
+}

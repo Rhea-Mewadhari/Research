@@ -1,0 +1,13 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.derived.state.test.tsx (4 tests) 222ms
+ ✓ tests/hidden.sorting.integrity.test.tsx (2 tests) 121ms
+ ✓ tests/hidden.combined.behavior.test.tsx (2 tests) 507ms
+   ✓ Hidden: combined filter behavior > combines category + inStockOnly + search correctly  421ms
+
+ Test Files  3 passed (3)
+      Tests  8 passed (8)
+   Start at  09:53:11
+   Duration  1.22s (transform 85ms, setup 178ms, collect 574ms, tests 850ms, environment 713ms, prepare 178ms)
+
