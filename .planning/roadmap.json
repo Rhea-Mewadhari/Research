@@ -1,0 +1,52 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express v5.2.1 (peer-typed via @types/express ^5.0.6)",
+      "TypeScript ~6.0.2, ESM modules ('type': 'module'), target es2023, moduleResolution: bundler, verbatimModuleSyntax: true",
+      "Vitest v4.1.5 for tests, Supertest v7.2.2 for HTTP integration tests",
+      "Zod v4.4.3 for schema validation; custom validate() middleware applies schemas per-route before controllers",
+      "cors middleware applied globally; express.json() for body parsing",
+      "pnpm package manager",
+      "Route registration order still determines match priority in Express 5 Router — the /compare route is unreachable when /:id is registered first (confirmed by live test failures)"
+    ],
+    "features": [
+      "apiProductRoutes.ts registers exactly two routes: GET /:id (line 9, first) and GET /compare (line 10, second)",
+      "GET /:id: validate(productIdSchema) -> getById controller -> getProductById service -> returns product JSON or 404 via ProductNotFoundError",
+      "GET /compare: validate(compareQuerySchema) -> compare controller -> getComparison service -> returns { products, count } JSON",
+      "compareService: throws ValidationError for <2, >3, or duplicate IDs; queries SQLite; throws ValidationError if any ID not found",
+      "Bug: /:id is registered first so GET /api/products/compare is captured as id='compare', productService returns not-found, endpoint returns 404",
+      "compare.test.ts asserts: 200 with products array of length 2 and count 2; id and name present on each product; 400 for fewer than 2 IDs",
+      "products.test.ts covers the auth-protected /products router (not apiProductRoutes) — must not regress"
+    ],
+    "architecture": [
+      "Layer structure: src/routes/ -> src/controllers/ -> src/services/ -> SQLite db (better-sqlite3)",
+      "app.ts mounts apiProductRoutes at app.use('/api/products', apiProductRoutes) — no auth middleware on this path",
+      "Full compare endpoint path: GET /api/products/compare?ids=1,2",
+      "Full single-product path: GET /api/products/:id",
+      "Validated input is set on req.validated by the validate() middleware; controllers read from req.validated, not raw req.params/req.query",
+      "Typed errors (ValidationError, ProductNotFoundError) are caught by the global errorHandler middleware registered last in app.ts",
+      "New public product routes belong in src/routes/apiProductRoutes.ts; always pair with a validate(schema) middleware"
+    ],
+    "edgeCases": [
+      "Zero IDs (?ids=): Zod array min(2) rejects empty/single-element result — returns 400 before controller",
+      "One ID (?ids=1): Zod min(2) rejects — returns 400; compareService also has a redundant guard that is never reached",
+      "Missing ids param entirely: Zod treats missing required field as error — returns 400",
+      "Two or three IDs: happy path; compareService queries DB and returns { products, count }",
+      "More than three IDs: Zod max(3) rejects — returns 400",
+      "Duplicate IDs: Zod passes, compareService detects duplicates and throws ValidationError — returns 400",
+      "Non-numeric IDs: Zod passes (z.string().min(1)), SQLite won't match string against integer id, compareService throws ValidationError — returns 400",
+      "After route reorder: /compare is matched literally before /:id; /:id still matches any segment not equal to 'compare'; no other static routes exist in apiProductRoutes.ts that could be shadowed",
+      "/:id continues to accept any string including 'compare' at the schema level, but Express will never route /compare to /:id after the fix"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1–7: GET /api/products/compare must return 200 with products/count; 400 for fewer than 2 IDs; GET /api/products/:id must continue to return 200 or 404 correctly; fix confined to src/routes/apiProductRoutes.ts; all tests pass",
+      "description": "Swap the route registration order in apiProductRoutes.ts so that router.get('/compare', ...) is registered before router.get('/:id', ...). This gives Express the opportunity to match the static literal path first, making the compare endpoint reachable and leaving the dynamic /:id route fully functional for all other IDs.",
+      "files": [
+        "src/benchmark-backend/src/routes/apiProductRoutes.ts"
+      ]
+    }
+  ]
+}
