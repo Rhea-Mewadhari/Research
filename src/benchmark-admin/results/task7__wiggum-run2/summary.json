@@ -1,0 +1,96 @@
+{
+  "taskId": "task7",
+  "runId": "wiggum-run2",
+  "timestamp": "2026-09-21T13:09:44.617Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 22,
+    "failed": 0,
+    "total": 22
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 3083,
+    "hiddenMs": 727,
+    "buildMs": 728,
+    "totalMs": 4647
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "backend",
+    "taskId": "task7",
+    "wall_duration_ms": 144900,
+    "cost_usd": 0.6561807,
+    "num_turns": 28,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "e5b9a95c-d0b0-4ca8-b307-2ae4eae46406",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix route registration order in apiProductRoutes.ts so /compare is registered before /:id",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Run pnpm test to verify all visible tests pass",
+          "status": "done",
+          "notes": "All 22 tests across 2 test files passed."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 45728,
+          "cost_usd": 0.2242563,
+          "num_turns": 11,
+          "session_id": "8d5b4666-4d31-40a1-b6bf-89899b37ca8e",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 44806,
+          "cost_usd": 0.2539647,
+          "num_turns": 11,
+          "session_id": "e5b9a95c-d0b0-4ca8-b307-2ae4eae46406",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 2,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
