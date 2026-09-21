@@ -1,0 +1,61 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express 5.2.1 with Node.js ESM (\"type\": \"module\"); TypeScript ~6.0.2 targeting ES2023",
+      "Vitest 4.1.5 + Supertest 7.2.0 for tests; pnpm as package manager",
+      "tsconfig: noUnusedLocals and noUnusedParameters both true — underscore prefix (_err) suppresses the unused-variable diagnostic; passing _err to next(_err) removes the unused warning and is TypeScript-valid",
+      "No ESLint project config found; TypeScript compiler enforces unused-variable rules",
+      "Relative ESM imports throughout (e.g. import { RateLimitError } from '../errors')"
+    ],
+    "features": [
+      "favouriteController exports list, add, remove — only add() has the inline 404 bug; remove() also sends inline 404 but is explicitly out of scope for task8",
+      "add() catch block: ProductNotFoundError branch sends res.status(404).json({message}) inline; catch-all branch already calls next(err) correctly",
+      "compareController.compare() catch block: catches as _err but calls next() with no argument, silently swallowing the error",
+      "rateLimiter: already has /health bypass (lines 13-16: if req.path === '/health' then next(); return) that must be preserved",
+      "rateLimiter: retryAfterSeconds computed as Math.max(1, Math.ceil((oldest + WINDOW_MS - now) / 1000)) — clamp must be preserved when constructing RateLimitError",
+      "Visible tests in src/tests/visible/: middleware.test.ts asserts POST /api/favourites returns 404 with {error,code,requestId}; GET /api/products/compare returns 400; rateLimiter.test.js asserts status 429 and Retry-After header is defined"
+    ],
+    "architecture": [
+      "Middleware order in app.ts: requestId → rateLimiter → cors → express.json → routes → 404 fallback → errorHandler (last)",
+      "errorHandler is a 4-arg Express handler: (err: unknown, req, res, _next) — all errors passed via next(err) reach it",
+      "RateLimitError (errors/index.ts): constructor(retryAfterSeconds: number); sets statusCode=429, code='RATE_LIMIT_EXCEEDED'; errorHandler sets Retry-After header and responds {error, code, requestId}",
+      "AppError subclasses (ProductNotFoundError, ValidationError, etc.): errorHandler uses err.statusCode and err.code → responds {error, code, requestId}",
+      "Unknown Error (not AppError): errorHandler falls back to 500 and {error, requestId} with no code field — this is the current broken behaviour for rateLimiter",
+      "Routes wire directly to controller functions via import in productRoutes.ts, apiProductRoutes.ts, favouriteRoutes.ts"
+    ],
+    "edgeCases": [
+      "favouriteController.add: the catch-all branch (DatabaseError and others) already calls next(err) — removing only the ProductNotFoundError inline branch leaves the catch-all intact; no regression",
+      "compareController.compare: no finally block or post-catch logic; _err can be passed directly as next(_err) without renaming — once referenced, noUnusedParameters warning disappears",
+      "rateLimiter: Math.max(1, ...) clamp on retryAfterSeconds must be preserved in the RateLimitError constructor call; test asserts Retry-After header is defined (not a specific value), so any positive value passes",
+      "rateLimiter: /health bypass must not be removed or repositioned — health-check tests depend on it",
+      "RateLimitError constructor accepts exactly one argument (retryAfterSeconds: number) — no other params needed",
+      "Files that must not be modified: src/middleware/errorHandler.ts, src/services/*.ts, src/errors/index.ts"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1 & 2: POST /api/favourites with non-existent productId must return 404 with {error,code,requestId} shape via errorHandler; favouriteController.add must call next(err) instead of res.status(404).json(...) in the ProductNotFoundError catch branch",
+      "description": "In the ProductNotFoundError catch branch of add(), remove the inline `res.status(404).json({ message: 'Product not found' }); return;` and replace it with `next(err);` so the error propagates to errorHandler",
+      "files": [
+        "src/benchmark-backend/src/controllers/favouriteController.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 3 & 4: GET /api/products/compare with valid-format but non-existent ids must return 400 with {error,code,requestId}; compareController.compare must pass the caught error to next(err) not bare next()",
+      "description": "In the catch block of compare(), change `next()` to `next(_err)` so the caught error (currently named _err) is forwarded to errorHandler instead of being swallowed",
+      "files": [
+        "src/benchmark-backend/src/controllers/compareController.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 5 & 6: Rate-limit response must be HTTP 429 with Retry-After header; rateLimiter must import and use RateLimitError instead of plain new Error(...)",
+      "description": "Add `import { RateLimitError } from '../errors';` to rateLimiter.ts and replace `next(new Error(...))` with `next(new RateLimitError(retryAfter))`, preserving the existing Math.max(1,...) clamp and the /health bypass",
+      "files": [
+        "src/benchmark-backend/src/middleware/rateLimiter.ts"
+      ]
+    }
+  ]
+}

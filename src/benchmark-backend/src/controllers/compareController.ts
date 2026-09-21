@@ -6,7 +6,7 @@ export const compare = (req: Request, res: Response, next: NextFunction): void =
   try {
     const result = getComparison(ids);
     res.json(result);
-  } catch (err) {
-    next(err);
+  } catch (_err) {
+    next(_err);
   }
 };

@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "POST /api/favourites with a non-existent productId must return HTTP 404 with JSON body { error, code, requestId } produced by errorHandler, not inline.",
+      "passed": true,
+      "evidence": "middleware.test.ts > 'Error propagation > POST /api/favourites with a non-existent productId returns 404' PASSED. favouriteController.add calls next(err), which reaches errorHandler; errorHandler returns { error, code, requestId } (line 25 of errorHandler.ts). No 'message' key present. Test run: 22 passed (22), exit 0."
+    },
+    {
+      "id": "2",
+      "description": "favouriteController.add must call next(err) in the ProductNotFoundError catch branch, not res.status(404).json(...).",
+      "passed": true,
+      "evidence": "Reading src/benchmark-backend/src/controllers/favouriteController.ts lines 19-25: catch block contains 'if (err instanceof ProductNotFoundError) { next(err); return; }' at line 21. No res.status(404) call anywhere in the add handler."
+    },
+    {
+      "id": "3",
+      "description": "GET /api/products/compare with valid-format but non-existent ids must return HTTP 400 with { error, code, requestId }.",
+      "passed": true,
+      "evidence": "middleware.test.ts > 'Error propagation > GET /api/products/compare with valid format but non-existent ids returns 400' PASSED. compareController calls next(_err) which reaches errorHandler, returning { error, code, requestId }. Test run: 22 passed (22), exit 0."
+    },
+    {
+      "id": "4",
+      "description": "compareController.compare must call next(_err) (not bare next()) so the error reaches errorHandler.",
+      "passed": true,
+      "evidence": "Reading src/benchmark-backend/src/controllers/compareController.ts lines 9-11: catch block is 'catch (_err) { next(_err); }'. The caught error is passed to next, not bare next()."
+    },
+    {
+      "id": "5",
+      "description": "When rate limit exceeded, response must be HTTP 429 with Retry-After header set to seconds until retry.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 28: calls next(new RateLimitError(retryAfter)) where retryAfter = Math.max(1, ...). errorHandler.ts lines 13-17: checks RateLimitError, calls res.setHeader('Retry-After', String(err.retryAfterSeconds)) then res.status(err.statusCode). All 22 tests pass (exit 0)."
+    },
+    {
+      "id": "6",
+      "description": "rateLimiter must import and use RateLimitError from ../errors, not bare new Error(...).",
+      "passed": true,
+      "evidence": "Reading src/benchmark-backend/src/middleware/rateLimiter.ts line 2: 'import { RateLimitError } from \"../errors\"'. Line 28: 'next(new RateLimitError(retryAfter))'. No bare new Error(...) passed to next for the rate-limit case."
+    },
+    {
+      "id": "7",
+      "description": "pnpm test must exit with code 0 (all visible tests pass).",
+      "passed": true,
+      "evidence": "pnpm test output: 'Test Files  2 passed (2) / Tests  22 passed (22)' with 'Duration 424ms'. No failing tests. Process exited with code 0."
+    },
+    {
+      "id": "8",
+      "description": "None of these files may be modified: src/middleware/errorHandler.ts, src/services/*.ts, src/errors/index.ts.",
+      "passed": true,
+      "evidence": "git diff --name-only (working tree vs HEAD) returns no output — working tree is clean. The restricted files (errorHandler.ts, errors/index.ts, compareService.ts, favouritesService.ts, productService.ts, dataFetcher.ts) are unmodified relative to HEAD."
+    }
+  ]
+}
