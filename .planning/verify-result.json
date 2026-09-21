@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /api/products/compare?ids=1,2 returns HTTP 200 with a JSON body containing a `products` array of length 2 and a `count` field equal to 2.",
+      "passed": true,
+      "evidence": "compare.test.ts > GET /api/products/compare > 'returns 200 with matching products for two valid ids' PASSED (8ms). Test asserts res.status === 200, Array.isArray(res.body.products) === true, res.body.products.toHaveLength(2), res.body.count === 2. Full run: 2 test files, 22 tests, all passed."
+    },
+    {
+      "id": "2",
+      "description": "Each product object in the `products` array from GET /api/products/compare contains at least an `id` field and a `name` field.",
+      "passed": true,
+      "evidence": "compare.test.ts > GET /api/products/compare > 'includes id and name in each returned product' PASSED (1ms). Test asserts res.body.products.every((p: any) => p.id && p.name) === true."
+    },
+    {
+      "id": "3",
+      "description": "GET /api/products/compare?ids=1 (fewer than two IDs) returns HTTP 400.",
+      "passed": true,
+      "evidence": "compare.test.ts > GET /api/products/compare > 'returns 400 when fewer than two ids are provided' PASSED (1ms). Test asserts res.status === 400."
+    },
+    {
+      "id": "4",
+      "description": "GET /api/products/:id with a valid numeric product ID continues to return HTTP 200 with the correct product.",
+      "passed": true,
+      "evidence": "products.test.ts suite fully passed — all 19 tests green (including GET /products tests, Pagination, Auth middleware, and getById-related routes). pnpm test output: 2 test files, 22 tests, all passed. No regressions on /:id route."
+    },
+    {
+      "id": "5",
+      "description": "GET /api/products/:id with a non-existent ID continues to return HTTP 404.",
+      "passed": true,
+      "evidence": "products.test.ts suite fully passed — all 19 tests green. pnpm test output: 2 test files, 22 tests, all passed. 404 behaviour for unknown IDs is preserved; no test failures indicate any regression."
+    },
+    {
+      "id": "6",
+      "description": "Only src/routes/apiProductRoutes.ts is modified; no other source file differs from its pre-fix state.",
+      "passed": true,
+      "evidence": "git diff --name-only is not directly applicable (single commit in repo history). Verified via file content inspection: (a) inject-route-order-bugs.js (read from file) shows only src/routes/apiProductRoutes.ts was modified to inject the bug; (b) baseline-quality.json (generated pre-fix) shows productController.ts had lint findings at lines 7, 13, 28, 38 — the current file has functions at exactly those same lines, confirming it is unchanged; (c) compareController.ts (12 lines), compareService.ts (52 lines), and productSchema.ts (23 lines) show no compensatory logic for route ordering; (d) apiProductRoutes.ts (12 lines) contains only the corrected route order with no other changes."
+    },
+    {
+      "id": "7",
+      "description": "The /compare route is registered in apiProductRoutes.ts before the /:id route so that Express matches the static segment first.",
+      "passed": true,
+      "evidence": "Read src/routes/apiProductRoutes.ts: line 9 is `router.get('/compare', validate(compareQuerySchema), compare);` and line 10 is `router.get('/:id', validate(productIdSchema), getById);`. The static /compare route appears before the dynamic /:id route."
+    }
+  ]
+}
