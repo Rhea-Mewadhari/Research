@@ -1,0 +1,18 @@
+{
+  "taskId": "task7",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix route registration order in apiProductRoutes.ts so /compare is registered before /:id",
+      "status": "done",
+      "notes": "Swapped route registration order: /compare now appears before /:id. All 22 tests pass."
+    },
+    {
+      "id": "phase-2",
+      "title": "Run tests to verify all four requirements pass (compare 200, compare 400, product valid, product 404)",
+      "status": "done",
+      "notes": "All 22 tests pass and build succeeds. The route registration fix from phase-1 ensures /compare is matched before /:id, satisfying all four requirements."
+    }
+  ]
+}
