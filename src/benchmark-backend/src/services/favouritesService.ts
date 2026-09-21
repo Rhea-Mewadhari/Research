@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { db } from '../db/client';
 import type { Favourite } from '../types/product';
-import { ProductNotFoundError, DatabaseError } from '../errors';
+import { DatabaseError, ProductNotFoundError } from '../errors';
 
 function rowToFavourite(row: Record<string, unknown>): Favourite {
   return {
@@ -11,19 +11,16 @@ function rowToFavourite(row: Record<string, unknown>): Favourite {
   };
 }
 
-function productExists(productId: string): boolean {
-  return !!db.prepare('SELECT 1 FROM products WHERE id = ?').get(productId);
-}
-
 export function addFavourite(productId: string): { favourite: Favourite; created: boolean } {
-  if (!productExists(productId)) {
-    throw new ProductNotFoundError(productId);
-  }
   try {
+    const product = db.prepare('SELECT 1 FROM products WHERE id = ?').get(productId);
+    if (!product) {
+      throw new ProductNotFoundError(productId);
+    }
     const result = db
       .prepare('INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)')
       .run(randomUUID(), productId);
-    const created = result.changes > 0;
+    const created = result.changes === 1;
     const row = db
       .prepare('SELECT * FROM favourites WHERE product_id = ?')
       .get(productId) as Record<string, unknown>;

@@ -1,0 +1,71 @@
+{
+  "investigations": {
+    "techStack": [
+      "Database: better-sqlite3 v12.11.1 — synchronous API; db.pragma() for configuration, db.prepare(sql).run(params) returns {changes, lastInsertRowid}",
+      "FK pragma pattern: db.pragma('foreign_keys = ON') — same synchronous call style as the existing db.pragma('journal_mode = WAL')",
+      "INSERT OR IGNORE: standard SQLite syntax; result.changes === 1 if row inserted, 0 if duplicate ignored",
+      "Test framework: vitest v4.1.5 with supertest; run via 'pnpm test' (vitest run)",
+      "TypeScript ~6.0.2 with noUnusedLocals + noUnusedParameters — any added imports must be used",
+      "Package manager: pnpm; tests run from src/benchmark-backend directory"
+    ],
+    "features": [
+      "favouritesService.ts addFavourite: currently does SELECT-then-INSERT (two statements, not atomic); no product existence check; never throws ProductNotFoundError",
+      "favouritesService.ts removeFavourite: bug on line with 'result.changes > -1' — always returns true; should be result.changes > 0",
+      "favouritesService.ts addFavourite return shape: { favourite: Favourite; created: boolean } — type is correct, no type changes needed",
+      "errors/index.ts: ProductNotFoundError(productId) exists — statusCode 404, code PRODUCT_NOT_FOUND, message \"Product with id '${productId}' not found\"",
+      "db/client.ts: sets journal_mode = WAL pragma but does NOT set foreign_keys = ON — FK constraints in schema are currently unenforced",
+      "favouriteController.ts (read-only): add handler calls next(err) on throw, so ProductNotFoundError thrown from service correctly produces 404 response; remove handler checks boolean return to send 404 vs 204"
+    ],
+    "architecture": [
+      "Only two files are allowed to change: src/db/client.ts and src/services/favouritesService.ts",
+      "Read-only files (per req 8): src/controllers/favouriteController.ts, src/routes/favouriteRoutes.ts, src/db/migrations/*.sql",
+      "Error flow: service throws AppError subclass → controller catches and calls next(err) → errorHandler middleware maps err.statusCode → JSON response",
+      "DB client is a singleton exported as { db } from '../db/client'; services import and use it directly with synchronous prepared statements",
+      "Schema (002_favourites.sql): favourites table has UNIQUE(product_id) and REFERENCES products(id) ON DELETE CASCADE — both constraints exist but FK is inactive without the pragma",
+      "Products table exists and is referenced; product existence check must query 'SELECT 1 FROM products WHERE id = ?' before insert"
+    ],
+    "edgeCases": [
+      "Non-existent productId: explicit SELECT on products table must precede INSERT; throw ProductNotFoundError before touching favourites table so FK constraint acts as secondary guard only",
+      "Duplicate add (valid productId already favourited): INSERT OR IGNORE is a no-op; result.changes === 0 → created: false → controller returns 200 (not 201)",
+      "New add (valid productId not yet favourited): INSERT OR IGNORE inserts row; result.changes === 1 → created: true → controller returns 201",
+      "After INSERT OR IGNORE, always do a SELECT to retrieve the row for the return value — needed in both insert and duplicate cases",
+      "removeFavourite for non-existent productId: result.changes === 0 → return false → controller sends 404 with { error: 'Favourite not found' }",
+      "removeFavourite for existing favourite: result.changes === 1 → return true → controller sends 204 (regression must still pass)",
+      "TypeScript strict flags: ProductNotFoundError import must be added to favouritesService.ts since noUnusedLocals is enforced and it will be used"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: src/benchmark-backend/src/db/client.ts executes db.pragma('foreign_keys = ON') immediately after opening the database connection",
+      "description": "Add db.pragma('foreign_keys = ON') to client.ts immediately after the existing db.pragma('journal_mode = WAL') call, so SQLite enforces FK constraints on every connection (both test :memory: and production file-based)",
+      "files": [
+        "src/benchmark-backend/src/db/client.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2 and 3: addFavourite throws ProductNotFoundError when the given productId is absent from the products table (checked before any insert attempt), so POST /api/favourites returns HTTP 404",
+      "description": "In favouritesService.ts addFavourite, add an explicit product existence check using db.prepare('SELECT 1 FROM products WHERE id = ?').get(productId) before the insert logic. If the result is undefined, throw new ProductNotFoundError(productId). Also add the ProductNotFoundError import from '../errors/index'.",
+      "files": [
+        "src/benchmark-backend/src/services/favouritesService.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 4 and 5: addFavourite uses a single atomic INSERT OR IGNORE statement instead of a separate SELECT followed by INSERT, so UNIQUE(product_id) handles deduplication at the DB level; second POST with same productId returns 200 (not 201)",
+      "description": "In favouritesService.ts addFavourite, replace the SELECT-then-INSERT two-statement pattern with a single 'INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)'. Use result.changes === 1 to determine created: true (new insert) vs created: false (duplicate ignored). After the INSERT OR IGNORE, do one SELECT to fetch the row for the return value in both cases.",
+      "files": [
+        "src/benchmark-backend/src/services/favouritesService.ts"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 6 and 7: removeFavourite evaluates result.changes > 0 (not > -1) to determine whether a row was deleted, returning false when changes === 0, so DELETE /api/favourites/:productId returns HTTP 404 for a non-existent favourite",
+      "description": "In favouritesService.ts removeFavourite, change the condition 'result.changes > -1' to 'result.changes > 0'. This is the only change needed — result.changes from better-sqlite3 is always >= 0 so > -1 was always true.",
+      "files": [
+        "src/benchmark-backend/src/services/favouritesService.ts"
+      ]
+    }
+  ]
+}
