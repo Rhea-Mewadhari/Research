@@ -55,7 +55,7 @@ describe('Hidden: filter-aware total count', () => {
 describe('Hidden: productService structural checks', () => {
   it('productService uses a filtered COUNT query', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/services/productService.ts'),
+      path.resolve(__dirname, '../../services/productService.ts'),
       'utf8'
     );
     // Bug 1 pattern: bare COUNT without WHERE — must include the WHERE placeholder
@@ -64,7 +64,7 @@ describe('Hidden: productService structural checks', () => {
 
   it('productService applies the featured filter in SQL, not in JS', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/services/productService.ts'),
+      path.resolve(__dirname, '../../services/productService.ts'),
       'utf8'
     );
     // Bug 2 pattern: featured applied via Array.filter after pagination
@@ -73,7 +73,7 @@ describe('Hidden: productService structural checks', () => {
 
   it('productService uses Math.ceil for totalPages', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/services/productService.ts'),
+      path.resolve(__dirname, '../../services/productService.ts'),
       'utf8'
     );
     expect(content).toMatch(/Math\.ceil\(/);

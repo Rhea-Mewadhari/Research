@@ -30,7 +30,7 @@ describe('Hidden: compare endpoint reachability', () => {
 describe('Hidden: route registration order', () => {
   it('/compare is registered before /:id in apiProductRoutes.ts', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/routes/apiProductRoutes.ts'),
+      path.resolve(__dirname, '../../routes/apiProductRoutes.ts'),
       'utf8'
     );
     const comparePos = content.indexOf("'/compare'");
@@ -42,7 +42,7 @@ describe('Hidden: route registration order', () => {
 
   it('getById does not contain a guard for the literal string "compare"', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/controllers/productController.ts'),
+      path.resolve(__dirname, '../../controllers/productController.ts'),
       'utf8'
     );
     expect(content).not.toMatch(/'compare'/);

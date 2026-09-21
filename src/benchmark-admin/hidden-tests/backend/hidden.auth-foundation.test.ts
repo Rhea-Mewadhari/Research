@@ -23,7 +23,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 
 describe('Hidden: auth foundation — structure', () => {
   it('a migration file creates the users table', () => {
-    const migrationsDir = path.resolve(__dirname, '../src/db/migrations');
+    const migrationsDir = path.resolve(__dirname, '../../db/migrations');
     const files = fs.readdirSync(migrationsDir);
     const usersMigration = files.find((f) => /users/i.test(f));
     expect(usersMigration).toBeDefined();
@@ -35,12 +35,12 @@ describe('Hidden: auth foundation — structure', () => {
 
   it('requireJwt is its own middleware file, and requireAuth is untouched', () => {
     const authContent = fs.readFileSync(
-      path.resolve(__dirname, '../src/middleware/auth.ts'),
+      path.resolve(__dirname, '../../middleware/auth.ts'),
       'utf8'
     );
     expect(authContent).not.toMatch(/requireJwt/);
 
-    const jwtMiddlewarePath = path.resolve(__dirname, '../src/middleware/requireJwt.ts');
+    const jwtMiddlewarePath = path.resolve(__dirname, '../../middleware/requireJwt.ts');
     expect(fs.existsSync(jwtMiddlewarePath)).toBe(true);
   });
 });

@@ -29,7 +29,7 @@ async function registerUser(overrides: Partial<{ email: string; username: string
 describe('Hidden: profile management — structure', () => {
   it('userRoutes.ts guards PATCH /me with requireJwt', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/routes/userRoutes.ts'),
+      path.resolve(__dirname, '../../routes/userRoutes.ts'),
       'utf8'
     );
     expect(content).toMatch(/requireJwt/);
@@ -37,7 +37,7 @@ describe('Hidden: profile management — structure', () => {
 
   it('authController no longer resolves getMe from a URL parameter', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/controllers/authController.ts'),
+      path.resolve(__dirname, '../../controllers/authController.ts'),
       'utf8'
     );
     // The Bug 1 pattern from the spec: reading the target user id off req.params.

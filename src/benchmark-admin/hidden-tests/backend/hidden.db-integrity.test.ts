@@ -23,7 +23,7 @@ describe('Hidden: favourites edge-case behaviour', () => {
 describe('Hidden: DB integrity structural checks', () => {
   it('client.ts enables foreign key enforcement', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/db/client.ts'),
+      path.resolve(__dirname, '../../db/client.ts'),
       'utf8'
     );
     expect(content).toMatch(/foreign_keys\s*=\s*ON/i);
@@ -31,7 +31,7 @@ describe('Hidden: DB integrity structural checks', () => {
 
   it('favouritesService uses INSERT OR IGNORE for atomic upsert', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/services/favouritesService.ts'),
+      path.resolve(__dirname, '../../services/favouritesService.ts'),
       'utf8'
     );
     expect(content).toMatch(/INSERT OR IGNORE/i);
@@ -39,7 +39,7 @@ describe('Hidden: DB integrity structural checks', () => {
 
   it('favouritesService validates product existence before inserting', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/services/favouritesService.ts'),
+      path.resolve(__dirname, '../../services/favouritesService.ts'),
       'utf8'
     );
     expect(content).toContain('productExists');
@@ -47,7 +47,7 @@ describe('Hidden: DB integrity structural checks', () => {
 
   it('removeFavourite uses result.changes > 0 — not > -1', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/services/favouritesService.ts'),
+      path.resolve(__dirname, '../../services/favouritesService.ts'),
       'utf8'
     );
     expect(content).not.toMatch(/changes\s*>\s*-1/);

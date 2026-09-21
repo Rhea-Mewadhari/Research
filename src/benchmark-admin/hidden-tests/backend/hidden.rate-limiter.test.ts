@@ -27,7 +27,7 @@ afterAll(() => {
 describe('Hidden: rate limiter structural checks', () => {
   it('rateLimiter.ts prunes expired timestamps on each request', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/middleware/rateLimiter.ts'),
+      path.resolve(__dirname, '../../middleware/rateLimiter.ts'),
       'utf8'
     );
     // Must have a .filter( call that removes old entries from the array
@@ -36,7 +36,7 @@ describe('Hidden: rate limiter structural checks', () => {
 
   it('rateLimiter.ts exempts /health with a correctly formed path string', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/middleware/rateLimiter.ts'),
+      path.resolve(__dirname, '../../middleware/rateLimiter.ts'),
       'utf8'
     );
     // Must contain '/health' (with the leading slash)
@@ -47,7 +47,7 @@ describe('Hidden: rate limiter structural checks', () => {
 
   it('rateLimiter.ts computes Retry-After dynamically, not as a hardcoded constant', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/middleware/rateLimiter.ts'),
+      path.resolve(__dirname, '../../middleware/rateLimiter.ts'),
       'utf8'
     );
     // The bug pattern: `retryAfter = 60`

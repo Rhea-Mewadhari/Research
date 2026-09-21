@@ -28,7 +28,7 @@ describe('Hidden: error response shape uniformity', () => {
 describe('Hidden: error middleware wiring', () => {
   it('favouriteController.add does not send inline json with a message field on error', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/controllers/favouriteController.ts'),
+      path.resolve(__dirname, '../../controllers/favouriteController.ts'),
       'utf8'
     );
     expect(content).not.toMatch(/\.json\(\s*\{\s*message\s*:/);
@@ -36,7 +36,7 @@ describe('Hidden: error middleware wiring', () => {
 
   it('compareController.compare passes errors to next(err) — no bare next() in catch', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/controllers/compareController.ts'),
+      path.resolve(__dirname, '../../controllers/compareController.ts'),
       'utf8'
     );
     expect(content).not.toMatch(/\bnext\(\s*\)/);
@@ -44,7 +44,7 @@ describe('Hidden: error middleware wiring', () => {
 
   it('rateLimiter uses RateLimitError when calling next(err)', () => {
     const content = fs.readFileSync(
-      path.resolve(__dirname, '../src/middleware/rateLimiter.ts'),
+      path.resolve(__dirname, '../../middleware/rateLimiter.ts'),
       'utf8'
     );
     expect(content).toContain('RateLimitError');
