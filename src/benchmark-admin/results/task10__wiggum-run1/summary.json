@@ -1,0 +1,211 @@
+{
+  "taskId": "task10",
+  "runId": "wiggum-run1",
+  "timestamp": "2026-09-21T06:17:49.920Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 22,
+    "failed": 0,
+    "total": 22
+  },
+  "hiddenTests": {
+    "success": false,
+    "passed": 8,
+    "failed": 2,
+    "total": 10,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": false
+  },
+  "timing": {
+    "visibleMs": 2139,
+    "hiddenMs": 1448,
+    "buildMs": 949,
+    "totalMs": 4882
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 0.8,
+    "robustnessGap": 0.2,
+    "buildStability": 1,
+    "correctnessScore": 0.9,
+    "qualityScore": 0.6,
+    "overallScore": 0.78
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task10",
+    "wall_duration_ms": 447780,
+    "cost_usd": 2.1197781,
+    "num_turns": 93,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "f240df7e-96df-4a62-bfad-b93bfaf52d87",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Capture previous focus on open and restore it on close",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Move focus to close button when panel opens",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Add document-level Escape key listener to close the panel",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-4",
+          "title": "Implement Tab/Shift+Tab focus trap within the panel",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-5",
+          "title": "Run test suite and verify all tests pass",
+          "status": "done",
+          "notes": "All 22 tests pass across 7 test files. Build succeeds with no TypeScript errors."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 82378,
+          "cost_usd": 0.4076607,
+          "num_turns": 17,
+          "session_id": "2d8dc01f-896b-4863-b4f0-c0f162784525",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 90363,
+          "cost_usd": 0.4342899,
+          "num_turns": 20,
+          "session_id": "25ff86dd-7302-4bc1-ab40-1dcb9dc782a9",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 55100,
+          "cost_usd": 0.33221130000000004,
+          "num_turns": 15,
+          "session_id": "7ef6a4d3-472c-4cd9-960a-dbe869fbb1fb",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 97258,
+          "cost_usd": 0.4463832000000001,
+          "num_turns": 21,
+          "session_id": "7fcdfb73-55d9-4138-a9a3-7508b57975da",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 5,
+          "label": "iter5",
+          "exit_code": 0,
+          "wall_duration_ms": 32661,
+          "cost_usd": 0.22184910000000002,
+          "num_turns": 9,
+          "session_id": "f240df7e-96df-4a62-bfad-b93bfaf52d87",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 5,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}

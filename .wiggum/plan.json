@@ -1,0 +1,36 @@
+{
+  "taskId": "task10",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Capture previous focus on open and restore it on close",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Move focus to close button when panel opens",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Add document-level Escape key listener to close the panel",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Implement Tab/Shift+Tab focus trap within the panel",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-5",
+      "title": "Run test suite and verify all tests pass",
+      "status": "done",
+      "notes": "All 22 tests pass across 7 test files. Build succeeds with no TypeScript errors."
+    }
+  ]
+}
