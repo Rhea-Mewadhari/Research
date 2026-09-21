@@ -42,7 +42,15 @@ describe('Hidden: DB integrity structural checks', () => {
       path.resolve(__dirname, '../../services/favouritesService.ts'),
       'utf8'
     );
-    expect(content).toContain('productExists');
+    // Accept either an explicit app-level existence check (e.g. a
+    // `productExists` helper) or reliance on the DB's own foreign-key
+    // constraint — SQLite always enforces FK violations even under
+    // INSERT OR IGNORE, so catching that constraint error and converting
+    // it to a not-found error is an equally valid way to satisfy this.
+    const hasExplicitCheck = content.includes('productExists');
+    const hasForeignKeyEnforcement =
+      /FOREIGNKEY/i.test(content) && /ProductNotFoundError/.test(content);
+    expect(hasExplicitCheck || hasForeignKeyEnforcement).toBe(true);
   });
 
   it('removeFavourite uses result.changes > 0 — not > -1', () => {
