@@ -1,0 +1,24 @@
+{
+  "taskId": "task11",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix Bug 1: move sort after filter in useFilteredProducts.ts",
+      "status": "done",
+      "notes": "Moved sort block to after the filter blocks. Changed products.sort() to result.sort() so we sort the already-filtered array, not the full list. Build passes; 5 test files still pass; 2 test files (sorting, derivedStateCorrectness) still fail due to Bugs 2 & 3 (pre-existing, not regressions)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix Bug 2 & 3: use non-mutating sort and add sortBy to useMemo deps",
+      "status": "done",
+      "notes": "Changed result.sort() to [...result].sort() to avoid mutating the array. Added sortBy to the useMemo dependency array. All 21 tests pass; build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Run derivedStateCorrectness tests and verify all three bugs are fixed",
+      "status": "done",
+      "notes": "All 21 tests pass (7 test files: derivedStateCorrectness, app.render, loadingError, clearFilters, sorting, pagination, filtering). Build succeeds. All three bugs confirmed fixed."
+    }
+  ]
+}
