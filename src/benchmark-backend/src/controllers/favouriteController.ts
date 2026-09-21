@@ -4,6 +4,7 @@ import {
   removeFavourite,
   getFavourites,
 } from '../services/favouritesService';
+import { ProductNotFoundError } from '../errors';
 
 export const list = (_req: Request, res: Response): void => {
   const favourites = getFavourites();
@@ -16,6 +17,10 @@ export const add = (req: Request, res: Response, next: NextFunction): void => {
     const { favourite, created } = addFavourite(productId);
     res.status(created ? 201 : 200).json(favourite);
   } catch (err) {
+    if (err instanceof ProductNotFoundError) {
+      next(err);
+      return;
+    }
     next(err);
   }
 };

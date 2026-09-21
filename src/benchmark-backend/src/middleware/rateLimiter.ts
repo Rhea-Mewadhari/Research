@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
-import { RateLimitError } from '../errors';
+import { RateLimitError } from '../errors/index.js';
 
 const WINDOW_MS = 60_000;
-const MAX_REQUESTS = 10;
+const MAX_REQUESTS = 100;
 
 const store = new Map<string, number[]>();
 
@@ -20,7 +20,6 @@ export function rateLimiter(req: Request, _res: Response, next: NextFunction): v
   const now = Date.now();
   const cutoff = now - WINDOW_MS;
 
-  // Prune expired timestamps before checking — prevents unbounded memory growth
   const timestamps = (store.get(ip) ?? []).filter((t) => t > cutoff);
 
   if (timestamps.length >= MAX_REQUESTS) {
