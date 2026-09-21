@@ -1,0 +1,46 @@
+{
+  "investigations": {
+    "techStack": [
+      "Framework: Express 5.2.1 (ESM, TypeScript ~6.0.2 strict mode)",
+      "Validation: Zod 4.4.3 via custom validate() middleware that sets req.validated on success, returns 400 JSON on failure",
+      "Test runner: Vitest 4.1.5 with Supertest 7.2.2 for HTTP integration tests",
+      "Express route matching is first-match-wins: routes must be registered in specificity order (static before dynamic)",
+      "Route files use Express Router; each route may chain validate(schema) middleware before the controller handler",
+      "No middleware or tooling overrides Express route registration order — order in the file is the effective order"
+    ],
+    "features": [
+      "src/benchmark-backend/src/routes/apiProductRoutes.ts currently registers GET /:id FIRST, then GET /compare — this is the bug",
+      "compareController.compare(): extracts validated ids array from req.validated, calls compareService.getComparison(ids), returns { products, count }",
+      "compareService.getComparison(): enforces min 2 / max 3 IDs, no duplicates, all IDs must exist; returns { products: Product[], count: number }",
+      "productController.getById(): extracts validated id, calls productService.getProductById(id), returns product or 404 ProductNotFoundError",
+      "Visible tests: src/benchmark-backend/src/tests/visible/compare.test.ts (3 cases: 200 with 2 products, 400 for <2 ids, id+name present)",
+      "Visible tests: src/benchmark-backend/src/tests/visible/products.test.ts (18 cases covering /products auth, pagination, filtering — not /api/products/:id)"
+    ],
+    "architecture": [
+      "Layer order: routes → controllers → services → SQLite (via better-sqlite3 db.prepare() in services)",
+      "app.ts mounts apiProductRoutes at /api/products — the compare and /:id routes are both children of this mount",
+      "Routing-layer fixes belong exclusively in src/benchmark-backend/src/routes/apiProductRoutes.ts",
+      "Controllers and services must not be modified per the constraint: fix is routing-layer only",
+      "validate() middleware is invoked per-route in the route file; swapping route order also swaps which schema is applied first — no conflict since /compare and /:id have different schemas"
+    ],
+    "edgeCases": [
+      "compareQuerySchema splits ids on comma, trims whitespace, requires min 2 / max 3 elements — missing or empty ids param returns 400",
+      "productIdSchema requires min 1 / max 100 chars — no numeric enforcement at schema level (service handles non-existent IDs)",
+      "ids=compare (the string 'compare' as an /:id value): after the fix, /compare is matched first so this string never reaches /:id as a product lookup",
+      "Duplicate IDs in compare query: schema allows them, service rejects with 400-equivalent error",
+      "ids beyond max 3: compareQuerySchema rejects with 400 before controller is reached",
+      "Non-existent product IDs in compare: compareService rejects all-or-nothing; routing fix does not affect this behavior",
+      "/:id with non-existent numeric ID: productService returns ProductNotFoundError → 404; must still work after reorder (requirement 5)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 6: The fix is confined to src/routes/apiProductRoutes.ts — router.get('/compare', ...) must be registered before router.get('/:id', ...). Requirements 1–5 all depend on this reorder being made.",
+      "description": "In src/benchmark-backend/src/routes/apiProductRoutes.ts, move the router.get('/compare', validate(compareQuerySchema), compare) registration to appear before the router.get('/:id', validate(productIdSchema), getById) registration. No other change to the file or any other file.",
+      "files": [
+        "src/benchmark-backend/src/routes/apiProductRoutes.ts"
+      ]
+    }
+  ]
+}

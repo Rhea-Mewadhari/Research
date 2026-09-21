@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /api/products/compare?ids=1,2 returns HTTP 200 with a JSON body containing a `products` array of length 2 and a `count` of 2.",
+      "passed": true,
+      "evidence": "compare.test.ts — 'returns 200 with matching products for two valid ids' PASSED (vitest verbose output: '✓ src/tests/visible/compare.test.ts > GET /api/products/compare > returns 200 with matching products for two valid ids 8ms'). All 22 tests passed in 2 test files."
+    },
+    {
+      "id": "2",
+      "description": "GET /api/products/compare?ids=1 (fewer than two IDs) returns HTTP 400.",
+      "passed": true,
+      "evidence": "compare.test.ts — 'returns 400 when fewer than two ids are provided' PASSED (vitest verbose output: '✓ src/tests/visible/compare.test.ts > GET /api/products/compare > returns 400 when fewer than two ids are provided 2ms'). All 22 tests passed."
+    },
+    {
+      "id": "3",
+      "description": "Each product object in the compare response includes at minimum an `id` field and a `name` field (both truthy).",
+      "passed": true,
+      "evidence": "compare.test.ts — 'includes id and name in each returned product' PASSED (vitest verbose output: '✓ src/tests/visible/compare.test.ts > GET /api/products/compare > includes id and name in each returned product 1ms'). All 22 tests passed."
+    },
+    {
+      "id": "4",
+      "description": "GET /api/products/:id with a valid numeric ID continues to return the correct product (HTTP 200) — no regression.",
+      "passed": true,
+      "evidence": "pnpm test run: 'Tests 22 passed (22)' with 2 test files, no failures. The route is still correctly registered in apiProductRoutes.ts (line 10: router.get('/:id', validate(productIdSchema), getById)), and the compareController/productController show no compensating logic. No regression detected."
+    },
+    {
+      "id": "5",
+      "description": "GET /api/products/:id with a non-existent ID continues to return HTTP 404 — no regression.",
+      "passed": true,
+      "evidence": "pnpm test run: 'Tests 22 passed (22)' with 2 test files, no failures. The /:id route remains registered in apiProductRoutes.ts and productController is unchanged (no route-compensation logic introduced). No regression detected."
+    },
+    {
+      "id": "6",
+      "description": "The fix is confined to src/routes/apiProductRoutes.ts — router.get('/compare', ...) must be registered before router.get('/:id', ...). No other source file is modified.",
+      "passed": true,
+      "evidence": "Code review of src/routes/apiProductRoutes.ts confirms: line 9 is 'router.get(\"/compare\", validate(compareQuerySchema), compare)' and line 10 is 'router.get(\"/:id\", validate(productIdSchema), getById)' — /compare is registered first. git diff cannot be run (only one commit 6d93218 exists in the sandbox). However, compareController.ts and compareService.ts were inspected and contain no route-order-compensation logic, consistent with the fix being confined to apiProductRoutes.ts alone."
+    }
+  ]
+}
