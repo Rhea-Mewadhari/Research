@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "favouriteController.ts add handler must not send any direct HTTP response for ProductNotFoundError; it must call next(err) so the centralised errorHandler produces the response.",
+      "passed": true,
+      "evidence": "Source inspection of src/controllers/favouriteController.ts confirms the catch block is `catch (err) { next(err); }` — no direct res.status/res.json call for errors. The visible test 'POST /api/favourites with a non-existent productId returns 404' is among the 22 tests that all passed in `pnpm test` (Test Files 2 passed, Tests 22 passed)."
+    },
+    {
+      "id": "2",
+      "description": "compareController.ts compare handler must call next(_err) (forwarding the caught error) instead of next() (no argument) so errors from getComparison reach errorHandler.",
+      "passed": true,
+      "evidence": "Source inspection of src/controllers/compareController.ts confirms the catch block is `catch (err) { next(err); }` — the error is forwarded, not dropped. The visible test 'GET /api/products/compare with valid format but non-existent ids returns 400' is among the 22 tests that all passed in `pnpm test`."
+    },
+    {
+      "id": "3",
+      "description": "rateLimiter.ts must pass new RateLimitError(retryAfter) to next() instead of new Error(...) so that errorHandler can match it by type, set Retry-After, and return 429.",
+      "passed": true,
+      "evidence": "Source inspection of src/middleware/rateLimiter.ts shows `import { RateLimitError } from '../errors';` at the top and `next(new RateLimitError(retryAfter));` in the rate-limit branch. No plain `new Error(...)` is used. All 22 tests passed in `pnpm test`."
+    },
+    {
+      "id": "4",
+      "description": "errorHandler.ts, all files under src/services/, and src/errors/index.ts must not be modified.",
+      "passed": true,
+      "evidence": "`git diff -- src/middleware/errorHandler.ts src/services/ src/errors/index.ts` produced no output (empty diff), confirming none of these files were modified."
+    },
+    {
+      "id": "5",
+      "description": "All visible tests pass.",
+      "passed": true,
+      "evidence": "`pnpm test` exited with code 0. Output: 'Test Files  2 passed (2) / Tests  22 passed (22)' with 0 failures in src/tests/visible/middleware.test.ts and src/tests/visible/products.test.ts."
+    }
+  ]
+}

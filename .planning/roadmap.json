@@ -1,0 +1,58 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express v5, TypeScript ESM, Vitest v4 + supertest for integration tests",
+      "Error hierarchy: AppError (base) → ValidationError (400), ProductNotFoundError (404), DatabaseError (500), AuthError (401), RateLimitError (429)",
+      "RateLimitError constructor: RateLimitError(retryAfterSeconds: number) — single numeric arg stored as retryAfterSeconds property",
+      "TypeScript strict: noUnusedLocals + noUnusedParameters enabled — catch-clause variable _err must be renamed to err once it is referenced",
+      "pnpm test runs Vitest from src/benchmark-backend/"
+    ],
+    "features": [
+      "POST /api/favourites — add handler catches ProductNotFoundError inline (lines 20-23) and responds with { message } instead of calling next(err)",
+      "GET /api/products/compare — compare handler (line 10) calls next() with no argument, swallowing all errors from getComparison (ValidationError 400)",
+      "rateLimiter — line 27 calls next(new Error(...)) with a plain Error; errorHandler only sets Retry-After and 429 for instanceof RateLimitError",
+      "All other routes (GET /health, GET /products/, GET /api/products/:id, GET /api/favourites, DELETE /api/favourites/:productId) work correctly and must not regress",
+      "Visible test assertions: 404 on POST favourites unknown product, 400 on compare with 1 id, 400 on compare with non-existent ids — second and third currently fail"
+    ],
+    "architecture": [
+      "app.ts wires middleware in order: requestId → rateLimiter → cors → json → routes → errorHandler (4-arg, registered last)",
+      "Controllers import error types from '../errors' (named exports from src/errors/index.ts)",
+      "Services are synchronous (better-sqlite3); controllers call them directly, catch errors, and forward with next(err)",
+      "Read-only files: src/middleware/errorHandler.ts, src/errors/index.ts, all src/services/ files",
+      "No changes to routes, app.ts, or test files required"
+    ],
+    "edgeCases": [
+      "favouriteController — removing the inline ProductNotFoundError branch leaves the outer catch unchanged (line 24 already calls next(err) for unexpected errors); list and remove handlers have no try/catch and are unaffected",
+      "compareController — TypeScript noUnusedLocals: rename catch variable from _err to err before passing to next(err) to avoid lint error on the now-referenced variable",
+      "rateLimiter — retryAfter is already computed as Math.max(1, Math.ceil((oldest + WINDOW_MS - now) / 1000)) before the next() call; only the import and the Error constructor need to change",
+      "Rate-limit path: plain Error currently produces 500; after fix, RateLimitError produces 429 with Retry-After header — no test asserts this but source inspection is required per requirement 3",
+      "compareController handles all ValidationError variants from getComparison (fewer-than-2-ids, more-than-3-ids, duplicate-ids, product-not-found) — fix covers all of them uniformly"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — favouriteController.ts add handler must not send any direct HTTP response for ProductNotFoundError; it must call next(err) so the centralised errorHandler produces the response",
+      "description": "In the add handler's catch block (lines 20-23), remove the inline if (err instanceof ProductNotFoundError) branch that calls res.status(404).json({ message: 'Product not found' }). Replace it with next(err) so both ProductNotFoundError and any other error are forwarded to errorHandler. Also remove the ProductNotFoundError import if it is no longer used in the file.",
+      "files": [
+        "src/benchmark-backend/src/controllers/favouriteController.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2 — compareController.ts compare handler must call next(_err) (forwarding the caught error) instead of next() (no argument) so errors from getComparison reach errorHandler",
+      "description": "In the compare handler's catch block (line 10), rename the catch variable from _err to err and change next() to next(err). This forwards all ValidationError (and other) errors thrown by getComparison to the centralised errorHandler, which responds with the correct status code (400 for ValidationError).",
+      "files": [
+        "src/benchmark-backend/src/controllers/compareController.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3 — rateLimiter.ts must pass new RateLimitError(retryAfter) to next() instead of new Error(...) so that errorHandler can match it by type, set Retry-After, and return 429",
+      "description": "Add import { RateLimitError } from '../errors'; at the top of rateLimiter.ts. On line 27, replace next(new Error(`Rate limit exceeded, retry after ${retryAfter}s`)) with next(new RateLimitError(retryAfter)). The retryAfter variable is already computed on line 26 and matches the RateLimitError constructor signature exactly.",
+      "files": [
+        "src/benchmark-backend/src/middleware/rateLimiter.ts"
+      ]
+    }
+  ]
+}
