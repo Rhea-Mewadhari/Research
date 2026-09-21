@@ -1,0 +1,54 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task11",
+  "wall_duration_ms": 215062,
+  "cost_usd": 0.7431288,
+  "num_turns": 31,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "aa53392c-a163-49bc-a4ed-8ace97142d23",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix all three bugs in useFilteredProducts.ts",
+        "status": "done",
+        "notes": "Fixed: (1) filter now runs before sort, (2) sort uses [...result].sort() to avoid mutating context array, (3) sortBy added to useMemo dependency array."
+      },
+      {
+        "id": "phase-2",
+        "title": "Verify tests pass",
+        "status": "done",
+        "notes": "All 21 tests pass across 7 test files. Build succeeds (tsc + vite build) with no errors."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 75700,
+        "cost_usd": 0.2815728,
+        "num_turns": 13,
+        "session_id": "a191ec33-7af1-4709-baf4-8fadb9215022",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 31946,
+        "cost_usd": 0.20739570000000002,
+        "num_turns": 8,
+        "session_id": "aa53392c-a163-49bc-a4ed-8ace97142d23",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 2,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}

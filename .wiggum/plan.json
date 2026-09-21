@@ -1,0 +1,18 @@
+{
+  "taskId": "task11",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix all three bugs in useFilteredProducts.ts",
+      "status": "done",
+      "notes": "Fixed: (1) filter now runs before sort, (2) sort uses [...result].sort() to avoid mutating context array, (3) sortBy added to useMemo dependency array."
+    },
+    {
+      "id": "phase-2",
+      "title": "Verify tests pass",
+      "status": "done",
+      "notes": "All 21 tests pass across 7 test files. Build succeeds (tsc + vite build) with no errors."
+    }
+  ]
+}
