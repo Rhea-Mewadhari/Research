@@ -2,10 +2,9 @@ import { useMemo } from 'react';
 import { useProductContext } from '../context/ProductContext';
 import { useFilterContext } from '../context/FilterContext';
 import { filterProducts } from '../utils/productFilters';
-import type { Product } from '../types/product';
 
 interface UseFilteredProductsResult {
-  filteredProducts: Product[];
+  filteredProducts: ReturnType<typeof filterProducts>;
   resultCount: number;
 }
 

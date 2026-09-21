@@ -1,0 +1,198 @@
+{
+  "taskId": "task11",
+  "runId": "gsd-run2",
+  "timestamp": "2026-09-21T08:03:03.240Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 21,
+    "failed": 0,
+    "total": 21
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "expectedFiles": 3,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 2433,
+    "hiddenMs": 1845,
+    "buildMs": 946,
+    "totalMs": 5426
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "gsd",
+    "target": "frontend",
+    "taskId": "task11",
+    "wall_duration_ms": 515750,
+    "cost_usd": 2.2105311000000003,
+    "num_turns": 53,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "2c20f2ee-6abb-4339-8612-dbf8643c6dbd",
+    "gsd": {
+      "phases": [
+        {
+          "name": "new-project",
+          "treeHash": "6fc6246b60f3a3cc2a978910771d55dd106fb4c7",
+          "label": "new-project",
+          "exit_code": 0,
+          "wall_duration_ms": 42543,
+          "cost_usd": 0.2194119,
+          "num_turns": 9,
+          "session_id": "be12df31-a2a9-451d-99e1-ac1259946d70",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "discuss-phase",
+          "treeHash": "6ad96f5bfa49ce6e72c6c4ba4f58a565586ec980",
+          "label": "discuss-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 53453,
+          "cost_usd": 0.21685920000000003,
+          "num_turns": 7,
+          "session_id": "c2ef114d-9b3e-4d5a-bbb9-817afba4858c",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "plan-phase",
+          "treeHash": "9750cf8cf1095674e6c41ea66d13332073fc50b4",
+          "label": "plan-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 199570,
+          "cost_usd": 0.9752511000000004,
+          "num_turns": 8,
+          "session_id": "a60b1718-8912-4a33-a2e0-f0332d389761",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "fbbfa13874379ab071ffd3cc484414b29faf2631",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 68455,
+          "cost_usd": 0.2453823,
+          "num_turns": 8,
+          "session_id": "86e55b42-b5da-40bb-84c4-e25d3a16cc2b",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "d65d333f8eddb51ea877ff685531a45dd45ea1db",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 67387,
+          "cost_usd": 0.2801019,
+          "num_turns": 10,
+          "session_id": "5530b003-4547-4ec3-aa41-d571171e5316",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "complete-milestone",
+          "treeHash": "51e278d4e56378748ed86fee7e5e06db3e1d671c",
+          "label": "complete-milestone",
+          "exit_code": 0,
+          "wall_duration_ms": 48330,
+          "cost_usd": 0.2735247,
+          "num_turns": 11,
+          "session_id": "2c20f2ee-6abb-4339-8612-dbf8643c6dbd",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "passedFirstAttempt": true,
+      "reworkAttempts": 0,
+      "completed": true,
+      "failedAtPhase": null,
+      "failedCriteria": []
+    }
+  }
+}

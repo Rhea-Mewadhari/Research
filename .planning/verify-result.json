@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Filtering is applied before sorting: the pipeline in useMemo must apply search-term, category, and inStockOnly filters first, then sort the already-filtered result. Sort is never applied to the unfiltered product list.",
+      "passed": true,
+      "evidence": "In productFilters.ts lines 13-18, `result = products.filter(...)` applies search/category/inStockOnly first. Sort is only applied to `result` afterwards (lines 20-30) via `[...result].sort(...)`. Tests 1, 2, and 4 in derivedStateCorrectness.test.tsx all passed (✓ tests/derivedStateCorrectness.test.tsx (4 tests) 223ms), including test 1 confirming Fitness + price-asc yields ['Jump Rope', 'Foam Roller', 'Resistance Bands', 'Yoga Mat', 'Dumbbell Set']."
+    },
+    {
+      "id": "2",
+      "description": "Sorting produces a new array and does not mutate the `products` reference held by ProductContext. After any sort is applied, calling useProductContext().products still returns products in their original insertion order.",
+      "passed": true,
+      "evidence": "Code inspection of productFilters.ts shows sorting is done via `result = [...result].sort(...)` (spread operator creates new array before sort). The string `products.sort(` does not appear in useFilteredProducts.ts — only the delegated call `filterProducts(products, ...)` is present. All 4 tests in derivedStateCorrectness.test.tsx passed, exit code 0."
+    },
+    {
+      "id": "3",
+      "description": "All five values — products, debouncedSearch, category, inStockOnly, and sortBy — appear in the useMemo dependency array in useFilteredProducts.ts.",
+      "passed": true,
+      "evidence": "Code inspection of useFilteredProducts.ts line 17 shows the useMemo second argument is exactly `[products, debouncedSearch, category, inStockOnly, sortBy]` — all five identifiers present. Test 3 ('changing sortBy alone — with no other filter changes — triggers recomputation') passed: setSortBy('price-asc') alone caused filteredProducts[0].name to become 'Jump Rope', confirming sortBy is in the dep array and triggers recomputation."
+    },
+    {
+      "id": "4",
+      "description": "Changing the sort option alone — without changing category, search, or inStockOnly — immediately reorders the visible product list on the next render.",
+      "passed": true,
+      "evidence": "derivedStateCorrectness.test.tsx test 3 ('changing sortBy alone — with no other filter changes — triggers recomputation'): setSortBy('price-asc') called in isolated act() with no prior filter changes; assertion expect(result.current.filteredProducts[0].name).toBe('Jump Rope') passed. Output: ✓ tests/derivedStateCorrectness.test.tsx (4 tests) 223ms."
+    },
+    {
+      "id": "5",
+      "description": "The test suite tests/derivedStateCorrectness.test.tsx passes without modification to that file.",
+      "passed": true,
+      "evidence": "Running `pnpm test -- --testPathPattern=derivedStateCorrectness` from src/benchmark-frontend exited with code 0 and reported: ✓ tests/derivedStateCorrectness.test.tsx (4 tests) 223ms. Total: 7 test files passed, 21 tests passed."
+    }
+  ]
+}

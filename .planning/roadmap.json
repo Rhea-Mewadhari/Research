@@ -1,0 +1,54 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19, TypeScript 5.7, Vite 6 — ESM, bundler moduleResolution",
+      "Vitest 3 with jsdom 26 and @testing-library/react 16 for integration-style tests",
+      "Tests live in /tests/ (not colocated); run via `npm run test` or `pnpm test`",
+      "ESLint flat config with eslint-plugin-react-hooks — hooks rules enforced at lint time",
+      "TypeScript strict-ish: noUnusedLocals, noUnusedParameters — unused imports are errors",
+      "Array.prototype.sort is stable (ES2019+, es2023 target) — no secondary comparator needed"
+    ],
+    "features": [
+      "useFilteredProducts.ts: reads products from ProductContext and {debouncedSearch, category, inStockOnly, sortBy} from FilterContext; derives filteredProducts + resultCount via useMemo — all three bugs are in this useMemo body",
+      "productFilters.ts exports filterProducts(products, filters): filters first (search, category, inStockOnly) then sorts with [...result].sort(...) — correct pipeline, non-mutating, handles all three SortOption values and 'default'",
+      "ProductListPage.tsx (line 61) is the sole consumer of useFilteredProducts — destructures filteredProducts and resultCount",
+      "useProductFilters.ts is a legacy hook with its own fetch + local state; not consumed by any component — untouched",
+      "derivedStateCorrectness.test.tsx: 4 tests, each sets category then changes sortBy in a separate act() to isolate Bug 3; tests price-asc, price-desc, rating-desc, and no-filter price-asc variants"
+    ],
+    "architecture": [
+      "Layer order: API → Contexts (own state) → Hooks (derived state) → Pages (orchestrate) → Components (presentational)",
+      "Hooks call context hooks and delegate computation to pure utils in src/utils/ — this is the established convention",
+      "All three bug fixes belong inside the useMemo body in src/hooks/useFilteredProducts.ts — no other file needs changing",
+      "Optionally delegate to filterProducts from productFilters.ts (already correct) instead of fixing inline logic — both are valid; delegation is idiomatic for this codebase",
+      "Utils (src/utils/) have zero React imports — pure TypeScript functions only"
+    ],
+    "edgeCases": [
+      "sortBy === 'default': filter pipeline still runs; sort step is skipped; filtered result returned in insertion order — filterProducts handles this already",
+      "Mutation after partial fix: fixing Bug 3 (dep array) without Bug 2 (mutation) causes products.sort() to corrupt the context array on every sortBy-triggered recompute — both bugs must be fixed in the same change",
+      "Empty filter result: [...[]] .sort() returns a new empty array safely — no crash, no mutation",
+      "Transitioning back to 'default' after an active sort: without the mutation fix, prior sort reorders the context array permanently; after the fix, each recompute works from the original insertion-order array",
+      "Whitespace-only debouncedSearch (e.g. '   '): trimmed to '' before matching — filter is a no-op; handled by filterProducts",
+      "Multiple successive sort changes: each useMemo call spreads a fresh copy of the filtered slice — no cross-recompute mutation",
+      "Products context reference refresh (re-fetch): products is in the dep array already; recompute is triggered correctly once mutation is eliminated",
+      "Stable sort ties: JS sort is stable in ES2019+; no secondary comparator is needed or should be introduced"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1 and 2: Filtering applied before sorting; sorting produces a new array and does not mutate the products reference held by ProductContext",
+      "description": "Replace the useMemo body in useFilteredProducts.ts so that filtering runs first (debouncedSearch, category, inStockOnly) and sorting is applied only to the already-filtered result using a spread copy ([...filtered].sort(...)) or by delegating to filterProducts from productFilters.ts. The call products.sort(...) must not appear anywhere in the file after this change.",
+      "files": [
+        "src/benchmark-frontend/src/hooks/useFilteredProducts.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 3 and 4: All five values (products, debouncedSearch, category, inStockOnly, sortBy) appear in the useMemo dependency array; changing sortBy alone immediately reorders the visible product list",
+      "description": "Add sortBy to the useMemo dependency array in useFilteredProducts.ts. The second argument to useMemo must be [products, debouncedSearch, category, inStockOnly, sortBy]. This task must be applied together with task-1 — adding sortBy to the dep array while products.sort() is still in-place causes visible mutation on every sort-triggered recompute.",
+      "files": [
+        "src/benchmark-frontend/src/hooks/useFilteredProducts.ts"
+      ]
+    }
+  ]
+}
