@@ -1,0 +1,88 @@
+{
+  "framework": "wiggum",
+  "target": "frontend",
+  "taskId": "task11",
+  "wall_duration_ms": 365796,
+  "cost_usd": 1.5160455,
+  "num_turns": 69,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "706ed2c3-22ea-42df-95fe-0c433a4f6a76",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix Bug 2: sort mutates ProductContext array — use a copy instead",
+        "status": "done",
+        "notes": "Changed products.sort(...) to [...products].sort(...) in all three sort branches in useFilteredProducts.ts. Build passes; remaining test failures are from Bugs 1 and 3 (addressed in later phases)."
+      },
+      {
+        "id": "phase-2",
+        "title": "Fix Bug 1: move sort after filters (filter-then-sort order)",
+        "status": "done",
+        "notes": "Moved the sort block to after the three filter blocks in useFilteredProducts.ts. Sort now operates on `result` (the filtered array) instead of `products`. Build passes. The 7 remaining test failures are all pre-existing Bug 3 failures (sortBy not in dep array), addressed in phase 3."
+      },
+      {
+        "id": "phase-3",
+        "title": "Fix Bug 3: add sortBy to useMemo dependency array",
+        "status": "done",
+        "notes": "Added sortBy to the useMemo dependency array in useFilteredProducts.ts. Removed the BUG 3 comment. All 21 tests pass and build succeeds."
+      },
+      {
+        "id": "phase-4",
+        "title": "Restore deleted test file and verify all tests pass",
+        "status": "done",
+        "notes": "tests/derivedStateCorrectness.test.tsx was already present (restored by a prior iteration). All 21 tests pass (7 test files) and the build succeeds."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 91519,
+        "cost_usd": 0.3486504,
+        "num_turns": 16,
+        "session_id": "9ca5ea10-2bd7-4cf4-8f32-2e49d9a2dc69",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 78137,
+        "cost_usd": 0.3451782,
+        "num_turns": 13,
+        "session_id": "809a69a5-ed5f-4890-b1d0-654095fa97ee",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 3,
+        "label": "iter3",
+        "exit_code": 0,
+        "wall_duration_ms": 46021,
+        "cost_usd": 0.2302446,
+        "num_turns": 9,
+        "session_id": "1c1d11b7-11e0-4172-8d62-0bb2d96f5f84",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 4,
+        "label": "iter4",
+        "exit_code": 0,
+        "wall_duration_ms": 67402,
+        "cost_usd": 0.36526649999999994,
+        "num_turns": 21,
+        "session_id": "706ed2c3-22ea-42df-95fe-0c433a4f6a76",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 4,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}

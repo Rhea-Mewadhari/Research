@@ -1,0 +1,30 @@
+{
+  "taskId": "task11",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix Bug 2: sort mutates ProductContext array — use a copy instead",
+      "status": "done",
+      "notes": "Changed products.sort(...) to [...products].sort(...) in all three sort branches in useFilteredProducts.ts. Build passes; remaining test failures are from Bugs 1 and 3 (addressed in later phases)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix Bug 1: move sort after filters (filter-then-sort order)",
+      "status": "done",
+      "notes": "Moved the sort block to after the three filter blocks in useFilteredProducts.ts. Sort now operates on `result` (the filtered array) instead of `products`. Build passes. The 7 remaining test failures are all pre-existing Bug 3 failures (sortBy not in dep array), addressed in phase 3."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix Bug 3: add sortBy to useMemo dependency array",
+      "status": "done",
+      "notes": "Added sortBy to the useMemo dependency array in useFilteredProducts.ts. Removed the BUG 3 comment. All 21 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Restore deleted test file and verify all tests pass",
+      "status": "done",
+      "notes": "tests/derivedStateCorrectness.test.tsx was already present (restored by a prior iteration). All 21 tests pass (7 test files) and the build succeeds."
+    }
+  ]
+}
