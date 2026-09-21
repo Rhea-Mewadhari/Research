@@ -1,0 +1,30 @@
+{
+  "taskId": "task8",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix favouriteController: replace inline 404 response with next(err)",
+      "status": "done",
+      "notes": "Removed inline res.status(404).json() branch and now call next(err) for all errors including ProductNotFoundError. Removed unused import. Favourites 404 test passes."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix compareController: pass error to next() instead of swallowing it",
+      "status": "done",
+      "notes": "Changed next() to next(err) in the catch block so errors reach the centralized error handler. All 22 tests pass."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix rateLimiter: use RateLimitError instead of plain Error",
+      "status": "done",
+      "notes": "Imported RateLimitError from '../errors' and replaced next(new Error(...)) with next(new RateLimitError(retryAfter)). All 22 tests pass."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests to verify all three fixes pass",
+      "status": "done",
+      "notes": "All 22 tests pass (2 test files). Build succeeds with tsc -p tsconfig.build.json. All three prior fixes verified: favouriteController 404 via next(err), compareController error propagation, and rateLimiter RateLimitError usage."
+    }
+  ]
+}
