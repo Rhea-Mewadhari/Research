@@ -1,0 +1,30 @@
+{
+  "taskId": "task8",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix favouriteController: remove inline 404 response, propagate ProductNotFoundError via next(err)",
+      "status": "done",
+      "notes": "Removed inline ProductNotFoundError catch that called res.status(404).json(); now all errors propagate via next(err). Also removed unused import. Build passes, favouriteController test passes."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix compareController: change next() to next(_err) so the error reaches the error handler",
+      "status": "done",
+      "notes": "Changed next() to next(_err) in the catch block so errors propagate to the error handler. All 22 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix rateLimiter: replace new Error(...) with new RateLimitError(retryAfter) so the handler sets Retry-After and returns 429",
+      "status": "done",
+      "notes": "Imported RateLimitError and replaced new Error(...) with new RateLimitError(retryAfter). All 22 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run pnpm test and verify all tests pass",
+      "status": "done",
+      "notes": "All 22 tests pass across 2 test files. Build (tsc) succeeds with no errors."
+    }
+  ]
+}
