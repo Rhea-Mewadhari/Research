@@ -1,0 +1,78 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19 + ReactDOM 19 (portal via ReactDOM.createPortal); TypeScript 5.7 strict mode (noUnusedLocals, noUnusedParameters — every added ref/variable must be used)",
+      "Vitest 3 + jsdom 26 + @testing-library/react 16 + @testing-library/user-event 14; test globals enabled; environment: 'jsdom' in vite config",
+      "Build: Vite 6, ESM modules, tsc -b && vite build — TypeScript compile must pass",
+      "No focus-management libraries present or permitted (requirement 11); all focus logic must be vanilla DOM + React hooks",
+      "Existing scroll-lock useEffect (lines 44-51) is the canonical pattern: conditional guard → side effect → return cleanup → dependency array"
+    ],
+    "features": [
+      "ProductDetailPanel renders a portal to document.body containing: semi-transparent backdrop (aria-hidden, onClick=onClose) + dialog div (role='dialog', aria-modal='true', panelRef attached)",
+      "Close button (aria-label='Close panel') is inside the dialog; no ref currently attached to it",
+      "Props: productId: string | null (null = closed), onClose: () => void",
+      "isOpen computed as productId !== null; scroll lock already gated on isOpen",
+      "Five existing tests must not regress: panel opens on card click, close button present, close button closes panel, backdrop closes panel, product data renders after fetch",
+      "Comment block lines 53-59 explicitly marks the four missing behaviors — replace this block with the implementation"
+    ],
+    "architecture": [
+      "Only ProductDetailPanel.tsx may be modified (requirement 12)",
+      "panelRef: useRef<HTMLDivElement>(null) already exists (line 18) and is attached to the dialog div (line 72) — use it for focusable-element enumeration inside the trap",
+      "New refs needed: closeButtonRef: useRef<HTMLButtonElement>(null) for initial focus; previousFocusRef: useRef<HTMLElement | null>(null) to capture triggering element at open time",
+      "New focus-management useEffect placed after scroll-lock useEffect (after line 51), dependency array [isOpen, onClose]; returns cleanup function",
+      "Close button JSX (around line 90) needs ref={closeButtonRef} added — no other JSX changes required",
+      "Tab trap logic lives entirely inside the keydown handler registered in the new useEffect; queries panelRef.current for focusable elements dynamically per keypress"
+    ],
+    "edgeCases": [
+      "Single focusable element (only close button visible during loading): Tab and Shift+Tab must both leave focus on that same element — achieved by wrapping: first===last means both directions cycle to themselves",
+      "previousFocus is null, document.body, or a removed-from-DOM element: previousFocusRef.current?.focus() is a safe no-op in all cases (requirement 7 edge note)",
+      "Stale Escape listener: useEffect cleanup removes both event listeners (Escape + Tab trap) on every close path — close button, backdrop click, or Escape key (requirement 6)",
+      "Focusable element selector: 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])' — evaluated dynamically at each keypress against panelRef.current",
+      "Escape pressed while focus is outside the panel: listener is on document so it fires regardless (requirement 4); must NOT use React onKeyDown prop",
+      "Tab trap must not preventDefault on non-Tab keys — only intercept Tab (with and without Shift)",
+      "previousFocus captured at open time (when isOpen becomes true), not at close time — use ref so the captured value persists across renders without re-running the effect (requirement 8)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1 — focus moves to close button on open; 7/8 — focus restored to triggering element captured at open time",
+      "description": "Add two new refs after the existing panelRef declaration: closeButtonRef (useRef<HTMLButtonElement>(null)) for focusing the close button on open, and previousFocusRef (useRef<HTMLElement | null>(null)) for capturing and restoring the triggering element. Also attach ref={closeButtonRef} to the close button JSX element.",
+      "files": [
+        "src/benchmark-frontend/src/components/ProductDetailPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "1 — focus moves to close button when productId changes from null to non-null; 7/8 — previousFocus captured at open time",
+      "description": "Replace the BUG comment block (lines 53-59) with a new useEffect([isOpen, onClose]) that: (a) when isOpen becomes true, captures document.activeElement into previousFocusRef.current, then calls closeButtonRef.current?.focus(); (b) returns a cleanup function (see task-3 and task-4 for what else goes in this same effect).",
+      "files": [
+        "src/benchmark-frontend/src/components/ProductDetailPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "4/5/6 — document-level Escape listener that calls onClose and is removed when panel closes",
+      "description": "Inside the same focus-management useEffect (from task-2), when isOpen is true: register a 'keydown' listener on document that checks event.key === 'Escape' and calls onClose(). The cleanup function must call document.removeEventListener to remove this handler, ensuring requirement 6 (no stale listener fires after close).",
+      "files": [
+        "src/benchmark-frontend/src/components/ProductDetailPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "2/3 — Tab wraps to first focusable when on last; Shift+Tab wraps to last when on first; no focus escapes the dialog",
+      "description": "Inside the same focus-management useEffect, when isOpen is true: register a 'keydown' listener on document that intercepts Tab (and Shift+Tab). On each Tab keypress, query panelRef.current for all focusable elements using the selector 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])'. If Tab on the last element, move focus to the first and call preventDefault; if Shift+Tab on the first element, move focus to the last and call preventDefault. The cleanup function must removeEventListener for this handler as well.",
+      "files": [
+        "src/benchmark-frontend/src/components/ProductDetailPanel.tsx"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "7 — triggering element receives focus after panel closes; 6 — cleanup removes listeners; 9/10 — backdrop click and portal/scroll-lock continue to work",
+      "description": "Inside the focus-management useEffect cleanup function: after removing both document event listeners (Escape and Tab trap), call previousFocusRef.current?.focus() to restore focus to the element that was active when the panel opened. Verify the existing scroll-lock and portal behavior are not disturbed (no changes to the scroll-lock useEffect or JSX portal call).",
+      "files": [
+        "src/benchmark-frontend/src/components/ProductDetailPanel.tsx"
+      ]
+    }
+  ]
+}

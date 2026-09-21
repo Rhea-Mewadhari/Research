@@ -1,0 +1,283 @@
+{
+  "taskId": "task10",
+  "runId": "gsd-run4",
+  "timestamp": "2026-09-20T18:11:11.343Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 22,
+    "failed": 0,
+    "total": 22
+  },
+  "hiddenTests": {
+    "success": false,
+    "passed": 8,
+    "failed": 2,
+    "total": 10,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": false
+  },
+  "timing": {
+    "visibleMs": 2131,
+    "hiddenMs": 1467,
+    "buildMs": 899,
+    "totalMs": 4542
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 0.8,
+    "robustnessGap": 0.2,
+    "buildStability": 1,
+    "correctnessScore": 0.9,
+    "qualityScore": 0.61,
+    "overallScore": 0.784
+  },
+  "agent": {
+    "framework": "gsd",
+    "target": "frontend",
+    "taskId": "task10",
+    "wall_duration_ms": 1986932,
+    "cost_usd": 4.9741889,
+    "num_turns": 122,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "d9e166cd-4915-402c-88cc-e8564e5642cb",
+    "gsd": {
+      "phases": [
+        {
+          "name": "new-project",
+          "treeHash": "5c0162254139ab734b3ab93cc78bab653738af94",
+          "label": "new-project",
+          "exit_code": 0,
+          "wall_duration_ms": 55862,
+          "cost_usd": 0.3012846,
+          "num_turns": 12,
+          "session_id": "e160a857-88b8-4e4a-903d-ef8c7a6b3a95",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "discuss-phase",
+          "treeHash": "e0a9f8fc17fadfa8b70865ac8defb08add84dead",
+          "label": "discuss-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 54613,
+          "cost_usd": 0.22598730000000003,
+          "num_turns": 7,
+          "session_id": "59a0f269-d69c-42ce-9389-7e54dc13feac",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "plan-phase",
+          "treeHash": "1d68055f2bf1888da9d79696fd972581b80f8c6c",
+          "label": "plan-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 125307,
+          "cost_usd": 0.4101812,
+          "num_turns": 8,
+          "session_id": "2b05f7ce-f31a-46c3-8f0b-ea31b55aadff",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "c4cdd4f7bd9c65b4350754c94415467dca5b0b54",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 91238,
+          "cost_usd": 0.3128634,
+          "num_turns": 7,
+          "session_id": "5c382348-c5a8-4dc4-990c-997526a7bc65",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "ef5689195dcb8e5b17ec743a4ee034c144ada9d5",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 215650,
+          "cost_usd": 0.5554002,
+          "num_turns": 16,
+          "session_id": "23681afa-0053-425a-ab7f-d12765125d6a",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "f0982aef452e75894ad6c391d86aabc89e759631",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 835472,
+          "cost_usd": 1.5238674,
+          "num_turns": 23,
+          "session_id": "9884e37c-60e9-4b58-a92e-217ee7cc6637",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "7a1e7da91e5de09b828d52e510b30cc3b916f81f",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 246600,
+          "cost_usd": 0.6489039,
+          "num_turns": 19,
+          "session_id": "40d05eb7-9635-4bcb-829f-703859f37c11",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "5d795c0fce8ab2346e2418a32862c908f854ae18",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 103173,
+          "cost_usd": 0.38801789999999997,
+          "num_turns": 10,
+          "session_id": "25b5af58-9fea-4a63-998f-9da3854f0160",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "417c0924cd83012ec5b49dec3cd3645fdbf2a6ff",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 227754,
+          "cost_usd": 0.607683,
+          "num_turns": 20,
+          "session_id": "d9e166cd-4915-402c-88cc-e8564e5642cb",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "passedFirstAttempt": false,
+      "reworkAttempts": 2,
+      "completed": false,
+      "failedAtPhase": "verify-work",
+      "failedCriteria": [
+        {
+          "id": "1",
+          "description": "When productId changes from null to a non-null value, focus moves to the close button (aria-label=\"Close panel\") before the user can interact with the panel.",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests: 'clicking a product card opens the detail panel', 'panel contains a close button', 'clicking the close button closes the panel', 'clicking the backdrop closes the panel', 'panel shows product data after loading'. No test named 'moves focus to the close button when the panel opens' or any test that asserts screen.getByRole('button', { name: /close panel/i }).toHaveFocus() exists. The required verification test is absent; the requirement cannot be verified by the specified method."
+        },
+        {
+          "id": "2",
+          "description": "While the panel is open, pressing Tab on the last focusable element inside the panel wraps focus to the first focusable element inside the panel, and does not move focus to any element outside the panel.",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests (all listed in criterion 1). No test for Tab-trapping behavior exists — no test fires Tab or asserts dialog.containsElement(document.activeElement). The required verification test named 'Tab key keeps focus inside the dialog' (or equivalent) is absent."
+        },
+        {
+          "id": "3",
+          "description": "While the panel is open, pressing Shift+Tab on the first focusable element inside the panel wraps focus to the last focusable element inside the panel, and does not move focus to any element outside the panel.",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests (all listed in criterion 1). No test for Shift+Tab wrapping exists — no test fires Shift+Tab or asserts that focus wraps to the last element. The required verification test named 'Shift+Tab keeps focus inside the dialog' (or equivalent) is absent."
+        },
+        {
+          "id": "4",
+          "description": "The Escape key listener is attached to document (not to a React onKeyDown prop), so it fires regardless of which element on the page holds focus when the panel is open.",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests (all listed in criterion 1). No test moves focus to an element outside the dialog then fires Escape to verify it still closes. The required verification test 'pressing Escape while focus is outside the dialog still closes it' (or equivalent) is absent."
+        },
+        {
+          "id": "5",
+          "description": "Pressing Escape while the panel is open calls onClose, causing the dialog to be removed from the DOM.",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests (all listed in criterion 1). No test dispatches an Escape keydown and asserts screen.queryByRole('dialog') returns null. The required verification test 'pressing Escape removes the dialog from the DOM' (or equivalent) is absent."
+        },
+        {
+          "id": "6",
+          "description": "The document-level Escape key listener is removed when the panel closes (either via Escape, close button, or backdrop click), so no stale listener fires after the panel is gone.",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests (all listed in criterion 1). No test closes the panel and then verifies that a subsequent Escape keydown does not trigger any onClose call (spy call count unchanged). The required verification test 'document Escape listener is removed when the panel closes so no stale listener fires' (or equivalent) is absent."
+        },
+        {
+          "id": "7",
+          "description": "The element that had focus immediately before the panel opened receives focus again after the panel closes (regardless of how it closes: close button, Escape, or backdrop click).",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests (all listed in criterion 1). No test clicks a trigger element to open the panel then asserts that document.activeElement returns to that trigger element after closing. The required verification test 'restores focus to the triggering element after the panel closes' (or equivalent) is absent."
+        },
+        {
+          "id": "8",
+          "description": "Focus is captured at open time (when productId changes from null to non-null), not at close time, so the correct element is restored even if focus has moved inside the panel before closing.",
+          "passed": false,
+          "evidence": "productDetailFocus.test.tsx contains exactly 5 tests (all listed in criterion 1). No test opens the panel, presses Tab inside to move focus to a different element, then closes and verifies document.activeElement equals the open-time trigger (not the last focused element inside the panel). The required verification test 'restores focus to the open-time trigger element even after Tab cycling inside the panel' (or equivalent) is absent."
+        }
+      ]
+    }
+  }
+}
