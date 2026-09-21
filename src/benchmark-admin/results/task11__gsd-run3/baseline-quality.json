@@ -1,0 +1,1585 @@
+{
+  "meta": {
+    "target": "frontend",
+    "generatedAt": "2026-09-21T08:05:59.237Z",
+    "srcDir": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src"
+  },
+  "complexity": {
+    "error": null,
+    "cognitiveComplexityTotal": 107,
+    "functionsOverThreshold": 50,
+    "maxNestingDepth": 2,
+    "functionsTooLong": 154,
+    "findings": [
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/App.tsx",
+        "line": 14,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/App.tsx",
+        "line": 24,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/api/productsApi.ts",
+        "line": 6,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/api/productsApi.ts",
+        "line": 6,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/api/productsApi.ts",
+        "line": 10,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 6,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 6,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 11,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 14,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 14,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 39,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 56,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ComparisonBar.tsx",
+        "line": 72,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FavouriteButton.tsx",
+        "line": 7,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FavouriteButton.tsx",
+        "line": 7,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 5
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FavouriteButton.tsx",
+        "line": 19,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FilterPanel.tsx",
+        "line": 11,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FilterPanel.tsx",
+        "line": 23,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FilterPanel.tsx",
+        "line": 34,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FilterPanel.tsx",
+        "line": 36,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FilterPanel.tsx",
+        "line": 51,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/FilterPanel.tsx",
+        "line": 57,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/NavBar.tsx",
+        "line": 5,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/NavBar.tsx",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/NavBar.tsx",
+        "line": 13,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/NavBar.tsx",
+        "line": 19,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/NavBar.tsx",
+        "line": 19,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/NavBar.tsx",
+        "line": 43,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/NavBar.tsx",
+        "line": 43,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductCard.tsx",
+        "line": 11,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductCard.tsx",
+        "line": 11,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 6
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductCard.tsx",
+        "line": 21,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductCard.tsx",
+        "line": 55,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductCard.tsx",
+        "line": 69,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductCard.tsx",
+        "line": 69,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 22,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 22,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 4
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 34,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 34,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 35,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 41,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 41,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 42,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 45,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 49,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 49,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 56,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 56,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 57,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 59,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 65,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 65,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 66,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 77,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 77,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 78,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 80,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 80,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 10
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 81,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 86,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 88,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 92,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 103,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 106,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductDetailPanel.tsx",
+        "line": 170,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductErrorBoundary.tsx",
+        "line": 17,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductErrorBoundary.tsx",
+        "line": 21,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductErrorBoundary.tsx",
+        "line": 26,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductErrorBoundary.tsx",
+        "line": 26,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductErrorBoundary.tsx",
+        "line": 27,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductErrorBoundary.tsx",
+        "line": 44,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductList.tsx",
+        "line": 9,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductList.tsx",
+        "line": 9,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductList.tsx",
+        "line": 10,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/ProductList.tsx",
+        "line": 17,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 4,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 4,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 6
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 11,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 14,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 17,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 17,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 19,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 30,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 42,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 48,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 55,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 74,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 78,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 78,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 79,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SavedFiltersPanel.tsx",
+        "line": 80,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SortSelect.tsx",
+        "line": 8,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/SortSelect.tsx",
+        "line": 16,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/components/Spinner.tsx",
+        "line": 1,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 15,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 18,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 19,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 19,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 20,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 26,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 27,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 27,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 30,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 33,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 46,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 46,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ComparisonContext.tsx",
+        "line": 48,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 25,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 31,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 31,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 32,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 34,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 43,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 48,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 48,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 5
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 52,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 52,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 54,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 63,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 65,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 67,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 80,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 80,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 82,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 91,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 102,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 107,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 120,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 120,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FavouritesContext.tsx",
+        "line": 122,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 31,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 31,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 32,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 42,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 51,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 55,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 56,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 57,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 58,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 61,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 63,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 63,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 64,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 65,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 77,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 77,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 78,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 79,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 88,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 89,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 89,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 92,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 123,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 123,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/FilterContext.tsx",
+        "line": 125,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 25,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 33,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 33,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 3
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 35,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 49,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 53,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 64,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 64,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/context/ProductContext.tsx",
+        "line": 66,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useDebounce.ts",
+        "line": 3,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useDebounce.ts",
+        "line": 6,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useDebounce.ts",
+        "line": 7,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useDebounce.ts",
+        "line": 8,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 11,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 15,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 15,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 6
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 23,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 24,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 26,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 28,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 32,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 35,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useFilteredProducts.ts",
+        "line": 38,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 21,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 24,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 29,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 29,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 36,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 37,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/hooks/useProductFilters.ts",
+        "line": 42,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 7,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 7,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 12,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 12,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 40,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 40,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 48,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ComparePage.tsx",
+        "line": 78,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/FavouritesPage.tsx",
+        "line": 6,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/FavouritesPage.tsx",
+        "line": 6,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/FavouritesPage.tsx",
+        "line": 10,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 11,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 11,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 6
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 20,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 20,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 21,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 26,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 26,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 27,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 30,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 33,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 33,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 36,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 45,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 68,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 68,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductDetailPage.tsx",
+        "line": 100,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 14,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 14,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 3
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 32,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 32,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 37,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 39,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 45,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 45,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 52,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 93,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 96,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/pages/ProductListPage.tsx",
+        "line": 105,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/formatters.ts",
+        "line": 1,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/formatters.ts",
+        "line": 1,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/formatters.ts",
+        "line": 2,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/formatters.ts",
+        "line": 6,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/formatters.ts",
+        "line": 10,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/formatters.ts",
+        "line": 10,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/formatters.ts",
+        "line": 11,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 10,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 10,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 13,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 6
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 14,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 15,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 16,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 20,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 22,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 25,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend/src/utils/productFilters.ts",
+        "line": 28,
+        "rule": "max-lines-per-function",
+        "value": null
+      }
+    ]
+  },
+  "typeDiscipline": {
+    "error": null,
+    "typeErrorCount": 9,
+    "anyUsageCount": 0,
+    "nonNullAssertionCount": 7,
+    "tsIgnoreCount": 0
+  },
+  "coupling": {
+    "error": null,
+    "circularDependencyCount": 0,
+    "circularPaths": [],
+    "crossModuleImportCount": 65,
+    "layerViolationCount": 0,
+    "layerViolations": []
+  },
+  "duplication": {
+    "error": null,
+    "duplicateBlockCount": 10,
+    "duplicatedLines": 78,
+    "duplicatedTokens": 759,
+    "findings": [
+      {
+        "format": "typescript",
+        "lines": 13,
+        "tokens": 0,
+        "firstFile": "pages/ComparePage.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "pages/ComparePage.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 11,
+        "tokens": 0,
+        "firstFile": "pages/ComparePage.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 6,
+        "tokens": 0,
+        "firstFile": "components/ProductDetailPanel.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 6,
+        "tokens": 0,
+        "firstFile": "components/ProductDetailPanel.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "components/ProductDetailPanel.tsx",
+        "secondFile": "pages/ComparePage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 14,
+        "tokens": 0,
+        "firstFile": "components/ProductDetailPanel.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 9,
+        "tokens": 0,
+        "firstFile": "components/ProductCard.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "components/ProductCard.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      },
+      {
+        "format": "typescript",
+        "lines": 8,
+        "tokens": 0,
+        "firstFile": "components/ProductCard.tsx",
+        "secondFile": "pages/ProductDetailPage.tsx"
+      }
+    ]
+  },
+  "security": {
+    "error": null,
+    "totalFindingCount": 0,
+    "bySeverity": {},
+    "findings": []
+  }
+}

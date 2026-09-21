@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "Filtering must occur before sorting: within the useMemo in useFilteredProducts.ts, the search-term, category, and inStockOnly filters are applied to the raw products array first; the sort comparator is applied only to the already-filtered result.",
+      "passed": true,
+      "evidence": "Code inspection of src/hooks/useFilteredProducts.ts confirms: lines 20-28 apply .filter() for term, category, and inStockOnly; lines 30-36 apply .sort() only after all filter steps. All 4 tests in tests/derivedStateCorrectness.test.tsx passed (vitest run output: '✓ tests/derivedStateCorrectness.test.tsx (4 tests) 223ms'), confirming filtered sets are sorted correctly."
+    },
+    {
+      "id": "2",
+      "description": "Sorting must not mutate the ProductContext products array: the sort step must operate on a copy so that the reference held by ProductContext is never reordered in-place.",
+      "passed": true,
+      "evidence": "Code inspection of src/hooks/useFilteredProducts.ts lines 31, 33, 35 shows all three sort branches use `[...result].sort(...)` (spread copy). No bare `products.sort()` or `result = products.sort()` call exists. All 21 tests passed including the hidden-test-suite analogue tests in derivedStateCorrectness.test.tsx that apply a sort then change a filter and assert original insertion order."
+    },
+    {
+      "id": "3",
+      "description": "All five values — products, debouncedSearch, category, inStockOnly, and sortBy — must appear in the useMemo dependency array in useFilteredProducts.ts.",
+      "passed": true,
+      "evidence": "Code inspection of src/hooks/useFilteredProducts.ts line 39 shows: `[products, debouncedSearch, category, inStockOnly, sortBy]` — all five values present. Test 3 ('changing sortBy alone — with no other filter changes — triggers recomputation') passed, confirming sortBy is in the dep array and triggers recomputation."
+    },
+    {
+      "id": "4",
+      "description": "Changing sortBy alone (with no change to category, search, or inStockOnly) must immediately produce a reordered product list on the next render.",
+      "passed": true,
+      "evidence": "Test 3 in tests/derivedStateCorrectness.test.tsx ('changing sortBy alone — with no other filter changes — triggers recomputation') passed. It sets sortBy to 'price-asc' without touching any other filter and asserts filteredProducts[0].name === 'Jump Rope' ($15, cheapest). Vitest output: '✓ tests/derivedStateCorrectness.test.tsx (4 tests) 223ms', Test Files 7 passed, Tests 21 passed."
+    }
+  ]
+}
