@@ -10,15 +10,6 @@ type Props = {
 
 const BASE_URL = 'http://localhost:3001';
 
-function getFocusable(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),' +
-        'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
-    ),
-  );
-}
-
 export default function ProductDetailPanel({ productId, onClose }: Props) {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,9 +17,20 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
 
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const prevFocusRef = useRef<Element | null>(null);
 
   const isOpen = productId !== null;
+
+  // Capture the element that had focus before the panel opened, then move focus into the panel.
+  // On close, restore focus to the previously captured element.
+  useLayoutEffect(() => {
+    if (isOpen) {
+      prevFocusRef.current = document.activeElement;
+      closeButtonRef.current?.focus();
+    } else if (prevFocusRef.current) {
+      (prevFocusRef.current as HTMLElement).focus?.();
+    }
+  }, [isOpen]);
 
   // Fetch product details when panel opens
   useEffect(() => {
@@ -61,47 +63,50 @@ export default function ProductDetailPanel({ productId, onClose }: Props) {
     };
   }, [isOpen]);
 
-  // Focus management: save trigger element on open; restore on close
-  useLayoutEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
-      closeButtonRef.current?.focus();
-    } else {
-      const trigger = previousFocusRef.current;
-      previousFocusRef.current = null;
-      trigger?.focus();
-    }
-  }, [isOpen]);
-
-  // Keyboard: Escape + focus trap
+  // Escape key listener on document — fires regardless of which element has focus
   useEffect(() => {
     if (!isOpen) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-        return;
-      }
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
-      if (e.key === 'Tab' && panelRef.current) {
-        const focusable = getFocusable(panelRef.current);
-        if (!focusable.length) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
+  // Focus trap: Tab/Shift+Tab cycles through focusable elements within the panel
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
           e.preventDefault();
           last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
+        }
+      } else {
+        if (document.activeElement === last) {
           e.preventDefault();
           first.focus();
         }
       }
     };
-
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

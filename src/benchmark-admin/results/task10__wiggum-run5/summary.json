@@ -1,0 +1,228 @@
+{
+  "taskId": "task10",
+  "runId": "wiggum-run5",
+  "timestamp": "2026-09-21T07:42:37.093Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authLogin.test.tsx",
+        "line": 6,
+        "column": 23,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/LoginPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authNavBar.test.tsx",
+        "line": 4,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/authSignup.test.tsx",
+        "line": 6,
+        "column": 24,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/SignupPage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 5,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 3,
+        "column": 30,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/context/AuthContext' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 22,
+    "failed": 0,
+    "total": 22
+  },
+  "hiddenTests": {
+    "success": false,
+    "passed": 8,
+    "failed": 2,
+    "total": 10,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": false
+  },
+  "timing": {
+    "visibleMs": 7796,
+    "hiddenMs": 1512,
+    "buildMs": 2325,
+    "totalMs": 11818
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 0.8,
+    "robustnessGap": 0.2,
+    "buildStability": 1,
+    "correctnessScore": 0.9,
+    "qualityScore": 0.525,
+    "overallScore": 0.75
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task10",
+    "wall_duration_ms": 504009,
+    "cost_usd": 2.4469077,
+    "num_turns": 100,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "a5648d97-b8fe-4b24-a9a6-487804e35464",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Add closeButtonRef and capture previous focus element on open",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Move focus to close button when panel opens (useLayoutEffect)",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Attach document-level Escape key listener to call onClose",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-4",
+          "title": "Implement Tab/Shift+Tab focus trap within panel focusable elements",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-5",
+          "title": "Restore focus to previous element when panel closes",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-6",
+          "title": "Run tests and verify all pass",
+          "status": "done",
+          "notes": "All 22 tests pass (7 test files). Build succeeds with no errors."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 86203,
+          "cost_usd": 0.36985380000000007,
+          "num_turns": 19,
+          "session_id": "5c1b94a7-aca5-490a-bd30-93b66d2bdce8",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 75834,
+          "cost_usd": 0.3784062,
+          "num_turns": 14,
+          "session_id": "30729326-3765-42e3-9d7c-b9555ddd0364",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 53659,
+          "cost_usd": 0.3796035,
+          "num_turns": 13,
+          "session_id": "3f4dfa1f-59fc-446f-a8f8-98b126df99fe",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 79205,
+          "cost_usd": 0.3888477,
+          "num_turns": 14,
+          "session_id": "87aac04e-a4be-4550-8772-50d236993259",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 5,
+          "label": "iter5",
+          "exit_code": 0,
+          "wall_duration_ms": 69318,
+          "cost_usd": 0.407994,
+          "num_turns": 16,
+          "session_id": "bc6bc0b3-0d7b-46bd-93ae-a589ee7ec14c",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 6,
+          "label": "iter6",
+          "exit_code": 0,
+          "wall_duration_ms": 42308,
+          "cost_usd": 0.24057779999999998,
+          "num_turns": 12,
+          "session_id": "a5648d97-b8fe-4b24-a9a6-487804e35464",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 6,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
