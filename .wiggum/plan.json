@@ -1,0 +1,30 @@
+{
+  "taskId": "task10",
+  "target": "frontend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Focus on open + focus restore: add closeButtonRef, capture previousFocus with useLayoutEffect, move focus to close button on open, restore on close",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Escape to close: attach document-level keydown listener that calls onClose when Escape is pressed; clean up on unmount/close",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Focus trap: handle Tab and Shift+Tab in keydown listener to cycle focus through focusable elements inside the panel only",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run the test suite and confirm all tests in productDetailFocus.test.tsx and other test files pass with a clean build",
+      "status": "done",
+      "notes": "All 22 tests passed (7 test files including productDetailFocus.test.tsx with 5 tests). Build succeeded cleanly with tsc + vite."
+    }
+  ]
+}
