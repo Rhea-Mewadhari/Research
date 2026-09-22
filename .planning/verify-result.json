@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "POST /api/favourites with a productId that does not exist in the products table must return HTTP 404.",
+      "passed": true,
+      "evidence": "Two conditions verified: (1) client.ts line 11 contains `db.pragma('foreign_keys = ON');` — FK enforcement active. (2) Runtime confirmed INSERT OR IGNORE does NOT suppress FK violations: `node -e` test with SQLITE_CONSTRAINT_FOREIGNKEY shows error is thrown (Error code: SQLITE_CONSTRAINT_FOREIGNKEY, Message: FOREIGN KEY constraint failed). (3) favouritesService.ts:25-27 catch block checks `err.code === 'SQLITE_CONSTRAINT_FOREIGNKEY'` and throws `ProductNotFoundError(productId)` (statusCode=404). (4) favouriteController.ts:18 calls `next(err)`, and errorHandler.ts:19-26 converts any AppError to its statusCode → HTTP 404. The full chain correctly returns 404 for a non-existent productId."
+    },
+    {
+      "id": "2",
+      "description": "Sending POST /api/favourites with the same productId twice must result in exactly one row in the favourites table, and the second call must return HTTP 200 (not an error).",
+      "passed": true,
+      "evidence": "favouritesService.ts:17 uses `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)`. On duplicate: result.changes===0, created=false, SELECT returns existing row, controller responds res.status(200).json(favourite). Visible test 'POST /api/favourites with the same productId is idempotent and returns 200' passed: vitest output shows '✓ src/tests/visible/favourites.test.ts > Favourites API — happy path > POST /api/favourites with the same productId is idempotent and returns 200 1ms'. All 23 tests passed (exit code 0)."
+    },
+    {
+      "id": "3",
+      "description": "DELETE /api/favourites/:productId for a productId not present in the favourites table must return HTTP 404.",
+      "passed": true,
+      "evidence": "favouritesService.ts:36 returns `result.changes > 0` (not the buggy `> -1`). favouriteController.ts:27-30: `if (!removed) { res.status(404).json({ error: 'Favourite not found' }); return; }`. When productId was never added, DELETE changes===0, removeFavourite returns false, controller sends 404. Visible test '✓ src/tests/visible/favourites.test.ts > Favourites API — happy path > DELETE /api/favourites/:productId removes the favourite and returns 204 1ms' passed. All 23 tests passed (exit code 0)."
+    },
+    {
+      "id": "4",
+      "description": "All visible tests pass with no modifications to src/controllers/favouriteController.ts, src/routes/favouriteRoutes.ts, or any file under src/db/migrations/.",
+      "passed": true,
+      "evidence": "pnpm test from src/benchmark-backend/ exits with code 0: 'Test Files 2 passed (2), Tests 23 passed (23)'. Build: `pnpm run build` (tsc -p tsconfig.build.json) completed with no errors (no output, exit 0). favouriteController.ts and favouriteRoutes.ts implement the original route/controller logic (list/add/remove handlers wired via Router). Migrations 001_products.sql, 002_favourites.sql, 003_featured.sql are unchanged SQL DDL files."
+    }
+  ]
+}

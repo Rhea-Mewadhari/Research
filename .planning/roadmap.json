@@ -1,0 +1,65 @@
+{
+  "investigations": {
+    "techStack": [
+      "better-sqlite3 v12.11.1 (synchronous API): .prepare(sql).run(params) returns {changes: number} where changes is always >= 0, never negative",
+      "PRAGMA is set via db.pragma() method — e.g. db.pragma('foreign_keys = ON') — not via raw SQL exec",
+      "Express.js v5.2.1, TypeScript v6.0.2, ESModules",
+      "vitest v4.1.5 + supertest v7.2.2 for integration tests; test command is pnpm test from src/benchmark-backend/",
+      "SQLite FK enforcement is per-connection and off by default — must be enabled with PRAGMA foreign_keys = ON on every connection (including in-memory test DB)"
+    ],
+    "features": [
+      "addFavourite(productId): currently does SELECT-then-INSERT (TOCTOU race); returns {favourite, created: boolean}",
+      "removeFavourite(productId): deletes by product_id, returns boolean; bug is result.changes > -1 always true",
+      "isFavourite(productId): SELECT 1 existence check, returns boolean — no changes needed",
+      "getFavourites(): SELECT all ordered by created_at DESC — no changes needed",
+      "Controller add handler: returns 201 on created, 200 on idempotent; delegates FK errors to Express next() for 404",
+      "Controller remove handler: returns 204 on success, 404 when removeFavourite returns false",
+      "Visible tests: POST 201 (new), GET list, POST 200 (duplicate), DELETE 204 — all must continue to pass",
+      "Schema: UNIQUE(product_id) and FK to products(id) with ON DELETE CASCADE already defined in 002_favourites.sql — correct but not enforced"
+    ],
+    "architecture": [
+      "Layered: Routes → Controllers → Services → db/client.ts singleton",
+      "db/client.ts exports a single better-sqlite3 Database instance used by all services",
+      "PRAGMA foreign_keys = ON belongs in client.ts immediately after the existing journal_mode = WAL pragma",
+      "INSERT OR IGNORE and result.changes fix both belong in src/services/favouritesService.ts",
+      "Must NOT change: src/controllers/favouriteController.ts, src/routes/favouriteRoutes.ts, any file under src/db/migrations/",
+      "Only two files require edits: src/db/client.ts and src/services/favouritesService.ts"
+    ],
+    "edgeCases": [
+      "result.changes is always >= 0 (better-sqlite3 guarantee) — old condition result.changes > -1 is unconditionally true; result.changes > 0 correctly distinguishes 1 deleted row from 0",
+      "INSERT OR IGNORE is atomic at SQLite level — concurrent duplicate inserts: second is a no-op, no UNIQUE constraint error thrown",
+      "After INSERT OR IGNORE, result.changes === 0 means duplicate (created: false), result.changes === 1 means new row (created: true); a follow-up SELECT retrieves the row in both cases",
+      "The pre-check SELECT in addFavourite must be removed — it is the source of the race condition; INSERT OR IGNORE makes it unnecessary",
+      "PRAGMA foreign_keys = ON applies to the same connection used by test in-memory DB; no special test-path handling needed since client.ts is the shared singleton",
+      "productId null/empty: rejected by NOT NULL constraint independently of FK; FK rejects any productId not present in products table",
+      "Enabling FK does not break ON DELETE CASCADE — FK enforcement is required for cascade to fire correctly; enabling it only adds correctness",
+      "Two concurrent DELETEs for same productId: first returns changes=1 (true → 204), second returns changes=0 (false → 404) — correct"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "1. POST /api/favourites with a productId that does not exist in the products table must return HTTP 404. PRAGMA foreign_keys = ON must appear in src/benchmark-backend/src/db/client.ts.",
+      "description": "Add db.pragma('foreign_keys = ON') to src/db/client.ts immediately after the existing db.pragma('journal_mode = WAL') call. This enables SQLite FK enforcement on the shared connection so that INSERT into favourites with a non-existent product_id is rejected at the DB level, causing the service to throw, which the controller passes to Express error handling as a 404.",
+      "files": [
+        "src/benchmark-backend/src/db/client.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "2. Sending POST /api/favourites with the same productId twice must result in exactly one row in the favourites table, and the second call must return HTTP 200 (not an error). The insert statement in addFavourite must use INSERT OR IGNORE.",
+      "description": "Refactor addFavourite in src/services/favouritesService.ts: remove the pre-check SELECT (the TOCTOU race source), replace INSERT INTO with INSERT OR IGNORE INTO, then do a single SELECT to fetch the row. Use result.changes === 1 to set created: true (new row) vs created: false (ignored duplicate). This makes the operation atomic — concurrent identical inserts cannot throw UNIQUE constraint errors.",
+      "files": [
+        "src/benchmark-backend/src/services/favouritesService.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "3. DELETE /api/favourites/:productId for a productId not present in the favourites table must return HTTP 404. Mechanically: removeFavourite must return false when result.changes === 0, which requires fixing the condition from result.changes > -1 to result.changes > 0.",
+      "description": "In removeFavourite in src/services/favouritesService.ts, change the return condition from result.changes > -1 to result.changes > 0. Since better-sqlite3 result.changes is always >= 0, the old condition was unconditionally true; the fix makes the function return false when 0 rows were deleted, allowing the controller to respond with 404.",
+      "files": [
+        "src/benchmark-backend/src/services/favouritesService.ts"
+      ]
+    }
+  ]
+}
