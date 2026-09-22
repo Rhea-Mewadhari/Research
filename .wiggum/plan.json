@@ -1,0 +1,30 @@
+{
+  "taskId": "task11",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix health endpoint exemption: change 'health' to '/health' in rateLimiter.ts",
+      "status": "done",
+      "notes": "Changed req.path === 'health' to req.path === '/health'. All 21 tests pass."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix timestamp pruning: filter out entries older than WINDOW_MS on each request",
+      "status": "done",
+      "notes": "Replaced bare store.get() with filter(ts => now - ts < WINDOW_MS). All 21 tests pass."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix Retry-After header: compute actual seconds until oldest in-window timestamp expires instead of hardcoding 60",
+      "status": "done",
+      "notes": "Replaced hardcoded 60 with Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000). All 21 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify: run pnpm test in benchmark-backend and confirm all tests pass",
+      "status": "done",
+      "notes": "All 21 tests pass (2 test files) and pnpm run build succeeds with no errors."
+    }
+  ]
+}
