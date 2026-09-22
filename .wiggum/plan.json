@@ -1,0 +1,30 @@
+{
+  "taskId": "task10",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix COUNT query to use filter-aware WHERE clause (Bug 1)",
+      "status": "done",
+      "notes": "Changed COUNT(*) query to include the same WHERE clause and params built from filters. Now `SELECT COUNT(*) AS count FROM products ${where}` with the same params array."
+    },
+    {
+      "id": "phase-2",
+      "title": "Move featured filter into SQL WHERE clause instead of JS post-filter (Bug 2)",
+      "status": "done",
+      "notes": "Added `featured = ?` condition to SQL WHERE clause with params.push(query.featured ? 1 : 0). Removed the JS post-filter that was filtering an already-paginated slice. Build passes; remaining test failure is Bug 3 (Math.floor) handled in phase-3."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix totalPages formula to use Math.ceil instead of Math.floor (Bug 3)",
+      "status": "done",
+      "notes": "Changed Math.floor(total / limit) to Math.ceil(total / limit) in productService.ts:73. All 21 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify all success criteria",
+      "status": "done",
+      "notes": "All 21 tests pass (2 test files). Build succeeds with no TypeScript errors."
+    }
+  ]
+}
