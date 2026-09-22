@@ -1,0 +1,54 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express 5.2.1 + TypeScript strict mode (ES2023, ESNext modules)",
+      "Vitest 4.1.5 + Supertest 7.2.0 for testing; test files live in src/tests/",
+      "RateLimitError extends AppError (statusCode 429, code RATE_LIMIT_EXCEEDED, retryAfterSeconds property)",
+      "errorHandler middleware reads retryAfterSeconds from RateLimitError and sets the Retry-After response header — no change needed there",
+      "noUnusedLocals/noUnusedParameters enforced — every declared variable must be used",
+      "ESM: import/export syntax required; no CommonJS"
+    ],
+    "features": [
+      "RateLimitError in src/errors/index.ts: constructor takes retryAfterSeconds; errorHandler uses it to set Retry-After header",
+      "errorHandler in src/middleware/errorHandler.ts: handles RateLimitError specifically — must not be modified",
+      "/health route defined at app.ts:18 (GET /health → { status: 'ok' }); registered after rateLimiter in middleware chain",
+      "rateLimiter.test.ts covers basic enforcement (10 allowed, 11th → 429) and Retry-After header presence — must keep passing",
+      "Hidden tests verify: .filter() call present in rateLimiter.ts source, '/health' string present, dynamic retryAfter expression referencing timestamps[0]/WINDOW_MS, /health returns 200 after limit exhausted, window resets after expiry"
+    ],
+    "architecture": [
+      "Middleware chain in app.ts: requestId → rateLimiter → cors → express.json() → routes → errorHandler",
+      "rateLimiter runs globally before all routes including /health (registered at app.ts:14)",
+      "Only src/benchmark-backend/src/middleware/rateLimiter.ts is to be modified",
+      "self-contained file: Map store, getIp helper, and rateLimiter export all in one file",
+      "Error propagation: next(new RateLimitError(n)) → errorHandler sets 429 + Retry-After header"
+    ],
+    "edgeCases": [
+      "Timestamp exactly at window boundary (t === now - WINDOW_MS): must be pruned — filter condition is strict t > now - WINDOW_MS",
+      "IP with no prior entries: store.get(ip) ?? [] returns empty array; pruning is a no-op; request allowed — existing logic correct, must be preserved",
+      "retryAfter after pruning: timestamps[0] is the oldest active entry; Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000) rounds up sub-second remainders to at least 1s",
+      "GET /health when rate limit already exhausted for that IP: exemption check must run before IP lookup and count check so it always bypasses",
+      "Pruning via background setInterval: explicitly prohibited — must be inline per request",
+      "Order of operations: prune first, then check length, then compute retryAfter from pruned timestamps[0] — retryAfter calc only reached when limit exceeded so timestamps is non-empty after pruning"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "3 — GET /health must be exempt from rate limiting; path comparison must use '/health' (with leading slash)",
+      "description": "Change the path exemption check at the top of rateLimiter() from req.path === 'health' to req.path === '/health'",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "1 — Timestamps older than WINDOW_MS must be removed before the count is checked against MAX_REQUESTS",
+      "description": "After retrieving the timestamps array, filter it to keep only entries where t > now - WINDOW_MS and write the result back to the store before the length check",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "2 — Retry-After header must reflect actual seconds until the oldest in-window timestamp expires, not a hardcoded constant",
+      "description": "Replace the literal 60 passed to RateLimitError with Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000), where timestamps is the already-pruned array (task-2 must run first so timestamps[0] is the oldest active entry)",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    }
+  ]
+}
