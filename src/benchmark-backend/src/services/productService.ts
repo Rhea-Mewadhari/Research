@@ -63,8 +63,10 @@ export function getProducts(query: ProductQuery): PaginatedResult<Product> {
     .prepare(`SELECT * FROM products ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`)
     .all([...params, limit, offset]) as Record<string, unknown>[];
 
+  const data = rows.map(rowToProduct);
+
   return {
-    data: rows.map(rowToProduct),
+    data,
     total,
     page,
     limit,

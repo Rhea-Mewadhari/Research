@@ -1,0 +1,59 @@
+{
+  "investigations": {
+    "techStack": [
+      "Runtime/framework: Express.js v5.2.1 on Node.js with TypeScript v6.0.2 (ES2023 target)",
+      "Database client: better-sqlite3 v12.11.1 — synchronous SQLite, raw SQL only, no ORM or query builder",
+      "Query pattern: parameterized SQL via db.prepare('... WHERE ? ...').get(val) / .all([...params, limit, offset])",
+      "Conditions array convention: conditions: string[] joined with AND, params: (string|number)[] spread into .all()",
+      "Testing: Vitest v4.1.5 + supertest v7.2.2 (integration tests hit real SQLite :memory: DB in test mode)",
+      "TypeScript strict mode: noUnusedLocals, noUnusedParameters — any added param must be used"
+    ],
+    "features": [
+      "Supported filters: search (LOWER LIKE), category (LOWER = LOWER), inStock (in_stock = ?), featured (BUG: JS post-query), sort (ORDER BY enum map)",
+      "search, category, inStock are already pushed into the SQL WHERE via the conditions/params arrays",
+      "featured is NOT in the conditions array — applied in JavaScript AFTER the paginated SELECT returns rows (lines 67-69)",
+      "COUNT query is a separate hardcoded 'SELECT COUNT(*) AS count FROM products' with no WHERE clause (lines 56-58)",
+      "totalPages formula is Math.floor(total / limit) — rounds down, drops the last partial page",
+      "pagination.test.ts: asserts totalPages=2 for 15 products/limit=10 (ceil semantics) — currently fails; asserts totalPages=3 for 15/limit=5 (exact division)",
+      "products.test.ts: covers search, category, inStock, sort, pagination envelope shape, auth middleware — all must continue to pass"
+    ],
+    "architecture": [
+      "Layer order: productRoutes.ts → productController.ts → productService.ts → db/client.ts (better-sqlite3 singleton)",
+      "Controller calls parseProductQuery(req.query) → returns ProductQuery, then passes to queryProducts(query)",
+      "ProductQuery interface fields: search?, category?, inStock?, featured?, sort?, page?, limit? (all optional, validated by Zod in queryParser.ts)",
+      "productService.ts getProducts(): builds conditions[] and params[] incrementally, assembles WHERE, runs SELECT then separate COUNT",
+      "conditions array is built once (lines 31-45) and used only for the SELECT WHERE (line 48); the COUNT at lines 56-58 ignores it entirely",
+      "db imported as singleton from ../db/client; all queries use db.prepare().get() / .all()",
+      "getFeaturedProducts() at line 100 is a separate function (JOIN with featured_overrides) — unrelated to getProducts() and must not be touched"
+    ],
+    "edgeCases": [
+      "Exact division (15 products, limit=5): ceil(15/5)=3 = floor(15/5)=3 — formula change is safe, must not regress",
+      "Single-page filtered result (4 electronics, limit=10): ceil(4/10)=1, not 0 — requirement 1",
+      "featured+pagination (featured=true, limit=3): SQL WHERE must apply before LIMIT/OFFSET so exactly 3 featured items are returned — requirement 3",
+      "inStock=false: SQL condition must be in_stock = 0; total must reflect only out-of-stock count — requirements 2 and 7",
+      "Combined filters: COUNT and SELECT must share the identical conditions[]/params[] so total always reflects the intersection of all active filters — requirement 2",
+      "No filter active: conditions[] is empty, WHERE clause is omitted, bare COUNT(*) FROM products is correct — requirements 5, 6, 7",
+      "featured condition must be added to conditions[] before the WHERE string is assembled and before the COUNT query runs, so both queries see it"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 3: featured filter must be applied inside the SQL WHERE clause, not in JavaScript after the database returns rows",
+      "description": "In getProducts() in productService.ts, add a `featured = ?` condition to the conditions[] array and push 1 or 0 to params[] when query.featured !== undefined, following the same pattern used for inStock. Remove the post-query JavaScript .filter() on featured (lines 67-69). This must be done before task-2 so the conditions array is complete when the COUNT query is fixed.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 1 and 2: total and totalPages must reflect the filtered subset; the SQL COUNT query must include the same WHERE conditions as the data SELECT query",
+      "description": "Replace the hardcoded `SELECT COUNT(*) AS count FROM products` (no WHERE) with a parameterized COUNT query that includes the same WHERE clause as the data SELECT: `SELECT COUNT(*) AS count FROM products${where}` using the same conditions[] and params[] arrays already built earlier in the function. The where variable (or equivalent construction) must be reused, not duplicated.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 4, 5, and 6: totalPages must use ceiling division so the last partial page is not dropped",
+      "description": "Change the totalPages formula from Math.floor(total / limit) to Math.ceil(total / limit) in productService.ts. Verify the fix is correct for: ceil(11/6)=2 (requirement 4), ceil(15/10)=2 (requirement 5), ceil(15/5)=3 (requirement 6, exact division unchanged).",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}
