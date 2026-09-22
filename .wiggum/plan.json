@@ -1,0 +1,36 @@
+{
+  "taskId": "task9",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Enable SQLite FK constraints in db/client.ts",
+      "status": "done",
+      "notes": "Add `db.pragma('foreign_keys = ON')` after the WAL pragma in src/benchmark-backend/src/db/client.ts. Without this, SQLite silently ignores REFERENCES constraints, so inserting a non-existent product_id succeeds when it should fail."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix addFavourite: reject non-existent productId with ProductNotFoundError",
+      "status": "done",
+      "notes": "In src/benchmark-backend/src/services/favouritesService.ts, add an explicit check before inserting: query the products table for the given productId, and throw ProductNotFoundError (imported from '../errors') if the row is not found. This makes the controller (which calls next(err)) return a 404 response via the AppError-aware error handler."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix addFavourite: make duplicate insert atomic using INSERT OR IGNORE",
+      "status": "done",
+      "notes": "Replaced the SELECT-then-INSERT pattern with a single atomic `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)`. Uses result.changes === 1 to determine whether a new row was created. All 23 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Fix removeFavourite: correct return value to detect missing rows",
+      "status": "done",
+      "notes": "In src/benchmark-backend/src/services/favouritesService.ts, change `return result.changes > -1` to `return result.changes > 0`. The current condition is always true since better-sqlite3 never returns negative changes. The controller relies on a false return to send 404, which currently never happens."
+    },
+    {
+      "id": "phase-5",
+      "title": "Run tests and verify all success criteria",
+      "status": "done",
+      "notes": "All 23 tests pass (2 test files). Build succeeds with no TypeScript errors. Confirmed: previous phases implemented FK constraint enforcement, ProductNotFoundError on bad productId, atomic INSERT OR IGNORE for duplicates, and correct removeFavourite return value for 404 detection."
+    }
+  ]
+}

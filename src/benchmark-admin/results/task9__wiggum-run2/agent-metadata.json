@@ -1,0 +1,105 @@
+{
+  "framework": "wiggum",
+  "target": "backend",
+  "taskId": "task9",
+  "wall_duration_ms": 321015,
+  "cost_usd": 1.5341883,
+  "num_turns": 63,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "eeef2b7a-877a-4cc6-8f1b-2124762a42e0",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Enable SQLite FK constraints in db/client.ts",
+        "status": "done",
+        "notes": "Add `db.pragma('foreign_keys = ON')` after the WAL pragma in src/benchmark-backend/src/db/client.ts. Without this, SQLite silently ignores REFERENCES constraints, so inserting a non-existent product_id succeeds when it should fail."
+      },
+      {
+        "id": "phase-2",
+        "title": "Fix addFavourite: reject non-existent productId with ProductNotFoundError",
+        "status": "done",
+        "notes": "In src/benchmark-backend/src/services/favouritesService.ts, add an explicit check before inserting: query the products table for the given productId, and throw ProductNotFoundError (imported from '../errors') if the row is not found. This makes the controller (which calls next(err)) return a 404 response via the AppError-aware error handler."
+      },
+      {
+        "id": "phase-3",
+        "title": "Fix addFavourite: make duplicate insert atomic using INSERT OR IGNORE",
+        "status": "done",
+        "notes": "Replaced the SELECT-then-INSERT pattern with a single atomic `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)`. Uses result.changes === 1 to determine whether a new row was created. All 23 tests pass, build succeeds."
+      },
+      {
+        "id": "phase-4",
+        "title": "Fix removeFavourite: correct return value to detect missing rows",
+        "status": "done",
+        "notes": "In src/benchmark-backend/src/services/favouritesService.ts, change `return result.changes > -1` to `return result.changes > 0`. The current condition is always true since better-sqlite3 never returns negative changes. The controller relies on a false return to send 404, which currently never happens."
+      },
+      {
+        "id": "phase-5",
+        "title": "Run tests and verify all success criteria",
+        "status": "done",
+        "notes": "All 23 tests pass (2 test files). Build succeeds with no TypeScript errors. Confirmed: previous phases implemented FK constraint enforcement, ProductNotFoundError on bad productId, atomic INSERT OR IGNORE for duplicates, and correct removeFavourite return value for 404 detection."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 33334,
+        "cost_usd": 0.22618740000000004,
+        "num_turns": 10,
+        "session_id": "5b411368-16ad-466d-87bd-1329e17bfed6",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 50282,
+        "cost_usd": 0.3199911,
+        "num_turns": 15,
+        "session_id": "ee091727-5fce-46f6-866a-4d7cb0e5e688",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 3,
+        "label": "iter3",
+        "exit_code": 0,
+        "wall_duration_ms": 35109,
+        "cost_usd": 0.22447379999999997,
+        "num_turns": 8,
+        "session_id": "f22a70c4-b32f-4fe2-88ad-91fdec95b00b",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 4,
+        "label": "iter4",
+        "exit_code": 0,
+        "wall_duration_ms": 24602,
+        "cost_usd": 0.2014134,
+        "num_turns": 7,
+        "session_id": "3be83116-e96e-4f92-94d2-99f1af28e290",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 5,
+        "label": "iter5",
+        "exit_code": 0,
+        "wall_duration_ms": 28691,
+        "cost_usd": 0.17313840000000003,
+        "num_turns": 5,
+        "session_id": "eeef2b7a-877a-4cc6-8f1b-2124762a42e0",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 5,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}
