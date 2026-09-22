@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "`src/db/client.ts` must enable SQLite foreign-key enforcement by calling `db.pragma('foreign_keys = ON')` immediately after the database connection is opened.",
+      "passed": true,
+      "evidence": "grep of `src/benchmark-backend/src/db/client.ts` line 11 shows: `db.pragma('foreign_keys = ON');` — present immediately after `db.pragma('journal_mode = WAL')` which follows the Database() constructor call."
+    },
+    {
+      "id": "2",
+      "description": "`POST /api/favourites` with a non-existent `productId` must return HTTP 404 with JSON body `{ \"error\": \"...\", \"code\": \"PRODUCT_NOT_FOUND\" }`. `addFavourite` must throw `ProductNotFoundError` when the product is absent (checked via a SELECT on `products` before attempting the insert).",
+      "passed": true,
+      "evidence": "`favouritesService.ts` line 15-18: `const product = db.prepare('SELECT 1 FROM products WHERE id = ?').get(productId); if (!product) { throw new ProductNotFoundError(productId); }`. `ProductNotFoundError` (errors/index.ts) extends `AppError` with `statusCode: 404` and `code: 'PRODUCT_NOT_FOUND'`. Controller calls `next(err)` which routes to `errorHandler`, which returns `res.status(404).json({ error: err.message, code: err.code, requestId })`. All 23 tests passed including 4 favourites tests via `pnpm test`."
+    },
+    {
+      "id": "3",
+      "description": "Adding the same `productId` twice must result in exactly one row. Must use atomic `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)`. When INSERT was ignored, service must query the existing row and return `{ favourite, created: false }`.",
+      "passed": true,
+      "evidence": "`favouritesService.ts` line 22: `.prepare('INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)')`. Line 24-26: queries existing row after INSERT. Line 27: `return { favourite: rowToFavourite(row), created: result.changes === 1 }`. Test `✓ src/tests/visible/favourites.test.ts > Favourites API — happy path > POST /api/favourites with the same productId is idempotent and returns 200` passed in `pnpm test` output."
+    },
+    {
+      "id": "4",
+      "description": "`removeFavourite(productId)` must return `false` when `result.changes === 0`. Expression `result.changes > -1` must be replaced with `result.changes > 0`. `DELETE /api/favourites/:productId` for a non-existent favourite must return HTTP 404 with `{ \"error\": \"Favourite not found\" }`.",
+      "passed": true,
+      "evidence": "`favouritesService.ts` line 40: `return result.changes > 0;` — `> -1` is absent (grep confirms only `> 0` present). `favouriteController.ts` `remove` function: `const removed = removeFavourite(productId); if (!removed) { res.status(404).json({ error: 'Favourite not found' }); return; }`. Test `✓ src/tests/visible/favourites.test.ts > Favourites API — happy path > DELETE /api/favourites/:productId removes the favourite and returns 204` passed in `pnpm test` output."
+    },
+    {
+      "id": "5",
+      "description": "The visible test suite must pass in full without modifying any test file.",
+      "passed": true,
+      "evidence": "`pnpm test` in `benchmark-backend` output: `Test Files  2 passed (2)`, `Tests  23 passed (23)`, exit code 0. No test files were modified."
+    }
+  ]
+}
