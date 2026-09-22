@@ -1,0 +1,55 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript (v6.0.2), ESM modules ('type': 'module')",
+      "Express v5.2.1 — req.path is pathname only, no query string",
+      "Vitest v4.1.5 + supertest v7.2.2 for integration tests; run with 'pnpm test' inside src/benchmark-backend",
+      "WINDOW_MS = 60_000, MAX_REQUESTS = 10 (module-level constants in rateLimiter.ts)",
+      "RateLimitError constructor takes retryAfterSeconds: number; errorHandler sets Retry-After response header from err.retryAfterSeconds"
+    ],
+    "features": [
+      "GET /health — inline route handler returning { status: 'ok' }; must be exempt from rate limiting",
+      "All other routes (/products, /api/products, /api/favourites) are correctly subject to rate limiting",
+      "rateLimiter is second global middleware (after requestId), before CORS, body parsing, auth, and all route handlers",
+      "In-memory store: Map<string, number[]> keyed by IP; values are arrays of Date.now() millisecond timestamps",
+      "Visible test (rateLimiter.test.ts): sends 10 requests (expects none to be 429), then an 11th (expects 429 with Retry-After header defined) — does not test pruning accuracy, Retry-After value, or /health exemption",
+      "errorHandler converts RateLimitError to HTTP 429 JSON with Retry-After header from err.retryAfterSeconds"
+    ],
+    "architecture": [
+      "Single file to change: src/benchmark-backend/src/middleware/rateLimiter.ts",
+      "Request pipeline: requestId → rateLimiter → cors → express.json → route handlers → 404 → errorHandler",
+      "store.get(ip) ?? [] on line 23 already handles undefined (first-request IPs) correctly — no change needed",
+      "When rate limited: next(new RateLimitError(retryAfter)) is called; errorHandler intercepts and sends 429 with Retry-After header",
+      "All three bugs are isolated single-line or minimal fixes; no other files need modification"
+    ],
+    "edgeCases": [
+      "First request from IP: store.get(ip) returns undefined → ?? [] gives empty array → 0 >= 10 is false → allowed (already handled correctly)",
+      "All timestamps expired after pruning: array becomes empty → 0 >= 10 is false → request allowed (correct behavior once pruning is added)",
+      "Retry-After at start of window (oldest ~0 s ago): Math.ceil((ts + 60000 - now) / 1000) approaches 60",
+      "Retry-After near end of window (oldest ~59 s ago): Math.ceil((ts + 60000 - now) / 1000) approaches 1",
+      "GET /health?foo=bar: Express v5 sets req.path to '/health' without query string — leading-slash fix fully covers this case",
+      "Filter condition per requirements: ts >= now - WINDOW_MS (keeps timestamps at the exact boundary as in-window)",
+      "Correct order of operations: prune expired timestamps → store pruned array back (or push new timestamp then store once) → check count → if over limit compute retryAfter from Math.min(...prunedTimestamps)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: On every request from a given IP, timestamps older than now - WINDOW_MS must be removed before the count is checked or a new timestamp is added.",
+      "description": "In rateLimiter.ts, after retrieving the timestamps array (line 23), add a filter step: replace the raw retrieved array with timestamps.filter(ts => ts >= now - WINDOW_MS). Store the pruned array back into the store before pushing the new timestamp. This ensures expired entries are removed on every request so the sliding window resets correctly.",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2: When a 429 is returned, the Retry-After header must reflect actual seconds remaining: Math.ceil((oldestInWindowTimestamp + WINDOW_MS - now) / 1000). The hardcoded literal 60 must not appear as the retryAfter argument.",
+      "description": "In rateLimiter.ts, replace the hardcoded 'const retryAfter = 60' with a dynamic calculation. After pruning, the oldest in-window timestamp is Math.min(...timestamps) (the pruned array). Compute retryAfter as Math.ceil((Math.min(...timestamps) + WINDOW_MS - now) / 1000) and pass this value to new RateLimitError(retryAfter).",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 3: GET /health must be exempt from rate limiting. The path comparison must use '/health' (with leading slash) to match req.path as set by Express.",
+      "description": "In rateLimiter.ts, fix the health endpoint exemption check from req.path === 'health' to req.path === '/health'. This one-character fix makes the condition correctly match Express's req.path value, which always includes the leading slash.",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    }
+  ]
+}

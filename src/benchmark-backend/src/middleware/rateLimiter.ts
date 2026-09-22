@@ -18,19 +18,16 @@ export function rateLimiter(req: Request, _res: Response, next: NextFunction): v
 
   const ip = getIp(req);
   const now = Date.now();
-  const cutoff = now - WINDOW_MS;
 
-  // Prune expired timestamps before checking — prevents unbounded memory growth
-  const timestamps = (store.get(ip) ?? []).filter((t) => t > cutoff);
+  const pruned = (store.get(ip) ?? []).filter(ts => ts >= now - WINDOW_MS);
 
-  if (timestamps.length >= MAX_REQUESTS) {
-    const oldest = timestamps[0];
-    const retryAfter = Math.max(1, Math.ceil((oldest + WINDOW_MS - now) / 1000));
+  if (pruned.length >= MAX_REQUESTS) {
+    const retryAfter = Math.ceil((Math.min(...pruned) + WINDOW_MS - now) / 1000);
     next(new RateLimitError(retryAfter));
     return;
   }
 
-  timestamps.push(now);
-  store.set(ip, timestamps);
+  pruned.push(now);
+  store.set(ip, pruned);
   next();
 }

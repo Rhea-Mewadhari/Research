@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "On every request from a given IP, timestamps older than `now - WINDOW_MS` must be removed before the count is checked or a new timestamp is added. After the full 60-second window has elapsed, subsequent requests must be allowed.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 22: `const pruned = (store.get(ip) ?? []).filter(ts => ts >= now - WINDOW_MS);` — filter is applied before the `>= MAX_REQUESTS` check on line 24, and before `pruned.push(now)` on line 30. `pnpm test` output: 21 passed (21), exit code 0."
+    },
+    {
+      "id": "2",
+      "description": "When a 429 is returned, the `Retry-After` header must be computed as `Math.ceil((oldestInWindowTimestamp + WINDOW_MS - now) / 1000)` using the minimum of the pruned array. The hardcoded literal `60` must not appear as the retryAfter argument.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 25: `const retryAfter = Math.ceil((Math.min(...pruned) + WINDOW_MS - now) / 1000);` — matches the required formula exactly. `Math.min(...pruned)` provides the oldest in-window timestamp. No hardcoded `60` appears as the argument to `new RateLimitError(retryAfter)` on line 26. `pnpm test` output: 21 passed (21), exit code 0."
+    },
+    {
+      "id": "3",
+      "description": "`GET /health` must be exempt from rate limiting. The path comparison must use the string `'/health'` (with a leading slash) to match `req.path` as set by Express.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 14: `if (req.path === '/health') {` — uses `'/health'` with a leading slash, calls `next()` and returns immediately before any rate-limit logic. `pnpm test` output: 21 passed (21), exit code 0."
+    }
+  ]
+}
