@@ -1,0 +1,27 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.8 [39m[90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend[39m
+
+[90mstdout[2m | src/tests/hidden/hidden.pagination.test.ts
+[22m[39m  migration applied: 001_products.sql
+  migration applied: 002_favourites.sql
+  migration applied: 003_featured.sql
+
+[90mstdout[2m | src/tests/hidden/hidden.pagination.test.ts[2m > [22m[2mHidden: filter-aware total count[2m > [22m[2mGET /products?category=electronics&limit=10 reports total matching the filter, not all products
+[22m[39m[AUTH] 2026-09-22T08:15:50.048Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/hidden/hidden.pagination.test.ts[2m > [22m[2mHidden: filter-aware total count[2m > [22m[2mGET /products?featured=true&limit=3 returns exactly 3 featured products on page 1
+[22m[39m[AUTH] 2026-09-22T08:15:50.053Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/hidden/hidden.pagination.test.ts[2m > [22m[2mHidden: filter-aware total count[2m > [22m[2mGET /products?featured=true&limit=3&page=2 returns the remaining featured product
+[22m[39m[AUTH] 2026-09-22T08:15:50.055Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/hidden/hidden.pagination.test.ts[2m > [22m[2mHidden: filter-aware total count[2m > [22m[2mGET /products?inStock=true&limit=6 computes totalPages with ceil, not floor
+[22m[39m[AUTH] 2026-09-22T08:15:50.056Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+ [32m✓[39m src/tests/hidden/hidden.pagination.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 10:15:49
+[2m   Duration [22m 284ms[2m (transform 60ms, setup 40ms, import 166ms, tests 16ms, environment 0ms)[22m
+

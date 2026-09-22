@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products?limit=10 (no active filters, 15 total products) returns totalPages: 2.",
+      "passed": true,
+      "evidence": "pagination.test.ts > 'returns totalPages: 2 for 15 products with limit 10' asserts res.body.totalPages === 2. Test output: ✓ passed (21/21 tests passed in pnpm test run)."
+    },
+    {
+      "id": "2",
+      "description": "GET /products?limit=5 (no active filters, 15 total products) returns totalPages: 3.",
+      "passed": true,
+      "evidence": "pagination.test.ts > 'returns totalPages: 3 for 15 products with limit 5' asserts res.body.total === 15 and res.body.totalPages === 3. Test output: ✓ passed (21/21 tests passed)."
+    },
+    {
+      "id": "3",
+      "description": "GET /products?category=electronics&limit=10 returns total: 4 (not 15) and totalPages: 1.",
+      "passed": true,
+      "evidence": "products.test.ts > 'filters by category' (using limit=50) asserts res.body.data.length === 4. hidden.pagination.test.ts asserts res.body.total === 4 for category=electronics&limit=10. productService.ts line 38-40 adds 'LOWER(category) = LOWER(?)' to the WHERE conditions array, which is used in both the COUNT query (line 58-60) and data query (line 62-64). Math.ceil(4/10) = 1. Build succeeded (tsc -p tsconfig.build.json)."
+    },
+    {
+      "id": "4",
+      "description": "GET /products?category=electronics&limit=50 returns data.length: 4 with every item having category === 'electronics'.",
+      "passed": true,
+      "evidence": "products.test.ts > 'filters by category' asserts res.body.data.length === 4 AND res.body.data.every(p => p.category === 'electronics') === true. Test output: ✓ passed."
+    },
+    {
+      "id": "5",
+      "description": "GET /products?featured=true&limit=3 returns exactly 3 products, all with featured: true, and total reflects only featured products.",
+      "passed": true,
+      "evidence": "productService.ts lines 46-49 add 'featured = ?' to the SQL conditions array (same WHERE used for COUNT and data queries). hidden.pagination.test.ts asserts res.body.data.length === 3 and res.body.data.every(p => p.featured) === true for GET /products?featured=true&limit=3. Code inspection confirms no .filter((p) => p.featured) post-pagination pattern exists."
+    },
+    {
+      "id": "6",
+      "description": "GET /products?inStock=true&limit=50 returns data.length: 11 with every item having inStock: true.",
+      "passed": true,
+      "evidence": "products.test.ts > 'filters in-stock products' asserts res.body.data.length === 11 AND res.body.data.every(p => p.inStock) === true with limit=50. Test output: ✓ passed."
+    },
+    {
+      "id": "7",
+      "description": "GET /products?inStock=true&limit=6 returns totalPages: 2 (11 in-stock products / 6 = 1.833 → rounds up to 2).",
+      "passed": true,
+      "evidence": "hidden.pagination.test.ts asserts res.body.totalPages === 2 for GET /products?inStock=true&limit=6. productService.ts line 73 uses Math.ceil(total / limit); with 11 in-stock products and limit=6, Math.ceil(11/6) = Math.ceil(1.833) = 2."
+    },
+    {
+      "id": "8",
+      "description": "GET /products?category=nonexistent&limit=50 returns data: [] and total: 0.",
+      "passed": true,
+      "evidence": "products.test.ts > 'returns empty array for unknown category' asserts res.body.data equals []. Test output: ✓ passed. total: 0 confirmed by code inspection: the WHERE clause filters to 0 matching rows, so COUNT returns 0, total = 0, totalPages = Math.ceil(0/50) = 0."
+    },
+    {
+      "id": "9",
+      "description": "GET /products?page=1&limit=5 returns envelope { total: 15, page: 1, limit: 5, totalPages: 3, data.length: 5 }.",
+      "passed": true,
+      "evidence": "products.test.ts > Pagination > 'returns correct envelope shape for first page' asserts res.body.data.length === 5, res.body.total === 15, res.body.page === 1, res.body.limit === 5, res.body.totalPages === 3. Test output: ✓ passed."
+    },
+    {
+      "id": "10",
+      "description": "All four filters (search, category, inStock, featured) are enforced inside the SQL WHERE clause — none are applied in JavaScript after rows are fetched.",
+      "passed": true,
+      "evidence": "productService.ts lines 34-49: search → 'LOWER(name) LIKE ?' (line 35-37), category → 'LOWER(category) = LOWER(?)' (line 38-40), inStock → 'in_stock = ?' (line 42-44), featured → 'featured = ?' (line 46-49). All four conditions are appended to the `conditions` array, joined into a single WHERE string (line 51), and used in both the COUNT and data queries. No post-fetch JS filtering of these fields exists. Tests for requirements 3–7 all pass."
+    },
+    {
+      "id": "11",
+      "description": "The COUNT query used to derive total applies the same WHERE conditions as the data query.",
+      "passed": true,
+      "evidence": "productService.ts line 58-60: 'SELECT COUNT(*) AS count FROM products ${where}' — uses the same `where` variable as the data query on line 62-64: 'SELECT * FROM products ${where} ORDER BY ...'. Requirements 3 (total: 4), 6 (data.length: 11), 8 (total: 0) all assert filtered totals; all tests passed."
+    },
+    {
+      "id": "12",
+      "description": "totalPages is computed with Math.ceil(total / limit), not Math.floor.",
+      "passed": true,
+      "evidence": "productService.ts line 73: 'totalPages: Math.ceil(total / limit)'. No Math.floor in the file (confirmed by code inspection). Requirements 1 and 7 pass: Math.ceil(15/10) = 2 (not 1 as Math.floor would give), Math.ceil(11/6) = 2 (not 1 as Math.floor would give). Both assertions ✓ passed."
+    },
+    {
+      "id": "13",
+      "description": "All changes are confined to src/benchmark-backend/src/services/productService.ts; no other source or test file is modified.",
+      "passed": true,
+      "evidence": "git status shows 'nothing to commit, working tree clean'. git diff --name-only returns no output (no uncommitted modifications to any file). The task10.md instructions state 'Modify only src/services/productService.ts' and 'Do not change src/controllers/productController.ts, src/utils/queryParser.ts, or any route files'. Code inspection of productService.ts confirms all three bug fixes (filtered COUNT, featured in SQL WHERE, Math.ceil) are present and correct. No modifications to test files or other source files were observed."
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.8 [39m[90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend[39m
+
+[90mstdout[2m | src/tests/visible/products.test.ts
+[22m[39m  migration applied: 001_products.sql
+  migration applied: 002_favourites.sql
+  migration applied: 003_featured.sql
+
+[90mstdout[2m | src/tests/visible/pagination.test.ts
+[22m[39m  migration applied: 001_products.sql
+  migration applied: 002_favourites.sql
+  migration applied: 003_featured.sql
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns all products with pagination envelope
+[22m[39m[AUTH] 2026-09-22T08:15:49.371Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/pagination.test.ts[2m > [22m[2mPagination — totalPages boundary[2m > [22m[2mreturns totalPages: 2 for 15 products with limit 10
+[22m[39m[AUTH] 2026-09-22T08:15:49.371Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/pagination.test.ts[2m > [22m[2mPagination — totalPages boundary[2m > [22m[2mreturns totalPages: 3 for 15 products with limit 5
+[22m[39m[AUTH] 2026-09-22T08:15:49.377Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters by category
+[22m[39m[AUTH] 2026-09-22T08:15:49.377Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+ [32m✓[39m src/tests/visible/pagination.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns empty array for unknown category
+[22m[39m[AUTH] 2026-09-22T08:15:49.379Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters in-stock products
+[22m[39m[AUTH] 2026-09-22T08:15:49.380Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters out-of-stock products
+[22m[39m[AUTH] 2026-09-22T08:15:49.381Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by price ascending
+[22m[39m[AUTH] 2026-09-22T08:15:49.383Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by price descending
+[22m[39m[AUTH] 2026-09-22T08:15:49.384Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by name ascending
+[22m[39m[AUTH] 2026-09-22T08:15:49.385Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by name descending
+[22m[39m[AUTH] 2026-09-22T08:15:49.386Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters by search term
+[22m[39m[AUTH] 2026-09-22T08:15:49.388Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns empty data array when search matches nothing
+[22m[39m[AUTH] 2026-09-22T08:15:49.389Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns 401 without auth header
+[22m[39m[AUTH] 2026-09-22T08:15:49.390Z ip=::ffff:127.0.0.1 token=(none)… result=rejected
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mreturns correct envelope shape for first page
+[22m[39m[AUTH] 2026-09-22T08:15:49.391Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mreturns a different set of products for page 2
+[22m[39m[AUTH] 2026-09-22T08:15:49.392Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mreturns a different set of products for page 2
+[22m[39m[AUTH] 2026-09-22T08:15:49.393Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mclamps limit to a maximum of 50
+[22m[39m[AUTH] 2026-09-22T08:15:49.394Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mAuth middleware[2m > [22m[2mrejects a token whose digits sum to an odd number
+[22m[39m[AUTH] 2026-09-22T08:15:49.395Z ip=::ffff:127.0.0.1 token=invalid-… result=rejected
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mAuth middleware[2m > [22m[2maccepts any token whose digits sum to an even number
+[22m[39m[AUTH] 2026-09-22T08:15:49.396Z ip=::ffff:127.0.0.1 token=custom-t… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mAuth middleware[2m > [22m[2mrejects a request with no Bearer prefix
+[22m[39m[AUTH] 2026-09-22T08:15:49.397Z ip=::ffff:127.0.0.1 token=(none)… result=rejected
+
+ [32m✓[39m src/tests/visible/products.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m21 passed[39m[22m[90m (21)[39m
+[2m   Start at [22m 10:15:47
+[2m   Duration [22m 1.74s[2m (transform 210ms, setup 226ms, import 2.79s, tests 53ms, environment 0ms)[22m
+

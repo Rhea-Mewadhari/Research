@@ -1,0 +1,55 @@
+{
+  "investigations": {
+    "techStack": [
+      "Runtime: Node.js with Express v5, ESM modules (type: module)",
+      "Database: better-sqlite3 v12 — synchronous SQLite, raw SQL with ? placeholders, no ORM or query builder",
+      "Test framework: Vitest v4 with supertest for HTTP integration tests",
+      "TypeScript ~6.0, strict-equivalent flags (noUnusedLocals, noUnusedParameters, etc.), no ESLint/Prettier",
+      "In-memory SQLite DB used when NODE_ENV=test; disk DB otherwise"
+    ],
+    "features": [
+      "GET /products supports filters: search (LIKE), category (exact), inStock (bool), sort (allowlisted map); featured not in SQL",
+      "Pagination envelope: { total, page, limit, totalPages, data }; limit clamped to max 50",
+      "products.test.ts: covers category filter (4 electronics), inStock filter (11 in-stock), empty results, sort orders, auth, envelope shape",
+      "pagination.test.ts: asserts totalPages=2 for 15 products at limit=10, totalPages=3 for limit=5",
+      "getFeaturedProducts() is a separate export using LEFT JOIN featured_overrides — unrelated to getProducts()",
+      "Auth middleware rejects tokens whose digit-sum is odd; /health is exempt"
+    ],
+    "architecture": [
+      "Layer order: routes -> controllers -> services -> db (all static ES module imports, no DI framework)",
+      "productRoutes.ts -> productController.ts -> productService.getProducts() -> db singleton from db/client.ts",
+      "SQL style: raw parameterized strings, conditions[] array joined with AND, params[] array passed to .all()/.get()",
+      "WHERE clause already built at line 48 via: conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''",
+      "New filter conditions belong in the if-blocks between lines 31-47 (before the where variable is composed)",
+      "COUNT query at line 56-58 must receive the same where string and params as the SELECT query at line 61"
+    ],
+    "edgeCases": [
+      "total=0: Math.ceil(0/limit)=0 — safe, no division-by-zero or NaN",
+      "Exact divisibility (e.g. 15/5=3): Math.ceil and Math.floor agree — bug only surfaces when total%limit != 0",
+      "featured AND other filters: existing AND join in conditions[] is correct — intersection semantics required",
+      "No active filters: conditions=[], where='', both COUNT and SELECT run without WHERE — base case unchanged",
+      "featured=false must also be handled: query.featured !== undefined check needed (not just truthiness), already the gate in existing code",
+      "Post-pagination JS filter for featured on a limit=3 slice returns <3 results — removing it and moving to SQL fixes requirement 5 and 10"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Req 10 / Req 5: All four filters (search, category, inStock, featured) must be enforced inside the SQL WHERE clause — featured must not be applied in JS after rows are fetched",
+      "description": "In getProducts() (productService.ts line ~46), add an if-block for query.featured before the where variable is composed: push 'featured = ?' to conditions[] and push query.featured ? 1 : 0 to params[]. Remove the post-pagination JS filter block at lines 67-69.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Req 11 / Req 3 / Req 5 / Req 7 / Req 8: The COUNT query used to derive total must apply the same WHERE conditions as the data query",
+      "description": "In getProducts() (productService.ts line ~57), change 'SELECT COUNT(*) AS count FROM products' to 'SELECT COUNT(*) AS count FROM products ${where}' and pass params as the argument to .get(), so filtered totals reflect only matching rows.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Req 12 / Req 1 / Req 7: totalPages must be computed with Math.ceil(total / limit), not Math.floor",
+      "description": "In getProducts() (productService.ts line 76), change Math.floor(total / limit) to Math.ceil(total / limit) in the returned PaginatedResult object.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}
