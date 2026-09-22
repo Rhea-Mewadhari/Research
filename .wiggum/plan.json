@@ -1,0 +1,30 @@
+{
+  "taskId": "task11",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix health endpoint exemption (missing leading slash in path check)",
+      "status": "done",
+      "notes": "Changed req.path === 'health' to req.path === '/health'. All 21 tests pass. Build was already failing pre-change due to unused WINDOW_MS (resolved in phase-2)."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix timestamp pruning (remove expired entries on each request)",
+      "status": "done",
+      "notes": "Added windowStart = now - WINDOW_MS and filtered the stored timestamps array to only keep entries > windowStart before checking the count. All 21 tests pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix Retry-After header (compute actual seconds until oldest in-window entry expires)",
+      "status": "done",
+      "notes": "Replaced hardcoded retryAfter = 60 with Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000). timestamps[0] is the oldest in-window entry; adding WINDOW_MS gives its expiry time; subtracting now and dividing by 1000 gives seconds remaining. All 21 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify all three fixes pass",
+      "status": "done",
+      "notes": "All 21 tests pass (2 test files). Build (tsc -p tsconfig.build.json) succeeds with no errors. All three prior phases verified working."
+    }
+  ]
+}

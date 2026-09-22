@@ -1,0 +1,26 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ vitest run src/tests/hidden/hidden.rate-limiter.test.ts
+[90mstderr[2m | src/tests/hidden/hidden.rate-limiter.test.ts[2m > [22m[2mHidden: Retry-After reflects actual seconds until window resets[2m > [22m[2mRetry-After is less than 60 when the oldest in-window request is recent
+[22m[39m[5616580e-fed2-4411-8666-8623fc269441] RateLimitError: Too many requests
+    at rateLimiter [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/middleware/rateLimiter.ts:27:10[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestId [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/middleware/requestId.ts:8:3[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9 {
+  statusCode: [33m429[39m,
+  code: [32m'RATE_LIMIT_EXCEEDED'[39m,
+  retryAfterSeconds: [33m30[39m
+}
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/tests/hidden/hidden.rate-limiter.test.ts[2m > [22mHidden: /health is exempt from rate limiting[2m > [22m/health returns 200 even after the rate limit is exhausted
+[31m[1mError[22m: read ECONNRESET[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
