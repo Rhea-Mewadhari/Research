@@ -1,0 +1,61 @@
+{
+  "investigations": {
+    "techStack": [
+      "Language: TypeScript ~6.0.2, Runtime: Node.js",
+      "Web framework: Express 5.2.1",
+      "Database: better-sqlite3 (^12.11.1) — raw parameterized SQL with ? placeholders, no ORM",
+      "Test framework: Vitest ^4.1.5 + Supertest ^7.2.2 for HTTP integration tests",
+      "Package manager: pnpm; dev server: tsx watch; build: tsc"
+    ],
+    "features": [
+      "getProducts() builds a conditions:string[] and params:Array<string|number> in parallel, joining with AND into a WHERE clause",
+      "Filters correctly pushed into conditions[]: search (LIKE on name), category (LOWER comparison), inStock (0/1 integer)",
+      "featured filter is NOT in conditions[]; instead applied in JS after pagination via Array.filter — this is Bug 2",
+      "COUNT query at lines 56-58 is SELECT COUNT(*) AS count FROM products with no WHERE clause — always returns 15 regardless of filters — this is Bug 1",
+      "totalPages calculated with Math.floor(total / limit) at line 76 — this is Bug 3; 15/10=1.5 floors to 1 instead of correct 2",
+      "pagination.test.ts asserts: totalPages=2 for 15 products/limit 10, totalPages=3 for 15 products/limit 5",
+      "products.test.ts asserts: category/inStock/search/sort filters; auth validation (Bearer token with even digit sum)",
+      "Must not regress: sort ordering, auth, pagination envelope shape (data, total, page, limit, totalPages), empty result 200 responses"
+    ],
+    "architecture": [
+      "Layer structure: productRoutes.ts → productController.ts → productService.ts → db/client.ts (better-sqlite3)",
+      "SQL built with db.prepare(SQL).all([...params]) or .get(params) — parameterized, injection-safe",
+      "WHERE built by pushing strings into conditions[] and values into params[], then: WHERE ${conditions.join(' AND ')}",
+      "When conditions[] is empty no WHERE clause is added (full table scan) — this must remain for the unfiltered case",
+      "COUNT fix must reuse the same conditions[] and params[] before the LIMIT/OFFSET params are appended",
+      "featured in ProductQuery is typed as boolean; SQLite stores it as INTEGER 0|1, so must convert: query.featured ? 1 : 0",
+      "PaginatedResult shape: { data: T[], total: number, page: number, limit: number, totalPages: number }",
+      "New featured SQL condition belongs in the same conditions[] block (lines 34-48) as the other filters"
+    ],
+    "edgeCases": [
+      "No filters: conditions[] is empty → COUNT query must omit WHERE clause and return full catalogue count (15); unfiltered baseline must not break",
+      "featured=false: must emit WHERE featured = 0 in SQL (not JS); queryParser already converts 'false' string to boolean false",
+      "featured=true: must emit WHERE featured = 1 in SQL; JS post-filter block (lines 67-69) must be removed entirely",
+      "Multiple filters combined (e.g. category + inStock): all conditions appear in both COUNT WHERE and SELECT WHERE automatically via shared conditions[]",
+      "Exact division (e.g. 4 electronics / limit 2 = 2.0): Math.ceil(2.0) = 2, correct; Math.ceil(3.0) = 3, also correct — no extra phantom page",
+      "total=0 (no products match): Math.ceil(0/limit) = 0 → totalPages=0; data=[] with 200 response",
+      "Page beyond last (offset > total): SQL returns data=[] but COUNT still returns correct filtered total and totalPages",
+      "Boolean-to-integer coercion for featured: use (query.featured ? 1 : 0) when pushing to params[]"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Req 1-3 & 4: COUNT(*) must include the same WHERE conditions as the main SELECT so that total reflects the filtered count, not the full catalogue",
+      "description": "In getProducts() in productService.ts, change the COUNT query (currently SELECT COUNT(*) AS count FROM products with no WHERE) to reuse the same conditions[] array and params[] values that are already built for the main SELECT. When conditions[] is non-empty, append WHERE ${conditions.join(' AND ')} to the COUNT query string and pass params as its arguments. When conditions[] is empty, the COUNT query remains unfiltered (full catalogue). The COUNT .get() call must receive the params array (without the limit/offset values appended for the main SELECT).",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Req 4: The featured filter must be applied as a SQL WHERE featured = ? condition before pagination, not in JavaScript after the paginated slice is returned",
+      "description": "In getProducts() in productService.ts, add an if block for query.featured (similar to the inStock block) that pushes 'featured = ?' into conditions[] and (query.featured ? 1 : 0) into params[]. This must be added in the filter-building section (alongside the other conditions) so it is included in both the COUNT query (task-1) and the main SELECT WHERE clause. After adding this, remove the post-pagination JS filter block that does: if (query.featured !== undefined) { data = data.filter(p => p.featured === query.featured) }.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Req 5 & 6: totalPages must be computed as Math.ceil(total / limit) so a non-zero remainder always adds one full page, while exact division remains correct",
+      "description": "In getProducts() in productService.ts, change the totalPages calculation from Math.floor(total / limit) to Math.ceil(total / limit). This single character change fixes the off-by-one for any filtered or unfiltered result set whose size is not evenly divisible by limit, while leaving exact-division cases unaffected (Math.ceil(3.0) === 3).",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}

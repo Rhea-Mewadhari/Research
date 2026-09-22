@@ -1,0 +1,135 @@
+{
+  "framework": "gsd",
+  "target": "backend",
+  "taskId": "task10",
+  "wall_duration_ms": 1355621,
+  "cost_usd": 3.7378573000000004,
+  "num_turns": 124,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "437dfbca-8312-4bf9-affc-a4af3dc3b648",
+  "gsd": {
+    "phases": [
+      {
+        "name": "new-project",
+        "treeHash": "8ab73dae63c5c68d392702850bc4f76364779018",
+        "label": "new-project",
+        "exit_code": 0,
+        "wall_duration_ms": 58120,
+        "cost_usd": 0.32602200000000003,
+        "num_turns": 13,
+        "session_id": "7940e067-62e7-4298-b29a-14de9e61b282",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "discuss-phase",
+        "treeHash": "5bb0f732a617eab7c34409db328e4edadb2d1149",
+        "label": "discuss-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 62636,
+        "cost_usd": 0.24601860000000003,
+        "num_turns": 8,
+        "session_id": "d80f2205-2384-40db-8969-e9771fadbc87",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "plan-phase",
+        "treeHash": "871585c76399aa3c1533b38d7344b74b105e8fdc",
+        "label": "plan-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 109945,
+        "cost_usd": 0.4033114,
+        "num_turns": 9,
+        "session_id": "ef5c8758-8f24-4b74-883c-2a1da366f1d0",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "2c225c2099d8427f14da5376f3a40e55f27f8985",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 57810,
+        "cost_usd": 0.23947289999999996,
+        "num_turns": 7,
+        "session_id": "47587395-7c97-420c-adb0-ca2895f84792",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "6543b0f4a26cd9b1d8916dc948567a0b85159708",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 174430,
+        "cost_usd": 0.47667119999999996,
+        "num_turns": 18,
+        "session_id": "bf5d8f10-49fb-44f2-8756-32899ae8591f",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "b97dc74b9575bff18e425790b6ec70cdd2e0dcea",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 281233,
+        "cost_usd": 0.38059770000000004,
+        "num_turns": 11,
+        "session_id": "a2b78f35-2e69-4455-b40d-bdea1e936711",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "76e638ca2e73714e077e245f2de4660ccd9f1a93",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 143192,
+        "cost_usd": 0.4362387000000001,
+        "num_turns": 15,
+        "session_id": "cc5c483e-e30a-42e0-97fc-0f71edcdba33",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "execute-phase",
+        "treeHash": "76e638ca2e73714e077e245f2de4660ccd9f1a93",
+        "label": "execute-phase",
+        "exit_code": 0,
+        "wall_duration_ms": 135203,
+        "cost_usd": 0.3665493,
+        "num_turns": 12,
+        "session_id": "605ca9c2-12f7-439c-bda7-5daaede2956d",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "name": "verify-work",
+        "treeHash": "7e955dae608a3d199ba7134d3582942a1077b1e6",
+        "label": "verify-work",
+        "exit_code": 0,
+        "wall_duration_ms": 297211,
+        "cost_usd": 0.8629755,
+        "num_turns": 31,
+        "session_id": "437dfbca-8312-4bf9-affc-a4af3dc3b648",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "passedFirstAttempt": false,
+    "reworkAttempts": 2,
+    "completed": false,
+    "failedAtPhase": "verify-work",
+    "failedCriteria": [
+      {
+        "id": "7",
+        "description": "Only src/benchmark-backend/src/services/productService.ts is modified; no other source file changes.",
+        "passed": false,
+        "evidence": "Verification method requires 'git diff --name-only lists only src/benchmark-backend/src/services/productService.ts'. Observed: 'git diff --name-only' returns empty output (working tree is clean). The repository has a single commit ('5c1e4bd sandbox: after execute-phase') that added all 241 files in one shot. There is no baseline commit to diff against, so git diff --name-only produces no output and cannot confirm that only productService.ts was changed relative to the original buggy state. The stated verification method cannot be satisfied in a single-commit repository."
+      }
+    ]
+  }
+}

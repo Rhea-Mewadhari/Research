@@ -1,0 +1,53 @@
+{
+  "passed": false,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products with a category filter must return total equal to the count of products matching that category, not the full catalogue count.",
+      "passed": true,
+      "evidence": "Inline vitest test 'Req1: category=electronics total===4' ran against the real SQLite test DB and passed: GET /products?category=electronics&limit=10 returned status 200 and res.body.total === 4. productService.ts:38-40 adds 'LOWER(category) = LOWER(?)' to conditions[], which is used in the COUNT(*) query at line 58-60, so total is filtered. Test result: ✓ src/tests/visible/verify_totals.test.ts > Requirement verification > Req1: category=electronics total===4."
+    },
+    {
+      "id": "2",
+      "description": "GET /products with an inStock filter must return total equal to the count of products matching the stock status.",
+      "passed": true,
+      "evidence": "Inline vitest test 'Req2: inStock=true limit=6 total===11 totalPages===2' passed: GET /products?inStock=true&limit=6 returned status 200, res.body.total === 11, res.body.totalPages === 2. productService.ts:42-44 adds 'in_stock = ?' to conditions[], applied to both COUNT(*) and SELECT. Pagination test 'returns totalPages: 2 for 15 products with limit 10' passed confirming unfiltered total === 15. Test result: ✓ verify_totals > Req2."
+    },
+    {
+      "id": "3",
+      "description": "GET /products with a search filter must return total equal to the count of products whose name matches the search term.",
+      "passed": true,
+      "evidence": "Inline vitest test 'Req3: search=laptop total matches only laptop products (not 15)' passed: GET /products?search=laptop&limit=50 returned status 200, res.body.total === res.body.data.length AND res.body.total < 15. productService.ts:34-37 adds 'LOWER(name) LIKE ?' to conditions[], applied to both COUNT(*) and SELECT. Test result: ✓ verify_totals > Req3."
+    },
+    {
+      "id": "4",
+      "description": "The featured filter must be applied as a SQL WHERE featured = ? condition before pagination; post-pagination JS filter block must be removed from productService.ts.",
+      "passed": true,
+      "evidence": "Inline vitest test 'Req4: featured=true limit=3 returns 3 featured items, total = featured product count' passed: GET /products?featured=true&limit=3 returned 3 items all with featured===true, and total matched the count from GET /products?featured=true&limit=50. productService.ts:46-49 shows conditions.push('featured = ?') applied before the COUNT(*) and SELECT queries. Full file inspection of productService.ts (109 lines) confirms NO post-pagination JS filter block exists — line 66 reads 'const data = rows.map(rowToProduct)' with no subsequent .filter() call for featured. Test result: ✓ verify_totals > Req4."
+    },
+    {
+      "id": "5",
+      "description": "totalPages must be computed as Math.ceil(total / limit) so that a non-zero remainder always adds one full page.",
+      "passed": true,
+      "evidence": "productService.ts:73 reads 'totalPages: Math.ceil(total / limit)'. Test 'Pagination — totalPages boundary > returns totalPages: 2 for 15 products with limit 10' passed (15/10=1.5 → ceil → 2). pnpm test verbose: ✓ src/tests/visible/pagination.test.ts > Pagination — totalPages boundary > returns totalPages: 2 for 15 products with limit 10. Inline test also confirmed inStock=true limit=6 returns totalPages: 2 (11/6=1.833 → ceil → 2)."
+    },
+    {
+      "id": "6",
+      "description": "Exact-division pagination must remain correct: when total is evenly divisible by limit, totalPages equals the quotient with no extra page.",
+      "passed": true,
+      "evidence": "Test 'Pagination — totalPages boundary > returns totalPages: 3 for 15 products with limit 5' passed (15/5=3.0 → ceil → 3, no extra page). pnpm test verbose: ✓ src/tests/visible/pagination.test.ts > Pagination — totalPages boundary > returns totalPages: 3 for 15 products with limit 5. Test Files: 2 passed, Tests: 21 passed, 0 failing."
+    },
+    {
+      "id": "7",
+      "description": "Only src/benchmark-backend/src/services/productService.ts is modified; no other source file changes.",
+      "passed": false,
+      "evidence": "Verification method requires 'git diff --name-only lists only src/benchmark-backend/src/services/productService.ts'. Observed: 'git diff --name-only' returns empty output (working tree is clean). The repository has a single commit ('5c1e4bd sandbox: after execute-phase') that added all 241 files in one shot. There is no baseline commit to diff against, so git diff --name-only produces no output and cannot confirm that only productService.ts was changed relative to the original buggy state. The stated verification method cannot be satisfied in a single-commit repository."
+    },
+    {
+      "id": "8",
+      "description": "All visible tests pass after the fix.",
+      "passed": true,
+      "evidence": "pnpm test run from src/benchmark-backend/: 'Test Files  2 passed (2)', 'Tests  21 passed (21)', exit code 0. All 21 tests passed across two files: pagination.test.ts (2 tests: totalPages:2 and totalPages:3) and products.test.ts (19 tests covering filters, sorting, pagination envelope, auth middleware). Earlier transient failure in verbose mode ('sorts by price descending') was a one-time flap — the test passed in two subsequent runs."
+    }
+  ]
+}
