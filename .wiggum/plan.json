@@ -1,0 +1,30 @@
+{
+  "taskId": "task10",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix featured filter: move from JS post-pagination to SQL WHERE clause",
+      "status": "done",
+      "notes": "Added featured = ? condition to SQL WHERE clause; removed JS post-filter. Build passes."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix total count: apply WHERE conditions to COUNT(*) query so it reflects active filters",
+      "status": "done",
+      "notes": "Passed the same WHERE clause and params into COUNT(*) query. Build passes; 20/21 tests pass (remaining failure is totalPages/Phase 3 bug)."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix totalPages formula: replace Math.floor with Math.ceil",
+      "status": "done",
+      "notes": "Replaced Math.floor with Math.ceil in productService.ts line 73. All 21 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests to verify all three fixes pass",
+      "status": "done",
+      "notes": "All 21 tests pass, build clean (tsc -p tsconfig.build.json exits 0)."
+    }
+  ]
+}
