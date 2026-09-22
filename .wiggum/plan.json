@@ -1,0 +1,30 @@
+{
+  "taskId": "task9",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Enable SQLite foreign key enforcement in db/client.ts",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix addFavourite: reject non-existent productId (ProductNotFoundError) and make insert atomic (INSERT OR IGNORE)",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix removeFavourite: change result.changes > -1 to result.changes > 0 so missing rows return false",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Run pnpm test to verify all three bugs are fixed and visible tests pass",
+      "status": "done",
+      "notes": "23/23 tests passed, build succeeded with no errors"
+    }
+  ]
+}

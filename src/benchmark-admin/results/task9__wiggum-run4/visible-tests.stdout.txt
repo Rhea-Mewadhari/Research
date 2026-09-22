@@ -1,0 +1,78 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.8 [39m[90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend[39m
+
+[90mstdout[2m | src/tests/visible/favourites.test.ts
+[22m[39m  migration applied: 001_products.sql
+  migration applied: 002_favourites.sql
+  migration applied: 003_featured.sql
+
+[90mstdout[2m | src/tests/visible/products.test.ts
+[22m[39m  migration applied: 001_products.sql
+  migration applied: 002_favourites.sql
+  migration applied: 003_featured.sql
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns all products with pagination envelope
+[22m[39m[AUTH] 2026-09-22T07:45:21.354Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters by category
+[22m[39m[AUTH] 2026-09-22T07:45:21.359Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns empty array for unknown category
+[22m[39m[AUTH] 2026-09-22T07:45:21.361Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters in-stock products
+[22m[39m[AUTH] 2026-09-22T07:45:21.362Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters out-of-stock products
+[22m[39m[AUTH] 2026-09-22T07:45:21.364Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by price ascending
+[22m[39m[AUTH] 2026-09-22T07:45:21.365Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by price descending
+[22m[39m[AUTH] 2026-09-22T07:45:21.367Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by name ascending
+[22m[39m[AUTH] 2026-09-22T07:45:21.368Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2msorts by name descending
+[22m[39m[AUTH] 2026-09-22T07:45:21.369Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mfilters by search term
+[22m[39m[AUTH] 2026-09-22T07:45:21.371Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns empty data array when search matches nothing
+[22m[39m[AUTH] 2026-09-22T07:45:21.372Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mGET /products[2m > [22m[2mreturns 401 without auth header
+[22m[39m[AUTH] 2026-09-22T07:45:21.373Z ip=::ffff:127.0.0.1 token=(none)… result=rejected
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mreturns correct envelope shape for first page
+[22m[39m[AUTH] 2026-09-22T07:45:21.374Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mreturns a different set of products for page 2
+[22m[39m[AUTH] 2026-09-22T07:45:21.375Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mreturns a different set of products for page 2
+[22m[39m[AUTH] 2026-09-22T07:45:21.376Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mPagination[2m > [22m[2mclamps limit to a maximum of 50
+[22m[39m[AUTH] 2026-09-22T07:45:21.377Z ip=::ffff:127.0.0.1 token=benchmar… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mAuth middleware[2m > [22m[2mrejects a token whose digits sum to an odd number
+[22m[39m[AUTH] 2026-09-22T07:45:21.378Z ip=::ffff:127.0.0.1 token=invalid-… result=rejected
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mAuth middleware[2m > [22m[2maccepts any token whose digits sum to an even number
+[22m[39m[AUTH] 2026-09-22T07:45:21.379Z ip=::ffff:127.0.0.1 token=custom-t… result=accepted
+
+[90mstdout[2m | src/tests/visible/products.test.ts[2m > [22m[2mAuth middleware[2m > [22m[2mrejects a request with no Bearer prefix
+[22m[39m[AUTH] 2026-09-22T07:45:21.380Z ip=::ffff:127.0.0.1 token=(none)… result=rejected
+
+ [32m✓[39m src/tests/visible/products.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m src/tests/visible/favourites.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 70[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m23 passed[39m[22m[90m (23)[39m
+[2m   Start at [22m 09:45:19
+[2m   Duration [22m 1.82s[2m (transform 196ms, setup 206ms, import 2.87s, tests 105ms, environment 0ms)[22m
+

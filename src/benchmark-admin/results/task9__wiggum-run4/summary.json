@@ -1,0 +1,130 @@
+{
+  "taskId": "task9",
+  "runId": "wiggum-run4",
+  "timestamp": "2026-09-22T07:45:18.146Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 23,
+    "failed": 0,
+    "total": 23
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 3270,
+    "hiddenMs": 674,
+    "buildMs": 761,
+    "totalMs": 4810
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 1,
+    "overallScore": 1
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "backend",
+    "taskId": "task9",
+    "wall_duration_ms": 307104,
+    "cost_usd": 1.6104576,
+    "num_turns": 70,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "69b4cc22-ae6c-4767-b7de-17c341166f6f",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Enable SQLite foreign key enforcement in db/client.ts",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Fix addFavourite: reject non-existent productId (ProductNotFoundError) and make insert atomic (INSERT OR IGNORE)",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Fix removeFavourite: change result.changes > -1 to result.changes > 0 so missing rows return false",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-4",
+          "title": "Run pnpm test to verify all three bugs are fixed and visible tests pass",
+          "status": "done",
+          "notes": "23/23 tests passed, build succeeded with no errors"
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 42496,
+          "cost_usd": 0.2766114,
+          "num_turns": 14,
+          "session_id": "7fd1b9fc-c0c6-481d-983a-6c64a0d83fdd",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 83934,
+          "cost_usd": 0.4937093999999999,
+          "num_turns": 21,
+          "session_id": "1202d5d9-a902-49cf-b2b6-570daaa7cfb7",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 41926,
+          "cost_usd": 0.2965599,
+          "num_turns": 12,
+          "session_id": "e3a0e1e8-2971-4e0e-ae7e-4110d55ab2ae",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 26842,
+          "cost_usd": 0.21092790000000003,
+          "num_turns": 8,
+          "session_id": "69b4cc22-ae6c-4767-b7de-17c341166f6f",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
