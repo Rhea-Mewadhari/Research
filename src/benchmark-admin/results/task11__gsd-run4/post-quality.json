@@ -1,0 +1,949 @@
+{
+  "meta": {
+    "target": "backend",
+    "generatedAt": "2026-09-22T16:57:19.013Z",
+    "srcDir": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src"
+  },
+  "complexity": {
+    "error": null,
+    "cognitiveComplexityTotal": 77,
+    "functionsOverThreshold": 25,
+    "maxNestingDepth": 2,
+    "functionsTooLong": 69,
+    "findings": [
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/app.ts",
+        "line": 18,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/app.ts",
+        "line": 26,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/compareController.ts",
+        "line": 4,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/compareController.ts",
+        "line": 4,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/compareController.ts",
+        "line": 6,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouriteController.ts",
+        "line": 8,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouriteController.ts",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouriteController.ts",
+        "line": 13,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouriteController.ts",
+        "line": 15,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouriteController.ts",
+        "line": 23,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouriteController.ts",
+        "line": 23,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouriteController.ts",
+        "line": 27,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouritesController.ts",
+        "line": 4,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouritesController.ts",
+        "line": 4,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouritesController.ts",
+        "line": 6,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/favouritesController.ts",
+        "line": 14,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 7,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 13,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 3
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 16,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 21,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 28,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 28,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 31,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 38,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 38,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 4
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 42,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 43,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 44,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/controllers/productController.ts",
+        "line": 48,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/migrate.ts",
+        "line": 8,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/migrate.ts",
+        "line": 8,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 3
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/migrate.ts",
+        "line": 15,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/migrate.ts",
+        "line": 18,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/migrate.ts",
+        "line": 19,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 39,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 46,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 46,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 47,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 51,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 52,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 52,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 68,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 68,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 70,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 73,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 73,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 92,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 92,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 3
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 96,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/db/seed.ts",
+        "line": 98,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/errors/index.ts",
+        "line": 5,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/errors/index.ts",
+        "line": 16,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/errors/index.ts",
+        "line": 23,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/errors/index.ts",
+        "line": 31,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/errors/index.ts",
+        "line": 38,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/errors/index.ts",
+        "line": 46,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 8,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 11,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 11,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 12,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 16,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 20,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 20,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 4
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 29,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 32,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/auth.ts",
+        "line": 38,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/errorHandler.ts",
+        "line": 4,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/errorHandler.ts",
+        "line": 4,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 8
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/errorHandler.ts",
+        "line": 13,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/errorHandler.ts",
+        "line": 19,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/rateLimiter.ts",
+        "line": 9,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/rateLimiter.ts",
+        "line": 13,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/rateLimiter.ts",
+        "line": 13,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/rateLimiter.ts",
+        "line": 14,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/rateLimiter.ts",
+        "line": 23,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/rateLimiter.ts",
+        "line": 25,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/requestId.ts",
+        "line": 4,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/validate.ts",
+        "line": 11,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/validate.ts",
+        "line": 12,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/validate.ts",
+        "line": 12,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/validate.ts",
+        "line": 23,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/validate.ts",
+        "line": 24,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/middleware/validate.ts",
+        "line": 24,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/schemas/productSchema.ts",
+        "line": 20,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/schemas/productSchema.ts",
+        "line": 20,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/server.ts",
+        "line": 7,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/server.ts",
+        "line": 10,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 5,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 23,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 23,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 6
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 24,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 27,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 31,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 35,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 40,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 43,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/compareService.ts",
+        "line": 45,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/dataFetcher.ts",
+        "line": 4,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/dataFetcher.ts",
+        "line": 22,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 6,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 14,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 18,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 18,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 4
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 19,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 22,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 32,
+        "rule": "max-depth",
+        "value": 2
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 37,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 44,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/favouritesService.ts",
+        "line": 48,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 4,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 30,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 30,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 10
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 34,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 38,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 42,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 46,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 75,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 75,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 82,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 82,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 83,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 84,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 88,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 90,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 91,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/services/productService.ts",
+        "line": 95,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/utils/queryParser.ts",
+        "line": 5,
+        "rule": "max-lines-per-function",
+        "value": null
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/utils/queryParser.ts",
+        "line": 5,
+        "rule": "sonarjs/cognitive-complexity",
+        "value": 11
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/utils/queryParser.ts",
+        "line": 8,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/utils/queryParser.ts",
+        "line": 12,
+        "rule": "max-depth",
+        "value": 1
+      },
+      {
+        "file": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/src/utils/queryParser.ts",
+        "line": 16,
+        "rule": "max-depth",
+        "value": 1
+      }
+    ]
+  },
+  "typeDiscipline": {
+    "error": null,
+    "typeErrorCount": 0,
+    "anyUsageCount": 0,
+    "nonNullAssertionCount": 0,
+    "tsIgnoreCount": 0
+  },
+  "coupling": {
+    "error": null,
+    "circularDependencyCount": 0,
+    "circularPaths": [],
+    "crossModuleImportCount": 54,
+    "layerViolationCount": 0,
+    "layerViolations": []
+  },
+  "duplication": {
+    "error": null,
+    "duplicateBlockCount": 16,
+    "duplicatedLines": 113,
+    "duplicatedTokens": 1177,
+    "findings": [
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "tests/visible/userProfile.test.ts",
+        "secondFile": "tests/visible/userProfile.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "tests/visible/userProfile.test.ts",
+        "secondFile": "tests/visible/userProfile.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "tests/visible/userProfile.test.ts",
+        "secondFile": "tests/visible/userProfile.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "tests/visible/userProfile.test.ts",
+        "secondFile": "tests/visible/userProfile.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "tests/visible/userProfile.test.ts",
+        "secondFile": "tests/visible/userProfile.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "tests/visible/products.test.ts",
+        "secondFile": "tests/visible/userProfile.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 6,
+        "tokens": 0,
+        "firstFile": "tests/visible/products.test.ts",
+        "secondFile": "tests/visible/products.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 6,
+        "tokens": 0,
+        "firstFile": "tests/visible/compare.test.ts",
+        "secondFile": "tests/visible/middleware.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 9,
+        "tokens": 0,
+        "firstFile": "tests/visible/auth.test.ts",
+        "secondFile": "tests/visible/userProfile.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 6,
+        "tokens": 0,
+        "firstFile": "tests/visible/auth.test.ts",
+        "secondFile": "tests/visible/auth.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 6,
+        "tokens": 0,
+        "firstFile": "tests/visible/auth.test.ts",
+        "secondFile": "tests/visible/auth.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "tests/visible/auth.test.ts",
+        "secondFile": "tests/visible/auth.test.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 13,
+        "tokens": 0,
+        "firstFile": "services/dataFetcher.ts",
+        "secondFile": "services/productService.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 7,
+        "tokens": 0,
+        "firstFile": "services/dataFetcher.ts",
+        "secondFile": "services/productService.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 21,
+        "tokens": 0,
+        "firstFile": "services/compareService.ts",
+        "secondFile": "services/productService.ts"
+      },
+      {
+        "format": "typescript",
+        "lines": 6,
+        "tokens": 0,
+        "firstFile": "services/compareService.ts",
+        "secondFile": "services/productService.ts"
+      }
+    ]
+  },
+  "security": {
+    "error": null,
+    "totalFindingCount": 0,
+    "bySeverity": {},
+    "findings": []
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "On every request for a given IP, timestamps older than 60,000 ms must be removed from the in-memory store before the request count is evaluated or a new timestamp is appended. Any entry where `now - timestamp >= WINDOW_MS` must be filtered out.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 23: `const active = timestamps.filter(ts => now - ts < WINDOW_MS);` — keeps only entries where `now - ts < WINDOW_MS`, discarding any where `now - ts >= WINDOW_MS`. This filtered `active` array is used for both the count check (line 25) and the push (line 31), before `store.set`. `pnpm test` ran 21 tests across 2 test files, all passed (exit 0)."
+    },
+    {
+      "id": "2",
+      "description": "When the rate limit is exceeded, the `Retry-After` response header must carry Math.ceil((oldestTimestamp + WINDOW_MS - now) / 1000), where oldestTimestamp is the earliest entry in the already-pruned in-window array. The literal value `60` must not appear as the argument passed to `RateLimitError`.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 26: `const retryAfter = Math.ceil((active[0] + WINDOW_MS - now) / 1000);` — `active[0]` is the oldest entry in the pruned array. Line 27: `next(new RateLimitError(retryAfter));` passes the computed variable, not the literal `60`. No hardcoded `60` appears anywhere in the rate-limit logic. `pnpm test` ran 21 tests, all passed (exit 0)."
+    },
+    {
+      "id": "3",
+      "description": "When `req.path` equals `'/health'` (with leading slash), the middleware must call `next()` immediately and skip all rate-limit logic. The string literal used in the comparison must be `'/health'`, not `'health'`.",
+      "passed": true,
+      "evidence": "rateLimiter.ts lines 14-17: `if (req.path === '/health') { next(); return; }` — exact string comparison with `'/health'` (with leading slash), placed before any rate-limit logic. `pnpm test` ran 21 tests, all passed (exit 0)."
+    }
+  ]
+}

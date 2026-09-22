@@ -1,0 +1,54 @@
+{
+  "investigations": {
+    "techStack": [
+      "Runtime: Node.js ESM, TypeScript ~6.0.2 via tsx; Express v5",
+      "Test runner: Vitest v4 + supertest; Vitest globals in scope (no explicit imports needed)",
+      "RateLimitError(retryAfterSeconds: number) — single constructor arg; sets retryAfterSeconds property read by errorHandler for Retry-After header",
+      "verbatimModuleSyntax: true — type-only imports must use 'import type'",
+      "noUnusedLocals/Parameters: true — any introduced but unused variable will cause a type error",
+      "Math.ceil is the correct rounding for Retry-After per requirement 2"
+    ],
+    "features": [
+      "rateLimiter is applied app-level in app.ts before all routes — a single app.use(rateLimiter)",
+      "GET /health defined in app.ts returns { status: 'ok' }; currently incorrectly rate-limited due to Bug 3",
+      "errorHandler handles RateLimitError specially: sets Retry-After header to err.retryAfterSeconds, sends 429 — shape must stay compatible",
+      "requireAuth middleware has its own independent per-IP auth-failure limiter — must not be affected",
+      "Module-scoped store Map<string, number[]> is shared across all requests; no reset mechanism exists"
+    ],
+    "architecture": [
+      "Only src/benchmark-backend/src/middleware/rateLimiter.ts needs to change — all three bugs are in this one file",
+      "src/errors/index.ts: no changes needed — RateLimitError is already correct",
+      "src/middleware/errorHandler.ts: no changes needed — already reads err.retryAfterSeconds for Retry-After header",
+      "src/app.ts: no changes needed — wiring is correct (app-level, correct order)",
+      "Current buggy rateLimiter flow: (1) path check against 'health' (missing slash), (2) get timestamps with no pruning, (3) if length >= 10 call next(new RateLimitError(60)) with hardcoded 60, (4) else push now and call next()"
+    ],
+    "edgeCases": [
+      "Timestamp at exact boundary (now - ts === WINDOW_MS): must be pruned — requires >= in filter condition, not >",
+      "Empty store entry for new IP: filter on empty array is a no-op, count is 0, proceeds normally — no special case needed",
+      "Retry-After near start of window (oldest ts ~0 s ago): result ~60 s — Math.ceil((ts + 60000 - now) / 1000)",
+      "Retry-After near end of window (oldest ts ~59 s ago): result ~1 s — Math.ceil covers sub-second remainders",
+      "GET /health?foo=bar: req.path excludes query string so '/health' still matches — no extra handling needed",
+      "/api/health, /healthz, /healthcheck: must remain rate-limited — exact equality check against '/health' ensures this"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "3 — req.path === '/health' guard must use the literal '/health' with a leading slash",
+      "description": "In rateLimiter(), change the health-check path comparison from `req.path === 'health'` to `req.path === '/health'` so the /health endpoint is correctly exempted from rate limiting",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "1 — expired timestamps (now - timestamp >= WINDOW_MS) must be removed before the request count is evaluated or a new timestamp is appended",
+      "description": "In rateLimiter(), after retrieving the timestamps array from the store, add a filter step: `const active = timestamps.filter(ts => now - ts < WINDOW_MS);` and use `active` in place of `timestamps` for the length check and the push, then store `active` back with the new timestamp appended",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "2 — Retry-After must be Math.ceil((oldestTimestamp + WINDOW_MS - now) / 1000) using the earliest entry in the pruned in-window array; the literal value 60 must not be passed to RateLimitError",
+      "description": "In rateLimiter(), when the rate limit is exceeded, compute `const retryAfter = Math.ceil((active[0] + WINDOW_MS - now) / 1000);` using the already-pruned active array (task-2 must be applied first so active[0] is the oldest in-window timestamp), then pass that computed value to `new RateLimitError(retryAfter)`",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    }
+  ]
+}
