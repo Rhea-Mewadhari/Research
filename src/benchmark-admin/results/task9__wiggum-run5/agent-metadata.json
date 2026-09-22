@@ -1,0 +1,105 @@
+{
+  "framework": "wiggum",
+  "target": "backend",
+  "taskId": "task9",
+  "wall_duration_ms": 342703,
+  "cost_usd": 1.5341448,
+  "num_turns": 62,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "38a981fe-138c-4d6c-85d2-69f3a83f719c",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix removeFavourite return value (changes > -1 → changes > 0)",
+        "status": "done",
+        "notes": "In src/services/favouritesService.ts, removeFavourite returns `result.changes > -1` which is always true because changes is always >= 0. Change to `result.changes > 0` so the function correctly returns false when no row was deleted. The controller (favouriteController.ts) already checks this value and returns 404 when false — no controller changes needed."
+      },
+      {
+        "id": "phase-2",
+        "title": "Enable SQLite FK constraints in db/client.ts",
+        "status": "done",
+        "notes": "SQLite does not enforce foreign key constraints by default. Add `db.pragma('foreign_keys = ON')` to src/db/client.ts after the WAL pragma. The favourites table has `product_id TEXT NOT NULL REFERENCES products(id)` — enabling FK enforcement ensures DB-level integrity on top of the service-level check added in phase-3."
+      },
+      {
+        "id": "phase-3",
+        "title": "Add product existence check in addFavourite to return 404 for unknown productId",
+        "status": "done",
+        "notes": "Added a SELECT against the products table at the start of addFavourite. If no row is found, throws ProductNotFoundError (imported from src/errors/index.ts). The check runs before the try/catch block so the error propagates correctly. All 23 tests pass and build succeeds."
+      },
+      {
+        "id": "phase-4",
+        "title": "Make addFavourite insert atomic using INSERT OR IGNORE",
+        "status": "done",
+        "notes": "The current addFavourite does a SELECT then INSERT — these are two separate statements, creating a TOCTOU race that can insert duplicate rows under concurrent access. The schema already has UNIQUE(product_id), so replace the SELECT+INSERT pair with a single `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)`. After the insert, use the changes count to determine if a row was created (created: changes === 1) or already existed (created: false). Then do one SELECT to return the row. This removes the race window."
+      },
+      {
+        "id": "phase-5",
+        "title": "Verify all visible tests pass",
+        "status": "done",
+        "notes": "All 23 tests pass (2 test files). Build also succeeds cleanly. Confirmed: pnpm test → 23 passed, pnpm run build → no errors."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 38628,
+        "cost_usd": 0.2394348,
+        "num_turns": 8,
+        "session_id": "d3d177f4-f6d3-4daf-b0a0-344410114a31",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 45792,
+        "cost_usd": 0.22654049999999998,
+        "num_turns": 9,
+        "session_id": "33c411d8-2d25-49c5-9c93-0177a74610c1",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 3,
+        "label": "iter3",
+        "exit_code": 0,
+        "wall_duration_ms": 55283,
+        "cost_usd": 0.2630067,
+        "num_turns": 11,
+        "session_id": "6903cfff-5a70-4ada-a921-561f8e97b05e",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 4,
+        "label": "iter4",
+        "exit_code": 0,
+        "wall_duration_ms": 45668,
+        "cost_usd": 0.228651,
+        "num_turns": 8,
+        "session_id": "85176f35-b5ba-4624-bfac-53d4dffddf82",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 5,
+        "label": "iter5",
+        "exit_code": 0,
+        "wall_duration_ms": 43237,
+        "cost_usd": 0.2385837,
+        "num_turns": 12,
+        "session_id": "38a981fe-138c-4d6c-85d2-69f3a83f719c",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 5,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "taskId": "task9",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix removeFavourite return value (changes > -1 → changes > 0)",
+      "status": "done",
+      "notes": "In src/services/favouritesService.ts, removeFavourite returns `result.changes > -1` which is always true because changes is always >= 0. Change to `result.changes > 0` so the function correctly returns false when no row was deleted. The controller (favouriteController.ts) already checks this value and returns 404 when false — no controller changes needed."
+    },
+    {
+      "id": "phase-2",
+      "title": "Enable SQLite FK constraints in db/client.ts",
+      "status": "done",
+      "notes": "SQLite does not enforce foreign key constraints by default. Add `db.pragma('foreign_keys = ON')` to src/db/client.ts after the WAL pragma. The favourites table has `product_id TEXT NOT NULL REFERENCES products(id)` — enabling FK enforcement ensures DB-level integrity on top of the service-level check added in phase-3."
+    },
+    {
+      "id": "phase-3",
+      "title": "Add product existence check in addFavourite to return 404 for unknown productId",
+      "status": "done",
+      "notes": "Added a SELECT against the products table at the start of addFavourite. If no row is found, throws ProductNotFoundError (imported from src/errors/index.ts). The check runs before the try/catch block so the error propagates correctly. All 23 tests pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Make addFavourite insert atomic using INSERT OR IGNORE",
+      "status": "done",
+      "notes": "The current addFavourite does a SELECT then INSERT — these are two separate statements, creating a TOCTOU race that can insert duplicate rows under concurrent access. The schema already has UNIQUE(product_id), so replace the SELECT+INSERT pair with a single `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)`. After the insert, use the changes count to determine if a row was created (created: changes === 1) or already existed (created: false). Then do one SELECT to return the row. This removes the race window."
+    },
+    {
+      "id": "phase-5",
+      "title": "Verify all visible tests pass",
+      "status": "done",
+      "notes": "All 23 tests pass (2 test files). Build also succeeds cleanly. Confirmed: pnpm test → 23 passed, pnpm run build → no errors."
+    }
+  ]
+}
