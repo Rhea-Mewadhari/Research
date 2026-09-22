@@ -1,0 +1,36 @@
+{
+  "taskId": "task9",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Enable SQLite FK enforcement in db/client.ts",
+      "status": "done",
+      "notes": "Add `db.pragma('foreign_keys = ON')` to src/benchmark-backend/src/db/client.ts after the WAL pragma. This activates the REFERENCES constraint declared on favourites.product_id so the DB will reject inserts referencing non-existent products."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix addFavourite to return 404 for non-existent productId",
+      "status": "done",
+      "notes": "Added SELECT 1 FROM products WHERE id = ? check before the insert. Imported AppError and ProductNotFoundError from '../errors'. Added `if (err instanceof AppError) throw err` in the catch block so ProductNotFoundError is not swallowed into DatabaseError. All 23 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-3",
+      "title": "Make addFavourite insert atomic using INSERT OR IGNORE",
+      "status": "done",
+      "notes": "Replaced the SELECT-then-INSERT pattern with a single atomic `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)`. `created` is now determined from `result.changes === 1`. Then fetches the row with SELECT. All 23 tests pass, build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Fix removeFavourite to correctly return false when no row deleted",
+      "status": "done",
+      "notes": "In src/benchmark-backend/src/services/favouritesService.ts, change `result.changes > -1` to `result.changes > 0`. The current condition is always true because changes is never negative; fixing it lets the controller's `if (!removed)` branch fire and return 404 when no favourite existed."
+    },
+    {
+      "id": "phase-5",
+      "title": "Run tests and verify all success criteria",
+      "status": "done",
+      "notes": "All 23 tests pass (2 test files). Build succeeds via `tsc -p tsconfig.build.json`. The prior phases implemented: (1) FK enforcement so non-existent productId → 404, (2) INSERT OR IGNORE so duplicate inserts produce one row, (3) `result.changes > 0` fix so DELETE of non-existent favourite → 404."
+    }
+  ]
+}
