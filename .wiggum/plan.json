@@ -1,0 +1,30 @@
+{
+  "taskId": "task10",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Move featured filter into SQL WHERE clause",
+      "status": "done",
+      "notes": "Added `if (query.featured !== undefined)` block pushing 'featured = ?' and (query.featured ? 1 : 0) into conditions/params before the where string is built. Removed the post-pagination JS filter block. After this fix, 20/21 visible tests pass; only the Math.floor totalPages test still fails."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix COUNT(*) to use the WHERE clause",
+      "status": "done",
+      "notes": "Changed COUNT query to include ${where} template and pass params to .get(). Total now reflects filtered dataset. 20/21 tests pass; only the Math.floor totalPages test still fails (phase-3)."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix totalPages formula to use Math.ceil",
+      "status": "done",
+      "notes": "Changed Math.floor(total / limit) to Math.ceil(total / limit) on line 73 of productService.ts. All 21 tests now pass and build succeeds."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify success criteria",
+      "status": "done",
+      "notes": "Ran `pnpm test` in src/benchmark-backend — 21/21 tests passed (2 test files). Build also succeeded (`pnpm run build` with no errors). All three success criteria are satisfied by the previous phases."
+    }
+  ]
+}
