@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "POST /api/favourites with a productId not present in the products table must return HTTP 404 with a JSON body containing an error field.",
+      "passed": true,
+      "evidence": "favouritesService.ts::addFavourite contains: `const product = db.prepare('SELECT 1 FROM products WHERE id = ?').get(productId); if (!product) { throw new ProductNotFoundError(productId); }` — ProductNotFoundError carries a 404 statusCode and propagates via next(err) through the error handler. All 23 tests passed (including hidden-suite path via supertest); no test failures observed."
+    },
+    {
+      "id": "2",
+      "description": "Calling POST /api/favourites twice with the same productId must result in exactly one row in the favourites table (idempotent insert), with the second call returning HTTP 200.",
+      "passed": true,
+      "evidence": "Visible test 'POST /api/favourites with the same productId is idempotent and returns 200' passed (✓ src/tests/visible/favourites.test.ts > Favourites API — happy path > POST /api/favourites with the same productId is idempotent and returns 200 1ms). favouritesService.ts uses `INSERT OR IGNORE INTO favourites (id, product_id) VALUES (?, ?)` — confirmed atomic single-statement pattern."
+    },
+    {
+      "id": "3",
+      "description": "DELETE /api/favourites/:productId for a productId with no row in the favourites table must return HTTP 404 with a JSON body containing an error field.",
+      "passed": true,
+      "evidence": "favouritesService.ts::removeFavourite returns `result.changes > 0` — when result.changes === 0 (no row found), returns false, causing the controller to return 404 with an error body. Guard is `result.changes > 0` (not `result.changes > -1`), confirmed by file inspection."
+    },
+    {
+      "id": "4",
+      "description": "All visible tests in src/benchmark-backend/src/tests/visible/favourites.test.ts pass without modification.",
+      "passed": true,
+      "evidence": "pnpm test (vitest run) exited code 0. All 4 tests in 'Favourites API — happy path' passed: ✓ POST /api/favourites with a valid productId returns 201 with the favourite (13ms), ✓ GET /api/favourites includes the added favourite (2ms), ✓ POST /api/favourites with the same productId is idempotent and returns 200 (1ms), ✓ DELETE /api/favourites/:productId removes the favourite and returns 204 (1ms). Total: 2 test files, 23 tests, all passed."
+    },
+    {
+      "id": "5",
+      "description": "SQLite foreign-key constraints are enforced at the DB client level so that the schema-level REFERENCES products(id) on favourites.product_id is active.",
+      "passed": true,
+      "evidence": "src/benchmark-backend/src/db/client.ts contains exactly: `db.pragma('foreign_keys = ON');` — confirmed by direct file read. The line appears after `db.pragma('journal_mode = WAL');`."
+    },
+    {
+      "id": "6",
+      "description": "The files src/benchmark-backend/src/controllers/favouriteController.ts, src/benchmark-backend/src/routes/favouriteRoutes.ts, and all files under src/benchmark-backend/src/db/migrations/ are not modified.",
+      "passed": true,
+      "evidence": "git diff --name-only HEAD -- 'src/benchmark-backend/src/controllers/favouriteController.ts' 'src/benchmark-backend/src/routes/favouriteRoutes.ts' 'src/benchmark-backend/src/db/migrations/' produced no output — none of those paths appear in the diff."
+    }
+  ]
+}

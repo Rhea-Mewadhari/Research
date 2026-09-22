@@ -1,0 +1,66 @@
+{
+  "investigations": {
+    "techStack": [
+      "Package manager: pnpm",
+      "TypeScript ~6.0.2, target ES2023; Node types @25",
+      "Database: better-sqlite3 v12.11.1 (synchronous, single-threaded)",
+      "HTTP framework: Express v5.2.1",
+      "Test framework: Vitest v4.1.5 + supertest v7.2.2",
+      "DB client is a module-level singleton exported from src/db/client.ts; only 'journal_mode = WAL' pragma is set — 'foreign_keys' is absent",
+      "Custom error hierarchy: AppError (base) → ProductNotFoundError (404), DatabaseError (500), ValidationError (400), AuthError (401), RateLimitError (429) — all in src/errors/index.ts",
+      "Error middleware maps AppError subclasses to their statusCode; does NOT inspect SqliteError codes — no FK-violation → 404 mapping exists"
+    ],
+    "features": [
+      "favouritesService.ts::addFavourite: SELECT-then-INSERT pattern (non-atomic TOCTOU race); try/catch wraps everything and rethrows as DatabaseError",
+      "favouritesService.ts::removeFavourite: runs DELETE, returns result.changes > -1 (always true — bug)",
+      "favouriteController.ts::add: try/catch → next(err) for errors; uses { favourite, created } return value to send 201 (created) or 200 (already exists) — cannot be modified",
+      "favouriteController.ts::remove: no try/catch; checks boolean return — if falsy, returns 404 { error: 'Favourite not found' } — cannot be modified",
+      "Schema (002_favourites.sql): UNIQUE(product_id) and REFERENCES products(id) ON DELETE CASCADE — do not modify",
+      "Visible tests (4 cases): POST valid → 201, GET → 200 with item, POST duplicate → 200, DELETE → 204; no visible test for 404 paths (those are hidden)"
+    ],
+    "architecture": [
+      "Layering: routes → controllers → services → db singleton (no repository layer)",
+      "New existence check belongs in favouritesService.ts::addFavourite, before the INSERT — throw new ProductNotFoundError(productId) on miss",
+      "ProductNotFoundError is already defined with statusCode 404; error handler will return HTTP 404 automatically when it propagates via next(err)",
+      "The service may query products directly via db.prepare('SELECT 1 FROM products WHERE id = ?').get(productId) — no need to import productService",
+      "INSERT OR IGNORE is atomic under the existing UNIQUE(product_id) constraint; follow with a SELECT to retrieve the row and set created = (changes === 1)",
+      "FK pragma goes in client.ts immediately after the WAL pragma — one line, same pattern"
+    ],
+    "edgeCases": [
+      "POST with nonexistent productId: explicit existence check throws ProductNotFoundError → error handler returns 404 with { error, code, requestId }; FK pragma alone would not suffice because DatabaseError wraps FK violations at 500",
+      "POST duplicate productId: INSERT OR IGNORE silently succeeds (0 changes); subsequent SELECT returns existing row; created = false → controller returns 200",
+      "DELETE for productId never added: result.changes === 0; removeFavourite returns false; controller returns 404",
+      "DELETE for productId added-then-removed: same as above",
+      "POST with missing/invalid body: caught by existing validate(addFavouriteSchema) middleware before reaching the service — pre-existing behaviour must not regress",
+      "Concurrent POST race: INSERT OR IGNORE is atomic under SQLite's single-writer model; only one insert wins, the other gets changes=0 and returns 200 — no duplicate rows possible",
+      "Product deleted between existence check and INSERT: FK constraint fires (now that FK pragma is ON); caught by try/catch in addFavourite and rethrown as DatabaseError (500) — acceptable; not a stated requirement",
+      "addFavourite must still return { favourite, created } shape — controller depends on this; cannot change controller"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 5: SQLite foreign-key constraints must be enforced at the DB client level — db.pragma('foreign_keys = ON') must appear in client.ts",
+      "description": "Add db.pragma('foreign_keys = ON') in src/db/client.ts immediately after the existing db.pragma('journal_mode = WAL') line. This activates the REFERENCES products(id) FK constraint on the favourites table for the lifetime of the connection.",
+      "files": ["src/benchmark-backend/src/db/client.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 1: POST /api/favourites with a productId not in products must return HTTP 404 with a JSON body containing an error field",
+      "description": "In favouritesService.ts::addFavourite, add an explicit product existence check before the INSERT: run db.prepare('SELECT 1 FROM products WHERE id = ?').get(productId) and, if null, throw new ProductNotFoundError(productId). This ensures a 404 AppError propagates via next(err) through the error handler — the FK pragma alone would produce a 500 DatabaseError, not 404.",
+      "files": ["src/benchmark-backend/src/services/favouritesService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 2: Calling POST /api/favourites twice with the same productId must result in exactly one row (idempotent insert); second call returns HTTP 200",
+      "description": "Replace the non-atomic SELECT + INSERT in favouritesService.ts::addFavourite with a single atomic INSERT OR IGNORE INTO favourites ... statement, then SELECT the row. Set created = (stmt.changes === 1) so the controller receives the correct boolean to return 201 on first insert and 200 on duplicates. This eliminates the TOCTOU race under concurrent access.",
+      "files": ["src/benchmark-backend/src/services/favouritesService.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirement 3: DELETE /api/favourites/:productId for a productId with no row must return HTTP 404 with a JSON body containing an error field",
+      "description": "In favouritesService.ts::removeFavourite, change the return expression from result.changes > -1 to result.changes > 0. The old expression is always true (changes is 0 when no row deleted, and 0 > -1 is true), causing the controller to always return 204. The fix makes removeFavourite return false when nothing was deleted, which the controller maps to 404.",
+      "files": ["src/benchmark-backend/src/services/favouritesService.ts"]
+    }
+  ]
+}
