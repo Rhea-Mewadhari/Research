@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "On every request for a given IP, the per-IP timestamp array must be filtered to remove entries older than 60 seconds before the count is compared against MAX_REQUESTS. The pruning must occur inline on each request, not via a background interval.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 22: `const timestamps = (store.get(ip) ?? []).filter(ts => now - ts < WINDOW_MS);` — the filtered array is used for both the `timestamps.length >= MAX_REQUESTS` check (line 24) and `store.set(ip, timestamps)` (line 31). No background interval exists. pnpm test: 2 test files, 21 tests, all passed."
+    },
+    {
+      "id": "2",
+      "description": "When a 429 response is returned, the Retry-After response header must equal the computed number of whole seconds until the oldest in-window timestamp will fall outside the 60-second window, rounded up. Specifically: Math.ceil((oldestTimestamp + WINDOW_MS - now) / 1000). The value must not be hardcoded.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 25: `const retryAfter = Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000);` — uses `timestamps[0]` (oldest in-window timestamp after filtering) and `WINDOW_MS`, not a hardcoded literal. No literal `60` appears as the retryAfterSeconds argument. pnpm test: 21/21 passed."
+    },
+    {
+      "id": "3",
+      "description": "A GET /health request must bypass the rate-limit check entirely and call next() without incrementing the IP's request count. The exemption check must compare req.path against '/health' (with leading slash).",
+      "passed": true,
+      "evidence": "rateLimiter.ts lines 14-17: `if (req.path === '/health') { next(); return; }` — uses the string literal `'/health'` with leading slash. The early return occurs before any store read or timestamp push. pnpm test: 21/21 passed."
+    },
+    {
+      "id": "4",
+      "description": "Only src/benchmark-backend/src/middleware/rateLimiter.ts is modified. No other source file (error handler, error classes, route files) is changed.",
+      "passed": true,
+      "evidence": "`git diff --name-only` returns empty (working tree clean — all changes committed). Only one commit exists (`eefa69d sandbox: after execute-phase`), so no pre-execute baseline is available for git diff comparison. Code inspection of errors/index.ts confirms standard RateLimitError class unmodified (accepts retryAfterSeconds: number). Code inspection of errorHandler.ts confirms standard implementation (sets Retry-After from err.retryAfterSeconds). No evidence of modifications to error classes or route files."
+    },
+    {
+      "id": "5",
+      "description": "All visible tests pass without modification.",
+      "passed": true,
+      "evidence": "Ran `pnpm test` from src/benchmark-backend/: vitest v4.1.8, 2 test files passed, 21 tests passed, exit code 0. Duration: 426ms."
+    }
+  ]
+}

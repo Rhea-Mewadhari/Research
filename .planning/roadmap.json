@@ -1,0 +1,59 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript + Express.js; middleware functions typed as (req: Request, _res: Response, next: NextFunction): void",
+      "pnpm as package manager; tests run with `pnpm test` from src/benchmark-backend/",
+      "supertest for integration tests against the Express app instance",
+      "Error class hierarchy: AppError base → RateLimitError(retryAfterSeconds); errorHandler.ts reads err.retryAfterSeconds and sets Retry-After header — so only the value passed to new RateLimitError() needs to change",
+      "Module-level Map<string, number[]> store for per-IP timestamp arrays; no external state store"
+    ],
+    "features": [
+      "rateLimiter middleware: enforces 10-request/60-second sliding window per IP using a module-level Map",
+      "errorHandler middleware: converts RateLimitError to 429 JSON response with Retry-After header set from err.retryAfterSeconds — must not be modified",
+      "Health-check bypass: req.path comparison at top of rateLimiter before any IP tracking",
+      "Visible tests (rateLimiter.test.ts): verify 10 requests allowed, 11th returns 429 with Retry-After header defined — do NOT test pruning, Retry-After accuracy, or /health exemption",
+      "Other middleware (auth, requestId, validate) and all route/controller/service files are unrelated and must not regress"
+    ],
+    "architecture": [
+      "Single middleware file pattern: src/benchmark-backend/src/middleware/rateLimiter.ts exports rateLimiter function",
+      "Request flow: rateLimiter → (auth, validate, etc.) → route handlers → errorHandler",
+      "All three bugs are isolated to rateLimiter.ts; errorHandler.ts and errors/index.ts are read-only for this task",
+      "Fixed array is written back to store with store.set(ip, timestamps) — the pruned array must be what is stored, not the original",
+      "RateLimitError constructor signature: constructor(retryAfterSeconds: number) — pass computed value, not literal 60"
+    ],
+    "edgeCases": [
+      "IP at exactly 10 in-window requests: 11th triggers 429; after window expires, request from same IP must succeed (requires pruning to work)",
+      "Retry-After must vary: arriving 1s after first in-window request → ~59s; arriving 59s after → ~1s; Math.ceil ensures it never returns 0",
+      "GET /health when IP is already over the 10-request limit must still return 200, not 429 — health check bypass must come before any IP lookup or count check",
+      "Paths /healthcheck, /health/status, health (no slash) must NOT be exempted — only exact '/health' match",
+      "Pruned array (not original) must be used for both the >= MAX_REQUESTS check and the store.set call to prevent count drift",
+      "oldestTimestamp for Retry-After is timestamps[0] after pruning (array is append-only so index 0 is always oldest in-window)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 1: Timestamps older than the 60-second window must be removed on each request for that IP so the rate limit resets correctly after the window expires",
+      "description": "In rateLimiter.ts, after retrieving the timestamp array from the store, filter it to only entries where `now - ts < WINDOW_MS` (i.e. `ts >= now - WINDOW_MS`). Assign the result to `timestamps` (replacing the raw array). Use this filtered array for both the `>= MAX_REQUESTS` check and the `store.set(ip, ...)` call.",
+      "files": [
+        "src/benchmark-backend/src/middleware/rateLimiter.ts"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2: The Retry-After header must report the actual seconds until the oldest in-window timestamp will expire — computed, not hardcoded",
+      "description": "In rateLimiter.ts, replace the hardcoded `const retryAfter = 60` with `const retryAfter = Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000)`. This must be computed after the pruning in task-1, so `timestamps[0]` is the oldest remaining in-window timestamp. Pass this computed value to `new RateLimitError(retryAfter)`.",
+      "files": [
+        "src/benchmark-backend/src/middleware/rateLimiter.ts"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 3: GET /health must return 200 regardless of how many requests the same IP has made to other endpoints",
+      "description": "In rateLimiter.ts, change the health-check path comparison from `req.path === 'health'` to `req.path === '/health'` so the bypass correctly matches Express's req.path value for GET /health requests.",
+      "files": [
+        "src/benchmark-backend/src/middleware/rateLimiter.ts"
+      ]
+    }
+  ]
+}
