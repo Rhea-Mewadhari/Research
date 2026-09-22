@@ -1,0 +1,130 @@
+{
+  "taskId": "task11",
+  "runId": "wiggum-run5",
+  "timestamp": "2026-09-22T17:33:41.333Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 21,
+    "failed": 0,
+    "total": 21
+  },
+  "hiddenTests": {
+    "success": false,
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": false
+  },
+  "timing": {
+    "visibleMs": 889,
+    "hiddenMs": 699,
+    "buildMs": 737,
+    "totalMs": 2371
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 0.833,
+    "robustnessGap": 0.167,
+    "buildStability": 1,
+    "correctnessScore": 0.917,
+    "qualityScore": 0.99,
+    "overallScore": 0.946
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "backend",
+    "taskId": "task11",
+    "wall_duration_ms": 263884,
+    "cost_usd": 1.306815,
+    "num_turns": 54,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "3f6b9271-6296-49a9-834b-576f2ee344b7",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix health endpoint exemption — change 'health' to '/health' in path comparison",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-2",
+          "title": "Fix timestamp pruning — filter out entries older than WINDOW_MS on each request",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-3",
+          "title": "Fix Retry-After header — compute seconds until oldest in-window timestamp expires instead of hardcoding 60",
+          "status": "done",
+          "notes": ""
+        },
+        {
+          "id": "phase-4",
+          "title": "Verify — run pnpm test in benchmark-backend and confirm all tests pass",
+          "status": "done",
+          "notes": "21/21 tests passed, build clean (tsc -p tsconfig.build.json exited 0)"
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 52487,
+          "cost_usd": 0.2706564,
+          "num_turns": 14,
+          "session_id": "ebfde6bd-8ca2-4726-b93f-fd6812c11892",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 57560,
+          "cost_usd": 0.35629050000000007,
+          "num_turns": 13,
+          "session_id": "2cfb0fde-dc33-4b77-b83a-0f853171293c",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 57986,
+          "cost_usd": 0.2786646,
+          "num_turns": 13,
+          "session_id": "6399fd37-dcdb-4769-9dee-4b3175151fd6",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 33447,
+          "cost_usd": 0.2051487,
+          "num_turns": 8,
+          "session_id": "3f6b9271-6296-49a9-834b-576f2ee344b7",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}

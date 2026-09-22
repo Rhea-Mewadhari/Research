@@ -1,0 +1,30 @@
+{
+  "taskId": "task11",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix health endpoint exemption — change 'health' to '/health' in path comparison",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix timestamp pruning — filter out entries older than WINDOW_MS on each request",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix Retry-After header — compute seconds until oldest in-window timestamp expires instead of hardcoding 60",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Verify — run pnpm test in benchmark-backend and confirm all tests pass",
+      "status": "done",
+      "notes": "21/21 tests passed, build clean (tsc -p tsconfig.build.json exited 0)"
+    }
+  ]
+}
