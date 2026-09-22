@@ -1,0 +1,30 @@
+{
+  "taskId": "task10",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Move `featured` filter into SQL WHERE clause",
+      "status": "done",
+      "notes": "Added featured = ? condition to SQL WHERE clause and removed the post-pagination JS filter."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix COUNT query to respect active WHERE filters",
+      "status": "done",
+      "notes": "Added WHERE clause to COUNT query so it uses the same conditions/params as the data query. total now reflects only filtered rows."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix totalPages to use Math.ceil instead of Math.floor",
+      "status": "done",
+      "notes": "Changed Math.floor to Math.ceil in productService.ts line 73. All 21 tests pass."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests to verify all three fixes pass",
+      "status": "done",
+      "notes": "All 21 tests pass (2 test files). Build also succeeds with no errors."
+    }
+  ]
+}
