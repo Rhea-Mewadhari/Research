@@ -1,0 +1,88 @@
+{
+  "framework": "wiggum",
+  "target": "backend",
+  "taskId": "task11",
+  "wall_duration_ms": 281214,
+  "cost_usd": 1.2768468,
+  "num_turns": 56,
+  "exit_code": 0,
+  "is_error": false,
+  "session_id": "f85bd16a-697c-4992-ae3d-fb90a1d432e8",
+  "wiggum": {
+    "planPhases": [
+      {
+        "id": "phase-1",
+        "title": "Fix health-check exemption (missing leading slash in path comparison)",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-2",
+        "title": "Fix timestamp pruning (remove entries outside the 60-second window on each request)",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-3",
+        "title": "Fix Retry-After header (compute actual seconds until oldest in-window timestamp expires)",
+        "status": "done",
+        "notes": ""
+      },
+      {
+        "id": "phase-4",
+        "title": "Run tests and verify all visible tests pass",
+        "status": "done",
+        "notes": "All 21 tests passed (2 test files). Build completed without errors."
+      }
+    ],
+    "iterations": [
+      {
+        "index": 1,
+        "label": "iter1",
+        "exit_code": 0,
+        "wall_duration_ms": 65173,
+        "cost_usd": 0.28372649999999994,
+        "num_turns": 13,
+        "session_id": "09535af6-6f14-4e02-8e86-8db4c31e6179",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 2,
+        "label": "iter2",
+        "exit_code": 0,
+        "wall_duration_ms": 43717,
+        "cost_usd": 0.2277729,
+        "num_turns": 9,
+        "session_id": "76c59937-ea27-45c7-9b60-58ba787296f9",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 3,
+        "label": "iter3",
+        "exit_code": 0,
+        "wall_duration_ms": 67646,
+        "cost_usd": 0.33000959999999996,
+        "num_turns": 16,
+        "session_id": "136a043a-573f-4020-a90a-dec49ef8bb9b",
+        "is_error": false,
+        "attemptsUsed": 1
+      },
+      {
+        "index": 4,
+        "label": "iter4",
+        "exit_code": 0,
+        "wall_duration_ms": 33840,
+        "cost_usd": 0.21626070000000003,
+        "num_turns": 9,
+        "session_id": "f85bd16a-697c-4992-ae3d-fb90a1d432e8",
+        "is_error": false,
+        "attemptsUsed": 1
+      }
+    ],
+    "contextResets": 4,
+    "terminationReason": "plan-complete",
+    "failedPhaseId": null
+  }
+}

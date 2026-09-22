@@ -1,0 +1,30 @@
+{
+  "taskId": "task11",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix health-check exemption (missing leading slash in path comparison)",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix timestamp pruning (remove entries outside the 60-second window on each request)",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix Retry-After header (compute actual seconds until oldest in-window timestamp expires)",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify all visible tests pass",
+      "status": "done",
+      "notes": "All 21 tests passed (2 test files). Build completed without errors."
+    }
+  ]
+}
