@@ -1,0 +1,50 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript backend with better-sqlite3 (synchronous driver) — db.prepare().get() / .all()",
+      "Raw SQL string building with parameterized queries — no ORM",
+      "pnpm monorepo; tests run with `pnpm test` inside src/benchmark-backend/",
+      "Parameters are positional placeholders (?); arrays spread into .all([...params, limit, offset])"
+    ],
+    "features": [
+      "getProducts(query): handles search/category/inStock filters, sorting, pagination — returns {data, total, page, limit, totalPages}",
+      "conditions[] + params[] pattern already used for search, category, inStock — featured must follow the same pattern",
+      "getProductById, getProductsByIds, getFeaturedProducts: must not regress — they are separate functions and unaffected by the WHERE-building changes",
+      "getFeaturedProducts uses a LEFT JOIN with featured_overrides — unrelated to the getProducts filter path"
+    ],
+    "architecture": [
+      "Single service file: src/benchmark-backend/src/services/productService.ts — the only file allowed to change",
+      "Pattern in getProducts: build conditions[] + params[] → assemble `where` string → COUNT query → data query → map rows → return envelope",
+      "COUNT query must use the same `where` and `params` as the data query — currently it ignores them entirely",
+      "featured filter must be added to the conditions[]/params[] block before `where` is assembled, then the JS post-filter block removed"
+    ],
+    "edgeCases": [
+      "featured=false: must add `featured = 0` to SQL WHERE — condition applies for any defined value, not just truthy",
+      "featured=undefined: no condition should be added — existing `if (query.featured !== undefined)` guard handles this",
+      "No active filters: COUNT(*) without WHERE still works — the assembled `where` variable is empty string in that case, making the query `SELECT COUNT(*) AS count FROM products`",
+      "Exact division (15 products, limit 5): Math.ceil(15/5)=3 — both floor and ceil agree here, so the fix doesn't break this case",
+      "Non-divisible boundary (15 products, limit 10): Math.ceil(1.5)=2 — the broken floor gives 1, the fix gives 2",
+      "inStock=true with limit 6 and 11 matching: filter-aware COUNT returns 11, Math.ceil(11/6)=2 — requires both Bug 1 and Bug 3 fixes together"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 3 — When the total count is not evenly divisible by the page limit, totalPages must round up",
+      "description": "Change Math.floor(total / limit) to Math.ceil(total / limit) on the totalPages line in getProducts",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 2 — Every supported filter (search, category, inStock, featured) must be enforced in the SQL query — not applied in JavaScript after the database returns rows",
+      "description": "Add featured to the SQL WHERE clause: insert a conditions.push('featured = ?') / params.push(query.featured ? 1 : 0) block guarded by `if (query.featured !== undefined)` alongside the other filters, then delete the JS post-filter block (data = data.filter(...featured...)) that currently runs after pagination",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 1 — total and totalPages must reflect the count of products matching all active query filters, not the total catalogue size",
+      "description": "Move the COUNT query to after the `where` variable is assembled, and rewrite it to `SELECT COUNT(*) AS count FROM products ${where}` using `[...params]` as its bound parameters so active filter conditions are included in the count",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}

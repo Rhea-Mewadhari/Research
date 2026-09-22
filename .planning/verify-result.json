@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "totalPages must equal Math.ceil(total / limit) — not Math.floor.",
+      "passed": true,
+      "evidence": "productService.ts:73 reads `totalPages: Math.ceil(total / limit)`. Confirmed by verbose test output: '✓ src/tests/visible/pagination.test.ts > Pagination — totalPages boundary > returns totalPages: 2 for 15 products with limit 10 9ms' and '✓ Pagination — totalPages boundary > returns totalPages: 3 for 15 products with limit 5 2ms' — both passed. pnpm test exited 0 with 21/21 tests passing."
+    },
+    {
+      "id": "2",
+      "description": "The total field in the paginated response must reflect the count of products matching all active query filters, not the total catalogue size.",
+      "passed": true,
+      "evidence": "productService.ts:58-60 executes `SELECT COUNT(*) AS count FROM products ${where}`, using the same WHERE clause built from all active filters (search, category, inStock, featured). The buggy version omitted the WHERE clause entirely. All 21 tests pass including 'filters by category' and 'filters in-stock products' in products.test.ts, which assert filter-correct totals."
+    },
+    {
+      "id": "3",
+      "description": "The featured filter must be enforced in the SQL WHERE clause before LIMIT/OFFSET is applied — not in JavaScript after paginated rows are returned.",
+      "passed": true,
+      "evidence": "productService.ts:46-49 adds `featured = ?` to the `conditions[]` array when `query.featured` is defined, which is joined into the SQL WHERE clause at line 51. No post-pagination JS filter exists in the current code (compare with inject-pagination-bugs.js which applied `data.filter(p => p.featured === query.featured)` after the SQL query). All 21 tests pass."
+    },
+    {
+      "id": "4",
+      "description": "All visible tests in src/benchmark-backend/src/tests/visible/ pass without modification.",
+      "passed": true,
+      "evidence": "Running `pnpm test` inside src/benchmark-backend/ produced: 'Test Files  2 passed (2), Tests  21 passed (21)' with exit code 0. Verbose output confirms every individual test case passed, including both pagination boundary tests and all product filter/sort/auth tests."
+    },
+    {
+      "id": "5",
+      "description": "Only src/services/productService.ts is modified; no test files, controller files, route files, or migration SQL files are changed.",
+      "passed": true,
+      "evidence": "The repo has a single commit ('sandbox: after execute-phase') so `git diff --name-only` (working tree vs HEAD) produces no output — the tree is clean. The bug injection script inject-pagination-bugs.js targeted only `src/benchmark-backend/src/services/productService.ts`, and the current productService.ts has all three bugs fixed (Math.ceil, WHERE-clause COUNT, SQL-level featured filter). Inspection of pagination.test.ts confirms it is an unmodified test file (tests the correct ceil behavior without any execute-phase alterations). No evidence of changes to controllers, routes, or migrations."
+    }
+  ]
+}
