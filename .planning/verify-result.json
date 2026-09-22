@@ -1,0 +1,59 @@
+{
+  "passed": false,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "GET /products with category filter returns total reflecting only matching products (category=electronics → total: 4)",
+      "passed": true,
+      "evidence": "HTTP GET /products?category=electronics&limit=10 with Authorization: Bearer benchmark-token-2024 returned {\"total\":4,\"data\":[...4 items, all category=electronics...],\"totalPages\":1}. COUNT query uses WHERE clause: `SELECT COUNT(*) AS count FROM products WHERE LOWER(category) = LOWER(?)` with params — confirmed in productService.ts lines 59-61."
+    },
+    {
+      "id": "2",
+      "description": "GET /products with inStock filter returns total reflecting only matching products (inStock=true → total: 11)",
+      "passed": true,
+      "evidence": "HTTP GET /products?inStock=true&limit=6 with auth header returned {\"total\":11,\"data\":[...6 items...],\"totalPages\":2}. The COUNT query applies WHERE in_stock=1 — confirmed response shows total=11 (not 15), correctly reflecting only in-stock products."
+    },
+    {
+      "id": "3",
+      "description": "featured filter enforced in SQL WHERE clause: GET /products?featured=true&limit=3 returns exactly 3 items all with featured: true",
+      "passed": true,
+      "evidence": "HTTP GET /products?featured=true&limit=3 returned {\"data\":[{\"featured\":true,...},{\"featured\":true,...},{\"featured\":true,...}],\"total\":4,\"totalPages\":2}. Exactly 3 items returned, all with featured:true. If the filter were post-pagination, a JS filter on a pre-sliced 3 rows that included non-featured items would yield fewer than 3 featured items — returning exactly 3 proves the WHERE clause filters before LIMIT. productService.ts line 47-49 adds `featured = ?` to conditions array used in both COUNT and data queries."
+    },
+    {
+      "id": "4",
+      "description": "GET /products with featured filter returns total reflecting only featured products (total equals data.length when all fit in one page)",
+      "passed": true,
+      "evidence": "HTTP GET /products?featured=true&limit=50 returned {\"total\":4,\"data\":[...4 items...],\"totalPages\":1}. total=4 equals data.length=4. All featured products are returned and the count matches."
+    },
+    {
+      "id": "5",
+      "description": "totalPages uses Math.ceil so partial last page is counted: GET /products?limit=10 returns totalPages: 2 for 15-product catalogue",
+      "passed": true,
+      "evidence": "pnpm test output: 'Test Files  2 passed (2), Tests  21 passed (21)'. pagination.test.ts 'returns totalPages: 2 for 15 products with limit 10' PASSED. productService.ts line 74: `totalPages: Math.ceil(total / limit)` — Math.ceil(15/10)=2."
+    },
+    {
+      "id": "6",
+      "description": "totalPages correct when count evenly divisible by limit: GET /products?limit=5 returns totalPages: 3",
+      "passed": true,
+      "evidence": "pnpm test: 21 tests passed. pagination.test.ts 'returns totalPages: 3 for 15 products with limit 5' PASSED. Math.ceil(15/5)=3 exactly — same result as Math.floor for even division, no regression."
+    },
+    {
+      "id": "7",
+      "description": "GET /products?inStock=true&limit=6 must return totalPages: 2",
+      "passed": true,
+      "evidence": "HTTP GET /products?inStock=true&limit=6 returned {\"totalPages\":2}. 11 in-stock products / 6 per page = 1.833 → Math.ceil=2. Confirmed directly in HTTP response body."
+    },
+    {
+      "id": "8",
+      "description": "All pre-existing visible tests continue to pass with no regressions",
+      "passed": true,
+      "evidence": "pnpm test output: 'Test Files  2 passed (2), Tests  21 passed (21), Start at 12:33:21, Duration 402ms'. Both src/tests/visible/products.test.ts and src/tests/visible/pagination.test.ts green. Exit code 0."
+    },
+    {
+      "id": "9",
+      "description": "Only src/benchmark-backend/src/services/productService.ts is modified (git diff --name-only lists exactly that file and nothing else)",
+      "passed": false,
+      "evidence": "git diff --name-only returned empty output (working tree clean, confirmed by git status: 'nothing to commit, working tree clean'). The repository has exactly one commit ('sandbox: after execute-phase', bfc01f7) containing all 241 project files as new insertions — there is no prior commit to diff against. The stated verification method cannot confirm that only productService.ts was modified because git diff produces no output rather than listing exactly that file."
+    }
+  ]
+}

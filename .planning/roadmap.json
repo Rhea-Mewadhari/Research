@@ -1,0 +1,61 @@
+{
+  "investigations": {
+    "techStack": [
+      "TypeScript ~6.0 targeting ES2023 ESM, executed via tsx (dev) / tsc (build)",
+      "Express v5 for HTTP routing, zod v4 for input validation",
+      "SQLite via better-sqlite3 v12 — synchronous, no ORM, raw SQL strings only",
+      "WHERE clauses built by pushing strings into conditions[] and values into params[], joined with ' AND ', then interpolated into a template literal SQL string",
+      "Parameterized queries use ? placeholders passed to db.prepare(...).all([...params, limit, offset])",
+      "Boolean columns (in_stock, featured) stored as INTEGER 0/1 in SQLite, mapped to JS booleans in rowToProduct",
+      "Test runner: Vitest v4 with globals mode; HTTP integration tests via supertest v7; pnpm as package manager"
+    ],
+    "features": [
+      "GET /products accepts filters: search (LIKE on name), category (equality), inStock (boolean), featured (currently JS-only), sort, page, limit",
+      "Response envelope: { data: Product[], total: number, page: number, limit: number, totalPages: number }",
+      "products.test.ts asserts: 15 total products unfiltered; 4 in electronics; 11 inStock; page=1&limit=5 → totalPages:3; limit clamped at 50",
+      "pagination.test.ts asserts: limit=10 with 15 products → totalPages:2 (Math.ceil test, currently failing); limit=5 → totalPages:3 (exact division, passes either way)",
+      "Auth middleware: Bearer token with even digit-sum → 200, odd → 401; GET /products requires auth",
+      "getFeaturedProducts() (separate function, line 100-111) correctly uses SQL WHERE with COALESCE on featured_overrides — this must not be touched"
+    ],
+    "architecture": [
+      "Layer stack: routes → controllers → services → db/client",
+      "routes/productRoutes.ts → controllers/productController.ts → services/productService.ts → db/client.ts (better-sqlite3 handle)",
+      "products table columns: id, name, description, price, category, in_stock INTEGER, rating, stock, featured INTEGER, images TEXT (JSON), tags TEXT (JSON), created_at",
+      "featured_overrides table (migration 003): product_id, is_featured, set_at — used by getFeaturedProducts() via LEFT JOIN COALESCE, not by getProducts()",
+      "Bug 1 location: lines 56-58 — SELECT COUNT(*) AS count FROM products (no WHERE); total always equals full table count",
+      "Bug 2 location: line 46 comment marks featured excluded from SQL; lines 67-69 apply JS filter post-pagination on already-sliced data[]",
+      "Bug 3 location: line 76 — Math.floor(total / limit) should be Math.ceil",
+      "Only src/benchmark-backend/src/services/productService.ts is permitted to change (requirement 9)"
+    ],
+    "edgeCases": [
+      "featured=false: must produce SQL 'featured = 0', not 'featured = 1'; the JS filter correctly handled false but the SQL fix must branch on value",
+      "featured=undefined: the existing guard 'if (query.featured !== undefined)' must be preserved — only add to conditions when explicitly set",
+      "Multiple simultaneous filters (e.g. category + inStock + featured): conditions[] uses AND joining; adding featured to the array is consistent by construction — no extra handling needed",
+      "COUNT query must receive the same params array as the data query; once featured is in conditions/params, passing the full params to COUNT avoids a better-sqlite3 parameter-count mismatch",
+      "No active filters: where is empty string → COUNT(*) FROM products (correct, must not regress); total:15 assertions in products.test.ts must still pass",
+      "totalPages with total=0 (no matching products): Math.ceil(0/n) = 0 — correct, no special case needed",
+      "totalPages with exact division (15/5=3): Math.ceil(3)=3 = Math.floor(3) — no regression at even boundaries",
+      "totalPages with non-even division (15/10=1.5): Math.ceil → 2 (correct); Math.floor → 1 (wrong, current bug)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirement 3 — featured filter must be enforced in SQL WHERE, not JS post-pagination; Requirement 4 — total for featured filter must reflect only matching products",
+      "description": "In getProducts(), add 'featured = ?' to the conditions[] array and push the mapped integer value (query.featured ? 1 : 0) to params[] inside the existing 'if (query.featured !== undefined)' guard, before the WHERE string is assembled. Remove the JS post-pagination filter block at lines 67-69 that currently does 'data = data.filter(p => p.featured === query.featured)'.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirement 1 — category filter total must reflect only matching products; Requirement 2 — inStock filter total must reflect only matching products; Requirement 4 — featured filter total must reflect only matching products",
+      "description": "In getProducts(), change the COUNT query at lines 56-58 from 'SELECT COUNT(*) AS count FROM products' to 'SELECT COUNT(*) AS count FROM products ${where}', and pass the same params array (without limit/offset) to db.prepare(...).get(params). This must be done after task-1 so that featured is already included in the conditions/params when the WHERE string is assembled.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirement 5 — totalPages must use Math.ceil; Requirement 6 — totalPages correct when count evenly divisible; Requirement 7 — inStock=true&limit=6 must return totalPages:2",
+      "description": "In getProducts(), change line 76 from 'Math.floor(total / limit)' to 'Math.ceil(total / limit)'. This is independent of tasks 1 and 2 but should be applied in the same edit pass.",
+      "files": ["src/benchmark-backend/src/services/productService.ts"]
+    }
+  ]
+}

@@ -48,7 +48,8 @@ export function getProducts(query: ProductQuery): PaginatedResult<Product> {
     params.push(query.featured ? 1 : 0);
   }
 
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const where =
+    conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
   const orderBy = (query.sort && SORT_MAP[query.sort]) ?? 'CAST(id AS INTEGER) ASC';
 
   const page = query.page ?? 1;
@@ -63,8 +64,10 @@ export function getProducts(query: ProductQuery): PaginatedResult<Product> {
     .prepare(`SELECT * FROM products ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`)
     .all([...params, limit, offset]) as Record<string, unknown>[];
 
+  const data = rows.map(rowToProduct);
+
   return {
-    data: rows.map(rowToProduct),
+    data,
     total,
     page,
     limit,
