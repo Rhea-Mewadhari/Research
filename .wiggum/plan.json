@@ -1,0 +1,30 @@
+{
+  "taskId": "task11",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Fix health endpoint exemption (missing leading slash in path comparison)",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-2",
+      "title": "Add timestamp window pruning to prevent unbounded memory growth and allow rate limit reset",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix Retry-After header to report actual seconds until oldest in-window timestamp expires",
+      "status": "done",
+      "notes": ""
+    },
+    {
+      "id": "phase-4",
+      "title": "Run tests and verify all pass",
+      "status": "done",
+      "notes": "21 tests passed across 2 test files; build (tsc) completed with no errors."
+    }
+  ]
+}
