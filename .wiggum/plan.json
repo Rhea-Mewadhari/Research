@@ -1,0 +1,30 @@
+{
+  "taskId": "task9",
+  "target": "backend",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Enable SQLite FK enforcement in db/client.ts",
+      "status": "done",
+      "notes": "Added db.pragma('foreign_keys = ON') to db/client.ts. All 23 tests pass."
+    },
+    {
+      "id": "phase-2",
+      "title": "Fix addFavourite: reject non-existent productId (404) and make insert atomic",
+      "status": "done",
+      "notes": "Added ProductNotFoundError import; check product exists before insert; replaced SELECT+INSERT with INSERT OR IGNORE for atomicity. All 23 tests pass, build clean."
+    },
+    {
+      "id": "phase-3",
+      "title": "Fix removeFavourite: return false when no row deleted (changes > 0)",
+      "status": "done",
+      "notes": "Changed `result.changes > -1` to `result.changes > 0` in favouritesService.ts:37. All 23 tests pass, build clean."
+    },
+    {
+      "id": "phase-4",
+      "title": "Run pnpm test to verify all three bug fixes pass",
+      "status": "done",
+      "notes": "23/23 tests pass, build clean (tsc -p tsconfig.build.json exits 0)."
+    }
+  ]
+}

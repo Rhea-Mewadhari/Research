@@ -1,0 +1,130 @@
+{
+  "taskId": "task9",
+  "runId": "wiggum-run1",
+  "timestamp": "2026-09-22T07:09:08.570Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 23,
+    "failed": 0,
+    "total": 23
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1202,
+    "hiddenMs": 758,
+    "buildMs": 841,
+    "totalMs": 2906
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.96,
+    "overallScore": 0.984
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "backend",
+    "taskId": "task9",
+    "wall_duration_ms": 295131,
+    "cost_usd": 1.6686144000000003,
+    "num_turns": 72,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "33f635b9-a390-4a8f-b8a4-738aeb09497e",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Enable SQLite FK enforcement in db/client.ts",
+          "status": "done",
+          "notes": "Added db.pragma('foreign_keys = ON') to db/client.ts. All 23 tests pass."
+        },
+        {
+          "id": "phase-2",
+          "title": "Fix addFavourite: reject non-existent productId (404) and make insert atomic",
+          "status": "done",
+          "notes": "Added ProductNotFoundError import; check product exists before insert; replaced SELECT+INSERT with INSERT OR IGNORE for atomicity. All 23 tests pass, build clean."
+        },
+        {
+          "id": "phase-3",
+          "title": "Fix removeFavourite: return false when no row deleted (changes > 0)",
+          "status": "done",
+          "notes": "Changed `result.changes > -1` to `result.changes > 0` in favouritesService.ts:37. All 23 tests pass, build clean."
+        },
+        {
+          "id": "phase-4",
+          "title": "Run pnpm test to verify all three bug fixes pass",
+          "status": "done",
+          "notes": "23/23 tests pass, build clean (tsc -p tsconfig.build.json exits 0)."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 58003,
+          "cost_usd": 0.3667458,
+          "num_turns": 16,
+          "session_id": "5442b3cc-d647-49c4-a945-03c9d640a8a9",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 81989,
+          "cost_usd": 0.5096757000000001,
+          "num_turns": 21,
+          "session_id": "64e0955e-3404-442c-ad95-c2f5ba5b8bcb",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 40455,
+          "cost_usd": 0.2893623,
+          "num_turns": 13,
+          "session_id": "1ffff3c6-e511-4bc9-b00a-165914ed8776",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 26933,
+          "cost_usd": 0.21162720000000004,
+          "num_turns": 8,
+          "session_id": "33f635b9-a390-4a8f-b8a4-738aeb09497e",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 4,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
