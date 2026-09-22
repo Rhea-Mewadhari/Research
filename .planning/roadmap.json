@@ -1,0 +1,61 @@
+{
+  "investigations": {
+    "techStack": [
+      "Express v5, TypeScript ~6.0, ESM modules; middleware signature is standard (req, res, next)",
+      "No third-party rate-limiting library — hand-rolled in-memory Map<string, number[]>",
+      "RateLimitError extends AppError; constructor takes retryAfterSeconds: number; errorHandler reads err.retryAfterSeconds and sets Retry-After header automatically",
+      "TypeScript strict mode: noUnusedLocals, noUnusedParameters — introduced variables must be used",
+      "Test runner: Vitest v4 with supertest for integration tests; pnpm test from src/benchmark-backend/"
+    ],
+    "features": [
+      "rateLimiter is applied globally in app.ts (before cors, body parsing, and routes) — runs on every request",
+      "Limit: MAX_REQUESTS=10, WINDOW_MS=60000; store is Map<string, number[]> keyed by IP",
+      "GET /health is registered inline in app.ts, intended to be exempt from rate limiting",
+      "products.test.ts mocks the rateLimiter entirely — product test suite is unaffected by any fix to rateLimiter.ts",
+      "rateLimiter.test.ts has 2 existing tests: (1) allows first 10 requests, (2) returns 429 with Retry-After header on request 11+; both must continue to pass",
+      "errorHandler sets res.setHeader('Retry-After', err.retryAfterSeconds) for RateLimitError — no change needed there"
+    ],
+    "architecture": [
+      "Middleware registration order in app.ts: requestId → rateLimiter → cors → express.json() → routes → errorHandler",
+      "Health check guard is the very first statement in rateLimiter — fires before getIp, before any store interaction",
+      "RateLimitError is defined in src/errors/index.ts; re-exported from src/types/errors.ts",
+      "The errorHandler (src/middleware/errorHandler.ts) handles RateLimitError specifically — no changes needed there",
+      "Only src/benchmark-backend/src/middleware/rateLimiter.ts is to be modified; no routes, error handlers, or test files change"
+    ],
+    "edgeCases": [
+      "Pruning must occur before the timestamps.length >= MAX_REQUESTS check — otherwise stale entries inflate the count and requests are wrongly rejected",
+      "Filter predicate must be t > now - WINDOW_MS (strictly greater) — a timestamp exactly at the boundary is expired and must be excluded",
+      "Retry-After computation uses pruned[0] (oldest remaining timestamp); pruned[0] is always defined when the limit branch is reached (pruned.length >= MAX_REQUESTS)",
+      "Math.ceil ensures Retry-After is always >= 1 even when pruned[0] is 59999ms old (remaining window is 1ms → ceil(0.001) = 1), preventing a 0 or negative value",
+      "The three fixes are logically independent but Bug 2 (Retry-After) correctness depends on Bug 1 (pruning) being applied first — pruned[0] must reflect only in-window timestamps",
+      "Health check fix (Bug 3) is fully independent — it returns before reaching pruning or Retry-After logic",
+      "Each IP's timestamp array is isolated in the Map — pruning one IP's array cannot affect another IP's quota"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "3 — GET /health must always receive HTTP 200; exemption check must use req.path === '/health' (with the leading slash)",
+      "description": "Change req.path === 'health' to req.path === '/health' on the health-check guard line in rateLimiter. This is the first statement in the middleware and is fully independent of the other two fixes.",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-2",
+      "requirement": "1 — All timestamps older than 60 seconds must be removed from the store before the count is compared against MAX_REQUESTS",
+      "description": "After retrieving the timestamp array from the store (store.get(ip) ?? []), apply a filter to keep only entries where t > now - WINDOW_MS. Assign the result to a new variable (e.g. pruned) and use that variable for all subsequent operations (count check, store update, Retry-After computation). This must happen before the timestamps.length >= MAX_REQUESTS guard.",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-3",
+      "requirement": "2 — When a 429 is returned, the Retry-After header value must equal Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000) where timestamps[0] is the oldest in-window timestamp after pruning",
+      "description": "Replace const retryAfter = 60 with const retryAfter = Math.ceil((pruned[0] + WINDOW_MS - now) / 1000), where pruned is the filtered array from task-2. This value is passed into new RateLimitError(retryAfter) and flows through errorHandler to the Retry-After response header automatically.",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    },
+    {
+      "id": "task-4",
+      "requirement": "4 — All existing visible tests continue to pass without modification",
+      "description": "After applying tasks 1–3, run pnpm test from src/benchmark-backend/ to confirm rateLimiter.test.ts and products.test.ts both exit with code 0. No test files are modified. The two rateLimiter tests (allow 10 requests, return 429 with Retry-After on 11th) must still pass; products tests are unaffected because they mock rateLimiter.",
+      "files": ["src/benchmark-backend/src/middleware/rateLimiter.ts"]
+    }
+  ]
+}

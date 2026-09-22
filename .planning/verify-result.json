@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "On each request, timestamps older than 60 seconds must be removed before the count is compared against MAX_REQUESTS. After a full 60-second window elapses, a subsequent request must be allowed (HTTP 200).",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 23: `const pruned = timestamps.filter(t => t > now - WINDOW_MS);` is applied BEFORE the `if (pruned.length >= MAX_REQUESTS)` guard at line 25. Pruning precedes the count check, satisfying the structural requirement. The bug injection confirms the original code had no filter; the current code does."
+    },
+    {
+      "id": "2",
+      "description": "When a 429 is returned, the Retry-After header value must equal Math.ceil((timestamps[0] + WINDOW_MS - now) / 1000) — not the literal constant 60.",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 26: `const retryAfter = Math.ceil((pruned[0] + WINDOW_MS - now) / 1000);` — no hardcoded `60` exists in that position. The visible test (`rateLimiter.test.ts`, test 2: 'returns 429 with a Retry-After header on the request that exceeds the limit') passed: `res.headers['retry-after']` is defined. All 21 tests passed (pnpm test output: '21 passed (21)')."
+    },
+    {
+      "id": "3",
+      "description": "GET /health must always receive HTTP 200 regardless of prior requests; the exemption check must use req.path === '/health' (with leading slash).",
+      "passed": true,
+      "evidence": "rateLimiter.ts line 14: `if (req.path === '/health')` — exact string with leading slash. The bug injection confirms the original used `'health'` (missing slash). The fix is in place."
+    },
+    {
+      "id": "4",
+      "description": "All existing visible tests continue to pass without modification.",
+      "passed": true,
+      "evidence": "pnpm test run from src/benchmark-backend/: 'Test Files  2 passed (2)' and 'Tests  21 passed (21)'. Both rateLimiter.test.ts and products.test.ts ran and all 21 test cases passed. Exit code 0."
+    },
+    {
+      "id": "5",
+      "description": "Only src/benchmark-backend/src/middleware/rateLimiter.ts is modified — no other source file, route, error handler, or test file is changed.",
+      "passed": true,
+      "evidence": "git diff --name-only (working tree vs HEAD) shows 0 files — working tree is clean with no uncommitted changes. The repo has a single commit ('sandbox: after execute-phase'); comparing the current rateLimiter.ts against the bug injection script (inject-rate-limiter-bugs.js) confirms only the three targeted changes were made to rateLimiter.ts. The visible test file rateLimiter.test.ts content matches the expected unmodified fixture (comment on line 4 explicitly states it does not test pruning/Retry-After accuracy/health exemption — unchanged from the task setup). All 21 tests pass with no compilation errors that would indicate unintended file changes."
+    }
+  ]
+}
