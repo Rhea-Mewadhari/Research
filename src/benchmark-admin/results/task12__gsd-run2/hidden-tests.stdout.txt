@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.auth-foundation.test.tsx (6 tests) 230ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  13:43:42
+   Duration  786ms (transform 37ms, setup 55ms, collect 142ms, tests 230ms, environment 193ms, prepare 43ms)
+

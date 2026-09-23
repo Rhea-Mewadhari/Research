@@ -48,3 +48,9 @@ export class RateLimitError extends AppError {
     this.retryAfterSeconds = retryAfterSeconds;
   }
 }
+
+export class ConflictError extends AppError {
+  constructor(message: string) {
+    super(message, 409, 'CONFLICT_ERROR');
+  }
+}
