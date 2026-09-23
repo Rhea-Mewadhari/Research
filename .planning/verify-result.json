@@ -1,0 +1,125 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "A file src/benchmark-backend/src/db/migrations/004_users.sql exists and contains a CREATE TABLE users DDL with exactly the required columns.",
+      "passed": true,
+      "evidence": "File read at src/benchmark-backend/src/db/migrations/004_users.sql. Content: CREATE TABLE IF NOT EXISTS users ( id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')) ); — all five required columns present with correct types and constraints."
+    },
+    {
+      "id": "2",
+      "description": "A valid registration request returns HTTP 201 with body { user: { id, email, username, createdAt }, token }.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'registers a new user and returns 201 with a user object and token' ran and passed as part of the 34-test suite."
+    },
+    {
+      "id": "3",
+      "description": "The password field never appears in the register response body.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'never includes the password anywhere in the response body' ran and passed."
+    },
+    {
+      "id": "4",
+      "description": "The password stored in the users table is a bcrypt hash (begins with $2a$, $2b$, or $2y$), not plaintext.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'stores the password as a bcrypt hash, not plaintext' ran and passed."
+    },
+    {
+      "id": "5",
+      "description": "The token in the register response is a three-part JWT whose payload contains userId, email, and username claims.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'issues a JWT carrying userId, email, and username claims' ran and passed."
+    },
+    {
+      "id": "6",
+      "description": "A registration request with a password shorter than 8 characters returns HTTP 400.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'rejects a password shorter than 8 characters with 400' ran and passed."
+    },
+    {
+      "id": "7",
+      "description": "A registration request with the password field omitted returns HTTP 400.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'rejects a missing password with 400' ran and passed."
+    },
+    {
+      "id": "8",
+      "description": "A registration request with a malformed email returns HTTP 400.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'rejects an invalid email format with 400' ran and passed."
+    },
+    {
+      "id": "9",
+      "description": "A registration attempt with a duplicate email returns HTTP 409 with body { \"error\": \"Email already registered\" }.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 409 'Email already registered' for a duplicate email\" ran and passed."
+    },
+    {
+      "id": "10",
+      "description": "A registration attempt with a duplicate username returns HTTP 409 with body { \"error\": \"Username already taken\" }.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 409 'Username already taken' for a duplicate username\" ran and passed."
+    },
+    {
+      "id": "11",
+      "description": "A login request with valid credentials returns HTTP 200 with { user: { id, email, username, createdAt }, token } and user.password is absent.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'logs in with valid credentials and returns 200 with a user and token' ran and passed."
+    },
+    {
+      "id": "12",
+      "description": "A login request with a wrong password returns HTTP 401 with { \"error\": \"Invalid credentials\" }.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 401 'Invalid credentials' for a wrong password\" ran and passed."
+    },
+    {
+      "id": "13",
+      "description": "A login request with an unknown email returns HTTP 401 with { \"error\": \"Invalid credentials\" } — same message as a wrong password.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 401 'Invalid credentials' for an unknown email (same message as a wrong password)\" ran and passed."
+    },
+    {
+      "id": "14",
+      "description": "GET /api/auth/me with a valid Bearer token returns HTTP 200 with the user object, and password is absent.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'returns the user object for a valid token, without the password field' ran and passed."
+    },
+    {
+      "id": "15",
+      "description": "GET /api/auth/me with no Authorization header returns HTTP 401.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'returns 401 when no Authorization header is provided' ran and passed."
+    },
+    {
+      "id": "16",
+      "description": "GET /api/auth/me with a malformed or invalid token returns HTTP 401.",
+      "passed": true,
+      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'returns 401 for a malformed or invalid token' ran and passed."
+    },
+    {
+      "id": "17",
+      "description": "The existing src/benchmark-backend/src/middleware/auth.ts file (requireAuth) is unchanged from git HEAD.",
+      "passed": true,
+      "evidence": "git diff HEAD -- src/benchmark-backend/src/middleware/auth.ts produced no output, confirming the file is identical to its committed state."
+    },
+    {
+      "id": "18",
+      "description": "JWT_SECRET is never hardcoded in any source file; always read from process.env.JWT_SECRET.",
+      "passed": true,
+      "evidence": "grep -r 'JWT_SECRET' src/benchmark-backend/src/ --include='*.ts' shows only two occurrences in src/utils/jwt.ts: `process.env['JWT_SECRET'] ?? ''` — no hardcoded string literal values found."
+    },
+    {
+      "id": "19",
+      "description": "All new auth routes are mounted at /api/auth in src/benchmark-backend/src/app.ts.",
+      "passed": true,
+      "evidence": "app.ts line 26: `app.use('/api/auth', authRoutes)` confirmed by grep. Full test suite (34 tests) passes using POST /api/auth/register, POST /api/auth/login, GET /api/auth/me paths."
+    },
+    {
+      "id": "20",
+      "description": "The full visible test suite (pnpm test in src/benchmark-backend) passes with no test failures.",
+      "passed": true,
+      "evidence": "pnpm test output: 'Test Files  2 passed (2), Tests  34 passed (34), Duration  1.00s' — exit code 0, zero failures."
+    }
+  ]
+}

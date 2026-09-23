@@ -1,0 +1,81 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ vitest run src/tests/visible/products.test.ts src/tests/visible/auth.test.ts
+[90mstderr[2m | src/tests/visible/auth.test.ts[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mreturns 409 "Email already registered" for a duplicate email
+[22m[39m[5c9e8782-fcfa-4eaf-a7e5-f5caf26aa22c] AppError: Email already registered
+    at registerUser [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/services/authService.ts:38:11[90m)[39m
+    at register [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/controllers/authController.ts:11:26[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:157:13[90m)[39m
+    at [90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/middleware/validate.ts:33:5
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:157:13[90m)[39m
+    at Route.dispatch [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:117:3[90m)[39m
+    at handle [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:435:11[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m {
+  statusCode: [33m409[39m,
+  code: [32m'EMAIL_CONFLICT'[39m
+}
+
+[90mstderr[2m | src/tests/visible/auth.test.ts[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mreturns 409 "Username already taken" for a duplicate username
+[22m[39m[6304eca4-49fc-441b-abf9-ab59aad63c9e] AppError: Username already taken
+    at registerUser [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/services/authService.ts:43:11[90m)[39m
+    at register [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/controllers/authController.ts:11:26[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:157:13[90m)[39m
+    at [90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/middleware/validate.ts:33:5
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:157:13[90m)[39m
+    at Route.dispatch [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:117:3[90m)[39m
+    at handle [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:435:11[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m {
+  statusCode: [33m409[39m,
+  code: [32m'USERNAME_CONFLICT'[39m
+}
+
+[90mstderr[2m | src/tests/visible/auth.test.ts[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mreturns 401 "Invalid credentials" for a wrong password
+[22m[39m[ddf96849-bb2e-4b52-b584-abe29f594c04] AppError: Invalid credentials
+    at loginUser [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/services/authService.ts:67:11[90m)[39m
+    at login [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/controllers/authController.ts:21:20[90m)[39m {
+  statusCode: [33m401[39m,
+  code: [32m'INVALID_CREDENTIALS'[39m
+}
+
+[90mstderr[2m | src/tests/visible/auth.test.ts[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mreturns 401 "Invalid credentials" for an unknown email (same message as a wrong password)
+[22m[39m[61d7b1ed-5f33-49d1-825b-3ac70c01588d] AppError: Invalid credentials
+    at loginUser [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/services/authService.ts:67:11[90m)[39m
+    at login [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/controllers/authController.ts:21:26[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:157:13[90m)[39m
+    at [90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/middleware/validate.ts:33:5
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:157:13[90m)[39m
+    at Route.dispatch [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:117:3[90m)[39m
+    at handle [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:435:11[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m {
+  statusCode: [33m401[39m,
+  code: [32m'INVALID_CREDENTIALS'[39m
+}
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/tests/visible/auth.test.ts[2m > [22mPOST /api/auth/register[2m > [22mregisters a new user and returns 201 with a user object and token
+[31m[1mAssertionError[22m: expected 400 to be 201 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 201[39m
+[31m+ 400[39m
+
+[36m [2m❯[22m src/tests/visible/auth.test.ts:[2m32:24[22m[39m
+    [90m 30|[39m     })[33m;[39m
+    [90m 31|[39m
+    [90m 32|[39m     [34mexpect[39m(res[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)[33m;[39m
+    [90m   |[39m                        [31m^[39m
+    [90m 33|[39m     [34mexpect[39m(res[33m.[39mbody[33m.[39muser)[33m.[39m[34mtoMatchObject[39m({
+    [90m 34|[39m       email[33m:[39m [32m'jane.doe@example.com'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+

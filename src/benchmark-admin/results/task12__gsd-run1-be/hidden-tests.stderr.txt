@@ -1,0 +1,59 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ vitest run src/tests/hidden/hidden.auth-foundation.test.ts
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22mHidden: auth foundation — structure[2m > [22mrequireJwt is its own middleware file, and requireAuth is untouched
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/tests/hidden/hidden.auth-foundation.test.ts:[2m44:46[22m[39m
+    [90m 42|[39m
+    [90m 43|[39m     const jwtMiddlewarePath = path.resolve(__dirname, '../../middlewar…
+    [90m 44|[39m     [34mexpect[39m(fs[33m.[39m[34mexistsSync[39m(jwtMiddlewarePath))[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   |[39m                                              [31m^[39m
+    [90m 45|[39m   })[33m;[39m
+    [90m 46|[39m })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22mHidden: auth foundation — register/login/me edge cases[2m > [22mrejects a whitespace-only username with 400
+[31m[1mAssertionError[22m: expected 201 to be 400 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+[36m [2m❯[22m src/tests/hidden/hidden.auth-foundation.test.ts:[2m69:24[22m[39m
+    [90m 67|[39m       password[33m:[39m [32m'validpassword1'[39m[33m,[39m
+    [90m 68|[39m     })[33m;[39m
+    [90m 69|[39m     [34mexpect[39m(res[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m400[39m)[33m;[39m
+    [90m   |[39m                        [31m^[39m
+    [90m 70|[39m   })[33m;[39m
+    [90m 71|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22mHidden: auth foundation — register/login/me edge cases[2m > [22missues a token that expires roughly 24 hours after issuance
+[31m[1mAssertionError[22m: expected 'undefined' to be 'number' // Object.is equality[39m
+
+Expected: [32m"number"[39m
+Received: [31m"undefined"[39m
+
+[36m [2m❯[22m src/tests/hidden/hidden.auth-foundation.test.ts:[2m100:35[22m[39m
+    [90m 98|[39m     [35mconst[39m payload [33m=[39m [34mdecodeJwtPayload[39m(res[33m.[39mbody[33m.[39mtoken)[33m;[39m
+    [90m 99|[39m     [34mexpect[39m([35mtypeof[39m payload[[32m'iat'[39m])[33m.[39m[34mtoBe[39m([32m'number'[39m)[33m;[39m
+    [90m100|[39m     [34mexpect[39m([35mtypeof[39m payload[[32m'exp'[39m])[33m.[39m[34mtoBe[39m([32m'number'[39m)[33m;[39m
+    [90m   |[39m                                   [31m^[39m
+    [90m101|[39m
+    [90m102|[39m     const lifetimeSeconds = (payload['exp'] as number) - (payload['iat…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+

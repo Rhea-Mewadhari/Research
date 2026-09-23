@@ -1,0 +1,95 @@
+{
+  "investigations": {
+    "techStack": [
+      "React 19.0.0 + React Router DOM 7.18.1",
+      "Vite 6.2.0 build tool, TypeScript 5.7.2 (strict: noUnusedLocals, noUnusedParameters)",
+      "Vitest 3.2.4 + @testing-library/react 16.3.2 + jsdom environment",
+      "Test setup at tests/setup.ts mocks localStorage, fetch, and scrollTo",
+      "No path aliases — all imports are relative (no @/ prefix)",
+      "JSX transform: react-jsx (automatic), no explicit React import needed",
+      "Existing context pattern: React Context API with Provider + custom hook exports"
+    ],
+    "features": [
+      "Existing pages: ProductListPage, ProductDetailPage, FavouritesPage, ComparePage — must not regress",
+      "Existing NavBar: renders brand + Catalog/Favourites/Compare NavLinks with badge counts from FavouritesContext/ComparisonContext",
+      "Existing productsApi.ts: single fetchProducts() with hardcoded 'Authorization: Bearer benchmark-token-2024' header",
+      "Existing App.tsx: 4 nested providers (ProductProvider → FilterProvider → FavouritesProvider → ComparisonProvider) → BrowserRouter, AppLayout wrapper with NavBar + ComparisonBar",
+      "Existing routes: /, /product/:id, /favourites, /compare — all inside AppLayout",
+      "Existing auth test files: authLogin.test.tsx, authNavBar.test.tsx, authSignup.test.tsx, authProductsApiToken.test.ts already exist in tests/"
+    ],
+    "architecture": [
+      "New file: src/context/AuthContext.tsx — follows same context pattern as FavouritesContext/ComparisonContext",
+      "New file: src/pages/SignupPage.tsx — export default function, relative import from ../context/AuthContext",
+      "New file: src/pages/LoginPage.tsx — export default function, relative import from ../context/AuthContext",
+      "Modify: src/components/NavBar.tsx — add useAuth() call, conditional render block",
+      "Modify: src/api/productsApi.ts — replace hardcoded token with localStorage.getItem('auth_token') fallback",
+      "Modify: src/App.tsx — add AuthProvider import + wrap, add /signup and /login routes (must be inside AppLayout or standalone — tests use MemoryRouter so both approaches work; hidden tests may render full App)",
+      "AppLayout currently wraps all routes via Outlet — /signup and /login should also be inside this layout so NavBar is visible",
+      "NavBar test wraps in FavouritesProvider → ComparisonProvider → AuthProvider → router — NavBar must consume useAuth without crashing when those providers are present"
+    ],
+    "edgeCases": [
+      "localStorage keys are exact strings: 'auth_token' (JWT) and 'auth_user' (JSON-stringified user object)",
+      "auth_user JSON must be { username, email } shape — no password field ever stored",
+      "Login 401: display hardcoded 'Invalid email or password', NOT the raw server 'error' field (e.g. 'Invalid credentials')",
+      "Signup 409: display raw server 'error' string inline; no token stored",
+      "Signup 400: display details[0].message inline (field-level validation error from server)",
+      "Signup confirm-password mismatch: show error matching /passwords? (do not|don't) match/i; no network fetch issued",
+      "Submit button disabled while fetch is in-flight for both Login (name=/log in/i) and Signup (name=/sign up/i)",
+      "AuthProvider must hydrate synchronously from localStorage on mount (not in useEffect) so NavBar renders correct state on first paint",
+      "logout() must remove both auth_token and auth_user from localStorage and navigate to /login",
+      "login/register success must navigate to /",
+      "productsApi fallback: when no auth_token in localStorage, use 'Bearer benchmark-token-2024'",
+      "NavBar test supplies FavouritesProvider + ComparisonProvider wrappers — NavBar must still call useAuth() safely within those"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "requirement": "Requirements 1, 2, 3, 4 — AuthContext shape, localStorage hydration on mount, logout clears localStorage, password never stored",
+      "description": "Create src/context/AuthContext.tsx exporting AuthProvider component and useAuth hook. Context shape: { user: User | null, token: string | null, isAuthenticated: boolean, login(email, password): Promise<void>, register(email, username, password): Promise<void>, logout(): void }. Hydrate synchronously in useState initializer (not useEffect) from localStorage keys 'auth_token' and 'auth_user'. login() POSTs to /api/auth/login, stores token+user, sets state. register() POSTs to /api/auth/register, stores token+user, sets state. logout() removes both keys and resets state to null. auth_user stored as { username, email } — no password field.",
+      "files": [
+        "src/benchmark-frontend/src/context/AuthContext.tsx"
+      ]
+    },
+    {
+      "id": "task-2",
+      "requirement": "Requirements 20, 21 — App.tsx wraps in AuthProvider and registers /signup and /login routes",
+      "description": "Modify src/App.tsx to import AuthProvider from ./context/AuthContext and wrap the existing provider chain with it (outermost or just inside BrowserRouter). Add two new Route elements: path='/signup' rendering SignupPage and path='/login' rendering LoginPage. Both routes should be inside the AppLayout element so NavBar is present, matching expected structure for hidden tests.",
+      "files": [
+        "src/benchmark-frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "task-3",
+      "requirement": "Requirements 5, 6, 7, 8, 9, 10 — SignupPage fields, mismatch error, success redirect, 409/400 error display, loading state",
+      "description": "Create src/pages/SignupPage.tsx. Render four labeled fields with matching htmlFor/id pairs: email, username, password, confirm password (label matching /confirm password/i). On submit: if password !== confirmPassword, show error matching /passwords? (do not|don't) match/i and return without fetching. Otherwise POST to /api/auth/register, disable submit button while in-flight (name=/sign up/i). On 201: store JWT under 'auth_token', store { username, email } under 'auth_user' in localStorage, navigate to /. On 409: display server's error string inline. On 400: display details[0].message inline.",
+      "files": [
+        "src/benchmark-frontend/src/pages/SignupPage.tsx"
+      ]
+    },
+    {
+      "id": "task-4",
+      "requirement": "Requirements 11, 12, 13, 14 — LoginPage fields, success redirect, 401 error display, loading state",
+      "description": "Create src/pages/LoginPage.tsx. Render two labeled fields with htmlFor/id: email and password. POST to /api/auth/login on submit, disable submit button while in-flight (name=/log in/i). On 200: store JWT under 'auth_token', store { username, email } under 'auth_user' in localStorage, navigate to /. On 401: display hardcoded 'Invalid email or password' text (not the raw server error field); no token stored.",
+      "files": [
+        "src/benchmark-frontend/src/pages/LoginPage.tsx"
+      ]
+    },
+    {
+      "id": "task-5",
+      "requirement": "Requirements 15, 16, 17 — NavBar logged-out links, logged-in username + Log Out button, logout action",
+      "description": "Modify src/components/NavBar.tsx to call useAuth() from ../context/AuthContext. When isAuthenticated is false: render a Link with text matching /sign up/i (href /signup) and a Link with text matching /log in/i (href /login); no Log Out button. When isAuthenticated is true: render the username text and a button with name matching /log out/i; no Sign Up or Log In links. Button onClick calls logout() and navigates to /login.",
+      "files": [
+        "src/benchmark-frontend/src/components/NavBar.tsx"
+      ]
+    },
+    {
+      "id": "task-6",
+      "requirement": "Requirements 18, 19 — productsApi attaches JWT when present, falls back to benchmark token",
+      "description": "Modify src/api/productsApi.ts fetchProducts() to read localStorage.getItem('auth_token'). If a value is present, set Authorization header to 'Bearer <stored JWT>'. If absent, fall back to 'Bearer benchmark-token-2024' (existing hardcoded value). No other changes to the function.",
+      "files": [
+        "src/benchmark-frontend/src/api/productsApi.ts"
+      ]
+    }
+  ]
+}
