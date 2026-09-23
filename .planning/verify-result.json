@@ -3,123 +3,105 @@
   "criteria": [
     {
       "id": "1",
-      "description": "A file src/benchmark-backend/src/db/migrations/004_users.sql exists and contains a CREATE TABLE users DDL with exactly the required columns.",
+      "description": "`requireJwt` is added to `src/middleware/auth.ts`. It verifies the Bearer token using `verifyJwt`, attaches `req.user = { userId }` on success, and calls `next()`. When the token is absent or invalid it responds with HTTP 401 and calls no further handlers. It must not modify `requireAuth`.",
       "passed": true,
-      "evidence": "File read at src/benchmark-backend/src/db/migrations/004_users.sql. Content: CREATE TABLE IF NOT EXISTS users ( id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')) ); — all five required columns present with correct types and constraints."
+      "evidence": "auth.ts lines 51-68: `requireJwt` exported, extracts Bearer token, calls `verifyJwt(token)`, sets `req.user = { userId: payload.userId }`, calls `next()`. Lines 55-63: absent or invalid token → `res.status(401).json({ error: 'Unauthorized' })` with no further handlers. `requireAuth` (lines 21-49) is unmodified. Tests for reqs 4, 5, 9, 10, 11, 12 all pass (all send Bearer tokens and succeed); test 'requires a valid JWT' passes returning 401 without token."
     },
     {
       "id": "2",
-      "description": "A valid registration request returns HTTP 201 with body { user: { id, email, username, createdAt }, token }.",
+      "description": "`src/types/express.d.ts` declares `user?: { userId: string }` on the Express `Request` interface so `req.user.userId` compiles without `any` or `@ts-ignore`.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'registers a new user and returns 201 with a user object and token' ran and passed as part of the 34-test suite."
+      "evidence": "express.d.ts line 6: `user?: { userId: string };` inside `namespace Express { interface Request { ... } }`. `pnpm exec tsc --noEmit` exited with code 0 (no output, no errors)."
     },
     {
       "id": "3",
-      "description": "The password field never appears in the register response body.",
+      "description": "`GET /api/auth/me` is routed through `requireJwt` and its controller reads the user exclusively from `req.user!.userId`. A request carrying a spoofed id in the query string still returns only the token owner's data.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'never includes the password anywhere in the response body' ran and passed."
+      "evidence": "authRoutes.ts line 11: `router.get('/me', requireJwt, me)`. authController.ts line 29: `const user = getUserById(req.user!.userId)` — no query-string param access anywhere. Test 'returns only the caller's own data regardless of a spoofed id in the URL' → ✓ passed (136ms)."
     },
     {
       "id": "4",
-      "description": "The password stored in the users table is a bcrypt hash (begins with $2a$, $2b$, or $2y$), not plaintext.",
+      "description": "`PATCH /api/users/me` requires a valid JWT. Any request without a valid `Authorization: Bearer <token>` header returns HTTP 401.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'stores the password as a bcrypt hash, not plaintext' ran and passed."
+      "evidence": "userRoutes.ts line 9: `router.patch('/me', requireJwt, validate(userUpdateSchema), updateMe)`. Test 'requires a valid JWT' → ✓ passed (2ms), unauthenticated PATCH returned 401."
     },
     {
       "id": "5",
-      "description": "The token in the register response is a three-part JWT whose payload contains userId, email, and username claims.",
+      "description": "`PATCH /api/users/me` with a valid JWT and body `{ username: \"new_value\" }` returns HTTP 200 with JSON body `{ user: { id, email, username, createdAt } }` where `user.username` equals the new value, `user.email` is unchanged, and `user` does not contain a `password` field.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'issues a JWT carrying userId, email, and username claims' ran and passed."
+      "evidence": "userController.ts line 12: `res.json({ user })` where `user` is `toUserResponse(row)` from userService.ts lines 27-29 (only id, email, username, createdAt — no password). Test 'updates the username and returns the new user object' → ✓ passed (55ms)."
     },
     {
       "id": "6",
-      "description": "A registration request with a password shorter than 8 characters returns HTTP 400.",
+      "description": "`PATCH /api/users/me` with an empty body `{}` or a body with no recognised fields returns HTTP 400.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'rejects a password shorter than 8 characters with 400' ran and passed."
+      "evidence": "userSchema.ts lines 10-16: first `.refine()` requires at least one of username/email/currentPassword/newPassword to be present, driving 400 via validate middleware. Test 'returns 400 for an empty body / no recognised fields' → ✓ passed (55ms)."
     },
     {
       "id": "7",
-      "description": "A registration request with the password field omitted returns HTTP 400.",
+      "description": "`PATCH /api/users/me` with `{ newPassword: \"...\" }` but no `currentPassword` field returns HTTP 400.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'rejects a missing password with 400' ran and passed."
+      "evidence": "userSchema.ts lines 18-20: second `.refine()` enforces `!data.newPassword || data.currentPassword !== undefined`. Test 'returns 400 when newPassword is given without currentPassword' → ✓ passed (55ms)."
     },
     {
       "id": "8",
-      "description": "A registration request with a malformed email returns HTTP 400.",
+      "description": "`PATCH /api/users/me` with `{ currentPassword, newPassword }` where `currentPassword` does not match the stored bcrypt hash returns HTTP 400 with JSON body `{ \"error\": \"Current password is incorrect\" }`.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'rejects an invalid email format with 400' ran and passed."
+      "evidence": "userService.ts lines 39-43: `compare(updates.currentPassword, currentRow.password)` → if false, throws `AppError('Current password is incorrect', 400, 'INVALID_PASSWORD')`. Test 'returns 400 \"Current password is incorrect\" when currentPassword is wrong' → ✓ passed (107ms). Stderr confirms AppError with message 'Current password is incorrect'."
     },
     {
       "id": "9",
-      "description": "A registration attempt with a duplicate email returns HTTP 409 with body { \"error\": \"Email already registered\" }.",
+      "description": "`PATCH /api/users/me` with correct `currentPassword` and `newPassword` updates the stored password such that old password login returns 401 and new password login returns 200.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 409 'Email already registered' for a duplicate email\" ran and passed."
+      "evidence": "userService.ts lines 65-67: hashes new password with `hash(updates.newPassword, 10)` and includes in single UPDATE. Test 'updates the password so a subsequent login with the new password succeeds and the old one fails' → ✓ passed (263ms). Stderr shows 'Invalid credentials' AppError triggered for old password login (expected)."
     },
     {
       "id": "10",
-      "description": "A registration attempt with a duplicate username returns HTTP 409 with body { \"error\": \"Username already taken\" }.",
+      "description": "After a successful password update, the `password` column stores a bcrypt hash matching `/^\\$2[aby]?\\$/`.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 409 'Username already taken' for a duplicate username\" ran and passed."
+      "evidence": "userService.ts line 66: `hash(updates.newPassword, 10)` (bcryptjs produces `$2b$` prefix). Test 'stores the updated password as a bcrypt hash, not plaintext' → ✓ passed (157ms)."
     },
     {
       "id": "11",
-      "description": "A login request with valid credentials returns HTTP 200 with { user: { id, email, username, createdAt }, token } and user.password is absent.",
+      "description": "`PATCH /api/users/me` with an email already owned by a different user returns HTTP 409. When the body also includes a username change, neither the email nor the username is written — the update is fully atomic.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'logs in with valid credentials and returns 200 with a user and token' ran and passed."
+      "evidence": "userService.ts lines 46-53: email conflict checked before building UPDATE; lines 55-62: username conflict also checked; line 87: a single `UPDATE users SET ... WHERE id = ?` issued only after all checks pass. Test 'returns 409 for an email already taken by another user, and leaves no field changed' → ✓ passed (109ms). Stderr confirms AppError EMAIL_CONFLICT at statusCode 409."
     },
     {
       "id": "12",
-      "description": "A login request with a wrong password returns HTTP 401 with { \"error\": \"Invalid credentials\" }.",
+      "description": "`PATCH /api/users/me` with a username already owned by a different user returns HTTP 409.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 401 'Invalid credentials' for a wrong password\" ran and passed."
+      "evidence": "userService.ts lines 55-62: username conflict check throws `AppError('Username already taken', 409, 'USERNAME_CONFLICT')`. Test 'returns 409 for a username already taken by another user' → ✓ passed (111ms). Stderr confirms AppError USERNAME_CONFLICT at statusCode 409."
     },
     {
       "id": "13",
-      "description": "A login request with an unknown email returns HTTP 401 with { \"error\": \"Invalid credentials\" } — same message as a wrong password.",
+      "description": "The `password` field does not appear in any API response from `GET /api/auth/me` or `PATCH /api/users/me`.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts \"returns 401 'Invalid credentials' for an unknown email (same message as a wrong password)\" ran and passed."
+      "evidence": "userService.ts `toUserResponse` (lines 27-29) returns only {id, email, username, createdAt}. authController.ts `me` calls `getUserById` (excludes password). Test 'updates the username and returns the new user object' asserts `res.body.user.password === undefined` → ✓ passed. All 44 tests pass with 0 failures."
     },
     {
       "id": "14",
-      "description": "GET /api/auth/me with a valid Bearer token returns HTTP 200 with the user object, and password is absent.",
+      "description": "A Zod validation schema for the PATCH body exists at `src/schemas/userSchema.ts`. Treats all four fields as optional, rejects a body with none of them, and enforces that `newPassword` requires `currentPassword`.",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'returns the user object for a valid token, without the password field' ran and passed."
+      "evidence": "userSchema.ts: exports `userUpdateSchema` (z.object with username/email/currentPassword/newPassword all optional), two `.refine()` calls — first enforces at least one field, second enforces currentPassword when newPassword present. Tests for reqs 6 and 7 pass (400 responses). `pnpm exec tsc --noEmit` exits 0."
     },
     {
       "id": "15",
-      "description": "GET /api/auth/me with no Authorization header returns HTTP 401.",
+      "description": "The `updateUser(userId, updates)` function in `src/services/userService.ts` performs uniqueness validation and all field writes as a single atomic SQL UPDATE (one statement).",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'returns 401 when no Authorization header is provided' ran and passed."
+      "evidence": "userService.ts lines 69-88: builds `setClauses` and `values` arrays from all update fields, then issues a single `db.prepare('UPDATE users SET ... WHERE id = ?').run(...values)` on line 87. Test for req 11 'returns 409 for an email already taken by another user, and leaves no field changed' → ✓ passed (109ms), confirming no partial write before conflict check."
     },
     {
       "id": "16",
-      "description": "GET /api/auth/me with a malformed or invalid token returns HTTP 401.",
+      "description": "Required files exist: `src/schemas/userSchema.ts`, `src/services/userService.ts`, `src/controllers/userController.ts`, `src/routes/userRoutes.ts`, `src/app.ts` (mounts userRoutes at `/api/users`).",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failed. auth.test.ts 'returns 401 for a malformed or invalid token' ran and passed."
+      "evidence": "`ls` confirmed all 7 files exist: middleware/auth.ts, types/express.d.ts, schemas/userSchema.ts, services/userService.ts, controllers/userController.ts, routes/userRoutes.ts, app.ts. app.ts line 28: `app.use('/api/users', userRoutes)`. userRoutes.ts exports Router with PATCH /me behind requireJwt and validate. userController.ts exports `updateMe`. userService.ts exports `updateUser`. `pnpm exec tsc --noEmit` exits 0 (all imports/exports valid). `pnpm vitest run` exits 0 (runtime routing works)."
     },
     {
       "id": "17",
-      "description": "The existing src/benchmark-backend/src/middleware/auth.ts file (requireAuth) is unchanged from git HEAD.",
+      "description": "Running `pnpm vitest run` exits with code 0. All test cases in `src/tests/visible/userProfile.test.ts` pass.",
       "passed": true,
-      "evidence": "git diff HEAD -- src/benchmark-backend/src/middleware/auth.ts produced no output, confirming the file is identical to its committed state."
-    },
-    {
-      "id": "18",
-      "description": "JWT_SECRET is never hardcoded in any source file; always read from process.env.JWT_SECRET.",
-      "passed": true,
-      "evidence": "grep -r 'JWT_SECRET' src/benchmark-backend/src/ --include='*.ts' shows only two occurrences in src/utils/jwt.ts: `process.env['JWT_SECRET'] ?? ''` — no hardcoded string literal values found."
-    },
-    {
-      "id": "19",
-      "description": "All new auth routes are mounted at /api/auth in src/benchmark-backend/src/app.ts.",
-      "passed": true,
-      "evidence": "app.ts line 26: `app.use('/api/auth', authRoutes)` confirmed by grep. Full test suite (34 tests) passes using POST /api/auth/register, POST /api/auth/login, GET /api/auth/me paths."
-    },
-    {
-      "id": "20",
-      "description": "The full visible test suite (pnpm test in src/benchmark-backend) passes with no test failures.",
-      "passed": true,
-      "evidence": "pnpm test output: 'Test Files  2 passed (2), Tests  34 passed (34), Duration  1.00s' — exit code 0, zero failures."
+      "evidence": "`pnpm vitest run` output: 'Test Files  3 passed (3), Tests  44 passed (44)'. userProfile.test.ts: 10 tests all ✓ passed — 'returns only the caller's own data...', 'requires a valid JWT', 'updates the username...', 'returns 400 for an empty body...', 'returns 400 when newPassword is given without currentPassword', 'returns 400 \"Current password is incorrect\"...', 'updates the password so a subsequent login...', 'stores the updated password as a bcrypt hash...', 'returns 409 for an email already taken...', 'returns 409 for a username already taken...'. Exit code 0."
     }
   ]
 }

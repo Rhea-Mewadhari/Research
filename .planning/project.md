@@ -1,25 +1,25 @@
 # Project
 
-Task: task12
+Task: task13
 Target: backend
 
 ## Idea
 
-Implement the backend half of a full-stack authentication system. A `users` table must be added via a new SQL migration. Three endpoints are required: `POST /api/auth/register` creates a new user (hashing the password with bcrypt, returning a signed JWT), `POST /api/auth/login` authenticates an existing user (returning a fresh JWT), and `GET /api/auth/me` identifies the caller by validating the JWT via a new `requireJwt` middleware. Input validation uses the existing Zod schema pattern. Passwords are never returned in any response. The existing `requireAuth` benchmark middleware must not be modified.
+Task 13 extends the authentication foundation built in Task 12 to support user profile management. On the backend this means: (1) a `requireJwt` middleware that verifies the custom JWT and attaches `req.user.userId` to the request; (2) fixing `GET /api/auth/me` to resolve the authenticated user strictly from `req.user.userId` (not from URL query params) by routing it through `requireJwt`; (3) a new `PATCH /api/users/me` endpoint (behind `requireJwt`) that lets users update username, email, and/or password — all changes must be written atomically (no partial writes on uniqueness conflict), passwords hashed with bcrypt, and `currentPassword` required when `newPassword` is supplied; (4) a Zod schema, service, controller, and route wired into `app.ts` at `/api/users`.
 
 ## Spec pointers
 
-- `src/benchmark-backend/instructions/task12.md`: Full task spec for both backend and frontend. Part 1 (lines 19–97) defines all backend requirements — migration DDL, endpoint contracts, validation rules, JWT signing details, middleware shape, and file list.
+- `src/benchmark-backend/instructions/task13.md`: Full task spec — Part 1 covers endpoint contract, validation rules, atomicity constraint, technical constraints, and the list of files to create/modify.
+- `src/benchmark-backend/src/tests/visible/userProfile.test.ts`: Read-only test suite — 9 test cases covering: GET /api/auth/me ownership (spoofed URL id ignored), PATCH 401 without auth, username update returns new user, 400 empty body, 400 missing currentPassword, 400 wrong currentPassword, password change + subsequent login check, bcrypt hash verification, 409 email conflict with atomicity check, 409 username conflict.
 
 ## Affected areas (initial read, not final)
 
-- `src/benchmark-backend/src/db/migrations/004_users.sql`: New file — DDL for the `users` table (id TEXT PK, email UNIQUE, username UNIQUE, password, created_at)
-- `src/benchmark-backend/src/schemas/authSchema.ts`: New file — Zod schemas for register (email, username, password) and login (email, password) request bodies
-- `src/benchmark-backend/src/services/authService.ts`: New file — `register`, `login`, `getById` business logic; bcrypt hashing; JWT signing; no `req`/`res` access
-- `src/benchmark-backend/src/middleware/requireJwt.ts`: New file — Express middleware that reads `Authorization: Bearer <token>`, verifies with `jsonwebtoken`, attaches decoded payload to `req`; returns 401 on failure
-- `src/benchmark-backend/src/controllers/authController.ts`: New file — HTTP handlers for register, login, me; parses request, calls service, sends response
-- `src/benchmark-backend/src/routes/authRoutes.ts`: New file — Express router wiring `POST /register`, `POST /login`, `GET /me` to controllers
-- `src/benchmark-backend/src/app.ts`: Existing file — mount auth router at `/api/auth`
-- `src/benchmark-backend/src/errors/index.ts`: Existing file — `ValidationError`, `AuthError`, `AppError` already defined; may need a `ConflictError` (409) for duplicate email/username
-- `src/benchmark-backend/src/db/client.ts`: Existing file — SQLite client used by services; examine before writing DB queries
-- `src/benchmark-backend/src/tests/visible/auth.test.ts`: Existing visible test file — must not be modified; defines what the endpoints must satisfy
+- `src/benchmark-backend/src/middleware/auth.ts`: Add `requireJwt` middleware — verifies JWT via `verifyJwt`, attaches `req.user = { userId }`, returns 401 on failure. (Do not modify `requireAuth`.)
+- `src/benchmark-backend/src/types/express.d.ts`: Add `user?: { userId: string }` to the Express Request interface so `req.user` is typed.
+- `src/benchmark-backend/src/controllers/authController.ts`: Fix `me` handler to use `req.user!.userId` (populated by `requireJwt`) instead of manually re-parsing the token.
+- `src/benchmark-backend/src/routes/authRoutes.ts`: Add `requireJwt` to `GET /me` so the controller can rely on `req.user`.
+- `src/benchmark-backend/src/schemas/userSchema.ts`: New file — Zod schema for PATCH body (all fields optional, at least one required, `newPassword` requires `currentPassword`).
+- `src/benchmark-backend/src/services/userService.ts`: New file — `updateUser(userId, updates)` validates uniqueness of changed email/username against other users, verifies `currentPassword` via bcrypt, hashes `newPassword`, then writes all fields in a single atomic SQL UPDATE.
+- `src/benchmark-backend/src/controllers/userController.ts`: New file — `updateMe` controller: extracts validated body, calls `userService.updateUser`, returns `{ user }`.
+- `src/benchmark-backend/src/routes/userRoutes.ts`: New file — `PATCH /me` route behind `requireJwt` + `validate(userUpdateSchema)`.
+- `src/benchmark-backend/src/app.ts`: Mount `userRoutes` at `/api/users`.

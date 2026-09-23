@@ -1,94 +1,117 @@
 {
   "investigations": {
     "techStack": [
-      "React 19.0.0 + React Router DOM 7.18.1",
-      "Vite 6.2.0 build tool, TypeScript 5.7.2 (strict: noUnusedLocals, noUnusedParameters)",
-      "Vitest 3.2.4 + @testing-library/react 16.3.2 + jsdom environment",
-      "Test setup at tests/setup.ts mocks localStorage, fetch, and scrollTo",
-      "No path aliases — all imports are relative (no @/ prefix)",
-      "JSX transform: react-jsx (automatic), no explicit React import needed",
-      "Existing context pattern: React Context API with Provider + custom hook exports"
+      "Runtime: Node.js, TypeScript 6.0.2, ESM (type: 'module'), bundler module resolution",
+      "Web framework: Express 5.2.1",
+      "Database: better-sqlite3 12.11.1 — raw SQL via db.prepare(), no ORM",
+      "Auth: bcryptjs 3.0.3 (hashing/compare); custom JWT util in src/utils/jwt.ts using JWT_SECRET env var",
+      "Validation: Zod 4.4.3 — schemas feed the validate() middleware which attaches parsed data to req.validated",
+      "Tests: Vitest 4.1.5 + Supertest 7.2.0",
+      "Package manager: pnpm",
+      "TypeScript strict mode: noUnusedLocals, noUnusedParameters, verbatimModuleSyntax (ESM enforcement)",
+      "No ORM — all queries are raw prepared statements"
     ],
     "features": [
-      "Existing pages: ProductListPage, ProductDetailPage, FavouritesPage, ComparePage — must not regress",
-      "Existing NavBar: renders brand + Catalog/Favourites/Compare NavLinks with badge counts from FavouritesContext/ComparisonContext",
-      "Existing productsApi.ts: single fetchProducts() with hardcoded 'Authorization: Bearer benchmark-token-2024' header",
-      "Existing App.tsx: 4 nested providers (ProductProvider → FilterProvider → FavouritesProvider → ComparisonProvider) → BrowserRouter, AppLayout wrapper with NavBar + ComparisonBar",
-      "Existing routes: /, /product/:id, /favourites, /compare — all inside AppLayout",
-      "Existing auth test files: authLogin.test.tsx, authNavBar.test.tsx, authSignup.test.tsx, authProductsApiToken.test.ts already exist in tests/"
+      "Auth endpoints already exist: POST /api/auth/register, POST /api/auth/login, GET /api/auth/me",
+      "Users table: id (TEXT UUID PK), email (TEXT UNIQUE), username (TEXT UNIQUE), password (TEXT bcrypt hash), created_at (TEXT)",
+      "JWT utils (src/utils/jwt.ts): createJwt(data) signs HS256 with JWT_SECRET; verifyJwt(token) returns JwtPayload|null",
+      "requireAuth middleware (src/middleware/auth.ts): uses digit-sum checksum NOT real JWT; has rate limiting; must NOT be modified",
+      "validate middleware (src/middleware/validate.ts): accepts Zod schema, validates req body/params, attaches to req.validated, returns 400 on failure",
+      "authController.me (src/controllers/authController.ts): currently manually extracts Bearer token and calls getUserFromToken() — must be changed to use req.user.userId from requireJwt",
+      "authService (src/services/authService.ts): registerUser, loginUser, getUserFromToken, toUserResponse() strips password and camelCases timestamps",
+      "express.d.ts (src/types/express.d.ts): already extends Request with validated and id; needs user?: { userId: string } added"
     ],
     "architecture": [
-      "New file: src/context/AuthContext.tsx — follows same context pattern as FavouritesContext/ComparisonContext",
-      "New file: src/pages/SignupPage.tsx — export default function, relative import from ../context/AuthContext",
-      "New file: src/pages/LoginPage.tsx — export default function, relative import from ../context/AuthContext",
-      "Modify: src/components/NavBar.tsx — add useAuth() call, conditional render block",
-      "Modify: src/api/productsApi.ts — replace hardcoded token with localStorage.getItem('auth_token') fallback",
-      "Modify: src/App.tsx — add AuthProvider import + wrap, add /signup and /login routes (must be inside AppLayout or standalone — tests use MemoryRouter so both approaches work; hidden tests may render full App)",
-      "AppLayout currently wraps all routes via Outlet — /signup and /login should also be inside this layout so NavBar is visible",
-      "NavBar test wraps in FavouritesProvider → ComparisonProvider → AuthProvider → router — NavBar must consume useAuth without crashing when those providers are present"
+      "Layer order: routes → controllers → services → db (better-sqlite3 prepared statements)",
+      "Middleware pipeline: requestId → rateLimiter → cors → json → validate() → controller → errorHandler",
+      "app.ts mounts routes at path prefixes: /api/auth, /api/products, /api/favourites, /products; new /api/users must be added here",
+      "Schemas live in src/schemas/ — Zod objects exported and passed to validate()",
+      "Controllers: (req, res, next) functions; read from req.validated; delegate to services; pass errors to next(err) for errorHandler",
+      "Services: typed pure functions; use db.prepare() directly; throw AppError subclasses (AuthError, ValidationError, etc.) on failure; return typed response objects",
+      "Custom errors in src/errors/index.ts: AppError base with statusCode + code; subclasses include AuthError (401), ValidationError (400)",
+      "Types directory: src/types/express.d.ts for Express augmentation",
+      "New files go in: src/schemas/userSchema.ts, src/services/userService.ts, src/controllers/userController.ts, src/routes/userRoutes.ts"
     ],
     "edgeCases": [
-      "localStorage keys are exact strings: 'auth_token' (JWT) and 'auth_user' (JSON-stringified user object)",
-      "auth_user JSON must be { username, email } shape — no password field ever stored",
-      "Login 401: display hardcoded 'Invalid email or password', NOT the raw server 'error' field (e.g. 'Invalid credentials')",
-      "Signup 409: display raw server 'error' string inline; no token stored",
-      "Signup 400: display details[0].message inline (field-level validation error from server)",
-      "Signup confirm-password mismatch: show error matching /passwords? (do not|don't) match/i; no network fetch issued",
-      "Submit button disabled while fetch is in-flight for both Login (name=/log in/i) and Signup (name=/sign up/i)",
-      "AuthProvider must hydrate synchronously from localStorage on mount (not in useEffect) so NavBar renders correct state on first paint",
-      "logout() must remove both auth_token and auth_user from localStorage and navigate to /login",
-      "login/register success must navigate to /",
-      "productsApi fallback: when no auth_token in localStorage, use 'Bearer benchmark-token-2024'",
-      "NavBar test supplies FavouritesProvider + ComparisonProvider wrappers — NavBar must still call useAuth() safely within those"
+      "GET /api/auth/me with spoofed ?id=<other.id>&userId=<other.id> must return the token owner's data — controller must never read from query params",
+      "PATCH /api/users/me without Authorization header → 401 (requireJwt intercepts before controller runs)",
+      "PATCH with empty body {} → 400 (Zod schema must require at least one recognized field via .refine())",
+      "PATCH with body containing only unrecognized fields → 400 (same Zod .refine() rule)",
+      "PATCH with { newPassword } but no currentPassword → 400 (Zod must enforce newPassword requires currentPassword)",
+      "PATCH with correct currentPassword + newPassword: old password must fail login (401), new password must succeed (200)",
+      "PATCH with wrong currentPassword → 400 with exact message 'Current password is incorrect'",
+      "Stored password after update must match /^\\$2[aby]?\\$/ (bcrypt hash, not plaintext)",
+      "PATCH with { username: taken_by_other, email: taken_by_other } → 409 AND both username and email must remain original (no partial write)",
+      "PATCH with only email conflict → 409, all fields unchanged",
+      "PATCH with only username conflict → 409",
+      "Response from GET /api/auth/me and PATCH /api/users/me must never include a password field",
+      "updateUser must do a single atomic SQL UPDATE — no per-field sequential writes that could leave partial state on conflict"
     ]
   },
   "tasks": [
     {
       "id": "task-1",
-      "requirement": "Requirements 1, 2, 3, 4 — AuthContext shape, localStorage hydration on mount, logout clears localStorage, password never stored",
-      "description": "Create src/context/AuthContext.tsx exporting AuthProvider component and useAuth hook. Context shape: { user: User | null, token: string | null, isAuthenticated: boolean, login(email, password): Promise<void>, register(email, username, password): Promise<void>, logout(): void }. Hydrate synchronously in useState initializer (not useEffect) from localStorage keys 'auth_token' and 'auth_user'. login() POSTs to /api/auth/login, stores token+user, sets state. register() POSTs to /api/auth/register, stores token+user, sets state. logout() removes both keys and resets state to null. auth_user stored as { username, email } — no password field.",
+      "requirement": "2 — Express type augmentation: src/benchmark-backend/src/types/express.d.ts must declare user?: { userId: string } on Request",
+      "description": "Add `user?: { userId: string }` to the Express Request interface in express.d.ts alongside the existing validated and id augmentations, so req.user.userId compiles without errors in requireJwt and authController",
       "files": [
-        "src/benchmark-frontend/src/context/AuthContext.tsx"
+        "src/benchmark-backend/src/types/express.d.ts"
       ]
     },
     {
       "id": "task-2",
-      "requirement": "Requirements 20, 21 — App.tsx wraps in AuthProvider and registers /signup and /login routes",
-      "description": "Modify src/App.tsx to import AuthProvider from ./context/AuthContext and wrap the existing provider chain with it (outermost or just inside BrowserRouter). Add two new Route elements: path='/signup' rendering SignupPage and path='/login' rendering LoginPage. Both routes should be inside the AppLayout element so NavBar is present, matching expected structure for hidden tests.",
+      "requirement": "1 — requireJwt middleware: added to src/benchmark-backend/src/middleware/auth.ts; verifies Bearer token via verifyJwt; attaches req.user = { userId }; returns 401 on failure; must not modify requireAuth",
+      "description": "Add an exported requireJwt function to auth.ts: extract Bearer token from Authorization header, call verifyJwt(), on success attach req.user = { userId: payload.userId } and call next(), on missing/invalid token return 401 JSON response without calling next(). Leave requireAuth unchanged.",
       "files": [
-        "src/benchmark-frontend/src/App.tsx"
+        "src/benchmark-backend/src/middleware/auth.ts"
       ]
     },
     {
       "id": "task-3",
-      "requirement": "Requirements 5, 6, 7, 8, 9, 10 — SignupPage fields, mismatch error, success redirect, 409/400 error display, loading state",
-      "description": "Create src/pages/SignupPage.tsx. Render four labeled fields with matching htmlFor/id pairs: email, username, password, confirm password (label matching /confirm password/i). On submit: if password !== confirmPassword, show error matching /passwords? (do not|don't) match/i and return without fetching. Otherwise POST to /api/auth/register, disable submit button while in-flight (name=/sign up/i). On 201: store JWT under 'auth_token', store { username, email } under 'auth_user' in localStorage, navigate to /. On 409: display server's error string inline. On 400: display details[0].message inline.",
+      "requirement": "3 — GET /api/auth/me routed through requireJwt in authRoutes.ts; controller reads user exclusively from req.user!.userId never from query-string params",
+      "description": "In authRoutes.ts: import requireJwt and add it as middleware on the GET /me route before the controller. In authController.ts: rewrite the me handler to use req.user!.userId (set by requireJwt) to look up the user, removing any manual Bearer token extraction or query-param reading.",
       "files": [
-        "src/benchmark-frontend/src/pages/SignupPage.tsx"
+        "src/benchmark-backend/src/routes/authRoutes.ts",
+        "src/benchmark-backend/src/controllers/authController.ts"
       ]
     },
     {
       "id": "task-4",
-      "requirement": "Requirements 11, 12, 13, 14 — LoginPage fields, success redirect, 401 error display, loading state",
-      "description": "Create src/pages/LoginPage.tsx. Render two labeled fields with htmlFor/id: email and password. POST to /api/auth/login on submit, disable submit button while in-flight (name=/log in/i). On 200: store JWT under 'auth_token', store { username, email } under 'auth_user' in localStorage, navigate to /. On 401: display hardcoded 'Invalid email or password' text (not the raw server error field); no token stored.",
+      "requirement": "14 — Zod validation schema for PATCH body at src/benchmark-backend/src/schemas/userSchema.ts: all four fields optional, at least one required, newPassword requires currentPassword",
+      "description": "Create src/schemas/userSchema.ts exporting userUpdateSchema: a Zod object with optional username (string), email (string), currentPassword (string), newPassword (string); add .refine() to reject objects where none of the four fields are present (drives 400); add .refine() to reject newPassword present without currentPassword (drives 400).",
       "files": [
-        "src/benchmark-frontend/src/pages/LoginPage.tsx"
+        "src/benchmark-backend/src/schemas/userSchema.ts"
       ]
     },
     {
       "id": "task-5",
-      "requirement": "Requirements 15, 16, 17 — NavBar logged-out links, logged-in username + Log Out button, logout action",
-      "description": "Modify src/components/NavBar.tsx to call useAuth() from ../context/AuthContext. When isAuthenticated is false: render a Link with text matching /sign up/i (href /signup) and a Link with text matching /log in/i (href /login); no Log Out button. When isAuthenticated is true: render the username text and a button with name matching /log out/i; no Sign Up or Log In links. Button onClick calls logout() and navigates to /login.",
+      "requirement": "15, 8, 9, 10, 11, 12 — updateUser(userId, updates) in src/benchmark-backend/src/services/userService.ts performs all validation and a single atomic SQL UPDATE",
+      "description": "Create src/services/userService.ts exporting updateUser(userId, updates): (1) fetch current user row by userId, (2) if currentPassword provided verify against stored hash via bcrypt.compare — throw AppError 400 with message 'Current password is incorrect' on mismatch, (3) check email uniqueness against other users if email is changing — throw AppError 409 on conflict, (4) check username uniqueness against other users if username is changing — throw AppError 409 on conflict, (5) hash newPassword with bcrypt if provided, (6) execute a single SQL UPDATE with all changed fields atomically, (7) return updated user row via toUserResponse-style mapping (id, email, username, createdAt — no password field).",
       "files": [
-        "src/benchmark-frontend/src/components/NavBar.tsx"
+        "src/benchmark-backend/src/services/userService.ts"
       ]
     },
     {
       "id": "task-6",
-      "requirement": "Requirements 18, 19 — productsApi attaches JWT when present, falls back to benchmark token",
-      "description": "Modify src/api/productsApi.ts fetchProducts() to read localStorage.getItem('auth_token'). If a value is present, set Authorization header to 'Bearer <stored JWT>'. If absent, fall back to 'Bearer benchmark-token-2024' (existing hardcoded value). No other changes to the function.",
+      "requirement": "5, 13, 16 — updateMe controller at src/benchmark-backend/src/controllers/userController.ts returns { user } with no password field",
+      "description": "Create src/controllers/userController.ts exporting updateMe: extract validated body from req.validated, call userService.updateUser(req.user!.userId, body), return res.json({ user }) with status 200. Pass errors to next(err) for the error handler. The returned user object must not include a password field.",
       "files": [
-        "src/benchmark-frontend/src/api/productsApi.ts"
+        "src/benchmark-backend/src/controllers/userController.ts"
+      ]
+    },
+    {
+      "id": "task-7",
+      "requirement": "4, 16 — PATCH /me route in src/benchmark-backend/src/routes/userRoutes.ts behind requireJwt and validate(userUpdateSchema)",
+      "description": "Create src/routes/userRoutes.ts exporting an Express Router with a single PATCH /me route that chains requireJwt, then validate(userUpdateSchema), then updateMe controller.",
+      "files": [
+        "src/benchmark-backend/src/routes/userRoutes.ts"
+      ]
+    },
+    {
+      "id": "task-8",
+      "requirement": "16 — app.ts mounts userRoutes at /api/users",
+      "description": "In src/app.ts import userRoutes from './routes/userRoutes' and mount with app.use('/api/users', userRoutes) alongside the existing /api/auth, /api/products, and /api/favourites mounts.",
+      "files": [
+        "src/benchmark-backend/src/app.ts"
       ]
     }
   ]

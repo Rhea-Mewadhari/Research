@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { registerUser, loginUser, getUserFromToken } from '../services/authService';
+import { registerUser, loginUser, getUserById } from '../services/authService';
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { email, username, password } = req.validated as {
@@ -26,19 +26,10 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 };
 
 export const me = (req: Request, res: Response): void => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-
-  if (!token) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
-
-  const user = getUserFromToken(token);
+  const user = getUserById(req.user!.userId);
   if (!user) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-
   res.json(user);
 };

@@ -1,44 +1,41 @@
 # Milestone
 
-Task: task12
+Task: task13
 Target: backend
 
 ## Requirements addressed
 
-- Requirement 1 (004_users.sql migration): verified — file present with all five required columns (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now'))).
-- Requirement 2 (POST /api/auth/register returns 201): verified — auth.test.ts 'registers a new user and returns 201 with a user object and token' PASSED; 34 tests passed, 0 failed.
-- Requirement 3 (password never in register response): verified — auth.test.ts 'never includes the password anywhere in the response body' PASSED.
-- Requirement 4 (bcrypt hash stored): verified — auth.test.ts 'stores the password as a bcrypt hash, not plaintext' PASSED; row.password matches /^\$2[aby]?\$/.
-- Requirement 5 (JWT carries userId, email, username claims): verified — auth.test.ts 'issues a JWT carrying userId, email, and username claims' PASSED.
-- Requirement 6 (password < 8 chars returns 400): verified — auth.test.ts 'rejects a password shorter than 8 characters with 400' PASSED.
-- Requirement 7 (missing password returns 400): verified — auth.test.ts 'rejects a missing password with 400' PASSED.
-- Requirement 8 (malformed email returns 400): verified — auth.test.ts 'rejects an invalid email format with 400' PASSED.
-- Requirement 9 (duplicate email returns 409): verified — auth.test.ts "returns 409 'Email already registered' for a duplicate email" PASSED; res.body.error === 'Email already registered'.
-- Requirement 10 (duplicate username returns 409): verified — auth.test.ts "returns 409 'Username already taken' for a duplicate username" PASSED; res.body.error === 'Username already taken'.
-- Requirement 11 (POST /api/auth/login returns 200): verified — auth.test.ts 'logs in with valid credentials and returns 200 with a user and token' PASSED; user.password absent.
-- Requirement 12 (wrong password returns 401): verified — auth.test.ts "returns 401 'Invalid credentials' for a wrong password" PASSED.
-- Requirement 13 (unknown email returns 401): verified — auth.test.ts "returns 401 'Invalid credentials' for an unknown email (same message as a wrong password)" PASSED.
-- Requirement 14 (GET /api/auth/me valid token returns 200): verified — auth.test.ts 'returns the user object for a valid token, without the password field' PASSED.
-- Requirement 15 (GET /api/auth/me no header returns 401): verified — auth.test.ts 'returns 401 when no Authorization header is provided' PASSED.
-- Requirement 16 (GET /api/auth/me invalid token returns 401): verified — auth.test.ts 'returns 401 for a malformed or invalid token' PASSED.
-- Requirement 17 (requireAuth middleware unchanged): verified — git diff HEAD -- src/benchmark-backend/src/middleware/auth.ts produced no output.
-- Requirement 18 (JWT_SECRET not hardcoded): verified — grep shows only process.env['JWT_SECRET'] references in src/utils/jwt.ts; no string literal values.
-- Requirement 19 (routes mounted at /api/auth): verified — app.ts line 26: app.use('/api/auth', authRoutes); all three endpoints reachable at required paths.
-- Requirement 20 (full test suite passes): verified — pnpm test: Test Files 2 passed (2), Tests 34 passed (34), Duration 1.00s; exit code 0.
+- requireJwt middleware (req 1): verified — auth.ts exports `requireJwt` that extracts Bearer token, calls `verifyJwt`, sets `req.user = { userId }` and calls `next()` on success; returns 401 on absent/invalid token without calling further handlers; `requireAuth` unmodified. Tests for reqs 4, 5, 9-12 all pass with Bearer tokens; 'requires a valid JWT' returns 401.
+- Express type augmentation (req 2): verified — express.d.ts line 6 declares `user?: { userId: string }` on Express Request interface; `pnpm exec tsc --noEmit` exits 0.
+- GET /api/auth/me ownership fix (req 3): verified — authRoutes.ts line 11 `router.get('/me', requireJwt, me)`; authController.ts line 29 reads `req.user!.userId` only; test 'returns only the caller's own data regardless of a spoofed id in the URL' passed (136ms).
+- PATCH /api/users/me authentication (req 4): verified — userRoutes.ts chains `requireJwt` before controller; test 'requires a valid JWT' returns 401 (2ms).
+- Username update returns new user (req 5): verified — controller returns `{ user }` via `toUserResponse` (id, email, username, createdAt, no password); test 'updates the username and returns the new user object' passed (55ms).
+- Empty body returns 400 (req 6): verified — userSchema.ts first `.refine()` rejects body with none of the four fields; test 'returns 400 for an empty body / no recognised fields' passed (55ms).
+- newPassword without currentPassword returns 400 (req 7): verified — userSchema.ts second `.refine()` enforces currentPassword when newPassword present; test 'returns 400 when newPassword is given without currentPassword' passed (55ms).
+- Wrong currentPassword returns 400 (req 8): verified — userService.ts throws AppError 400 'Current password is incorrect' on bcrypt mismatch; test 'returns 400 "Current password is incorrect" when currentPassword is wrong' passed (107ms).
+- Password change succeeds (req 9): verified — userService.ts hashes newPassword with bcrypt and writes atomically; test 'updates the password so a subsequent login with the new password succeeds and the old one fails' passed (263ms).
+- bcrypt hashing (req 10): verified — userService.ts uses `hash(updates.newPassword, 10)` producing `$2b$` prefix; test 'stores the updated password as a bcrypt hash, not plaintext' passed (157ms).
+- Email conflict is atomic (req 11): verified — userService.ts checks all conflicts before single `UPDATE`; test 'returns 409 for an email already taken by another user, and leaves no field changed' passed (109ms); username unchanged after 409.
+- Username conflict (req 12): verified — userService.ts throws AppError 409 USERNAME_CONFLICT; test 'returns 409 for a username already taken by another user' passed (111ms).
+- Password never in responses (req 13): verified — `toUserResponse` in userService returns only {id, email, username, createdAt}; `res.body.user.password === undefined` assertion passed; all 44 tests pass.
+- Zod schema (req 14): verified — userSchema.ts exports `userUpdateSchema` with four optional fields and two `.refine()` calls; `pnpm exec tsc --noEmit` exits 0.
+- Atomic SQL update (req 15): verified — userService.ts builds setClauses array and issues a single `db.prepare('UPDATE users SET ... WHERE id = ?').run(...)` only after all checks pass; req 11 test confirms no partial write.
+- File structure (req 16): verified — all 7 files confirmed present; app.ts line 28 mounts `userRoutes` at `/api/users`; `pnpm exec tsc --noEmit` exits 0.
+- All visible tests pass (req 17): verified — `pnpm vitest run` output: Test Files 3 passed (3), Tests 44 passed (44); userProfile.test.ts 10/10 passed; exit code 0.
 
 ## Files changed
 
-- `src/benchmark-backend/src/db/migrations/004_users.sql`: New file — CREATE TABLE users DDL with id, email, username, password, created_at columns.
-- `src/benchmark-backend/src/schemas/authSchema.ts`: New file — Zod schemas for register (email, username, password >= 8 chars) and login (email, password) request bodies.
-- `src/benchmark-backend/src/services/authService.ts`: New file — register, login, getById business logic; bcrypt hashing; JWT signing via process.env.JWT_SECRET.
-- `src/benchmark-backend/src/middleware/requireJwt.ts`: New file — Express middleware reading Authorization: Bearer token, verifying JWT, attaching decoded payload to req; returns 401 on failure.
-- `src/benchmark-backend/src/controllers/authController.ts`: New file — HTTP handlers for register, login, me; parses body, calls service, sends response; password excluded from all responses.
-- `src/benchmark-backend/src/routes/authRoutes.ts`: New file — Express router wiring POST /register, POST /login, GET /me to controllers via requireJwt middleware.
-- `src/benchmark-backend/src/utils/jwt.ts`: New file — JWT sign/verify utilities reading JWT_SECRET from process.env.
-- `src/benchmark-backend/src/errors/index.ts`: Modified — added ConflictError (409) for duplicate email/username cases.
-- `src/benchmark-backend/src/app.ts`: Modified — mounts auth router at /api/auth.
+- `src/benchmark-backend/src/types/express.d.ts`: Added `user?: { userId: string }` to Express Request interface for typed `req.user.userId` access.
+- `src/benchmark-backend/src/middleware/auth.ts`: Added exported `requireJwt` middleware — verifies Bearer JWT via `verifyJwt`, attaches `req.user = { userId }`, returns 401 on failure; `requireAuth` left unmodified.
+- `src/benchmark-backend/src/routes/authRoutes.ts`: Added `requireJwt` to `GET /me` route before the `me` controller.
+- `src/benchmark-backend/src/controllers/authController.ts`: Rewrote `me` handler to read user from `req.user!.userId` (set by `requireJwt`) instead of manually extracting the Bearer token.
+- `src/benchmark-backend/src/schemas/userSchema.ts`: New file — Zod schema `userUpdateSchema` with optional username/email/currentPassword/newPassword fields and two `.refine()` calls enforcing at least one field and currentPassword when newPassword present.
+- `src/benchmark-backend/src/services/userService.ts`: New file — exports `updateUser(userId, updates)`: verifies currentPassword via bcrypt, checks email/username uniqueness against other users, hashes newPassword, performs single atomic SQL UPDATE; returns user without password field.
+- `src/benchmark-backend/src/controllers/userController.ts`: New file — exports `updateMe` controller that calls `userService.updateUser` and returns `{ user }` with status 200.
+- `src/benchmark-backend/src/routes/userRoutes.ts`: New file — Express Router with `PATCH /me` behind `requireJwt` + `validate(userUpdateSchema)` + `updateMe`.
+- `src/benchmark-backend/src/app.ts`: Mounted `userRoutes` at `/api/users`.
 
 ## Checks
 
-- pnpm test: 34 passed, 0 failed
-- pnpm run build: pass
+- pnpm test: 44 passed, 0 failed (3 test files: auth.test.ts, products.test.ts, userProfile.test.ts — 10/10 userProfile tests)
+- pnpm run build: pass (tsc --noEmit exits 0, no TypeScript errors)

@@ -73,6 +73,12 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
   return { user, token };
 }
 
+export function getUserById(userId: string): UserResponse | null {
+  const row = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as UserRow | undefined;
+  if (!row) return null;
+  return toUserResponse(row);
+}
+
 export function getUserFromToken(token: string): UserResponse | null {
   const payload = verifyJwt(token);
   if (!payload) return null;

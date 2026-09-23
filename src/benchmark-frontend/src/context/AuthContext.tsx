@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 interface User {
+  id?: string;
   username: string;
   email: string;
+  createdAt?: string;
 }
 
 interface AuthContextValue {
@@ -12,6 +14,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -83,8 +86,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuth({ user: null, token: null });
   }
 
+  function updateUser(updatedUser: User): void {
+    localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+    setAuth((prev) => ({ ...prev, user: updatedUser }));
+  }
+
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

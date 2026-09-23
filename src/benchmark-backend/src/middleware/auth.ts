@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import { verifyJwt } from '../utils/jwt';
 
 const AUTH_FAIL_WINDOW_MS = 60_000;
 const MAX_AUTH_FAILURES = 5;
@@ -44,5 +45,24 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
   }
 
   console.log(`[AUTH] ${timestamp} ip=${ip} token=${tokenPrefix}… result=accepted`);
+  next();
+}
+
+export function requireJwt(req: Request, res: Response, next: NextFunction): void {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+  if (!token) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const payload = verifyJwt(token);
+  if (!payload) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  req.user = { userId: payload.userId };
   next();
 }
