@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/hidden.profile-management.test.tsx (7 tests) 418ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  18:21:46
+   Duration  1.03s (transform 39ms, setup 57ms, collect 141ms, tests 418ms, environment 198ms, prepare 86ms)
+

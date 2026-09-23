@@ -55,7 +55,8 @@ export function register(email: string, username: string, password: string): Aut
     throw new ConflictError('Username already taken');
   }
 
-  const passwordHash = bcrypt.hashSync(password, 10);
+  const bcryptRounds = process.env['NODE_ENV'] === 'test' ? 1 : 10;
+  const passwordHash = bcrypt.hashSync(password, bcryptRounds);
   const id = crypto.randomUUID();
   db.prepare(
     'INSERT INTO users (id, email, username, password) VALUES (?, ?, ?, ?)'

@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useLayoutEffect,
   useState,
   type ReactNode,
 } from 'react';
@@ -22,30 +21,28 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function loadStoredToken(): string | null {
+  return localStorage.getItem('auth_token');
+}
+
+function loadStoredUser(): User | null {
+  const stored = localStorage.getItem('auth_user');
+  if (!stored) return null;
+  try {
+    return JSON.parse(stored) as User;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-
-  useLayoutEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('auth_user');
-
-    if (storedToken) {
-      setToken(storedToken);
-    }
-
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser) as User);
-      } catch {
-        // malformed JSON — treat as logged-out user
-      }
-    }
-  }, []);
+  const [token, setToken] = useState<string | null>(loadStoredToken);
+  const [user, setUser] = useState<User | null>(loadStoredUser);
 
   async function login(email: string, password: string): Promise<void> {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -98,9 +95,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  function updateUser(updatedUser: User): void {
+    setUser(updatedUser);
+    localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, token, isAuthenticated: token !== null, login, register, logout }}
+      value={{ user, token, isAuthenticated: token !== null, login, register, logout, updateUser }}
     >
       {children}
     </AuthContext.Provider>
