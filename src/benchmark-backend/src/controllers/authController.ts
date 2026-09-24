@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { registerUser, loginUser, getUserById } from '../services/authService';
+import { updateUser } from '../services/userService';
 
 export function register(req: Request, res: Response, next: NextFunction): void {
   try {
@@ -29,6 +30,21 @@ export function me(req: Request, res: Response, next: NextFunction): void {
   try {
     const user = getUserById(req.user.userId);
     res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export function patchMe(req: Request, res: Response, next: NextFunction): void {
+  try {
+    const data = req.validated as {
+      username?: string;
+      email?: string;
+      currentPassword?: string;
+      newPassword?: string;
+    };
+    const result = updateUser(req.user.userId, data);
+    res.status(200).json({ user: result });
   } catch (err) {
     next(err);
   }

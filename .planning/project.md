@@ -1,25 +1,23 @@
 # Project
 
-Task: task12
+Task: task13
 Target: backend
 
 ## Idea
 
-Implement an authentication foundation for the backend API. This involves adding a `users` table via a SQL migration (`004_users.sql`), then building three endpoints (`POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`) that respectively create users with bcrypt-hashed passwords and return a JWT, authenticate users and return a fresh JWT, and return the current user's profile from a Bearer token. A new `requireJwt` middleware handles JWT verification. All validation uses the existing Zod schema pattern (mirroring `src/schemas/favouriteSchema.ts`). The existing `requireAuth` benchmark middleware must not be touched. Duplicate email/username return 409; invalid credentials return 401; the password field must never appear in any API response.
+Task 13 (backend portion) extends the existing Task 12 authentication foundation with a user profile management endpoint. The core addition is `PATCH /api/users/me`, a protected route that allows the authenticated user to update their own username, email, and/or password atomically. The update must be fully atomic (no partial writes if validation fails), must hash new passwords with bcrypt, must check for uniqueness conflicts on email/username, and must never return the password field. Additionally, `GET /api/auth/me` must be verified to resolve the user strictly from the JWT payload (`req.user.userId`), not from any URL-supplied parameter.
 
 ## Spec pointers
 
-- `src/benchmark-backend/instructions/task12.md` (Part 1 — Backend): Full specification covering the database migration DDL, all three endpoint request/response contracts, error codes and messages, `requireJwt` middleware design, Zod schema requirements, JWT payload shape (`{ userId, email, username }`), bcrypt hashing requirement, and the complete list of files to create or modify.
+- `src/benchmark-backend/instructions/task13.md`: Full task specification — backend endpoint rules, request/response shapes, validation requirements, atomicity constraint, files to create/modify, and success criteria
 
 ## Affected areas (initial read, not final)
 
-- `src/benchmark-backend/src/db/migrations/004_users.sql` — new migration creating `users` table (id TEXT PK, email TEXT UNIQUE, username TEXT UNIQUE, password TEXT, created_at TEXT)
-- `src/benchmark-backend/src/schemas/authSchema.ts` — new Zod schemas: `registerSchema` (email, username, password ≥8 chars) and `loginSchema` (email, password)
-- `src/benchmark-backend/src/services/authService.ts` — new service: `registerUser` (hash password, insert, return user+token), `loginUser` (verify password, return user+token), `getUserById` (lookup for /me)
-- `src/benchmark-backend/src/middleware/requireJwt.ts` — new middleware: extracts Bearer token, verifies with `JWT_SECRET`, attaches decoded payload to `req`; returns 401 on missing/invalid/expired
-- `src/benchmark-backend/src/controllers/authController.ts` — new controller: `register`, `login`, `me` handlers; parses request, calls service, sends response; never exposes password field
-- `src/benchmark-backend/src/routes/authRoutes.ts` — new router mounting POST /register, POST /login, GET /me (with requireJwt)
-- `src/benchmark-backend/src/app.ts` — modified to import and mount `authRoutes` at `/api/auth`
-- `src/benchmark-backend/src/db/client.ts` — read-only reference; verify how migrations are loaded (the new migration must be picked up automatically)
-- `src/benchmark-backend/src/errors/index.ts` — read-only reference; `ValidationError`, `AuthError`, `AppError` exist and will be reused
-- `src/benchmark-backend/src/tests/visible/auth.test.ts` — read-only visible test; defines expected behaviour for all three endpoints including bcrypt hash check and JWT payload claims
+- `src/benchmark-backend/src/schemas/userSchema.ts`: New file — Zod schema for PATCH /api/users/me request body (username, email, currentPassword, newPassword all optional, at least one required)
+- `src/benchmark-backend/src/services/userService.ts`: New file — `updateUser` service with atomic update logic, bcrypt hashing, and uniqueness checks
+- `src/benchmark-backend/src/controllers/authController.ts`: Verify/fix `me` controller to use `req.user.userId` only, never URL params; add `patchMe` controller for the PATCH endpoint
+- `src/benchmark-backend/src/routes/userRoutes.ts`: New file — `PATCH /api/users/me` route wired to `requireJwt` and the patch controller
+- `src/benchmark-backend/src/app.ts`: Mount the new user routes at `/api/users`
+- `src/benchmark-backend/src/services/authService.ts`: Reference only — provides `UserRow`, `UserResult`, and `getUserById` patterns to follow
+- `src/benchmark-backend/src/middleware/requireJwt.ts`: Reference only — must not be modified; used to guard the new route
+- `src/benchmark-backend/src/tests/visible/userProfile.test.ts`: Visible test file — defines the exact behaviours that must pass (ownership check, 200/400/409 cases, atomicity, bcrypt storage)

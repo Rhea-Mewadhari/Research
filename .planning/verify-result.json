@@ -3,171 +3,87 @@
   "criteria": [
     {
       "id": "1",
-      "description": "Migration file 004_users.sql exists and creates users table with correct columns",
+      "description": "GET /api/auth/me resolves the authenticated user strictly from req.user.userId; query params id/userId are ignored",
       "passed": true,
-      "evidence": "File src/benchmark-backend/src/db/migrations/004_users.sql exists. Contents: CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))."
+      "evidence": "userProfile.test.ts > GET /api/auth/me — ownership > 'returns only the caller's own data regardless of a spoofed id in the URL' — PASSED (vitest run: Test Files 3 passed, Tests 44 passed)"
     },
     {
       "id": "2",
-      "description": "Migration is picked up automatically by runMigrations(); no changes to migrate.ts or client.ts needed",
+      "description": "PATCH /api/users/me returns HTTP 401 when no valid JWT is present",
       "passed": true,
-      "evidence": "pnpm test in src/benchmark-backend ran 34 tests across 2 test files, all passed (0 failures). All auth.test.ts DB assertions passed without any manual migration setup beyond existing app bootstrap."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'requires a valid JWT' — PASSED (vitest run: Tests 44 passed)"
     },
     {
       "id": "3",
-      "description": "POST /api/auth/register is mounted and reachable (not 404)",
+      "description": "PATCH /api/users/me with { username } returns HTTP 200 with body { user: { id, email, username, createdAt } }; password not in response",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34), 0 failures. auth.test.ts register test (line 26 expects HTTP 201) passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'updates the username and returns the new user object' — PASSED (vitest run: Tests 44 passed)"
     },
     {
       "id": "4",
-      "description": "Valid registration responds HTTP 201 with { user: { id, email, username, createdAt }, token }",
+      "description": "PATCH /api/users/me with empty body ({}) returns HTTP 400",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 25-41 assertions (status 201, user.email, user.username, user.id, user.createdAt, token all non-empty strings) passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'returns 400 for an empty body / no recognised fields' — PASSED (vitest run: Tests 44 passed)"
     },
     {
       "id": "5",
-      "description": "password field absent from registration response; plaintext password not in serialized body",
+      "description": "PATCH /api/users/me with { newPassword } but no currentPassword returns HTTP 400",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts line 39 (res.body.user.password toBeUndefined) and lines 43-51 (JSON.stringify not to contain 'plaintext-secret') passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'returns 400 when newPassword is given without currentPassword' — PASSED (vitest run: Tests 44 passed)"
     },
     {
       "id": "6",
-      "description": "Password stored as bcrypt hash starting with $2a$, $2b$, or $2y$",
+      "description": "PATCH /api/users/me with wrong currentPassword returns HTTP 400 with { error: 'Current password is incorrect' }",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 53-67 (SELECT password FROM users WHERE email = ?, asserts row.password !== 'plaintext-secret' and matches /^\\$2[aby]?\\$/) passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'returns 400 \"Current password is incorrect\" when currentPassword is wrong' — PASSED (vitest run: Tests 44 passed; AppError 'Current password is incorrect' statusCode 400 observed in stderr confirming the error path)"
     },
     {
       "id": "7",
-      "description": "JWT is three-segment dot-separated; decoded payload contains userId, email, username claims",
+      "description": "PATCH /api/users/me with correct currentPassword + newPassword returns 200; old password login → 401, new password login → 200",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 69-83 (token.split('.').length === 3, payload.userId === res.body.user.id, payload.email, payload.username) passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'updates the password so a subsequent login with the new password succeeds and the old one fails' — PASSED (vitest run: Tests 44 passed; AuthError 'Invalid credentials' statusCode 401 in stderr confirms old-password 401 path)"
     },
     {
       "id": "8",
-      "description": "Password shorter than 8 characters responds HTTP 400",
+      "description": "After password update, users table stores bcrypt hash (matches /^\\$2[aby]?\\$/) not plaintext",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 85-93 (password 'short1' → res.status === 400) passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'stores the updated password as a bcrypt hash, not plaintext' — PASSED (vitest run: Tests 44 passed)"
     },
     {
       "id": "9",
-      "description": "Missing password field responds HTTP 400",
+      "description": "PATCH /api/users/me with email taken by another user returns HTTP 409; follow-up GET /api/auth/me shows original username and email (atomicity)",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 95-102 (body {email, username} with no password → res.status === 400) passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'returns 409 for an email already taken by another user, and leaves no field changed' — PASSED (vitest run: Tests 44 passed; AppError 'Email already registered' statusCode 409 in stderr)"
     },
     {
       "id": "10",
-      "description": "Malformed email responds HTTP 400",
+      "description": "PATCH /api/users/me with username taken by another user returns HTTP 409",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 104-112 (email 'not-an-email' → res.status === 400) passed."
+      "evidence": "userProfile.test.ts > PATCH /api/users/me > 'returns 409 for a username already taken by another user' — PASSED (vitest run: Tests 44 passed; AppError 'Username already taken' statusCode 409 in stderr)"
     },
     {
       "id": "11",
-      "description": "Duplicate email responds HTTP 409 with { error: 'Email already registered' }",
+      "description": "src/benchmark-backend/src/schemas/userSchema.ts exports a Zod schema with optional username/email/currentPassword/newPassword; requires at least one of {username,email,newPassword}; newPassword requires currentPassword",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 114-129 (second registration same email → res.status === 409, res.body.error === 'Email already registered') passed."
+      "evidence": "File exists at src/benchmark-backend/src/schemas/userSchema.ts (confirmed by ls). Requirements 4 and 5 pass — Zod schema rejections produce the asserted 400 responses (vitest run: Tests 44 passed)"
     },
     {
       "id": "12",
-      "description": "Duplicate username responds HTTP 409 with { error: 'Username already taken' }",
+      "description": "src/benchmark-backend/src/services/userService.ts exports an updateUser function performing atomic profile update; no partial write on validation failure",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 131-146 (second registration same username → res.status === 409, res.body.error === 'Username already taken') passed."
+      "evidence": "File exists; grep shows 'export function updateUser(' at line 14 of userService.ts. Requirement 9 atomicity assertion passes: follow-up GET after 409 shows original values (vitest run: Tests 44 passed)"
     },
     {
       "id": "13",
-      "description": "POST /api/auth/login is mounted and reachable",
+      "description": "src/benchmark-backend/src/routes/userRoutes.ts defines Express router with PATCH /me behind requireJwt; app.ts mounts it at /api/users",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts line 162 (login → HTTP 200 not 404) passed."
+      "evidence": "userRoutes.ts line 9: \"router.patch('/me', requireJwt, validate(updateUserSchema), patchMe)\"; line 11: \"export default router\". app.ts line 28: \"app.use('/api/users', userRoutes)\". Requirements 2–10 all pass confirming the route is registered and JWT-protected."
     },
     {
       "id": "14",
-      "description": "Valid login responds HTTP 200 with { user: { id, email, username, createdAt }, token } and no password field",
+      "description": "pnpm test from src/benchmark-backend exits 0; all userProfile.test.ts tests pass; no regressions in auth.test.ts or other test files",
       "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 160-171 (res.status === 200, res.body.user.email, res.body.user.username, res.body.user.password === undefined, res.body.token) passed."
-    },
-    {
-      "id": "15",
-      "description": "Correct email, wrong password responds HTTP 401 with { error: 'Invalid credentials' }",
-      "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 173-181 (res.status === 401, res.body.error === 'Invalid credentials') passed."
-    },
-    {
-      "id": "16",
-      "description": "Unknown email responds HTTP 401 with { error: 'Invalid credentials' } (no information leakage)",
-      "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 183-191 (res.status === 401, res.body.error === 'Invalid credentials') passed."
-    },
-    {
-      "id": "17",
-      "description": "GET /api/auth/me is mounted and reachable",
-      "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts line 209 (GET /api/auth/me → HTTP 200 not 404) passed."
-    },
-    {
-      "id": "18",
-      "description": "Valid Bearer JWT on GET /api/auth/me responds HTTP 200 with user object (no password)",
-      "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 207-216 (res.status === 200, res.body.email, res.body.username, res.body.password === undefined) passed."
-    },
-    {
-      "id": "19",
-      "description": "No Authorization header on GET /api/auth/me responds HTTP 401",
-      "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 218-221 (res.status === 401) passed."
-    },
-    {
-      "id": "20",
-      "description": "Malformed/invalid token on GET /api/auth/me responds HTTP 401",
-      "passed": true,
-      "evidence": "pnpm test: 34 passed (34). auth.test.ts lines 223-229 (Authorization: Bearer not-a-real-jwt → res.status === 401) passed."
-    },
-    {
-      "id": "21",
-      "description": "src/middleware/requireJwt.ts exports middleware that verifies Bearer token via JWT_SECRET, attaches payload, calls next(); returns 401 on missing/bad token",
-      "passed": true,
-      "evidence": "File src/benchmark-backend/src/middleware/requireJwt.ts exists. Line 13: jwt.verify(token, process.env.JWT_SECRET as string). Requirements 18-20 all pass end-to-end (34/34 tests pass)."
-    },
-    {
-      "id": "22",
-      "description": "Existing src/middleware/auth.ts (requireAuth) is not modified",
-      "passed": true,
-      "evidence": "git diff src/benchmark-backend/src/middleware/auth.ts returned no output (zero changes). Existing product endpoint tests still pass (34/34 tests, 2 test files)."
-    },
-    {
-      "id": "23",
-      "description": "src/schemas/authSchema.ts exports registerSchema (email, username, password min 8) and loginSchema (email, password); tsc --noEmit exits 0",
-      "passed": true,
-      "evidence": "File src/benchmark-backend/src/schemas/authSchema.ts exists. pnpm exec tsc --noEmit exited 0 with no type errors (only a pnpm config warning). Validation-failure tests (requirements 8-10) return 400 (all 34 tests pass)."
-    },
-    {
-      "id": "24",
-      "description": "JWT_SECRET is read from process.env.JWT_SECRET only; not hardcoded",
-      "passed": true,
-      "evidence": "grep -rn 'JWT_SECRET' src/benchmark-backend/src/ returns only two hits: requireJwt.ts:13: process.env.JWT_SECRET and authService.ts:30: process.env.JWT_SECRET. No bare secret string found."
-    },
-    {
-      "id": "25",
-      "description": "JWT signed with { expiresIn: '24h' }",
-      "passed": true,
-      "evidence": "authService.ts line 31: { expiresIn: '24h' } confirmed in signToken() function. JWT payload assertion tests (auth.test.ts lines 69-83) pass, implicitly confirming exp ≈ iat + 86400."
-    },
-    {
-      "id": "26",
-      "description": "app.ts imports authRoutes and mounts at /api/auth before 404 handler and errorHandler",
-      "passed": true,
-      "evidence": "grep 'authRoutes|/api/auth' src/benchmark-backend/src/app.ts returned: \"import authRoutes from './routes/authRoutes';\" and \"app.use('/api/auth', authRoutes);\". All three auth endpoints are reachable (requirements 3, 13, 17 all pass)."
-    },
-    {
-      "id": "27",
-      "description": "All six new files are created",
-      "passed": true,
-      "evidence": "ls of all 6 paths succeeded without errors: src/benchmark-backend/src/db/migrations/004_users.sql, src/benchmark-backend/src/schemas/authSchema.ts, src/benchmark-backend/src/services/authService.ts, src/benchmark-backend/src/middleware/requireJwt.ts, src/benchmark-backend/src/controllers/authController.ts, src/benchmark-backend/src/routes/authRoutes.ts."
-    },
-    {
-      "id": "28",
-      "description": "pnpm test exits 0 with all auth.test.ts cases passing and no regressions in other test files",
-      "passed": true,
-      "evidence": "pnpm test in src/benchmark-backend: Test Files 2 passed (2), Tests 34 passed (34), Duration 884ms. Exit code 0. No failures."
+      "evidence": "vitest run output: 'Test Files  3 passed (3), Tests  44 passed (44), Duration 1.24s'. products.test.ts (19 tests), auth.test.ts (12 tests), userProfile.test.ts (13 tests) all fully green. Build also passed: tsc -p tsconfig.build.json produced no errors and exited 0."
     }
   ]
 }
