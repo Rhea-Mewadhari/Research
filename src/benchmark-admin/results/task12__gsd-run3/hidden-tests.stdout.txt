@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ❯ tests/hidden.auth-foundation.test.tsx (6 tests | 1 failed) 222ms
+   ✓ Hidden: auth foundation — password field hardening > the signup password and confirm-password inputs use type="password" 14ms
+   ✓ Hidden: auth foundation — password field hardening > the login password input uses type="password" 2ms
+   ✓ Hidden: auth foundation — password field hardening > never persists the submitted plaintext password anywhere in localStorage 186ms
+   ✓ Hidden: auth foundation — session hydration robustness > a fresh mount picks up an existing session from localStorage (survives a reload) 3ms
+   × Hidden: auth foundation — session hydration robustness > does not crash when auth_user in localStorage is malformed JSON 5ms
+     → expected [Function] to not throw an error but 'SyntaxError: Expected property name o…' was thrown
+   ✓ Hidden: auth foundation — session hydration robustness > a fresh mount after logout does not resurrect the session from localStorage 12ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  08:06:36
+   Duration  589ms (transform 32ms, setup 29ms, collect 73ms, tests 222ms, environment 121ms, prepare 26ms)
+
+[ELIFECYCLE] Test failed. See above for more details.

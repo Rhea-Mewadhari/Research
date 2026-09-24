@@ -3,6 +3,9 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
+    env: {
+      JWT_SECRET: 'test-secret',
+    },
     setupFiles: ['./tests/setup.ts'],
     exclude: ['**/dist/**', '**/node_modules/**'],
     coverage: {

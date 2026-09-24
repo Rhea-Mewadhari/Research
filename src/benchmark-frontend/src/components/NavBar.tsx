@@ -1,10 +1,13 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useFavouritesContext } from '../context/FavouritesContext';
 import { useComparisonContext } from '../context/ComparisonContext';
+import { useAuthContext } from '../context/AuthContext';
 
 export default function NavBar() {
   const { favouriteIds } = useFavouritesContext();
   const { comparedIds } = useComparisonContext();
+  const { isAuthenticated, user, logout } = useAuthContext();
+  const navigate = useNavigate();
 
   return (
     <nav className="navbar" aria-label="Main navigation">
@@ -61,6 +64,26 @@ export default function NavBar() {
           </span>
         )}
       </NavLink>
+
+      {isAuthenticated ? (
+        <>
+          <span>{user?.username}</span>
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
+          >
+            Log Out
+          </button>
+        </>
+      ) : (
+        <>
+          <Link to="/signup">Sign Up</Link>
+          <Link to="/login">Log In</Link>
+        </>
+      )}
     </nav>
   );
 }

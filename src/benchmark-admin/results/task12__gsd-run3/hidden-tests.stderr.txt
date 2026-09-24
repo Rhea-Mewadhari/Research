@@ -1,0 +1,23 @@
+$ vitest run tests/hidden.auth-foundation.test.tsx
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/hidden.auth-foundation.test.tsx > Hidden: auth foundation — session hydration robustness > does not crash when auth_user in localStorage is malformed JSON
+AssertionError: expected [Function] to not throw an error but 'SyntaxError: Expected property name o…' was thrown
+
+[32m- Expected:[39m 
+undefined
+
+[31m+ Received:[39m 
+"SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+
+ ❯ tests/hidden.auth-foundation.test.tsx:125:38
+    123|     localStorage.setItem('auth_token', 'some.jwt.token');
+    124|     localStorage.setItem('auth_user', '{not valid json');
+    125|     expect(() => renderNavBar()).not.toThrow();
+       |                                      ^
+    126|   });
+    127| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
