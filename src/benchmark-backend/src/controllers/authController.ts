@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/authService';
+import * as userService from '../services/userService';
 import { AppError } from '../errors';
 
 export const registerHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -31,6 +32,26 @@ export const meHandler = async (req: Request, res: Response, next: NextFunction)
     }
     const user = authService.getById(userId);
     res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const patchMeHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.jwtPayload?.userId;
+    if (!userId) {
+      next(new AppError('Unauthorized', 401, 'AUTH_ERROR'));
+      return;
+    }
+    const input = req.validated as {
+      username?: string;
+      email?: string;
+      currentPassword?: string;
+      newPassword?: string;
+    };
+    const user = await userService.updateUser(userId, input);
+    res.status(200).json({ user });
   } catch (err) {
     next(err);
   }

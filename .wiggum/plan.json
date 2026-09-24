@@ -1,48 +1,30 @@
 {
-  "taskId": "task12",
+  "taskId": "task13",
   "target": "backend",
   "phases": [
     {
       "id": "phase-1",
-      "title": "Add 004_users.sql migration",
+      "title": "Create src/schemas/userSchema.ts — Zod schema for PATCH /api/users/me body",
       "status": "done",
-      "notes": "Create src/benchmark-backend/src/db/migrations/004_users.sql with the users table (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now'))). The migrate.ts runner picks up all *.sql files sorted alphabetically, so naming is sufficient — no code changes needed."
+      "notes": "Created patchMeSchema with two refines: at least one of username/email/newPassword must be provided, and currentPassword is required when newPassword is set. Build passes."
     },
     {
       "id": "phase-2",
-      "title": "Create authSchema.ts with Zod schemas",
+      "title": "Create src/services/userService.ts — updateUser with atomic DB update, bcrypt hashing, uniqueness checks",
       "status": "done",
-      "notes": "Create src/benchmark-backend/src/schemas/authSchema.ts. Export registerSchema (z.object with email: z.string().email(), username: z.string().min(1), password: z.string().min(8)) and loginSchema (z.object with email and password). Follow the pattern in src/schemas/favouriteSchema.ts."
+      "notes": "Created userService.ts with updateUser: verifies currentPassword before password change, checks email/username uniqueness against other users, builds a single atomic SQL UPDATE. Build passes. Tests remain at 8 failures but all are 404s (route not mounted yet — that's phases 3 and 4)."
     },
     {
       "id": "phase-3",
-      "title": "Create authService.ts (register, login, getById)",
+      "title": "Add patchMeHandler to src/controllers/authController.ts and verify meHandler uses only JWT userId",
       "status": "done",
-      "notes": "Created src/benchmark-backend/src/services/authService.ts with register(), login(), getById(). Added bcrypt and jsonwebtoken (plus @types) to package.json and ran pnpm install --offline (packages were already in .pnpm store). Build passes. Auth tests all 404 as expected since routes/controllers are not yet wired up (phases 4-6). Existing product tests still pass (20/20)."
+      "notes": "Added patchMeHandler that reads userId from req.jwtPayload, delegates to userService.updateUser, and returns { user }. meHandler already used req.jwtPayload?.userId (not URL params) so no changes needed there — the ownership test passes. All 8 remaining failures are PATCH /api/users/me returning 404 because the route is not yet mounted (phase 4). Build passes."
     },
     {
       "id": "phase-4",
-      "title": "Create requireJwt.ts middleware",
+      "title": "Create src/routes/userRoutes.ts and mount it in src/app.ts",
       "status": "done",
-      "notes": "Created src/benchmark-backend/src/middleware/requireJwt.ts. Extracts Bearer token from Authorization header, verifies with jsonwebtoken using JWT_SECRET (falls back to 'default-dev-secret' if env var not set). On success, attaches decoded payload to req.jwtPayload. On missing/invalid/expired token, responds 401 { error: 'Unauthorized' }. Also added jwtPayload?: { userId: string; email: string; username: string } to src/types/express.d.ts. Build passes. Test failures are 404s from routes not yet mounted (phases 5-6 still open)."
-    },
-    {
-      "id": "phase-5",
-      "title": "Create authController.ts (register, login, me handlers)",
-      "status": "done",
-      "notes": "Created src/benchmark-backend/src/controllers/authController.ts with registerHandler (201 { user, token }), loginHandler (200 { user, token }), and meHandler (200 safe user). All read from req.validated (set by validate middleware). meHandler reads userId from req.jwtPayload. Errors propagate via next(err). Build passes."
-    },
-    {
-      "id": "phase-6",
-      "title": "Create authRoutes.ts and mount at /api/auth in app.ts",
-      "status": "done",
-      "notes": "Created src/benchmark-backend/src/routes/authRoutes.ts with POST /register (validate+registerHandler), POST /login (validate+loginHandler), GET /me (requireJwt+meHandler). Added authRoutes import to app.ts and mounted at /api/auth before the 404 catch-all. All 34 tests pass (including 14 auth tests), build succeeds."
-    },
-    {
-      "id": "phase-7",
-      "title": "Run tests and verify all auth tests pass",
-      "status": "done",
-      "notes": "All 34 tests pass (2 test files: products and auth), build succeeds (tsc -p tsconfig.build.json). No changes required — previous phases had already wired everything correctly."
+      "notes": "Created userRoutes.ts with PATCH /me protected by requireJwt and validate(patchMeSchema), calling patchMeHandler. Mounted at /api/users in app.ts. All 44 tests pass, build clean."
     }
   ]
 }
