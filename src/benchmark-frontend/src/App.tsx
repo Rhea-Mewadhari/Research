@@ -12,7 +12,9 @@ import FavouritesPage from './pages/FavouritesPage';
 import LoginPage from './pages/LoginPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProductListPage from './pages/ProductListPage';
+import ProfilePage from './pages/ProfilePage';
 import SignupPage from './pages/SignupPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function AppLayout() {
   return (
@@ -40,6 +42,7 @@ export default function App() {
                     <Route path="compare" element={<ComparePage />} />
                     <Route path="signup" element={<SignupPage />} />
                     <Route path="login" element={<LoginPage />} />
+                    <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                   </Route>
                 </Routes>
               </BrowserRouter>

@@ -1,92 +1,55 @@
 # Requirements
 
-## Database migration
+<!-- Task 13 — Backend: PATCH /api/users/me, GET /api/auth/me ownership -->
 
-1. The file `src/benchmark-backend/src/db/migrations/004_users.sql` exists and contains a `CREATE TABLE users` statement with exactly these columns: `id TEXT PRIMARY KEY`, `email TEXT NOT NULL UNIQUE`, `username TEXT NOT NULL UNIQUE`, `password TEXT NOT NULL`, `created_at TEXT NOT NULL DEFAULT (datetime('now'))`.
-   - Verified by: `cat src/benchmark-backend/src/db/migrations/004_users.sql` matches the exact DDL from the task spec; `pnpm test` in `src/benchmark-backend` passes the "stores the password as a bcrypt hash" test which queries the `users` table by `email`.
+1. `GET /api/auth/me` resolves the user exclusively from `req.user.userId` (the decoded JWT payload). A request bearing User A's JWT but including `?id=<User-B-id>&userId=<User-B-id>` in the query string must return User A's own `id`, `email`, and `username` — not User B's.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "returns only the caller's own data regardless of a spoofed id in the URL" — asserts `res.status === 200`, `res.body.id === mine.id`, `res.body.email === mine.email`, `res.body.username === mine.username`.
 
-## POST /api/auth/register — happy path
+2. `PATCH /api/users/me` without a valid JWT bearer token returns HTTP 401.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "requires a valid JWT" — asserts `res.status === 401`.
 
-2. A valid `POST /api/auth/register` request (email in valid format, username non-empty, password ≥ 8 chars) returns HTTP 201 with a JSON body containing `user.id` (string), `user.email`, `user.username`, `user.createdAt` (string), and `token` (string); `user.password` is absent from the body.
-   - Verified by: `src/benchmark-backend/src/tests/visible/auth.test.ts` — "registers a new user and returns 201 with a user object and token" passes.
+3. `PATCH /api/users/me` with a valid JWT and `{ username: "<new>" }` returns HTTP 200 with body `{ user: { id, email, username, createdAt } }` where `username` equals the new value, `email` is unchanged, and the response body contains no `password` field at any nesting level.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "updates the username and returns the new user object" — asserts `res.status === 200`, `res.body.user.username === 'after_username_change'`, `res.body.user.email === user.email`, `res.body.user.password === undefined`.
 
-3. The response body for a successful registration contains no occurrence of the submitted plaintext password at any level of the JSON structure.
-   - Verified by: `auth.test.ts` — "never includes the password anywhere in the response body" passes.
+4. `PATCH /api/users/me` with a valid JWT and an empty body `{}` (no recognised fields) returns HTTP 400.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "returns 400 for an empty body / no recognised fields" — asserts `res.status === 400`.
 
-4. After registration, the `password` column in the `users` table contains a bcrypt hash (matches `/^\$2[aby]?\$/`) and not the plaintext value.
-   - Verified by: `auth.test.ts` — "stores the password as a bcrypt hash, not plaintext" passes.
+5. `PATCH /api/users/me` with a valid JWT and `{ newPassword: "..." }` but no `currentPassword` field returns HTTP 400.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "returns 400 when newPassword is given without currentPassword" — asserts `res.status === 400`.
 
-5. The returned `token` is a valid JWT with three dot-separated segments; its decoded payload contains `userId` equal to `user.id`, `email`, and `username` claims.
-   - Verified by: `auth.test.ts` — "issues a JWT carrying userId, email, and username claims" passes.
+6. `PATCH /api/users/me` with a valid JWT, an incorrect `currentPassword`, and a `newPassword` returns HTTP 400 with body `{ "error": "Current password is incorrect" }`.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "returns 400 'Current password is incorrect' when currentPassword is wrong" — asserts `res.status === 400` and `res.body.error === 'Current password is incorrect'`.
 
-## POST /api/auth/register — validation failures
+7. `PATCH /api/users/me` with a valid JWT, the correct `currentPassword`, and a `newPassword` updates the stored password. After updating: (a) `POST /api/auth/login` with the old password returns 401; (b) `POST /api/auth/login` with the new password returns 200.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "updates the password so a subsequent login with the new password succeeds and the old one fails" — asserts old login returns 401, new login returns 200.
 
-6. A registration request with `password` shorter than 8 characters returns HTTP 400.
-   - Verified by: `auth.test.ts` — "rejects a password shorter than 8 characters with 400" passes.
+8. After a successful password update via `PATCH /api/users/me`, the `password` column in the `users` table contains a bcrypt hash (matching `/^\$2[aby]?\$/`) — not the plaintext new password.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "stores the updated password as a bcrypt hash, not plaintext" — direct DB query asserts `row.password` does not equal the plaintext value and matches `/^\$2[aby]?\$/`.
 
-7. A registration request with `password` omitted entirely returns HTTP 400.
-   - Verified by: `auth.test.ts` — "rejects a missing password with 400" passes.
+9. `PATCH /api/users/me` with a valid JWT and `{ username: "<new>", email: "<already-taken-by-another-user>" }` returns HTTP 409. A subsequent `GET /api/auth/me` must show the user's `username` and `email` are both unchanged — no partial write occurred.
+   - Verified by: `src/tests/visible/userProfile.test.ts` — "returns 409 for an email already taken by another user, and leaves no field changed" — asserts `res.status === 409`, then `GET /api/auth/me` returns `username === 'wants_taken_email_user'` and `email === 'wants-taken-email@example.com'`.
 
-8. A registration request with an invalid email format (e.g. `"not-an-email"`) returns HTTP 400.
-   - Verified by: `auth.test.ts` — "rejects an invalid email format with 400" passes.
+10. `PATCH /api/users/me` with a valid JWT and `{ username: "<already-taken-by-another-user>" }` returns HTTP 409.
+    - Verified by: `src/tests/visible/userProfile.test.ts` — "returns 409 for a username already taken by another user" — asserts `res.status === 409`.
 
-## POST /api/auth/register — conflict errors
+11. The PATCH request body is validated by a Zod schema in `src/schemas/userSchema.ts` that accepts optional fields `username`, `email`, `currentPassword`, `newPassword` and uses a Zod refinement to reject a body where none of these recognised fields are present (enforcing the at-least-one-field rule).
+    - Verified by: requirements 4 and 5 exercised via the visible test suite; `pnpm tsc --noEmit` inside `src/benchmark-backend` exits 0 (no TypeScript compilation errors).
 
-9. A registration attempt with an email that already exists in the `users` table returns HTTP 409 with JSON body `{ "error": "Email already registered" }` (exact string).
-   - Verified by: `auth.test.ts` — "returns 409 \"Email already registered\" for a duplicate email" passes.
+12. The `updateUser` function in `src/services/userService.ts` issues a single SQL `UPDATE` statement that sets all changed columns in one atomic operation — not sequential per-field `UPDATE` statements. If any validation check fails (wrong password, taken email/username), zero DB writes occur.
+    - Verified by: requirement 9's atomicity assertion (email conflict leaves username also unchanged); `pnpm tsc --noEmit` exits 0.
 
-10. A registration attempt with a username that already exists in the `users` table returns HTTP 409 with JSON body `{ "error": "Username already taken" }` (exact string).
-    - Verified by: `auth.test.ts` — "returns 409 \"Username already taken\" for a duplicate username" passes.
+13. `src/routes/userRoutes.ts` defines a router with `PATCH /me` behind the `requireJwt` middleware. `src/app.ts` mounts that router at `/api/users` so the full path resolves to `PATCH /api/users/me`.
+    - Verified by: requirements 2 and 3 (401 without JWT, 200 with valid JWT) passing in the visible test suite.
 
-## POST /api/auth/login — happy path
-
-11. A `POST /api/auth/login` request with a registered email and the correct password returns HTTP 200 with a JSON body containing `user.email`, `user.username` (no `user.password`), and `token` (string).
-    - Verified by: `auth.test.ts` — "logs in with valid credentials and returns 200 with a user and token" passes.
-
-## POST /api/auth/login — failure cases
-
-12. A login request with a correct email but wrong password returns HTTP 401 with JSON body `{ "error": "Invalid credentials" }` (exact string).
-    - Verified by: `auth.test.ts` — "returns 401 \"Invalid credentials\" for a wrong password" passes.
-
-13. A login request with an email that does not exist in the `users` table returns HTTP 401 with JSON body `{ "error": "Invalid credentials" }` — the same message as a wrong password, with no information about whether the email exists.
-    - Verified by: `auth.test.ts` — "returns 401 \"Invalid credentials\" for an unknown email (same message as a wrong password)" passes.
-
-## GET /api/auth/me
-
-14. A `GET /api/auth/me` request with a valid `Authorization: Bearer <token>` header returns HTTP 200 with a JSON body containing `email` and `username` but no `password` field.
-    - Verified by: `auth.test.ts` — "returns the user object for a valid token, without the password field" passes.
-
-15. A `GET /api/auth/me` request with no `Authorization` header returns HTTP 401.
-    - Verified by: `auth.test.ts` — "returns 401 when no Authorization header is provided" passes.
-
-16. A `GET /api/auth/me` request with a malformed or invalid token (e.g. `"Bearer not-a-real-jwt"`) returns HTTP 401.
-    - Verified by: `auth.test.ts` — "returns 401 for a malformed or invalid token" passes.
-
-## Technical constraints
-
-17. The file `src/benchmark-backend/src/middleware/auth.ts` is not modified — its content is identical to the pre-task state.
-    - Verified by: `git diff src/benchmark-backend/src/middleware/auth.ts` produces no output.
-
-18. The JWT signing secret is read from `process.env.JWT_SECRET` and never hardcoded as a string literal in `authService.ts` or any other new file.
-    - Verified by: `grep -n "process.env.JWT_SECRET" src/benchmark-backend/src/services/authService.ts` returns a match; no string literal replaces the env reference in the `sign()` call.
-
-19. The three auth endpoints are mounted at `/api/auth` in `src/benchmark-backend/src/app.ts` via a dedicated router exported from `src/benchmark-backend/src/routes/authRoutes.ts`.
-    - Verified by: `cat src/benchmark-backend/src/app.ts` contains `app.use('/api/auth', ...)` (or equivalent); `src/benchmark-backend/src/routes/authRoutes.ts` exists.
-
-20. Request validation for register and login uses Zod schemas defined in `src/benchmark-backend/src/schemas/authSchema.ts` (following the existing `src/schemas/` pattern).
-    - Verified by: `src/benchmark-backend/src/schemas/authSchema.ts` exists and exports at least one Zod schema; the auth controller or router imports from this file.
-
-21. JWT verification for `GET /api/auth/me` is handled by a new middleware at `src/benchmark-backend/src/middleware/requireJwt.ts` (not by the existing `requireAuth` in `auth.ts`).
-    - Verified by: `src/benchmark-backend/src/middleware/requireJwt.ts` exists; `src/benchmark-backend/src/routes/authRoutes.ts` imports from `requireJwt.ts`.
-
-22. The entire visible test suite (`pnpm test` from `src/benchmark-backend`) exits with code 0 and all tests in `auth.test.ts` and `products.test.ts` are reported as passed.
+14. `pnpm test` run from `src/benchmark-backend` exits with code 0 and all tests in `src/tests/visible/userProfile.test.ts` are reported as passed (no skips, no failures). Test files must not be modified.
     - Verified by: `cd src/benchmark-backend && pnpm test` completes with exit code 0.
+
+---
 
 ## Edge cases
 
-- Empty string for `email`, `username`, or `password`: covered by requirements 6–8 (Zod validation rejects them the same way it rejects missing/invalid values).
-- JWT `exp` claim set to 24 hours: not directly asserted by visible tests, but the `requireJwt` middleware must reject expired tokens — covered by requirement 16 (invalid token → 401).
-- `password` field absent from `GET /api/auth/me` response body: covered by requirement 14.
-- `requireJwt` is a new file separate from `requireAuth`: covered by requirement 17 (auth.ts unmodified) and requirement 21 (requireJwt.ts exists).
-- Duplicate email vs. duplicate username returning distinct 409 messages: covered individually by requirements 9 and 10.
-- All error paths flow through the existing `errorHandler` middleware: implicitly verified by requirement 22 — if errors were swallowed or not propagated via `next(err)`, the error-case tests (400, 401, 409) would return unexpected status codes and the suite would fail.
+- **`currentPassword` missing when `newPassword` is supplied**: treated identically to a wrong password (HTTP 400) — covered by requirements 5 and 6. The Zod schema enforces that `currentPassword` must be present whenever `newPassword` is.
+- **Username + email both submitted but email conflicts**: username must NOT be persisted even though it was processed first — covered by requirement 9 (all-or-nothing atomicity).
+- **`password` field never in API responses**: covered by requirement 3 (`res.body.user.password === undefined`); applies to all 200 responses, not only the username-change case.
+- **Uniqueness check must exclude the current user's own row**: a user submitting their own current email must not receive a 409 — the SQL uniqueness check must filter `WHERE id != <current-user-id>`. Not directly tested by the visible suite but required for correctness.
+- **`requireJwt` middleware must not be modified**: covered by the framework constraint; only the new route file imports and applies it.

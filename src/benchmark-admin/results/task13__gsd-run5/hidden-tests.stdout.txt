@@ -1,0 +1,341 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ❯ tests/hidden.profile-management.test.tsx (7 tests | 2 failed) 2462ms
+   ✓ Hidden: ProtectedRoute is generic, not profile-specific > guards a second, unrelated route the same way it guards /profile 13ms
+   ✓ Hidden: ProtectedRoute is generic, not profile-specific > renders the second route through when authenticated 1ms
+   ✓ Hidden: ProfilePage — change password section > the change-password fields are collapsed until the section is expanded 29ms
+   × Hidden: ProfilePage — change password section > rejects a new password shorter than 8 characters client-side, without a request 1099ms
+     → Unable to find an element with the text: /(password must be at least 8|at least 8 characters)/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-username"[39m
+        [36m>[39m
+          [0mUsername[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-username"[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m"seed_user"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-email"[39m
+        [36m>[39m
+          [0mEmail[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-email"[39m
+          [33mtype[39m=[32m"email"[39m
+          [33mvalue[39m=[32m"seed@example.com"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-current-password"[39m
+          [36m>[39m
+            [0mCurrent password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-current-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"correctcurrentpw1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-new-password"[39m
+          [36m>[39m
+            [0mNew password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-new-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"short1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-confirm-password"[39m
+          [36m>[39m
+            [0mConfirm new password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-confirm-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"short1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mSave[0m
+      [36m</button>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mCancel[0m
+      [36m</button>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-username"[39m
+        [36m>[39m
+          [0mUsername[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-username"[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m"seed_user"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-email"[39m
+        [36m>[39m
+          [0mEmail[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-email"[39m
+          [33mtype[39m=[32m"email"[39m
+          [33mvalue[39m=[32m"seed@example.com"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-current-password"[39m
+          [36m>[39m
+            [0mCurrent password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-current-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"correctcurrentpw1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-new-password"[39m
+          [36m>[39m
+            [0mNew password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-new-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"short1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-confirm-password"[39m
+          [36m>[39m
+            [0mConfirm new password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-confirm-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"short1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mSave[0m
+      [36m</button>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mCancel[0m
+      [36m</button>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   × Hidden: ProfilePage — change password section > catches a new-password/confirm mismatch client-side, without a request 1130ms
+     → Unable to find an element with the text: /passwords? (do not|don't) match/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-username"[39m
+        [36m>[39m
+          [0mUsername[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-username"[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m"seed_user"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-email"[39m
+        [36m>[39m
+          [0mEmail[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-email"[39m
+          [33mtype[39m=[32m"email"[39m
+          [33mvalue[39m=[32m"seed@example.com"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-current-password"[39m
+          [36m>[39m
+            [0mCurrent password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-current-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"correctcurrentpw1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-new-password"[39m
+          [36m>[39m
+            [0mNew password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-new-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"brandnewpassword1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-confirm-password"[39m
+          [36m>[39m
+            [0mConfirm new password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-confirm-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"a-different-password1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mSave[0m
+      [36m</button>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mCancel[0m
+      [36m</button>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-username"[39m
+        [36m>[39m
+          [0mUsername[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-username"[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m"seed_user"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"profile-email"[39m
+        [36m>[39m
+          [0mEmail[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mid[39m=[32m"profile-email"[39m
+          [33mtype[39m=[32m"email"[39m
+          [33mvalue[39m=[32m"seed@example.com"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-current-password"[39m
+          [36m>[39m
+            [0mCurrent password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-current-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"correctcurrentpw1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-new-password"[39m
+          [36m>[39m
+            [0mNew password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-new-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"brandnewpassword1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"profile-confirm-password"[39m
+          [36m>[39m
+            [0mConfirm new password[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mid[39m=[32m"profile-confirm-password"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m"a-different-password1"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mSave[0m
+      [36m</button>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mCancel[0m
+      [36m</button>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ✓ Hidden: ProfilePage — diffing multiple changed fields > includes every changed field in the PATCH body when more than one changed 125ms
+   ✓ Hidden: profile update propagates through AuthContext, not just localStorage > NavBar reflects the new username immediately after a profile update, in the same provider tree 65ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+     Errors  2 errors
+   Start at  16:39:52
+   Duration  2.82s (transform 35ms, setup 29ms, collect 76ms, tests 2.46s, environment 118ms, prepare 26ms)
+
+[ELIFECYCLE] Test failed. See above for more details.
