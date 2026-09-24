@@ -1,0 +1,2 @@
+tests/profilePage.test.tsx(6,25): error TS2307: Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations.
+[ELIFECYCLE] Command failed with exit code 2.

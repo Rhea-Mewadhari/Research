@@ -1,0 +1,41 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ vitest run src/tests/hidden/hidden.auth-foundation.test.ts
+[90mstderr[2m | src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22m[2mHidden: auth foundation — register/login/me edge cases[2m > [22m[2mrejects a whitespace-only email with 400
+[22m[39m[2914130a-3005-40a5-8d78-73009f6ec2f4] ValidationError: Validation failed
+    at register [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39msrc/controllers/authController.ts:13:10[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:157:13[90m)[39m
+    at Route.dispatch [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/route.js:117:3[90m)[39m
+    at handle [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:435:11[90m)[39m
+    at Layer.handleRequest [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at [90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:295:15
+    at processParams [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at router.handle [90m(/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:186:3[90m)[39m {
+  statusCode: [33m400[39m,
+  code: [32m'VALIDATION_ERROR'[39m,
+  fields: [ { field: [32m'email'[39m, message: [32m'Invalid email address'[39m } ]
+}
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22mHidden: auth foundation — register/login/me edge cases[2m > [22mrejects a whitespace-only username with 400
+[31m[1mAssertionError[22m: expected 201 to be 400 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+[36m [2m❯[22m src/tests/hidden/hidden.auth-foundation.test.ts:[2m69:24[22m[39m
+    [90m 67|[39m       password[33m:[39m [32m'validpassword1'[39m[33m,[39m
+    [90m 68|[39m     })[33m;[39m
+    [90m 69|[39m     [34mexpect[39m(res[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m400[39m)[33m;[39m
+    [90m   |[39m                        [31m^[39m
+    [90m 70|[39m   })[33m;[39m
+    [90m 71|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+

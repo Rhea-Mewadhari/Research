@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "baselineFile": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-admin/results/task12__wiggum-run1-be/baseline-quality.json",
+    "postAgentFile": "/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-admin/results/task12__wiggum-run1-be/post-quality.json",
+    "generatedAt": "2026-09-24T15:27:08.984Z",
+    "baselineTarget": "backend",
+    "postAgentTarget": "backend"
+  },
+  "complexity": {
+    "status": "compared",
+    "cognitiveComplexityTotal": {
+      "baseline": 77,
+      "postAgent": 98,
+      "delta": 21
+    },
+    "functionsOverThreshold": {
+      "baseline": 25,
+      "postAgent": 34,
+      "delta": 9
+    },
+    "maxNestingDepth": {
+      "baseline": 2,
+      "postAgent": 2,
+      "delta": 0
+    },
+    "functionsTooLong": {
+      "baseline": 69,
+      "postAgent": 80,
+      "delta": 11
+    }
+  },
+  "coupling": {
+    "status": "compared",
+    "circularDependencyCount": {
+      "baseline": 0,
+      "postAgent": 0,
+      "delta": 0
+    },
+    "crossModuleImportCount": {
+      "baseline": 54,
+      "postAgent": 62,
+      "delta": 8
+    },
+    "layerViolationCount": {
+      "baseline": 0,
+      "postAgent": 0,
+      "delta": 0
+    }
+  },
+  "duplication": {
+    "status": "compared",
+    "duplicateBlockCount": {
+      "baseline": 16,
+      "postAgent": 17,
+      "delta": 1
+    },
+    "duplicatedLines": {
+      "baseline": 113,
+      "postAgent": 124,
+      "delta": 11
+    },
+    "duplicatedTokens": {
+      "baseline": 1177,
+      "postAgent": 1311,
+      "delta": 134
+    }
+  },
+  "typeDiscipline": {
+    "status": "compared",
+    "typeErrorCount": {
+      "baseline": 0,
+      "postAgent": 0,
+      "delta": 0
+    },
+    "anyUsageCount": {
+      "baseline": 0,
+      "postAgent": 0,
+      "delta": 0
+    },
+    "nonNullAssertionCount": {
+      "baseline": 0,
+      "postAgent": 0,
+      "delta": 0
+    },
+    "tsIgnoreCount": {
+      "baseline": 0,
+      "postAgent": 0,
+      "delta": 0
+    }
+  },
+  "security": {
+    "status": "compared",
+    "totalFindingCount": {
+      "baseline": 0,
+      "postAgent": 0,
+      "delta": 0
+    },
+    "bySeverity": {}
+  }
+}
