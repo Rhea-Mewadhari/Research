@@ -1,0 +1,20 @@
+
+ RUN  v3.2.4 /Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-frontend
+
+ ✓ tests/authProductsApiToken.test.ts (2 tests) 6ms
+ ✓ tests/authNavBar.test.tsx (3 tests) 58ms
+ ✓ tests/app.render.test.tsx (1 test) 70ms
+ ✓ tests/loadingError.test.tsx (4 tests) 85ms
+ ✓ tests/clearFilters.test.tsx (1 test) 154ms
+ ✓ tests/sorting.test.tsx (3 tests) 173ms
+ ✓ tests/pagination.test.tsx (5 tests) 175ms
+ ✓ tests/authLogin.test.tsx (4 tests) 315ms
+ ✓ tests/filtering.test.tsx (3 tests) 459ms
+   ✓ Filtering behavior > filters products by search term  405ms
+ ✓ tests/authSignup.test.tsx (6 tests) 698ms
+
+ Test Files  10 passed (10)
+      Tests  32 passed (32)
+   Start at  12:17:37
+   Duration  1.37s (transform 189ms, setup 670ms, collect 1.68s, tests 2.19s, environment 3.00s, prepare 429ms)
+

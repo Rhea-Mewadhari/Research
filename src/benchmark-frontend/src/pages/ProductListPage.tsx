@@ -61,7 +61,7 @@ export default function ProductListPage() {
   const { filteredProducts, resultCount } = useFilteredProducts();
 
   return (
-    <main className="container">
+    <main className="container" data-testid="home-page">
       <header>
         <h1>Product Catalog</h1>
         <p>Browse and filter available products.</p>

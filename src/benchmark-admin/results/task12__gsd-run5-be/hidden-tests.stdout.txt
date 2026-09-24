@@ -1,0 +1,29 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.8 [39m[90m/Users/rhea.mewadhari/Projects/Research/Research/src/benchmark-backend[39m
+
+[90mstdout[2m | src/tests/hidden/hidden.auth-foundation.test.ts
+[22m[39m  migration applied: 001_products.sql
+  migration applied: 002_favourites.sql
+  migration applied: 003_featured.sql
+  migration applied: 004_users.sql
+
+[90mstdout[2m | src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22m[2mHidden: auth foundation — register/login/me edge cases[2m > [22m[2mexisting benchmark-protected routes still require the benchmark token, unaffected by requireJwt
+[22m[39m[AUTH] 2026-09-24T10:35:15.872Z ip=::ffff:127.0.0.1 token=(none)… result=rejected
+
+ [31m❯[39m src/tests/hidden/hidden.auth-foundation.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 300[2mms[22m[39m
+     [32m✓[39m a migration file creates the users table[32m 1[2mms[22m[39m
+     [32m✓[39m requireJwt is its own middleware file, and requireAuth is untouched[32m 0[2mms[22m[39m
+     [32m✓[39m does not let extra request fields override the stored user (no mass assignment)[32m 56[2mms[22m[39m
+[31m     [31m×[31m rejects a whitespace-only username with 400[39m[32m 50[2mms[22m[39m
+     [32m✓[39m rejects a whitespace-only email with 400[32m 1[2mms[22m[39m
+     [32m✓[39m register/login are reachable without the benchmark Authorization header[32m 47[2mms[22m[39m
+     [32m✓[39m issues a token that expires roughly 24 hours after issuance[32m 47[2mms[22m[39m
+     [32m✓[39m existing benchmark-protected routes still require the benchmark token, unaffected by requireJwt[32m 1[2mms[22m[39m
+     [32m✓[39m a token issued by login (not just register) is accepted by GET /api/auth/me[32m 94[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 12:35:15
+[2m   Duration [22m 489ms[2m (transform 48ms, setup 24ms, import 111ms, tests 300ms, environment 0ms)[22m
+
+[ELIFECYCLE] Test failed. See above for more details.
