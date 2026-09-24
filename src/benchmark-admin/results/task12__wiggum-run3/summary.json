@@ -1,0 +1,196 @@
+{
+  "taskId": "task12",
+  "runId": "wiggum-run3",
+  "timestamp": "2026-09-24T17:24:01.251Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 4,
+        "column": 28,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/components/ProtectedRoute' or its corresponding type declarations."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 32,
+    "failed": 0,
+    "total": 32
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1791,
+    "hiddenMs": 922,
+    "buildMs": 809,
+    "totalMs": 3554
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.215,
+    "overallScore": 0.686
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task12",
+    "wall_duration_ms": 784591,
+    "cost_usd": 3.5493537,
+    "num_turns": 153,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "9683c4d1-7e17-4f76-9fdc-d29eed60f084",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Create AuthContext (src/context/AuthContext.tsx)",
+          "status": "done",
+          "notes": "Created src/context/AuthContext.tsx. Initialises token/user from localStorage, exposes login() and logout(), exports AuthProvider and useAuthContext. All base tests still pass; auth test failures are from later phases (missing LoginPage/SignupPage)."
+        },
+        {
+          "id": "phase-2",
+          "title": "Create LoginPage (src/pages/LoginPage.tsx)",
+          "status": "done",
+          "notes": "Created src/pages/LoginPage.tsx. Posts to http://localhost:3001/auth/login. On 200: calls login() and navigates to /. On 401/error: shows fixed string 'Invalid email or password'. Submit button is disabled while loading. All 4 authLogin.test.tsx tests pass. Build fails due to missing SignupPage (phase-3 pre-existing issue)."
+        },
+        {
+          "id": "phase-3",
+          "title": "Create SignupPage (src/pages/SignupPage.tsx)",
+          "status": "done",
+          "notes": "Created src/pages/SignupPage.tsx. Posts to http://localhost:3001/auth/signup. Client-side password mismatch shows 'Passwords do not match' without calling fetch. On 201: calls login() and navigates to /. On 409: shows server's error.message. On 400 with details array: shows first details[0].message. Submit button disabled while loading. All 6 authSignup.test.tsx tests pass. Build succeeds."
+        },
+        {
+          "id": "phase-4",
+          "title": "Update NavBar to show auth state",
+          "status": "done",
+          "notes": "Updated src/components/NavBar.tsx to consume useAuthContext(). Logged out: shows Sign Up and Log In links. Logged in: shows username text and Log Out button that calls logout() and navigates to /login. Also added AuthProvider import and wrapper to App.tsx (minimal prerequisite so existing tests that render App still pass — routes left for phase-6). All 3 authNavBar tests pass; all 31 existing tests pass; build succeeds."
+        },
+        {
+          "id": "phase-5",
+          "title": "Update productsApi to attach JWT header",
+          "status": "done",
+          "notes": "Updated src/api/productsApi.ts to read localStorage.getItem('auth_token') before each fetch. If present, uses 'Bearer <token>'; if absent, falls back to 'Bearer benchmark-token-2024'. Both authProductsApiToken tests pass. Build succeeds."
+        },
+        {
+          "id": "phase-6",
+          "title": "Wire AuthProvider and new routes in App.tsx",
+          "status": "done",
+          "notes": "Added imports for LoginPage and SignupPage. Added <Route path='login' element={<LoginPage />}> and <Route path='signup' element={<SignupPage />}> as sibling routes outside AppLayout. AuthProvider was already wrapping the tree from phase-4. All 32 tests pass; build succeeds."
+        },
+        {
+          "id": "phase-7",
+          "title": "Run tests and verify all task12 visible tests pass",
+          "status": "done",
+          "notes": "All 32 tests pass (10 test files): authProductsApiToken (2), authNavBar (3), app.render (1), loadingError (4), clearFilters (1), sorting (3), pagination (5), authLogin (4), filtering (3), authSignup (6). Build also succeeds with no TypeScript errors."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 98617,
+          "cost_usd": 0.4748337,
+          "num_turns": 24,
+          "session_id": "77ff6cee-bac9-4d3a-9895-678e8aec0f9c",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 96041,
+          "cost_usd": 0.3616629,
+          "num_turns": 17,
+          "session_id": "e4650915-7aac-40bf-9d5b-3097745b2ffc",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 87483,
+          "cost_usd": 0.364959,
+          "num_turns": 15,
+          "session_id": "37758ad8-fa47-4fec-8a34-2f984a6eab4a",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 149849,
+          "cost_usd": 0.6234999,
+          "num_turns": 28,
+          "session_id": "489905e8-25aa-438a-acc2-8c28c37ff8ce",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 5,
+          "label": "iter5",
+          "exit_code": 0,
+          "wall_duration_ms": 49176,
+          "cost_usd": 0.26285250000000004,
+          "num_turns": 12,
+          "session_id": "9a6f2296-3ad7-4c62-9523-6eb3134a9503",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 6,
+          "label": "iter6",
+          "exit_code": 0,
+          "wall_duration_ms": 60352,
+          "cost_usd": 0.27881490000000003,
+          "num_turns": 11,
+          "session_id": "610b12da-c590-4971-849d-60e4ab736479",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 7,
+          "label": "iter7",
+          "exit_code": 0,
+          "wall_duration_ms": 35112,
+          "cost_usd": 0.24268979999999998,
+          "num_turns": 10,
+          "session_id": "9683c4d1-7e17-4f76-9fdc-d29eed60f084",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 7,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
