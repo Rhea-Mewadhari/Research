@@ -1,134 +1,76 @@
 {
   "investigations": {
     "techStack": [
-      "Express v5.2.1, TypeScript ~6.0, better-sqlite3 v12 (sync SQLite), Zod v4, vitest + supertest",
-      "ESM project ('type': 'module'), moduleResolution: bundler, no path aliases — all imports are relative",
-      "Dev runner: tsx watch; build output to dist/; strict mode NOT enabled",
-      "Migration runner: runMigrations() in src/db/migrate.ts picks up .sql files from src/db/migrations/ alphabetically; 004_users.sql will be auto-applied after 003_featured.sql",
-      "jsonwebtoken and bcryptjs are ABSENT from package.json — must be added as runtime deps with @types/* as devDeps",
-      "uuid package is ABSENT — use crypto.randomUUID() (built-in Node 14.17+, confirmed available via @types/node ^25.6.0)",
-      "Error propagation: controllers throw AppError subclasses; global errorHandler (4-arg express middleware) catches and responds with { error, code, requestId }",
-      "No dotenv — environment variables read directly from process.env",
-      "validate middleware reads req.validated (populated from Zod parse); auth controllers will use the same pattern"
+      "Express 5.2.1, Zod 4.4.3, bcryptjs 3.0.3, better-sqlite3 12.11.1, jsonwebtoken 9.0.3, TypeScript ~6.0.2",
+      "Vitest 4.1.5 + supertest for testing; test env sets JWT_SECRET='test-jwt-secret'",
+      "bcryptjs (not bcrypt): import default as bcryptjs; SALT_ROUNDS = 10; use .hash() and .compare() (async)",
+      "TypeScript strict mode: noUnusedLocals, noUnusedParameters; ESM modules (module: esnext, moduleResolution: bundler)",
+      "better-sqlite3 is synchronous; queries via .prepare(sql).get() / .run() / .all()",
+      "Rate limiter is vi.mock'd in tests — PATCH endpoint will not be rate-limited during test runs",
+      "Express type augmentation in src/types/express.d.ts: req.validated (from validate middleware), req.jwtUser (from requireJwt)"
     ],
     "features": [
-      "Existing routes: GET /products (requireAuth), GET /api/products, GET /api/favourites — all must remain untouched",
-      "Schemas in src/schemas/: productSchema.ts, favouriteSchema.ts — pattern: named Zod schema exports consumed by validate middleware",
-      "Services in src/services/: productService.ts, favouritesService.ts, compareService.ts, dataFetcher.ts — pattern: exported async functions importing db singleton directly",
-      "Controllers in src/controllers/: productController.ts, favouriteController.ts, compareController.ts — pattern: try/catch → next(err)",
-      "Middleware in src/middleware/: auth.ts (requireAuth — digit-sum benchmark token check, does NOT attach user to req), errorHandler.ts, validate.ts, rateLimiter.ts, requestId.ts",
-      "DB migrations present: 001_products.sql, 002_favourites.sql, 003_featured.sql",
-      "express.d.ts currently declares: Request.id (string) and Request.validated (Record<string, unknown>) — jwtUser field is absent",
-      "Visible test suites: auth.test.ts (39 cases for new auth endpoints) and products.test.ts (18 cases for existing routes — regression guard)"
+      "requireJwt middleware exists at src/middleware/requireJwt.ts — sets req.jwtUser = { userId, email, username }; already used on GET /api/auth/me",
+      "validate() middleware exists at src/middleware/validate.ts — applies Zod schema to { ...params, ...body } for non-GET, sets req.validated, returns 400 on failure",
+      "ConflictError (409) and ValidationError (400) already defined in src/errors/index.ts — reuse directly",
+      "authService.getById(id) returns UserResult { id, email, username, createdAt } (no password) — follow same pattern in userService",
+      "authController.me() already uses req.jwtUser!.userId — B1 is satisfied, no change needed",
+      "app.ts mounts authRoutes; uses global middleware: requestId, rateLimiter, cors, express.json()",
+      "No userRoutes, userController, userService, or userSchema exist yet — all four must be created"
     ],
     "architecture": [
-      "Layer order: routes → controller → service → db; route files export default router; controllers export named handler functions",
-      "DB singleton: export const db = new Database(dbPath) in src/db/client.ts; imported in services as import { db } from '../db/client'",
-      "Controllers: try/catch wraps service calls; catch passes err to next(err); some inline 404 returns",
-      "Routes use Router() with middleware chaining inline: router.post('/path', validate(schema), handler)",
-      "App.ts mounts routers via app.use(prefix, [...optionalMiddleware], router) before the 404 fallback and errorHandler",
-      "requireAuth (auth.ts) only validates token presence — does NOT attach user to req; new requireJwt must be a separate file per requirement 17",
-      "New files belong at: src/db/migrations/004_users.sql, src/schemas/authSchema.ts, src/services/authService.ts, src/middleware/requireJwt.ts, src/controllers/authController.ts, src/routes/authRoutes.ts",
-      "app.ts: mount authRoutes at /api/auth before the 404 handler; no auth middleware at mount level (requireJwt applied per-route in authRoutes.ts)"
+      "Layer order: app.ts mount → route file (middleware chain) → controller → service → db singleton",
+      "Zod schemas live in src/schemas/; passed to validate() middleware; validated data lands in req.validated",
+      "DB singleton: import db from '../db/client'; synchronous .prepare(sql).get(id) / .run(...args) / .all()",
+      "Errors are thrown (not returned); global errorHandler in src/middleware/errorHandler.ts converts AppError subclasses to { error, code, requestId } JSON",
+      "UserResult shape (authService pattern): { id, email, username, createdAt } — password column must be excluded from SELECT or omitted from returned object",
+      "req.jwtUser typed in src/types/express.d.ts — no modification needed; contains { userId: string, email: string, username: string }",
+      "Controllers use async functions with try/catch and next(err) to pass errors to errorHandler"
     ],
     "edgeCases": [
-      "Password minimum: z.string().min(8) — 8 chars is valid, 7 is not; test uses 'short1' (6 chars) to verify rejection",
-      "Email format: Zod .email() rejects 'not-an-email'; empty string also rejected",
-      "createdAt must be camelCase in all responses (DB column is created_at — must transform when reading row)",
-      "Register/login response shape: { user: { id, email, username, createdAt }, token }; /me response is the user object directly (no wrapper)",
-      "JWT payload claims must be exactly: { userId, email, username } — not sub, user_id, or id",
-      "409 exact error strings: 'Email already registered' (duplicate email), 'Username already taken' (duplicate username) — email check fires first",
-      "401 exact error string: 'Invalid credentials' — same message for wrong password AND unknown email (no user enumeration)",
-      "Password must never appear in any response body; strip before returning (do not select or include password field)",
-      "bcrypt hash stored: regex /^\\$2[aby]?\\$/ — test reads DB directly to verify",
-      "requireJwt reads secret ONLY from process.env.JWT_SECRET — no hardcoded string; on missing/invalid/expired token returns 401 and does NOT call next()",
-      "requireAuth (auth.ts) must NOT be modified — verified by git diff requirement 17",
-      "errorHandler must NOT be modified — verified by git diff requirement 20",
-      "Mounting /api/auth must not interfere with /api/products, /products, /api/favourites — products.test.ts is the regression guard",
-      "rateLimiter is mocked in auth.test.ts to prevent in-memory exhaustion across test cases",
-      "ConflictError (409) needed in errors/index.ts so 409 flows through existing errorHandler middleware per requirement 20"
+      "Empty body {} must return 400 — Zod .refine must require at least one of: username, email, currentPassword, newPassword (unknown keys are stripped by Zod before refine runs)",
+      "Body with only unrecognised keys (e.g. { foo: 'bar' }) must also return 400 — Zod strips unknown keys leaving {}, then refine rejects it",
+      "newPassword without currentPassword must return 400 — second .refine in schema catches this before the service is reached",
+      "Wrong currentPassword must return 400 with EXACT message 'Current password is incorrect' — throw new ValidationError('Current password is incorrect') from service",
+      "Atomicity on conflict (B9): request with { username: 'new', email: taken_email } must leave BOTH fields unchanged — check ALL uniqueness BEFORE executing any UPDATE",
+      "Username conflict (B10) and email conflict (B9) both return 409 — throw new ConflictError(...)",
+      "Password must never appear in response — SELECT only id, email, username, created_at; map created_at → createdAt",
+      "bcrypt hash stored in DB must match /^\\$2[aby]?\\$/ — use bcryptjs.hash(newPassword, SALT_ROUNDS) with SALT_ROUNDS = 10",
+      "Users table columns: id TEXT PK, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL",
+      "Response shape for PATCH 200: { user: { id, email, username, createdAt } } — camelCase createdAt mapped from created_at column",
+      "GET /api/auth/me query params ?id=X&userId=X must be ignored — only req.jwtUser.userId determines identity (already correct in authController, no change needed)"
     ]
   },
   "tasks": [
     {
       "id": "task-1",
-      "requirement": "Requirement 2: jsonwebtoken and bcryptjs appear in dependencies; @types/* in devDependencies",
-      "description": "Add jsonwebtoken and bcryptjs to the dependencies block in package.json; add @types/jsonwebtoken and @types/bcryptjs to devDependencies",
-      "files": [
-        "src/benchmark-backend/package.json"
-      ]
+      "requirement": "B3 — PATCH /api/users/me with empty body or no recognised fields returns 400; B5 — newPassword without currentPassword returns 400",
+      "description": "Create src/benchmark-backend/src/schemas/userSchema.ts with a Zod object schema containing four optional fields: username (string), email (string), currentPassword (string), newPassword (string). Add two .refine calls: (1) at least one of the four fields must be defined; (2) if newPassword is present then currentPassword must also be present.",
+      "files": ["src/benchmark-backend/src/schemas/userSchema.ts"]
     },
     {
       "id": "task-2",
-      "requirement": "Requirement 1: 004_users.sql exists with CREATE TABLE users (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))",
-      "description": "Create src/benchmark-backend/src/db/migrations/004_users.sql with the exact CREATE TABLE statement specified; the migration runner picks it up alphabetically after 003_featured.sql",
-      "files": [
-        "src/benchmark-backend/src/db/migrations/004_users.sql"
-      ]
+      "requirement": "B4 — username update returns 200 with user object; B6 — wrong currentPassword returns 400 'Current password is incorrect'; B7 — successful password change allows login with new password; B8 — new password stored as bcrypt hash; B9 — email conflict returns 409 with no partial writes; B10 — username conflict returns 409; B11 — password never in response",
+      "description": "Create src/benchmark-backend/src/services/userService.ts with an updateUser(userId: string, payload) function. Steps in order: (1) if newPassword present, SELECT password FROM users WHERE id = userId and bcrypt.compare currentPassword against the stored hash — throw new ValidationError('Current password is incorrect') on mismatch; (2) if email is changing, SELECT id FROM users WHERE email = ? AND id != userId — throw new ConflictError if a row is found; (3) if username is changing, SELECT id FROM users WHERE username = ? AND id != userId — throw new ConflictError if a row is found; (4) build SET clause dynamically for changed fields, hash newPassword with bcryptjs.hash(newPassword, SALT_ROUNDS) if present; (5) execute single UPDATE users SET ... WHERE id = userId; (6) SELECT id, email, username, created_at FROM users WHERE id = userId and return { id, email, username, createdAt }.",
+      "files": ["src/benchmark-backend/src/services/userService.ts"]
     },
     {
       "id": "task-3",
-      "requirement": "Requirements 8 and 9: 409 responses with exact error strings must flow through existing errorHandler (requirement 20)",
-      "description": "Add a ConflictError class (HTTP 409, code 'CONFLICT') to src/benchmark-backend/src/errors/index.ts so duplicate-email and duplicate-username errors propagate through the global errorHandler correctly",
-      "files": [
-        "src/benchmark-backend/src/errors/index.ts"
-      ]
+      "requirement": "B4 — PATCH /api/users/me returns 200 with { user: { id, email, username, createdAt } }; B11 — password never in response",
+      "description": "Create src/benchmark-backend/src/controllers/userController.ts with an async updateMe handler. Reads userId from req.jwtUser!.userId and update payload from req.validated, calls userService.updateUser(userId, payload), and returns res.json({ user }) on success. Wraps in try/catch with next(err).",
+      "files": ["src/benchmark-backend/src/controllers/userController.ts"]
     },
     {
       "id": "task-4",
-      "requirement": "Requirement 3: authSchema.ts exports registerSchema (email valid format, username non-empty, password min 8) and loginSchema (email, password)",
-      "description": "Create src/benchmark-backend/src/schemas/authSchema.ts exporting registerSchema (z.object with .email(), non-empty string username, z.string().min(8) password) and loginSchema (z.object with email and password strings)",
-      "files": [
-        "src/benchmark-backend/src/schemas/authSchema.ts"
-      ]
+      "requirement": "B2 — PATCH /api/users/me without valid JWT returns 401; B3 — empty body returns 400",
+      "description": "Create src/benchmark-backend/src/routes/userRoutes.ts as an Express Router. Register PATCH /me with the middleware chain in order: requireJwt, validate(updateUserSchema), updateMe. Import requireJwt from '../middleware/requireJwt', validate from '../middleware/validate', updateUserSchema from '../schemas/userSchema', and updateMe from '../controllers/userController'.",
+      "files": ["src/benchmark-backend/src/routes/userRoutes.ts"]
     },
     {
       "id": "task-5",
-      "requirement": "Requirements 4, 5, 6, 10, 11, 12: register (bcrypt hash, uuid, DB insert, JWT sign), login (bcrypt compare, JWT sign), getById (DB select by id)",
-      "description": "Create src/benchmark-backend/src/services/authService.ts with: register() — hashes password with bcryptjs, generates id via crypto.randomUUID(), inserts into users table, signs JWT with claims { userId, email, username } from process.env.JWT_SECRET, returns { user (no password), token }; login() — looks up user by email, compares password with bcrypt, throws AuthError('Invalid credentials') for unknown email or wrong password, signs JWT, returns { user (no password), token }; getById() — fetches user row by id, returns user without password field; all DB rows with created_at must be mapped to createdAt in returned objects",
-      "files": [
-        "src/benchmark-backend/src/services/authService.ts"
-      ]
-    },
-    {
-      "id": "task-6",
-      "requirement": "Requirement 16: requireJwt reads JWT_SECRET from process.env only; attaches decoded payload to req on valid token; returns 401 without calling next() on missing/invalid/expired token",
-      "description": "Create src/benchmark-backend/src/middleware/requireJwt.ts: extract Bearer token from Authorization header; verify with jsonwebtoken using process.env.JWT_SECRET; on success attach decoded payload to req.jwtUser and call next(); on any failure (missing header, verification error, expired) respond with 401 JSON and do not call next(); no hardcoded secret string",
-      "files": [
-        "src/benchmark-backend/src/middleware/requireJwt.ts"
-      ]
-    },
-    {
-      "id": "task-7",
-      "requirement": "Requirements 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21: HTTP handlers for register, login, me; correct status codes; password stripped from all responses",
-      "description": "Create src/benchmark-backend/src/controllers/authController.ts with: register() — reads req.validated, calls authService.register, catches SQLite UNIQUE constraint errors and throws ConflictError('Email already registered') or ConflictError('Username already taken') based on which column triggered, responds 201 with { user, token }; login() — reads req.validated, calls authService.login (AuthError propagates to next()), responds 200 with { user, token }; me() — calls authService.getById(req.jwtUser.userId), responds 200 with user object directly (no wrapper); all handlers pass errors to next(err)",
-      "files": [
-        "src/benchmark-backend/src/controllers/authController.ts"
-      ]
-    },
-    {
-      "id": "task-8",
-      "requirement": "Requirement 18: authRoutes.ts registers POST /register, POST /login, GET /me (requireJwt applied to /me only)",
-      "description": "Create src/benchmark-backend/src/routes/authRoutes.ts: create Express Router; mount POST /register with validate(registerSchema) then register controller; mount POST /login with validate(loginSchema) then login controller; mount GET /me with requireJwt middleware then me controller; export default router",
-      "files": [
-        "src/benchmark-backend/src/routes/authRoutes.ts"
-      ]
-    },
-    {
-      "id": "task-9",
-      "requirement": "Requirement 19: app.ts imports auth router and mounts it at /api/auth before the 404 fallback handler",
-      "description": "Modify src/benchmark-backend/src/app.ts to import authRoutes and add app.use('/api/auth', authRoutes) before the existing 404 handler; do not add any additional middleware at the mount level (requireJwt is applied per-route in authRoutes.ts)",
-      "files": [
-        "src/benchmark-backend/src/app.ts"
-      ]
-    },
-    {
-      "id": "task-10",
-      "requirement": "Requirement 22: express.d.ts declares jwtUser field on Request so controllers access decoded payload without type assertions",
-      "description": "Extend src/benchmark-backend/src/types/express.d.ts to add jwtUser?: { userId: string; email: string; username: string } to the Express Request interface alongside the existing id and validated fields",
-      "files": [
-        "src/benchmark-backend/src/types/express.d.ts"
-      ]
+      "requirement": "B2 — PATCH /api/users/me is reachable at /api/users/me",
+      "description": "Modify src/benchmark-backend/src/app.ts to import userRoutes from './routes/userRoutes' and add app.use('/api/users', userRoutes) after the existing authRoutes mount.",
+      "files": ["src/benchmark-backend/src/app.ts"]
     }
   ]
 }

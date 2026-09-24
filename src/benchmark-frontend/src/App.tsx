@@ -7,11 +7,13 @@ import { ComparisonProvider } from './context/ComparisonContext';
 import { FavouritesProvider } from './context/FavouritesContext';
 import { FilterProvider } from './context/FilterContext';
 import { ProductProvider } from './context/ProductContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import ComparePage from './pages/ComparePage';
 import FavouritesPage from './pages/FavouritesPage';
 import LoginPage from './pages/LoginPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProductListPage from './pages/ProductListPage';
+import ProfilePage from './pages/ProfilePage';
 import SignupPage from './pages/SignupPage';
 
 function AppLayout() {
@@ -40,6 +42,7 @@ export default function App() {
                     <Route path="compare" element={<ComparePage />} />
                     <Route path="login" element={<LoginPage />} />
                     <Route path="signup" element={<SignupPage />} />
+                    <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                   </Route>
                 </Routes>
               </BrowserRouter>

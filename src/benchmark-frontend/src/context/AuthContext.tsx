@@ -1,9 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 
 export interface User {
   id?: string;
   email: string;
   username: string;
+  createdAt: string;
 }
 
 export class AuthApiError extends Error {
@@ -31,6 +32,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (user: User) => void;
 }
 
 const BASE_URL = 'http://localhost:3001';
@@ -38,23 +40,16 @@ const BASE_URL = 'http://localhost:3001';
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('auth_user');
-    if (storedToken) {
-      setToken(storedToken);
+  const [user, setUser] = useState<User | null>(() => {
+    const stored = localStorage.getItem('auth_user');
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored) as User;
+    } catch {
+      return null;
     }
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser) as User);
-      } catch {
-        setUser(null);
-      }
-    }
-  }, []);
+  });
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('auth_token'));
 
   const isAuthenticated = token !== null;
 
@@ -106,8 +101,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  function updateUser(user: User): void {
+    setUser(user);
+    localStorage.setItem('auth_user', JSON.stringify(user));
+  }
+
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

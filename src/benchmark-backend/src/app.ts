@@ -4,6 +4,7 @@ import productRoutes from './routes/productRoutes';
 import apiProductRoutes from './routes/apiProductRoutes';
 import favouriteRoutes from './routes/favouriteRoutes';
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
 import { requireAuth } from './middleware/auth';
 import { requestId } from './middleware/requestId';
 import { rateLimiter } from './middleware/rateLimiter';
@@ -24,6 +25,7 @@ app.use('/products', requireAuth, productRoutes);
 app.use('/api/products', apiProductRoutes);
 app.use('/api/favourites', favouriteRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });

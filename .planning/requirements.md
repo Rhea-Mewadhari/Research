@@ -1,221 +1,212 @@
 # Requirements
 
-<!-- Target: backend (task12) -->
+<!-- Target: frontend (task13) -->
 
-## Database
+## ProtectedRoute (`src/benchmark-frontend/src/components/ProtectedRoute.tsx`)
 
-1. `src/benchmark-backend/src/db/migrations/004_users.sql` exists and contains a `CREATE TABLE users` statement with columns: `id TEXT PRIMARY KEY`, `email TEXT NOT NULL UNIQUE`, `username TEXT NOT NULL UNIQUE`, `password TEXT NOT NULL`, `created_at TEXT NOT NULL DEFAULT (datetime('now'))`.
-   - Verified by: file is present at that exact path; running the visible test suite causes the migration runner to apply it — `auth.test.ts` line 61 queries `SELECT password FROM users WHERE email = ?` against the live DB and receives a row, which would fail with "no such table" if the migration were absent.
+1. `ProtectedRoute` accepts a `children` prop (React children API) and renders those children when authenticated — it no longer uses `Outlet`.
+   - Verified by: `tests/protectedRoute.test.tsx` — the test renders `<ProtectedRoute><div data-testid="protected-content" /></ProtectedRoute>` as a route `element`; if `Outlet` is used instead of `children`, the protected content never renders and the second test fails.
 
-## Dependencies
+2. When no `auth_token` is present in `localStorage`, `ProtectedRoute` renders `<Navigate to="/login" replace />` and the wrapped children are not mounted.
+   - Verified by: `tests/protectedRoute.test.tsx` — "redirects to /login when the user is not authenticated" — `findByTestId('login-page')` must resolve and `queryByTestId('protected-content')` must be `null`.
 
-2. `jsonwebtoken` and `bcryptjs` (or `bcrypt`) appear in the `dependencies` block of `src/benchmark-backend/package.json`; their corresponding `@types/*` packages appear in `devDependencies`.
-   - Verified by: inspecting `package.json` for the four package names; `pnpm test` in `benchmark-backend` does not fail at the import stage with "Cannot find module 'jsonwebtoken'" or "Cannot find module 'bcryptjs'".
+3. When `auth_token` and `auth_user` are present in `localStorage`, `ProtectedRoute` renders its `children` without redirecting.
+   - Verified by: `tests/protectedRoute.test.tsx` — "renders the wrapped content when the user is authenticated" — `getByTestId('protected-content')` must be in the document.
 
-## Zod Schemas
+## AuthContext (`src/benchmark-frontend/src/context/AuthContext.tsx`)
 
-3. `src/benchmark-backend/src/schemas/authSchema.ts` exists and exports `registerSchema` — a Zod object accepting `email` (string, valid email format), `username` (non-empty string), and `password` (string, minimum 8 characters) — and `loginSchema` — a Zod object accepting `email` (string) and `password` (string).
-   - Verified by: file is present; TypeScript build (`tsc --noEmit`) passes; validation rejection tests (requirements 7–9) pass, which exercise the schema via the register controller.
+4. The `User` interface exported from `AuthContext.tsx` includes a `createdAt` field typed as `string`.
+   - Verified by: TypeScript compilation (`pnpm --filter benchmark-frontend build` or `tsc --noEmit`) succeeds; `protectedRoute.test.tsx` and `profilePage.test.tsx` both seed `localStorage` with `{ createdAt: '2024-01-01T00:00:00.000Z' }` and the `AuthProvider` parses this into a `User` without type errors.
 
-## POST /api/auth/register
+5. `AuthContextValue` exposes an `updateUser(user: User): void` action that (a) calls `setUser` with the new user object, and (b) writes `JSON.stringify(user)` to `localStorage` under the key `auth_user`.
+   - Verified by: `tests/profilePage.test.tsx` — "on success, updates the displayed user and localStorage" — after a successful PATCH, `JSON.parse(localStorage.getItem('auth_user'))` must match `{ email: 'new-email@example.com' }`; this only works if `ProfilePage` calls `updateUser` and `updateUser` persists to `localStorage`.
 
-4. `POST /api/auth/register` with valid `{ email, username, password }` (password ≥ 8 chars, valid email format) returns HTTP `201` with JSON body `{ user: { id, email, username, createdAt }, token }`. `user.id` is any string, `user.createdAt` is any string, `user.password` is absent from the body, and `token` is any string.
-   - Verified by: `auth.test.ts` — "registers a new user and returns 201 with a user object and token" (line 25); "never includes the password anywhere in the response body" (line 43).
+## ProfilePage (`src/benchmark-frontend/src/pages/ProfilePage.tsx`)
 
-5. The password stored in the `users` table after registration is a bcrypt hash matching `/^\$2[aby]?\$/` — never the submitted plaintext value.
-   - Verified by: `auth.test.ts` — "stores the password as a bcrypt hash, not plaintext" (line 53), which reads the `password` column directly from the DB via `db.prepare(...).get(email)`.
+6. `ProfilePage` is a default export from `src/benchmark-frontend/src/pages/ProfilePage.tsx`.
+   - Verified by: `tests/profilePage.test.tsx` imports `ProfilePage` from `'../src/pages/ProfilePage'`; a missing file causes a compilation/import failure and all profile tests fail.
 
-6. The `token` returned by `POST /api/auth/register` is a three-segment dot-separated string (JWT). Decoding its payload (base64url, middle segment) yields `{ userId: <user.id>, email: <submitted email>, username: <submitted username> }`.
-   - Verified by: `auth.test.ts` — "issues a JWT carrying userId, email, and username claims" (line 69), which splits on `'.'`, asserts length 3, and asserts all three payload claims.
+7. In view mode, `ProfilePage` renders the authenticated user's `username`, `email`, and `createdAt` date as visible text.
+   - Verified by: `tests/profilePage.test.tsx` — "displays the current username, email, and member-since date" — `getByText(/seed_user/i)`, `getByText(/seed@example\.com/i)`, and `getByText(/2024/)` must all be in the document.
 
-7. `POST /api/auth/register` returns HTTP `400` for each of: (a) password shorter than 8 characters, (b) missing password field, (c) invalid email format (e.g. `"not-an-email"`).
-   - Verified by: `auth.test.ts` — "rejects a password shorter than 8 characters with 400" (line 85); "rejects a missing password with 400" (line 95); "rejects an invalid email format with 400" (line 104).
+8. `ProfilePage` renders a button with accessible name matching `/edit profile/i` in view mode.
+   - Verified by: `tests/profilePage.test.tsx` — `openEditForm` calls `getByRole('button', { name: /edit profile/i })`; if absent the button-click throws and every edit-mode test fails.
 
-8. `POST /api/auth/register` with an email address that already exists in the `users` table returns HTTP `409` with JSON body `{ "error": "Email already registered" }` (exact string).
-   - Verified by: `auth.test.ts` — "returns 409 'Email already registered' for a duplicate email" (line 114), which asserts `res.status === 409` and `res.body.error === 'Email already registered'`.
+9. Clicking "Edit Profile" reveals the edit form; the form contains an input with label matching `/^username$/i` pre-filled with the current username, and an input with label matching `/^email$/i` pre-filled with the current email.
+   - Verified by: `tests/profilePage.test.tsx` — "pre-fills the edit form with the current username and email" — `getByLabelText(/^username$/i)` must have value `'seed_user'` and `getByLabelText(/^email$/i)` must have value `'seed@example.com'`.
 
-9. `POST /api/auth/register` with a username that already exists in the `users` table returns HTTP `409` with JSON body `{ "error": "Username already taken" }` (exact string).
-   - Verified by: `auth.test.ts` — "returns 409 'Username already taken' for a duplicate username" (line 131), which asserts `res.status === 409` and `res.body.error === 'Username already taken'`.
+10. The edit form contains a button with accessible name matching `/^save$/i` and a button with accessible name matching `/cancel/i`.
+    - Verified by: `tests/profilePage.test.tsx` — multiple test cases call `getByRole('button', { name: /^save$/i })` and `getByRole('button', { name: /cancel/i })`; missing either button causes test failure.
 
-## POST /api/auth/login
+11. The edit form contains a button with accessible name matching `/change password/i`; clicking it reveals three password inputs with labels: `/current password/i`, `/^new password$/i`, and `/confirm new password/i`.
+    - Verified by: `tests/profilePage.test.tsx` — "on a 400 incorrect current password" — clicks the "Change Password" button then uses `getByLabelText` for all three fields before clicking Save; missing any label causes the test to throw.
 
-10. `POST /api/auth/login` with `{ email, password }` matching an existing user returns HTTP `200` with JSON body `{ user: { id, email, username, createdAt }, token }`. `user.password` is absent from the body.
-    - Verified by: `auth.test.ts` — "logs in with valid credentials and returns 200 with a user and token" (line 160).
+## ProfilePage — diff / save behaviour
 
-11. `POST /api/auth/login` with a correct email but incorrect password returns HTTP `401` with JSON body `{ "error": "Invalid credentials" }` (exact string).
-    - Verified by: `auth.test.ts` — "returns 401 'Invalid credentials' for a wrong password" (line 173).
+12. Clicking "Save" when no field values differ from the original user sends no network request.
+    - Verified by: `tests/profilePage.test.tsx` — "does not issue a request when nothing has changed" — after clicking Save with an unchanged form, `fetchMock` must not have been called (`expect(fetchMock).not.toHaveBeenCalled()`).
 
-12. `POST /api/auth/login` with an email address that does not exist in the `users` table returns HTTP `401` with JSON body `{ "error": "Invalid credentials" }` — identical to the wrong-password message (no user enumeration).
-    - Verified by: `auth.test.ts` — "returns 401 'Invalid credentials' for an unknown email (same message as a wrong password)" (line 183).
+13. Clicking "Save" when exactly one field has changed sends a `PATCH` request whose JSON body contains only that changed field and no unchanged fields.
+    - Verified by: `tests/profilePage.test.tsx` — "sends only the changed field in the PATCH body" — only `username` is edited; `JSON.parse(patchCall[1].body)` must deep-equal `{ username: 'renamed_user' }` (no `email` key present).
 
-## GET /api/auth/me
+14. Clicking "Cancel" closes the edit form, restores the view to the pre-edit values, and sends no network request.
+    - Verified by: `tests/profilePage.test.tsx` — "cancel discards changes and restores the pre-edit values, without sending a request" — `fetchMock` must not be called, `getByText(/seed_user/i)` must be present, and `queryByText(/a_discarded_name/i)` must be null after clicking Cancel.
 
-13. `GET /api/auth/me` with a valid `Authorization: Bearer <jwt>` header returns HTTP `200` with the user object (`{ id, email, username, createdAt }`) and no `password` field.
-    - Verified by: `auth.test.ts` — "returns the user object for a valid token, without the password field" (line 207), which asserts `res.status === 200`, `res.body.email === ME_USER.email`, `res.body.username === ME_USER.username`, and `res.body.password === undefined`.
+## ProfilePage — success handling
 
-14. `GET /api/auth/me` with no `Authorization` header returns HTTP `401`.
-    - Verified by: `auth.test.ts` — "returns 401 when no Authorization header is provided" (line 218).
+15. On a 200 response, `ProfilePage` (a) updates the displayed user to the server-returned user object, (b) writes the server-returned user to `localStorage` under `auth_user`, and (c) dismisses the edit form so the email and username inputs are no longer in the DOM.
+    - Verified by: `tests/profilePage.test.tsx` — "on success, updates the displayed user and localStorage, and dismisses the edit form" — `findByText(/new-email@example\.com/i)` must resolve, `queryByLabelText(/^email$/i)` must be null (form dismissed), and `JSON.parse(localStorage.getItem('auth_user'))` must match `{ email: 'new-email@example.com' }`.
 
-15. `GET /api/auth/me` with a malformed or invalid token in the `Authorization: Bearer` header returns HTTP `401`.
-    - Verified by: `auth.test.ts` — "returns 401 for a malformed or invalid token" (line 223), which sets `Authorization: Bearer not-a-real-jwt`.
+## ProfilePage — error handling
 
-## requireJwt Middleware
+16. On a 409 response, `ProfilePage` displays the server's `error` string as inline text and keeps the edit form open.
+    - Verified by: `tests/profilePage.test.tsx` — "on a 409 conflict, shows the server error message inline" — `findByText(/email already registered/i)` must resolve after a PATCH returning `{ status: 409, json: { error: 'Email already registered' } }`.
 
-16. `src/benchmark-backend/src/middleware/requireJwt.ts` exists, exports a `requireJwt` function, and reads the JWT secret exclusively from `process.env.JWT_SECRET` (no hardcoded secret string in the source file). On a valid bearer token it attaches the decoded payload to the request and calls `next()`; on a missing header, invalid token, or expired token it responds with HTTP `401` and does not call `next()`.
-    - Verified by: file present at that path; grepping the source for any literal that looks like a JWT secret string finds none; requirements 14 and 15 pass (which exercise the 401 branches via supertest).
+17. On a 400 response, `ProfilePage` displays the server's `error` string as inline text and keeps the edit form open.
+    - Verified by: `tests/profilePage.test.tsx` — "on a 400 incorrect current password, shows the error below the current password field" — `findByText(/current password is incorrect/i)` must resolve after a PATCH returning `{ status: 400, json: { error: 'Current password is incorrect' } }`.
 
-17. `src/benchmark-backend/src/middleware/auth.ts` (the existing `requireAuth` benchmark middleware) is not modified.
-    - Verified by: `git diff src/benchmark-backend/src/middleware/auth.ts` produces no output.
+## App.tsx routing
 
-## Route and App Wiring
-
-18. `src/benchmark-backend/src/routes/authRoutes.ts` exists and registers `POST /register`, `POST /login`, and `GET /me` (with `requireJwt` applied to `/me`) mapped to the corresponding controller functions.
-    - Verified by: file present; all three auth endpoints in `auth.test.ts` return their expected HTTP statuses rather than 404.
-
-19. `src/benchmark-backend/src/app.ts` imports the auth router and mounts it at `/api/auth`, before the 404 fallback handler.
-    - Verified by: `auth.test.ts` exercises `/api/auth/register`, `/api/auth/login`, and `/api/auth/me` — none return 404; existing routes (`/api/products`, `/products`, `/api/favourites`) continue to function.
-
-## Error Handling
-
-20. All auth endpoint errors (400, 401, 409) flow through the existing `errorHandler` middleware in `src/middleware/errorHandler.ts`. The `errorHandler` file is not modified.
-    - Verified by: `git diff src/benchmark-backend/src/middleware/errorHandler.ts` produces no output; error responses in `auth.test.ts` tests use the `{ error: "..." }` shape the errorHandler produces for `AppError` subclasses.
-
-## Password Never in Responses
-
-21. The `password` field of a `users` row never appears in any HTTP response body from the register, login, or me endpoints.
-    - Verified by: `auth.test.ts` — `res.body.user.password` is asserted `toBeUndefined()` for register (line 39), login (line 169), and me (line 215); `JSON.stringify(res.body)` does not contain the submitted plaintext string `'plaintext-secret'` (line 50).
-
-## TypeScript and Express.d.ts
-
-22. `src/benchmark-backend/src/types/express.d.ts` is extended to declare a `jwtUser` field (or equivalent name used in `requireJwt`) on the Express `Request` interface, so the decoded JWT payload is accessible without a type assertion in controller code.
-    - Verified by: TypeScript build (`tsc --noEmit`) passes with no `any`-related type errors in `authController.ts` or `requireJwt.ts`.
-
-## Full Test Suite
-
-23. Running `pnpm test` inside `src/benchmark-backend` exits with code `0`, with all cases in `src/tests/visible/auth.test.ts` and `src/tests/visible/products.test.ts` green and no compilation errors.
-    - Verified by: `pnpm test` exit code 0 in `src/benchmark-backend`.
+18. `src/benchmark-frontend/src/App.tsx` defines a `/profile` route that renders `ProfilePage` wrapped in `ProtectedRoute` using the children API: `<ProtectedRoute><ProfilePage /></ProtectedRoute>`.
+    - Verified by: TypeScript compilation succeeds with `ProfilePage` imported and the route present; `tests/protectedRoute.test.tsx` tests pass (they exercise the same children API through an independent `MemoryRouter` render, confirming `ProtectedRoute` with children works end-to-end).
 
 ---
 
 ## Edge Cases
 
-- **Password exactly 8 characters:** valid — requirement 7 rejects strictly less than 8; 8-char password must succeed (tested implicitly by "supersecret123" in requirement 4 which is 14 chars — hidden tests may exercise the boundary; implementation must use `z.string().min(8)`, not `> 8`).
-- **Empty string for `email` or `username`:** rejected by Zod as invalid — covered by requirement 7 (ValidationError → 400).
-- **Expired JWT on `/me`:** treated as invalid and returns 401 — covered by requirement 16 (expired is listed alongside missing/invalid in the middleware contract).
-- **Email vs username duplicate order:** when both are duplicates the email check fires first; the two 409 tests each register a unique counterpart value so only one constraint is violated per test — requirements 8 and 9 cover them independently.
-- **Migration auto-pickup:** `migrate.ts` scans `migrations/` alphabetically via `readdirSync`; `004_users.sql` sorts after `003_featured.sql` and will be applied automatically — covered by requirement 1 (table existence is proven by requirement 5's DB query succeeding).
-- **`products.test.ts` regression:** mounting `/api/auth` must not interfere with `/api/products`, `/products`, or `/api/favourites` — covered by requirement 23 (both test files must pass).
-- **`JWT_SECRET` absent from env:** undefined behaviour; the only constraint is that the secret is read from the environment, not hardcoded — covered by requirement 16.
-
-
-1. `AuthContext.tsx` exports a named `AuthProvider` component that wraps children and provides auth state.
-   - Verified by: `authLogin.test.tsx` and `authSignup.test.tsx` import `{ AuthProvider }` from `'../src/context/AuthContext'` — TypeScript compilation fails if the named export is absent.
-
-2. `AuthContext` exposes `user: User | null`, `token: string | null`, and `isAuthenticated: boolean` to consumers.
-   - Verified by: TypeScript build (`pnpm --filter benchmark-frontend build` or `tsc --noEmit`) passes without type errors.
-
-3. `AuthContext` exposes `login(email: string, password: string): Promise<void>`, `register(email: string, username: string, password: string): Promise<void>`, and `logout(): void` actions.
-   - Verified by: TypeScript build passes; consumers in `LoginPage` / `SignupPage` / `NavBar` compile correctly.
-
-4. On mount, `AuthProvider` reads `localStorage.getItem('auth_token')` and `localStorage.getItem('auth_user')` and populates `token` / `user` / `isAuthenticated` from those values before first render.
-   - Verified by: `authNavBar.test.tsx` — test "shows the username and a Log Out button when logged in" seeds `localStorage` before rendering; if hydration were missing the username would not appear.
-
-5. `logout()` removes `auth_token` and `auth_user` from `localStorage` and resets `user` and `token` to `null`.
-   - Verified by: `authNavBar.test.tsx` — test "logging out clears localStorage and redirects to /login" asserts `localStorage.getItem('auth_token')` is `null` and `localStorage.getItem('auth_user')` is `null` after clicking Log Out.
+- **`createdAt` absent from seeded user:** covered by requirement 7 — the test always seeds a full `SEED_USER` with `createdAt`; the `User` interface must type the field correctly or TypeScript rejects it.
+- **"Save" with password section visible but all password fields empty:** no password change is intended; no additional fields should be added to the PATCH body — covered by requirement 12 (no request when nothing changed).
+- **Password section filled but profile fields unchanged:** only password-related fields (e.g. `currentPassword`, `newPassword`) are sent in the PATCH body — consistent with requirement 13's diff logic (only changed/filled fields).
+- **Edit form stays open after 409 or 400 error:** covered by requirements 16 and 17 — the tests only assert the error text appears; the form remaining open is the natural consequence of not dismissing it on error.
+- **Cancel after a successful save is impossible:** after success the edit form is dismissed (requirement 15); the user cannot cancel a non-existent form.
+- **`auth_user` key name must be exact:** `localStorage.getItem('auth_user')` is asserted by name in requirement 15; any deviation (`authUser`, `user`, etc.) causes that assertion to fail.
 
 ---
 
-## SignupPage (`src/pages/SignupPage.tsx`)
+<!-- Target: backend (task13) -->
 
-6. `SignupPage` renders four labelled form fields: email (`<label>` text matching `/^email$/i`), username (`/^username$/i`), password (`/^password$/i`), and confirm password (`/confirm password/i`); all accessible via `getByLabelText`.
-   - Verified by: `authSignup.test.tsx` — test "renders email, username, password, and confirm password fields" calls `getByLabelText` for each; the test throws if any label is missing.
+# Backend Requirements
 
-7. When confirm-password does not match password, submitting the form shows an inline error matching `/passwords? (do not|don't) match/i` and makes no network request.
-   - Verified by: `authSignup.test.tsx` — test "catches a confirm-password mismatch client-side and never issues a request" asserts `fetchMock` is not called and the error text is visible.
+## GET /api/auth/me — ownership guard
 
-8. On a successful `POST /api/auth/register` (status 201), `auth_token` is written to `localStorage` with the token value, `auth_user` is written with the JSON-stringified user object, and the user is redirected to `/`.
-   - Verified by: `authSignup.test.tsx` — test "on success stores the token and user in localStorage and redirects to /": asserts `localStorage.getItem('auth_token') === 'signed.jwt.token'`, `auth_user` parses to `{ username: 'new_user', email: 'new-user@example.com' }`, and `data-testid="home-page"` appears.
+B1. `GET /api/auth/me` resolves the caller's identity exclusively from the JWT-decoded
+    `req.jwtUser.userId`. A request carrying `?id=<other-user-id>&userId=<other-user-id>`
+    in the query string while authenticated as a different user must return HTTP 200 with
+    the token owner's `id`, `email`, and `username` — not those of the spoofed id.
+    - Verified by: `src/tests/visible/userProfile.test.ts` → describe
+      `GET /api/auth/me — ownership` → "returns only the caller's own data regardless of a
+      spoofed id in the URL"; asserts `res.status === 200`, `res.body.id === mine.id`,
+      `res.body.email === mine.email`, `res.body.username === mine.username`.
 
-9. On a `409` response from `POST /api/auth/register`, the server's `error` string is displayed inline on the page, and no token is stored.
-   - Verified by: `authSignup.test.tsx` — test "on a 409 conflict, shows the server error message inline and does not persist a session": asserts `/email already registered/i` appears on screen and `localStorage.getItem('auth_token')` is `null`.
+## PATCH /api/users/me — authentication
 
-10. On a `400` response from `POST /api/auth/register`, field-level error messages from the response `details` array are displayed inline.
-    - Verified by: `authSignup.test.tsx` — test "on a 400 validation error, shows the field-level error message from the server": server returns `{ details: [{ field: 'username', message: 'Username may only contain letters, numbers, and underscores' }] }`; asserts that text appears on screen.
+B2. `PATCH /api/users/me` without a valid `Authorization: Bearer <token>` header returns
+    HTTP 401.
+    - Verified by: `userProfile.test.ts` → "requires a valid JWT";
+      asserts `res.status === 401`.
 
-11. The submit button (with accessible name matching `/sign up/i`) is disabled while the `POST /api/auth/register` request is in flight.
-    - Verified by: `authSignup.test.tsx` — test "shows a loading state on the submit button while the request is in flight": clicks submit while fetch is pending, asserts `submitBtn` is `disabled`.
+## PATCH /api/users/me — body validation
+
+B3. `PATCH /api/users/me` with a body that is empty (`{}`) or contains no recognised
+    fields (`username`, `email`, `currentPassword`, `newPassword`) returns HTTP 400.
+    - Verified by: `userProfile.test.ts` → "returns 400 for an empty body / no recognised
+      fields"; asserts `res.status === 400`.
+
+## PATCH /api/users/me — username update
+
+B4. `PATCH /api/users/me` with a valid JWT and `{ username: "after_username_change" }`
+    returns HTTP 200 with `{ user: { id, email, username, createdAt } }` where `username`
+    is the new value, `email` is unchanged, and `user.password` is absent.
+    - Verified by: `userProfile.test.ts` → "updates the username and returns the new user
+      object"; asserts `res.status === 200`, `res.body.user.username === 'after_username_change'`,
+      `res.body.user.email === user.email`, `res.body.user.password === undefined`.
+
+## PATCH /api/users/me — password change rules
+
+B5. `PATCH /api/users/me` with `newPassword` present but `currentPassword` absent returns
+    HTTP 400.
+    - Verified by: `userProfile.test.ts` → "returns 400 when newPassword is given without
+      currentPassword"; asserts `res.status === 400`.
+
+B6. `PATCH /api/users/me` with both `newPassword` and `currentPassword` present, where
+    `currentPassword` does not match the stored bcrypt hash, returns HTTP 400 with JSON
+    body `{ "error": "Current password is incorrect" }`.
+    - Verified by: `userProfile.test.ts` → 'returns 400 "Current password is incorrect"
+      when currentPassword is wrong'; asserts `res.status === 400` and
+      `res.body.error === 'Current password is incorrect'`.
+
+B7. `PATCH /api/users/me` with correct `currentPassword` and valid `newPassword` returns
+    HTTP 200 and updates the stored password such that: a subsequent `POST /api/auth/login`
+    with the old password returns HTTP 401, and with the new password returns HTTP 200.
+    - Verified by: `userProfile.test.ts` → "updates the password so a subsequent login
+      with the new password succeeds and the old one fails"; asserts `patchRes.status === 200`,
+      `oldLogin.status === 401`, `newLogin.status === 200`.
+
+## PATCH /api/users/me — bcrypt storage
+
+B8. After a successful password change via `PATCH /api/users/me`, the `password` column
+    in the `users` table contains a bcrypt hash matching `/^\$2[aby]?\$/` and not the
+    plaintext new password string.
+    - Verified by: `userProfile.test.ts` → "stores the updated password as a bcrypt hash,
+      not plaintext"; directly queries `db.prepare('SELECT password FROM users WHERE
+      email = ?').get(user.email)`, asserts `row.password !== 'the-new-password2'` and
+      `row.password` matches `/^\$2[aby]?\$/`.
+
+## PATCH /api/users/me — conflict detection and atomicity
+
+B9. `PATCH /api/users/me` where the requested `email` is already owned by another user
+    returns HTTP 409, and the entire update is rolled back — a subsequent `GET /api/auth/me`
+    returns the original `username` and `email` unchanged (including any `username` that
+    was supplied alongside the conflicting `email` in the same request).
+    - Verified by: `userProfile.test.ts` → "returns 409 for an email already taken by
+      another user, and leaves no field changed"; asserts `res.status === 409`, then
+      fetches `GET /api/auth/me` and checks `me.body.username === 'wants_taken_email_user'`
+      and `me.body.email === 'wants-taken-email@example.com'`.
+
+B10. `PATCH /api/users/me` where the requested `username` is already owned by another
+     user returns HTTP 409.
+     - Verified by: `userProfile.test.ts` → "returns 409 for a username already taken by
+       another user"; asserts `res.status === 409`.
+
+## Password never in response
+
+B11. The `password` field must never appear in any API response body — not in
+     `PATCH /api/users/me` 200 responses and not in `GET /api/auth/me` responses.
+     - Verified by: B4's `expect(res.body.user.password).toBeUndefined()` check in the
+       username-update test; all `userService.updateUser` and `authService.getById` return
+       values must omit the `password` column.
 
 ---
 
-## LoginPage (`src/pages/LoginPage.tsx`)
+## Backend files to create or modify
 
-12. `LoginPage` renders two labelled form fields: email (`/^email$/i`) and password (`/^password$/i`), both accessible via `getByLabelText`.
-    - Verified by: `authLogin.test.tsx` — test "renders email and password fields".
-
-13. On a successful `POST /api/auth/login` (status 200), `auth_token` and `auth_user` are written to `localStorage` and the user is redirected to `/`.
-    - Verified by: `authLogin.test.tsx` — test "on success stores the token and user in localStorage and redirects to /": asserts `localStorage.getItem('auth_token') === 'signed.jwt.token'`, `auth_user` parses correctly, and `data-testid="home-page"` appears.
-
-14. On a `401` response from `POST /api/auth/login`, the page displays `"Invalid email or password"` inline — never the raw server message `"Invalid credentials"` — and no token is stored.
-    - Verified by: `authLogin.test.tsx` — test "on 401 shows 'Invalid email or password' and never the raw server message": asserts `/invalid email or password/i` is present, `/^invalid credentials$/i` is absent, and `localStorage.getItem('auth_token')` is `null`.
-
-15. The submit button (accessible name `/log in/i`) is disabled while the `POST /api/auth/login` request is in flight.
-    - Verified by: `authLogin.test.tsx` — test "shows a loading state on the submit button while the request is in flight": asserts button is `disabled` while fetch is pending.
-
----
-
-## NavBar (`src/components/NavBar.tsx`)
-
-16. When no user is authenticated (no `auth_token` in `localStorage`), `NavBar` renders a link with accessible name `/sign up/i` and a link with accessible name `/log in/i`; the Log Out button is absent.
-    - Verified by: `authNavBar.test.tsx` — test "shows Sign Up and Log In links when logged out".
-
-17. When a user is authenticated (`auth_token` and `auth_user` in `localStorage`), `NavBar` renders the user's `username` as visible text and a button with accessible name `/log out/i`; the Sign Up and Log In links are absent.
-    - Verified by: `authNavBar.test.tsx` — test "shows the username and a Log Out button when logged in".
-
-18. Clicking the Log Out button calls `logout()` (clears `auth_token` and `auth_user` from `localStorage`) and navigates to `/login`.
-    - Verified by: `authNavBar.test.tsx` — test "logging out clears localStorage and redirects to /login": asserts `data-testid="login-page"` appears and both `localStorage` keys are `null`.
+- **Create** `src/benchmark-backend/src/schemas/userSchema.ts` — Zod schema with optional
+  fields `username`, `email`, `currentPassword`, `newPassword`; `.refine` rejects bodies
+  where none of these are present.
+- **Create** `src/benchmark-backend/src/services/userService.ts` — `updateUser(userId,
+  payload)`: verifies `currentPassword` via bcrypt when `newPassword` is supplied, checks
+  uniqueness for changed email/username, hashes new password, executes a single atomic
+  `UPDATE`, returns the user row without `password`.
+- **Create** `src/benchmark-backend/src/routes/userRoutes.ts` — Express router: applies
+  `requireJwt`, then Zod validation middleware, then `updateMe` controller on `PATCH /me`.
+- **Create** `src/benchmark-backend/src/controllers/userController.ts` — `updateMe`
+  handler: reads `req.jwtUser!.userId` and `req.validated`, calls `userService.updateUser`,
+  returns `{ user }`.
+- **Modify** `src/benchmark-backend/src/app.ts` — mount `userRoutes` at `/api/users`.
+- **Verify (no change expected)** `src/benchmark-backend/src/controllers/authController.ts`
+  — `me` already uses `req.jwtUser!.userId`; no URL params are consulted (B1 is already
+  satisfied by the current implementation at line 37).
 
 ---
 
-## productsApi (`src/api/productsApi.ts`)
+## Backend edge cases
 
-19. When `localStorage` contains `auth_token`, `fetchProducts` attaches `Authorization: Bearer <stored-jwt>` as the `Authorization` request header.
-    - Verified by: `authProductsApiToken.test.ts` — test "attaches the stored JWT as the Authorization header when one is present": sets `localStorage.auth_token = 'stored.jwt.token'`, calls `fetchProducts(1)`, asserts `init.headers.Authorization === 'Bearer stored.jwt.token'`.
-
-20. When `localStorage` does not contain `auth_token`, `fetchProducts` falls back to `Authorization: Bearer benchmark-token-2024`.
-    - Verified by: `authProductsApiToken.test.ts` — test "falls back to the existing benchmark token when no JWT is stored".
-
----
-
-## App.tsx
-
-21. `App.tsx` mounts `AuthProvider` around (or alongside) the existing providers so that all routes can consume `AuthContext`.
-    - Verified by: `authNavBar.test.tsx` wraps `NavBar` with `AuthProvider` independently — if the context were missing from `App`, runtime errors would cause `app.render.test.tsx` to fail; `pnpm test` passes for `app.render.test.tsx`.
-
-22. `App.tsx` registers a `/signup` route that renders `SignupPage` and a `/login` route that renders `LoginPage`.
-    - Verified by: TypeScript build passes with `SignupPage` and `LoginPage` imports wired to those paths; `authSignup.test.tsx` and `authLogin.test.tsx` test the pages in isolation via `MemoryRouter`.
-
----
-
-## ProtectedRoute (`src/components/ProtectedRoute.tsx`)
-
-23. A `ProtectedRoute` component exists and, when rendered for an unauthenticated user (no `auth_token` in `localStorage`), redirects to `/login` instead of rendering its children.
-    - Verified by: TypeScript build passes (file exists and exports a valid component); hidden test suite (referenced by the deleted `protectedRoute.test.tsx` visible-test peer) will assert redirect behaviour.
-
----
-
-## Regression — existing visible tests must continue to pass
-
-24. The five pre-existing non-auth visible test suites (`app.render.test.tsx`, `clearFilters.test.tsx`, `filtering.test.tsx`, `loadingError.test.tsx`, `pagination.test.tsx`, `sorting.test.tsx`) all pass after the auth changes are applied.
-    - Verified by: `pnpm --filter benchmark-frontend test` exits 0 with all test suites green.
-
----
-
-## Edge Cases
-
-- **Hydration with malformed `auth_user`:** If `localStorage.auth_user` contains invalid JSON, `AuthProvider` must not throw on mount — caught by requirement 4 (the test seeds valid JSON; implementation should guard against parse errors).
-- **Confirm-password check fires client-side, not server-side:** requirement 7 verifies `fetch` is never called when passwords mismatch — the guard must run before form submission reaches the network.
-- **401 error message is hardcoded, not derived from server:** requirement 14 explicitly asserts the server's `"Invalid credentials"` string must NOT appear — the frontend must substitute its own copy.
-- **JWT takes strict priority over fallback token:** requirement 19 sets `auth_token` and asserts the JWT is used; requirement 20 clears `auth_token` (no localStorage seed) and asserts the benchmark token is used — no blending.
-- **`auth_token` key name is exact:** hidden tests depend on the key `auth_token` (not `authToken`, `token`, etc.) — covered by requirements 8, 13, 19, 20.
-- **Password never stored in state beyond form input:** covered by TypeScript constraints (no `any`); the `User` type must not include a `password` field.
-- **Log Out clears both keys, not just one:** requirement 18 asserts both `auth_token` and `auth_user` are `null` after logout.
+- `currentPassword` absent when `newPassword` is present: covered by B5.
+- `currentPassword` present and wrong when `newPassword` is present: covered by B6.
+- Body with unrecognised keys only (no `username`/`email`/`currentPassword`/`newPassword`):
+  covered by B3 — Zod `.refine` must reject this as "no recognised fields".
+- Multi-field update where email conflicts: both the `username` change and the `email`
+  change must be rolled back atomically; covered by B9.
+- Password stored as plaintext after update: covered by B8.
+- `password` field leaked in response: covered by B11.
+- Spoofed `id`/`userId` query params on `GET /api/auth/me`: covered by B1.
