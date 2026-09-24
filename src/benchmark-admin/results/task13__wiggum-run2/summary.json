@@ -1,0 +1,79 @@
+{
+  "taskId": "task13",
+  "runId": "wiggum-run2",
+  "timestamp": "2026-09-24T16:59:53.084Z",
+  "build": {
+    "success": true,
+    "rawSuccess": true,
+    "preExistingErrors": []
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 42,
+    "failed": 0,
+    "total": 42
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1636,
+    "hiddenMs": 1156,
+    "buildMs": 1215,
+    "totalMs": 4037
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.98,
+    "overallScore": 0.992
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task13",
+    "wall_duration_ms": 262866,
+    "cost_usd": 0.9759737999999999,
+    "num_turns": 40,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "f6008ac3-6f8e-475f-862d-3842b4079c94",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Fix ProfilePage.tsx: add early return in handleSubmit when body is empty (nothing changed), so no PATCH request is issued",
+          "status": "done",
+          "notes": ""
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 84970,
+          "cost_usd": 0.39257909999999985,
+          "num_turns": 18,
+          "session_id": "f6008ac3-6f8e-475f-862d-3842b4079c94",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 1,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}

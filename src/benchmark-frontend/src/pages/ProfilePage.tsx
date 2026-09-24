@@ -54,6 +54,10 @@ export default function ProfilePage() {
       body.newPassword = newPassword;
     }
 
+    if (Object.keys(body).length === 0) {
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch('http://localhost:3001/api/users/me', {
