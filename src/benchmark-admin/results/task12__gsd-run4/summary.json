@@ -1,0 +1,149 @@
+{
+  "taskId": "task12",
+  "runId": "gsd-run4",
+  "timestamp": "2026-09-24T09:12:20.078Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/profilePage.test.tsx",
+        "line": 6,
+        "column": 25,
+        "code": "TS2307",
+        "message": "Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations."
+      },
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 26,
+        "column": 16,
+        "code": "TS2559",
+        "message": "Type '{ children: Element; }' has no properties in common with type 'IntrinsicAttributes'."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 32,
+    "failed": 0,
+    "total": 32
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1785,
+    "hiddenMs": 946,
+    "buildMs": 828,
+    "totalMs": 3594
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.245,
+    "overallScore": 0.698
+  },
+  "agent": {
+    "framework": "gsd",
+    "target": "frontend",
+    "taskId": "task12",
+    "wall_duration_ms": 1050865,
+    "cost_usd": 3.6440088,
+    "num_turns": 96,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "93f98990-5fce-44de-9b1b-346f3809241e",
+    "gsd": {
+      "phases": [
+        {
+          "name": "new-project",
+          "treeHash": "a97b90f7ece9c40dc536b3352387d74860f1f84d",
+          "label": "new-project",
+          "exit_code": 0,
+          "wall_duration_ms": 147702,
+          "cost_usd": 0.4689255,
+          "num_turns": 18,
+          "session_id": "579c2430-8b95-4398-9c2a-2918eac0c7c9",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "discuss-phase",
+          "treeHash": "6933ac8e846427783c401f32c73a6bc2ab7698ea",
+          "label": "discuss-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 161772,
+          "cost_usd": 0.5076036,
+          "num_turns": 19,
+          "session_id": "13c900cc-ded8-4d2a-bd71-ce5cf2b82bd1",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "plan-phase",
+          "treeHash": "c29ee0f6cf26572e2a89c1a24bd83a677c6814a5",
+          "label": "plan-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 240560,
+          "cost_usd": 0.9209174999999999,
+          "num_turns": 9,
+          "session_id": "1fa3257e-9533-4373-9abe-7943773860c1",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "execute-phase",
+          "treeHash": "1da322d809d8feeb24357be3ebabf7b0da4846d2",
+          "label": "execute-phase",
+          "exit_code": 0,
+          "wall_duration_ms": 338133,
+          "cost_usd": 1.0659011999999999,
+          "num_turns": 29,
+          "session_id": "0c01274f-65c4-4fc6-a2fd-fbf865d7d4fa",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "verify-work",
+          "treeHash": "ebe86a7ff7815541f5cce9ce6490dbc01b40484c",
+          "label": "verify-work",
+          "exit_code": 0,
+          "wall_duration_ms": 98718,
+          "cost_usd": 0.3806004,
+          "num_turns": 13,
+          "session_id": "806b6ae7-d5e6-4ca3-803a-1ee0f24be24e",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "name": "complete-milestone",
+          "treeHash": "f15e3ddb1fe3a1ccb0eb5965920128409d75461f",
+          "label": "complete-milestone",
+          "exit_code": 0,
+          "wall_duration_ms": 55286,
+          "cost_usd": 0.3000606,
+          "num_turns": 8,
+          "session_id": "93f98990-5fce-44de-9b1b-346f3809241e",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "passedFirstAttempt": true,
+      "reworkAttempts": 0,
+      "completed": true,
+      "failedAtPhase": null,
+      "failedCriteria": []
+    }
+  }
+}

@@ -1,0 +1,3 @@
+tests/profilePage.test.tsx(6,25): error TS2307: Cannot find module '../src/pages/ProfilePage' or its corresponding type declarations.
+tests/protectedRoute.test.tsx(26,16): error TS2559: Type '{ children: Element; }' has no properties in common with type 'IntrinsicAttributes'.
+[ELIFECYCLE] Command failed with exit code 2.

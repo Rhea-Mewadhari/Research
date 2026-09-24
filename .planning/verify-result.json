@@ -1,0 +1,143 @@
+{
+  "passed": true,
+  "criteria": [
+    {
+      "id": "1",
+      "description": "src/benchmark-backend/src/db/migrations/004_users.sql exists and contains a CREATE TABLE users statement with columns: id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')).",
+      "passed": true,
+      "evidence": "File present; content confirmed: 'CREATE TABLE users (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime(\\'now\\')));'. Verbose test output shows 'migration applied: 004_users.sql'; test 'stores the password as a bcrypt hash, not plaintext' queries SELECT password FROM users — PASSED without 'no such table' error."
+    },
+    {
+      "id": "2",
+      "description": "jsonwebtoken and bcryptjs in dependencies; @types/jsonwebtoken and @types/bcryptjs in devDependencies of src/benchmark-backend/package.json.",
+      "passed": true,
+      "evidence": "package.json dependencies: 'bcryptjs': '^3.0.3', 'jsonwebtoken': '^9.0.3'. devDependencies: '@types/bcryptjs': '^3.0.0', '@types/jsonwebtoken': '^9.0.10'. All 34 tests passed with no 'Cannot find module' import errors."
+    },
+    {
+      "id": "3",
+      "description": "src/benchmark-backend/src/schemas/authSchema.ts exists and exports registerSchema (email: email, username: non-empty string, password: min 8 chars) and loginSchema (email: string, password: string).",
+      "passed": true,
+      "evidence": "File present; content: registerSchema = z.object({ email: z.string().email(), username: z.string().min(1), password: z.string().min(8) }); loginSchema = z.object({ email: z.string(), password: z.string() }). tsc --noEmit produced no TypeScript errors. Validation tests (requirements 7-9) all passed."
+    },
+    {
+      "id": "4",
+      "description": "POST /api/auth/register with valid body returns HTTP 201 with { user: { id, email, username, createdAt }, token }; user.password absent from body.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'registers a new user and returns 201 with a user object and token' PASSED (65ms); 'never includes the password anywhere in the response body' PASSED (53ms). Both confirmed in '34 passed (34)' run."
+    },
+    {
+      "id": "5",
+      "description": "Password stored in users table after registration is a bcrypt hash matching /^\\$2[aby]?\\$/, never the submitted plaintext.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'stores the password as a bcrypt hash, not plaintext' PASSED (52ms). Test reads password column directly from DB via db.prepare().get(email) and asserts bcrypt pattern."
+    },
+    {
+      "id": "6",
+      "description": "Token returned by POST /api/auth/register is a three-segment JWT; decoding its payload yields { userId, email, username }.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'issues a JWT carrying userId, email, and username claims' PASSED (53ms). Test splits token on '.', asserts length 3, decodes middle segment (base64url), asserts all three claims."
+    },
+    {
+      "id": "7",
+      "description": "POST /api/auth/register returns HTTP 400 for: (a) password shorter than 8 chars, (b) missing password, (c) invalid email format.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'rejects a password shorter than 8 characters with 400' PASSED (1ms); 'rejects a missing password with 400' PASSED (1ms); 'rejects an invalid email format with 400' PASSED (1ms)."
+    },
+    {
+      "id": "8",
+      "description": "POST /api/auth/register with duplicate email returns HTTP 409 with { \"error\": \"Email already registered\" }.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'returns 409 \"Email already registered\" for a duplicate email' PASSED (105ms). Stderr shows ConflictError: Email already registered with statusCode: 409 flowing through errorHandler."
+    },
+    {
+      "id": "9",
+      "description": "POST /api/auth/register with duplicate username returns HTTP 409 with { \"error\": \"Username already taken\" }.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'returns 409 \"Username already taken\" for a duplicate username' PASSED (105ms). Stderr shows ConflictError: Username already taken with statusCode: 409 flowing through errorHandler."
+    },
+    {
+      "id": "10",
+      "description": "POST /api/auth/login with valid credentials returns HTTP 200 with { user: { id, email, username, createdAt }, token }; user.password absent.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'logs in with valid credentials and returns 200 with a user and token' PASSED (53ms)."
+    },
+    {
+      "id": "11",
+      "description": "POST /api/auth/login with correct email but wrong password returns HTTP 401 with { \"error\": \"Invalid credentials\" }.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'returns 401 \"Invalid credentials\" for a wrong password' PASSED (52ms). Stderr shows AuthError: Invalid credentials with statusCode: 401."
+    },
+    {
+      "id": "12",
+      "description": "POST /api/auth/login with unknown email returns HTTP 401 with { \"error\": \"Invalid credentials\" } (same message as wrong password, no user enumeration).",
+      "passed": true,
+      "evidence": "auth.test.ts: 'returns 401 \"Invalid credentials\" for an unknown email (same message as a wrong password)' PASSED (1ms). Stderr shows AuthError: Invalid credentials with statusCode: 401."
+    },
+    {
+      "id": "13",
+      "description": "GET /api/auth/me with valid Authorization: Bearer <jwt> returns HTTP 200 with user object ({ id, email, username, createdAt }); no password field.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'returns the user object for a valid token, without the password field' PASSED (2ms). Test asserts res.status === 200, email/username correct, res.body.password === undefined."
+    },
+    {
+      "id": "14",
+      "description": "GET /api/auth/me with no Authorization header returns HTTP 401.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'returns 401 when no Authorization header is provided' PASSED (1ms)."
+    },
+    {
+      "id": "15",
+      "description": "GET /api/auth/me with malformed or invalid token in Authorization: Bearer header returns HTTP 401.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'returns 401 for a malformed or invalid token' PASSED (1ms). Test sets Authorization: Bearer not-a-real-jwt."
+    },
+    {
+      "id": "16",
+      "description": "src/benchmark-backend/src/middleware/requireJwt.ts exists, exports requireJwt, reads secret exclusively from process.env.JWT_SECRET (no hardcoded secret), attaches decoded payload on valid token and calls next(), returns 401 without calling next() on missing/invalid/expired token.",
+      "passed": true,
+      "evidence": "File present; only secret reference is 'jwt.verify(token, process.env.JWT_SECRET as string)' (line 14) — no hardcoded secret string. On valid token: req.jwtUser = decoded; next() called. On missing/invalid: res.status(401).json({ error: 'Unauthorized' }) returned. Tests 14 ('returns 401 when no Authorization header is provided') and 15 ('returns 401 for a malformed or invalid token') both PASSED."
+    },
+    {
+      "id": "17",
+      "description": "src/benchmark-backend/src/middleware/auth.ts (the existing requireAuth benchmark middleware) is not modified.",
+      "passed": true,
+      "evidence": "'git diff src/benchmark-backend/src/middleware/auth.ts' produced no output — file unchanged from HEAD."
+    },
+    {
+      "id": "18",
+      "description": "src/benchmark-backend/src/routes/authRoutes.ts exists and registers POST /register, POST /login, and GET /me (with requireJwt applied to /me).",
+      "passed": true,
+      "evidence": "File present; content: router.post('/register', validate(registerSchema), register); router.post('/login', validate(loginSchema), login); router.get('/me', requireJwt, me). All three auth endpoints returned expected HTTP statuses in auth.test.ts (not 404)."
+    },
+    {
+      "id": "19",
+      "description": "src/benchmark-backend/src/app.ts imports the auth router and mounts it at /api/auth, before the 404 fallback handler.",
+      "passed": true,
+      "evidence": "app.ts line 6: 'import authRoutes from \\'./routes/authRoutes\\';'; line 26: 'app.use(\\'/api/auth\\', authRoutes);' — appears before the 404 fallback handler ('app.use((_req, res) => { res.status(404).json({...}) })') and before errorHandler. All auth tests returned correct statuses (not 404)."
+    },
+    {
+      "id": "20",
+      "description": "All auth endpoint errors (400, 401, 409) flow through existing errorHandler middleware; errorHandler.ts not modified.",
+      "passed": true,
+      "evidence": "'git diff src/benchmark-backend/src/middleware/errorHandler.ts' produced no output — file unchanged. Stderr logs show ConflictError (409) and AuthError (401) thrown as AppError subclasses and handled by errorHandler producing { error: '...' } responses. Tests 7, 8, 9, 11, 12 all PASSED with expected error bodies."
+    },
+    {
+      "id": "21",
+      "description": "The password field of a users row never appears in any HTTP response body from the register, login, or me endpoints.",
+      "passed": true,
+      "evidence": "auth.test.ts: 'never includes the password anywhere in the response body' PASSED (53ms) — asserts res.body.user.password toBeUndefined() and JSON.stringify(res.body) does not contain plaintext 'plaintext-secret'; login test PASSED asserts res.body.user.password undefined; 'returns the user object for a valid token, without the password field' PASSED (2ms) asserts res.body.password === undefined."
+    },
+    {
+      "id": "22",
+      "description": "src/benchmark-backend/src/types/express.d.ts declares jwtUser field on Express Request interface; TypeScript build passes with no type errors in authController.ts or requireJwt.ts.",
+      "passed": true,
+      "evidence": "File present; declares 'jwtUser?: { userId: string; email: string; username: string }' on Express.Request interface. 'pnpm exec tsc --noEmit' produced only a pnpm field warning and zero TypeScript errors."
+    },
+    {
+      "id": "23",
+      "description": "Running pnpm test inside src/benchmark-backend exits with code 0; all cases in auth.test.ts and products.test.ts green; no compilation errors.",
+      "passed": true,
+      "evidence": "'Test Files 2 passed (2); Tests 34 passed (34)' — exit code 0. auth.test.ts: 15 tests all PASSED (register, password hash, JWT claims, validation, duplicates, login, me). products.test.ts: 19 tests all PASSED. No compilation errors."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ vitest run src/tests/hidden/hidden.auth-foundation.test.ts
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22mHidden: auth foundation — register/login/me edge cases[2m > [22mrejects a whitespace-only username with 400
+[31m[1mAssertionError[22m: expected 201 to be 400 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+[36m [2m❯[22m src/tests/hidden/hidden.auth-foundation.test.ts:[2m69:24[22m[39m
+    [90m 67|[39m       password[33m:[39m [32m'validpassword1'[39m[33m,[39m
+    [90m 68|[39m     })[33m;[39m
+    [90m 69|[39m     [34mexpect[39m(res[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m400[39m)[33m;[39m
+    [90m   |[39m                        [31m^[39m
+    [90m 70|[39m   })[33m;[39m
+    [90m 71|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/hidden/hidden.auth-foundation.test.ts[2m > [22mHidden: auth foundation — register/login/me edge cases[2m > [22missues a token that expires roughly 24 hours after issuance
+[31m[1mAssertionError[22m: expected 604800 to be less than 88200[39m
+[36m [2m❯[22m src/tests/hidden/hidden.auth-foundation.test.ts:[2m105:29[22m[39m
+    [90m103|[39m     [90m// 24 hours, with a small tolerance either side[39m
+    [90m104|[39m     [34mexpect[39m(lifetimeSeconds)[33m.[39m[34mtoBeGreaterThan[39m([34m23.5[39m [33m*[39m [34m60[39m [33m*[39m [34m60[39m)[33m;[39m
+    [90m105|[39m     [34mexpect[39m(lifetimeSeconds)[33m.[39m[34mtoBeLessThan[39m([34m24.5[39m [33m*[39m [34m60[39m [33m*[39m [34m60[39m)[33m;[39m
+    [90m   |[39m                             [31m^[39m
+    [90m106|[39m   })[33m;[39m
+    [90m107|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+

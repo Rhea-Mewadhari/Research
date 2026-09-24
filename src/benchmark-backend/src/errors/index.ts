@@ -40,6 +40,12 @@ export class AuthError extends AppError {
   }
 }
 
+export class ConflictError extends AppError {
+  constructor(message: string) {
+    super(message, 409, 'CONFLICT');
+  }
+}
+
 export class RateLimitError extends AppError {
   readonly retryAfterSeconds: number;
 
