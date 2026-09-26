@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { register, login, getById } from '../services/authService';
+import { updateUser } from '../services/userService';
 
 export const registerHandler = (req: Request, res: Response, next: NextFunction): void => {
   const { email, username, password } = req.validated as {
@@ -34,6 +35,22 @@ export const meHandler = (req: Request, res: Response, next: NextFunction): void
       return;
     }
     res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateMeHandler = (req: Request, res: Response, next: NextFunction): void => {
+  const { userId } = req.jwtUser!;
+  const { username, email, currentPassword, newPassword } = req.validated as {
+    username?: string;
+    email?: string;
+    currentPassword?: string;
+    newPassword?: string;
+  };
+  try {
+    const user = updateUser(userId, { username, email, currentPassword, newPassword });
+    res.json({ user });
   } catch (err) {
     next(err);
   }

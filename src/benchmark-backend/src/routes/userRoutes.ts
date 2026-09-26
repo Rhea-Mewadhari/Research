@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { updateMeHandler } from '../controllers/authController';
+import { validate } from '../middleware/validate';
+import { requireJwt } from '../middleware/requireJwt';
+import { updateUserSchema } from '../schemas/userSchema';
+
+const router = Router();
+
+router.patch('/me', requireJwt, validate(updateUserSchema), updateMeHandler);
+
+export default router;

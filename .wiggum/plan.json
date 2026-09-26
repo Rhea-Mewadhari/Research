@@ -1,48 +1,24 @@
 {
-  "taskId": "task12",
+  "taskId": "task13",
   "target": "backend",
   "phases": [
     {
       "id": "phase-1",
-      "title": "Install bcryptjs and jsonwebtoken npm dependencies",
+      "title": "Create src/schemas/userSchema.ts — Zod schema for PATCH /api/users/me body",
       "status": "done",
-      "notes": "Installed bcryptjs@3.0.3 and jsonwebtoken@9.0.3 as dependencies; @types/bcryptjs and @types/jsonwebtoken as devDependencies."
+      "notes": ""
     },
     {
       "id": "phase-2",
-      "title": "Create DB migration src/db/migrations/004_users.sql",
+      "title": "Create src/services/userService.ts — updateUser with atomic DB update, bcrypt, and uniqueness checks",
       "status": "done",
-      "notes": "Created 004_users.sql with users table (id, email, username, password, created_at). Build passes; auth test failures are expected as endpoints not yet implemented."
+      "notes": ""
     },
     {
       "id": "phase-3",
-      "title": "Create Zod auth schemas in src/schemas/authSchema.ts",
+      "title": "Add PATCH handler to authController.ts, create src/routes/userRoutes.ts, and mount at /api/users in app.ts",
       "status": "done",
-      "notes": "Created authSchema.ts with registerSchema (email, username, password min 8) and loginSchema (email, password). Build passes."
-    },
-    {
-      "id": "phase-4",
-      "title": "Create auth service src/services/authService.ts (register, login, getById)",
-      "status": "done",
-      "notes": "Created authService.ts with register (bcrypt hash, UUID, UNIQUE conflict detection), login (bcrypt compare, AuthError on mismatch), and getById. Build passes; auth test failures are expected as routes/middleware not yet wired up."
-    },
-    {
-      "id": "phase-5",
-      "title": "Create JWT middleware src/middleware/requireJwt.ts",
-      "status": "done",
-      "notes": "Created requireJwt.ts: extracts Bearer token from Authorization header, verifies with jwt.verify using JWT_SECRET, attaches decoded payload as req.jwtUser, returns 401 on missing/invalid/expired token. Extended express.d.ts to add jwtUser field. Build passes cleanly; auth test 404s are expected since routes not yet mounted (phase 6)."
-    },
-    {
-      "id": "phase-6",
-      "title": "Create auth controller, routes, and mount /api/auth in app.ts",
-      "status": "done",
-      "notes": "Created authController.ts (registerHandler, loginHandler, meHandler), authRoutes.ts (POST /register, POST /login, GET /me with requireJwt), and mounted /api/auth in app.ts. All 34 tests pass, build clean."
-    },
-    {
-      "id": "phase-7",
-      "title": "Run tests and verify all backend tests pass",
-      "status": "done",
-      "notes": "All 34 tests pass (2 test files). Build completes cleanly with tsc."
+      "notes": ""
     }
   ]
 }
