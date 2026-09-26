@@ -1,0 +1,2 @@
+tests/protectedRoute.test.tsx(26,16): error TS2559: Type '{ children: Element; }' has no properties in common with type 'IntrinsicAttributes'.
+[ELIFECYCLE] Command failed with exit code 2.

@@ -1,0 +1,240 @@
+{
+  "taskId": "task12",
+  "runId": "wiggum-run5",
+  "timestamp": "2026-09-26T08:26:08.298Z",
+  "build": {
+    "success": true,
+    "rawSuccess": false,
+    "preExistingErrors": [
+      {
+        "file": "tests/protectedRoute.test.tsx",
+        "line": 26,
+        "column": 16,
+        "code": "TS2559",
+        "message": "Type '{ children: Element; }' has no properties in common with type 'IntrinsicAttributes'."
+      }
+    ]
+  },
+  "visibleTests": {
+    "success": true,
+    "passed": 32,
+    "failed": 0,
+    "total": 32
+  },
+  "hiddenTests": {
+    "success": true,
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "expectedFiles": 1,
+    "crashed": false
+  },
+  "overall": {
+    "success": true
+  },
+  "timing": {
+    "visibleMs": 1603,
+    "hiddenMs": 933,
+    "buildMs": 794,
+    "totalMs": 3357
+  },
+  "score": {
+    "visiblePassRate": 1,
+    "hiddenPassRate": 1,
+    "robustnessGap": 0,
+    "buildStability": 1,
+    "correctnessScore": 1,
+    "qualityScore": 0.085,
+    "overallScore": 0.634
+  },
+  "agent": {
+    "framework": "wiggum",
+    "target": "frontend",
+    "taskId": "task12",
+    "wall_duration_ms": 1279661,
+    "cost_usd": 5.776592100000001,
+    "num_turns": 249,
+    "exit_code": 0,
+    "is_error": false,
+    "session_id": "01e23294-30d8-4329-bb55-c6cbb9f136f9",
+    "wiggum": {
+      "planPhases": [
+        {
+          "id": "phase-1",
+          "title": "Restore deleted auth test files from git (profilePage, protectedRoute)",
+          "status": "done",
+          "notes": "No files to restore: protectedRoute.test.tsx and profilePage.test.tsx are task13 visible tests (per visible-tests-manifest/frontend.json), not task12. They do not exist anywhere in git history (only one commit in repo). Task12 visible tests are authSignup, authLogin, authNavBar, authProductsApiToken — all already present in tests/. No action needed."
+        },
+        {
+          "id": "phase-2",
+          "title": "Implement AuthContext (src/context/AuthContext.tsx) — user state, login, logout, signup, localStorage persistence",
+          "status": "done",
+          "notes": "Created src/context/AuthContext.tsx exporting AuthProvider and useAuthContext. Hydrates user/token from localStorage (auth_user/auth_token) on mount. Provides login (POST /api/auth/login), signup (POST /api/auth/signup), and logout (clears localStorage). All auth test files import AuthProvider without error; test failures are due to later-phase missing components (LoginPage, SignupPage, NavBar auth UI, productsApi token)."
+        },
+        {
+          "id": "phase-3",
+          "title": "Update productsApi to read JWT from localStorage and fall back to benchmark-token-2024",
+          "status": "done",
+          "notes": "Updated src/api/productsApi.ts to read localStorage.getItem('auth_token') at call time and fall back to 'benchmark-token-2024'. Both authProductsApiToken tests pass. Build failure is pre-existing: LoginPage and SignupPage are missing (phases 5-6) and referenced in test files."
+        },
+        {
+          "id": "phase-4",
+          "title": "Create ProtectedRoute component (src/components/ProtectedRoute.tsx) — redirect to /login when unauthenticated",
+          "status": "done",
+          "notes": "Created src/components/ProtectedRoute.tsx using useAuthContext and react-router-dom Navigate/Outlet. Renders Outlet when user is authenticated, redirects to /login with replace when not. Build failures are pre-existing (LoginPage/SignupPage missing, phases 5-6). 7 of 10 test files still pass; 3 failures are for later-phase features."
+        },
+        {
+          "id": "phase-5",
+          "title": "Create LoginPage (src/pages/LoginPage.tsx) — email+password form, store token on success, show error on 401",
+          "status": "done",
+          "notes": "Created src/pages/LoginPage.tsx with email+password form, calls login() from AuthContext, redirects to / on success, shows 'Invalid email or password' on 401, disables submit button during loading. All 4 authLogin tests pass. Build failure is pre-existing: SignupPage still missing (phase 6)."
+        },
+        {
+          "id": "phase-6",
+          "title": "Create SignupPage (src/pages/SignupPage.tsx) — email+username+password+confirm form, client-side mismatch check, store token on success",
+          "status": "done",
+          "notes": "Created src/pages/SignupPage.tsx with email/username/password/confirmPassword fields. Client-side mismatch check shows 'Passwords do not match' without fetching. On success redirects to /. On 409 shows server error.message; on 400 with details shows details[0].message. Disables submit during loading. All 6 authSignup tests pass; build succeeds. NavBar failures (3) are phase-8 work."
+        },
+        {
+          "id": "phase-7",
+          "title": "Create ProfilePage (src/pages/ProfilePage.tsx) — view/edit mode, PATCH only changed fields, password change, localStorage update on success",
+          "status": "done",
+          "notes": "Created src/pages/ProfilePage.tsx with view/edit mode toggled by 'Edit Profile' button. Edit form has username, email, and collapsible password section (currentPassword, newPassword, confirmNewPassword). PATCH /api/users/me with only changed fields; sends nothing if nothing changed. On success calls updateUser() from AuthContext (which updates both state and localStorage). On 409 shows error below relevant field; on 400 shows error below currentPassword field. Also added updateUser action to AuthContext (updates localStorage and React state). Build passes; 3 NavBar auth test failures are phase-8 work (unchanged from before)."
+        },
+        {
+          "id": "phase-8",
+          "title": "Update NavBar to show Sign Up/Log In when logged out and username/Log Out when logged in",
+          "status": "done",
+          "notes": "Updated NavBar.tsx to use useOptionalAuthContext (added to AuthContext.tsx alongside existing useAuthContext). When user is null: shows Sign Up (/signup) and Log In (/login) NavLinks. When user is set: shows username span and Log Out button that calls auth.logout() and navigates to /login. Using optional accessor avoids throwing when NavBar renders without AuthProvider (existing tests render App directly). All 32 tests pass, build succeeds."
+        },
+        {
+          "id": "phase-9",
+          "title": "Update App.tsx — add AuthProvider wrapper and /login, /signup, /profile (ProtectedRoute) routes",
+          "status": "done",
+          "notes": "Wrapped App with AuthProvider; added /login (LoginPage) and /signup (SignupPage) as sibling routes to AppLayout; added ProtectedRoute wrapping /profile (ProfilePage) inside AppLayout. All 32 tests pass, build succeeds."
+        },
+        {
+          "id": "phase-10",
+          "title": "Run full test suite and fix any remaining failures",
+          "status": "done",
+          "notes": "All 32 tests pass across 10 test files (authProductsApiToken, authNavBar, app.render, loadingError, clearFilters, sorting, pagination, authLogin, filtering, authSignup). Build succeeds with no TypeScript errors. No fixes were needed — all prior phases left the suite in a clean state."
+        }
+      ],
+      "iterations": [
+        {
+          "index": 1,
+          "label": "iter1",
+          "exit_code": 0,
+          "wall_duration_ms": 173556,
+          "cost_usd": 1.0755984,
+          "num_turns": 41,
+          "session_id": "16aab774-80c4-47e7-ba3d-8e2bf5431d22",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 2,
+          "label": "iter2",
+          "exit_code": 0,
+          "wall_duration_ms": 102154,
+          "cost_usd": 0.5066418000000001,
+          "num_turns": 21,
+          "session_id": "03bcb7e7-4a54-4258-a97a-11457ec99543",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 3,
+          "label": "iter3",
+          "exit_code": 0,
+          "wall_duration_ms": 67810,
+          "cost_usd": 0.370824,
+          "num_turns": 14,
+          "session_id": "e6bdb31b-c6ef-4084-b274-9ce11025d26a",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 4,
+          "label": "iter4",
+          "exit_code": 0,
+          "wall_duration_ms": 103221,
+          "cost_usd": 0.4632117,
+          "num_turns": 24,
+          "session_id": "930da93a-ae22-4df4-80b6-ff67c2374d80",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 5,
+          "label": "iter5",
+          "exit_code": 0,
+          "wall_duration_ms": 70956,
+          "cost_usd": 0.36700050000000006,
+          "num_turns": 17,
+          "session_id": "a690f9dd-c09b-412c-850f-185113f6ebcb",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 6,
+          "label": "iter6",
+          "exit_code": 0,
+          "wall_duration_ms": 72241,
+          "cost_usd": 0.3399807000000001,
+          "num_turns": 15,
+          "session_id": "4051ff00-218d-4516-ac98-e6007bcc24eb",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 7,
+          "label": "iter7",
+          "exit_code": 0,
+          "wall_duration_ms": 128832,
+          "cost_usd": 0.5754627,
+          "num_turns": 29,
+          "session_id": "1e1ab0e9-c8d4-40cc-9a64-be344b34234e",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 8,
+          "label": "iter8",
+          "exit_code": 0,
+          "wall_duration_ms": 113312,
+          "cost_usd": 0.47997270000000003,
+          "num_turns": 21,
+          "session_id": "71474135-bba4-4153-b934-f5505df0eeb9",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 9,
+          "label": "iter9",
+          "exit_code": 0,
+          "wall_duration_ms": 82134,
+          "cost_usd": 0.40942080000000003,
+          "num_turns": 21,
+          "session_id": "780c748d-7d87-4e72-a8a8-b930f2ac0db7",
+          "is_error": false,
+          "attemptsUsed": 1
+        },
+        {
+          "index": 10,
+          "label": "iter10",
+          "exit_code": 0,
+          "wall_duration_ms": 37742,
+          "cost_usd": 0.2347107,
+          "num_turns": 9,
+          "session_id": "01e23294-30d8-4329-bb55-c6cbb9f136f9",
+          "is_error": false,
+          "attemptsUsed": 1
+        }
+      ],
+      "contextResets": 10,
+      "terminationReason": "plan-complete",
+      "failedPhaseId": null
+    }
+  }
+}
